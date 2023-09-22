@@ -1,6 +1,6 @@
-# 🚀 United Storage (US) 🚀
+# United Storage (US)
 
-United Storage is a universal API for storing, changing and getting various entities (widget, dashboard, dataset, etc)
+United Storage is part of [DataLens](https://datalens.tech) that provides universal API for storing, updating and retrieving various configuration objects.
 
 ## Getting started
 
@@ -8,3 +8,5 @@ United Storage is a universal API for storing, changing and getting various enti
 npm ci
 npm run dev
 ```
+
+[More details](https://github.com/datalens-tech/datalens)
