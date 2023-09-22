@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "private": true,
   "author": "DataLens Team <https://github.com/datalens-tech>",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git@github.com:datalens-tech/united-storage.git"
+    "url": "git@github.com:datalens-tech/datalens-us.git"
   },
   "main": "dist/index.js",
   "dependencies": {
