@@ -1,0 +1,11 @@
+{
+  "extends": "@gravity-ui/tsconfig/tsconfig",
+  "compilerOptions": {
+    "outDir": "dist/server",
+    "noUnusedParameters": false,
+    "sourceMap": true
+  },
+  "include": ["typings", "src"],
+  "exclude": ["node_modules"],
+  "types": ["node"]
+}

@@ -1,0 +1,20 @@
+# libraries
+npm-debug.log
+node_modules
+
+# editor
+.idea
+.DS_Store
+.vscode
+.history
+
+# settings
+.env
+.env.development
+
+scripts/*.json
+
+dist/server
+dist/run/*
+!dist/run/.keep
+
