@@ -8,3 +8,5 @@ United Storage is a universal API for storing, changing and getting various enti
 npm ci
 npm run dev
 ```
+
+[More details](https://github.com/datalens-tech/datalens)
