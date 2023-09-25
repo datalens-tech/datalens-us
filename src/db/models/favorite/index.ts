@@ -11,8 +11,11 @@ import {registry} from '../../../registry';
 
 import {getWorkbook} from '../../../services/new/workbook';
 
+import {getWorkbooksListByIds} from '../../../services/new/workbook/get-workbooks-list-by-ids';
+
 interface Favorite extends MT.FavoriteColumns {}
 class Favorite extends Model {
+    workbookId!: string | null;
     static get tableName() {
         return 'favorites';
     }
@@ -128,20 +131,52 @@ class Favorite extends Model {
 
         const nextPageToken = Utils.getNextPageToken(page, pageSize, entries.total);
 
-        if (ctx.config.dlsEnabled) {
+        const workbookEntries: Favorite[] = [];
+        const entryWithoutWorkbook: Favorite[] = [];
+
+        entries.results.forEach((entry) => {
+            if (entry.workbookId) {
+                workbookEntries.push(entry);
+            } else {
+                entryWithoutWorkbook.push(entry);
+            }
+        });
+
+        if (ctx.config.dlsEnabled && entryWithoutWorkbook.length) {
             result = await DLS.checkBulkPermission(
                 {ctx},
                 {
-                    entities: entries.results,
+                    entities: entryWithoutWorkbook,
                     action: MT.DlsActions.Read,
                     includePermissionsInfo,
                 },
             );
         }
 
+        const {onlyPublic, embeddingInfo} = ctx.get('info');
+        const isEmbedding = Boolean(embeddingInfo);
+        const checkWorkbookEnabled = !onlyPublic && !isEmbedding;
+
+        if (workbookEntries.length && checkWorkbookEnabled) {
+            const workbookList = await getWorkbooksListByIds(
+                {ctx},
+                {
+                    workbookIds: workbookEntries.map((entry) => entry.workbookId),
+                },
+            );
+            const workbookIds = workbookList.map(
+                (workbook: {workbookId: string}) => workbook.workbookId,
+            );
+            workbookEntries.forEach((entry) => {
+                if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
+                    result.push(entry);
+                }
+            });
+        }
+
         // TODO: use originatePermissions
-        if (!ctx.config.dlsEnabled && entries.results.length > 0) {
-            result = entries.results.map((entry) => ({
+        if (!ctx.config.dlsEnabled && result.length > 0) {
+            result = result.map((entry) => ({
                 ...entry,
                 ...(includePermissionsInfo && {
                     permissions: {
