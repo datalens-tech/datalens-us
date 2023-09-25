@@ -9,6 +9,8 @@ import {RETURN_NAVIGATION_COLUMNS, COMPARISON_OPERATORS} from '../../../const';
 import {validateGetEntries, validateInterTenantGetEntries} from './scheme';
 import {registry} from '../../../registry';
 
+import {getWorkbooksListByIds} from '../../../services/new/workbook/get-workbooks-list-by-ids';
+
 interface Navigation extends MT.EntryColumns {
     isLocked?: boolean;
     permissions?: MT.UsPermission;
@@ -191,18 +193,20 @@ class Navigation extends Model {
             .page(page, pageSize)
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);
 
+        const workbookEntries: Navigation[] = [];
+        const entryWithoutWorkbook: Navigation[] = [];
+
+        entries.results.forEach((entry: Navigation) => {
+            if (entry.workbookId) {
+                workbookEntries.push(entry);
+            } else {
+                entryWithoutWorkbook.push(entry);
+            }
+        });
+
         const nextPageToken = Utils.getNextPageToken(page, pageSize, entries.total);
 
-        if (!isPrivateRoute && ctx.config.dlsEnabled) {
-            result = await DLS.checkBulkPermission(
-                {ctx},
-                {
-                    entities: entries.results,
-                    action: MT.DlsActions.Read,
-                    includePermissionsInfo,
-                },
-            );
-        } else {
+        if (isPrivateRoute) {
             result = entries.results.map((entry) => {
                 entry.isLocked = false;
                 // TODO: use originatePermissions
@@ -216,6 +220,38 @@ class Navigation extends Model {
                 }
                 return entry;
             });
+        } else {
+            if (ctx.config.dlsEnabled && entryWithoutWorkbook.length) {
+                result = await DLS.checkBulkPermission(
+                    {ctx},
+                    {
+                        entities: entryWithoutWorkbook,
+                        action: MT.DlsActions.Read,
+                        includePermissionsInfo,
+                    },
+                );
+            }
+
+            const {onlyPublic, embeddingInfo} = ctx.get('info');
+            const isEmbedding = Boolean(embeddingInfo);
+            const checkWorkbookEnabled = !onlyPublic && !isEmbedding;
+
+            if (workbookEntries.length && checkWorkbookEnabled) {
+                const workbookList = await getWorkbooksListByIds(
+                    {ctx},
+                    {
+                        workbookIds: workbookEntries.map((entry) => entry.workbookId),
+                    },
+                );
+                const workbookIds = workbookList.map(
+                    (workbook: {workbookId: string}) => workbook.workbookId,
+                );
+                workbookEntries.forEach((entry) => {
+                    if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
+                        result.push(entry);
+                    }
+                });
+            }
         }
 
         result = Navigation.processEntries(result);
