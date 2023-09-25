@@ -1,8 +1,6 @@
 #!/bin/sh
 set -e
 
-sleep 20
-
 echo "Start migration"
 if [ $PG_TEST_DATA -eq 1 ]
 then
