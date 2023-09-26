@@ -1,13 +1,18 @@
+import {TransactionOrKnex} from 'objection';
+import {AppContext} from '@gravity-ui/nodekit';
+
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
-import {logInfo} from '../../../utils';
+import Utils, {logInfo} from '../../../utils';
 import {registry} from '../../../registry';
 
 import {WorkbookPermission} from '../../../entities/workbook';
 
 import {Feature, isEnabledFeature} from '../../../components/features';
+
+import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -23,103 +28,23 @@ type GetWorkbooksListAndAllParentsArgs = {
     workbookIds: Nullable<string>[];
 };
 
-export const getWorkbooksListByIds = async (
-    {
-        ctx,
-        trx,
-        skipValidation = false,
-    }: // skipCheckPermissions = false
-    ServiceArgs,
-    args: GetWorkbooksListAndAllParentsArgs,
-): Promise<WorkbookModel[]> => {
-    const {workbookIds} = args;
+export const getParentsIdsFromMap = (
+    collectionId: string | null,
+    map: {[key: string]: string | null},
+): string[] => {
+    let id: string | null = collectionId;
+    const arr: string[] = id ? [id] : [];
 
-    logInfo(ctx, 'GET WORKBOOKS LIST AND ALL PARENTS START', {
-        workbookIds,
-    });
+    while (id !== null) {
+        const curr: string | null = map[id];
 
-    const {
-        tenantId,
-        // isPrivateRoute
-    } = ctx.get('info');
+        if (curr !== null) arr.push(curr);
 
-    if (!skipValidation) {
-        validateArgs(args);
+        id = curr;
     }
 
-    const targetTrx = getReplica(trx);
-
-    // const recursiveName = 'collectionParents';
-
-    const workbookList = await WorkbookModel.query(targetTrx)
-        .where({
-            [WorkbookModelColumn.DeletedAt]: null,
-            [WorkbookModelColumn.TenantId]: tenantId,
-        })
-        .whereIn([WorkbookModelColumn.WorkbookId], workbookIds);
-
-    const {Workbook} = registry.common.classes.get();
-
-    // const {accessServiceEnabled} = ctx.config;
-
-    const collectionIds: Nullable<string>[] | [] = workbookList
-        .map((workbook) => workbook.collectionId)
-        .filter((item) => Boolean(item));
-
-    const parents = await getParentsByIds({
-        ctx,
-        trx: targetTrx,
-        collectionIds,
-    });
-
-    const workbooksMap = new Map<WorkbookModel, string[]>();
-
-    const result: WorkbookModel[] = [];
-
-    workbookList.forEach(async (model) => {
-        const collectionId =
-            parents.find((item) => item.collectionId === model.collectionId)?.collectionId || null;
-
-        const map: {[key: string]: string | null} = {};
-
-        parents.forEach((parent: CollectionModel) => {
-            map[parent.collectionId] = parent.parentId;
-        });
-
-        const parentsforWorkbook = getParentsIds(collectionId, map);
-
-        workbooksMap.set(model, parentsforWorkbook);
-    });
-
-    for await (const pair of workbooksMap) {
-        const [workbookModel, parentIds] = pair;
-
-        const workbook = new Workbook({
-            ctx,
-            model: workbookModel,
-        });
-
-        try {
-            await workbook.checkPermission({
-                parentIds,
-                permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                    ? WorkbookPermission.LimitedView
-                    : WorkbookPermission.View,
-            });
-
-            result.push(workbookModel);
-        } catch (e) {
-            console.log('eene: ', e);
-        }
-    }
-
-    return result;
+    return arr;
 };
-
-import {TransactionOrKnex} from 'objection';
-import {AppContext} from '@gravity-ui/nodekit';
-
-import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 
 interface GetParentsArgs {
     ctx: AppContext;
@@ -169,20 +94,91 @@ export const getParentsByIds = async ({ctx, trx, collectionIds}: GetParentsArgs)
     return result;
 };
 
-export const getParentsIds = (
-    collectionId: string | null,
-    map: {[key: string]: string | null},
-): string[] => {
-    let id: string | null = collectionId;
-    const arr: string[] = id ? [id] : [];
+export const getWorkbooksListByIds = async (
+    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    args: GetWorkbooksListAndAllParentsArgs,
+): Promise<WorkbookModel[]> => {
+    const {workbookIds} = args;
 
-    while (id !== null) {
-        const curr: string | null = map[id];
+    logInfo(ctx, 'GET WORKBOOKS LIST BY IDS STARTED', {
+        workbookIds: workbookIds.map((id) => Utils.encodeId(id)),
+    });
 
-        if (curr !== null) arr.push(curr);
+    const {tenantId, isPrivateRoute} = ctx.get('info');
 
-        id = curr;
+    if (!skipValidation) {
+        validateArgs(args);
     }
 
-    return arr;
+    const targetTrx = getReplica(trx);
+
+    const workbookList = await WorkbookModel.query(targetTrx)
+        .where({
+            [WorkbookModelColumn.DeletedAt]: null,
+            [WorkbookModelColumn.TenantId]: tenantId,
+        })
+        .whereIn([WorkbookModelColumn.WorkbookId], workbookIds);
+
+    const {accessServiceEnabled} = ctx.config;
+
+    if ((!accessServiceEnabled && skipCheckPermissions) || isPrivateRoute) {
+        return workbookList;
+    }
+
+    const {Workbook} = registry.common.classes.get();
+
+    const collectionIds: Nullable<string>[] | [] = workbookList
+        .map((workbook) => workbook.collectionId)
+        .filter((item) => Boolean(item));
+
+    const parents = await getParentsByIds({
+        ctx,
+        trx: targetTrx,
+        collectionIds,
+    });
+
+    const workbooksMap = new Map<WorkbookModel, string[]>();
+
+    const result: WorkbookModel[] = [];
+
+    workbookList.forEach(async (model) => {
+        const collectionId =
+            parents.find((item) => item.collectionId === model.collectionId)?.collectionId || null;
+
+        const map: {[key: string]: string | null} = {};
+
+        parents.forEach((parent: CollectionModel) => {
+            map[parent.collectionId] = parent.parentId;
+        });
+
+        const parentsforWorkbook = getParentsIdsFromMap(collectionId, map);
+
+        workbooksMap.set(model, parentsforWorkbook);
+    });
+
+    for await (const pair of workbooksMap) {
+        const [workbookModel, parentIds] = pair;
+
+        const workbook = new Workbook({
+            ctx,
+            model: workbookModel,
+        });
+
+        try {
+            await workbook.checkPermission({
+                parentIds,
+                permission: isEnabledFeature(ctx, Feature.UseLimitedView)
+                    ? WorkbookPermission.LimitedView
+                    : WorkbookPermission.View,
+            });
+
+            result.push(workbookModel);
+        } catch (e) {}
+    }
+
+    logInfo(ctx, 'GET WORKBOOKS LIST BY IDS FINISHED', {
+        workbookIds: workbookList.map((workbook) => Utils.encodeId(workbook.workbookId)),
+    });
+
+    return result;
 };
