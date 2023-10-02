@@ -1,25 +1,29 @@
 #!/bin/sh
 set -e
 
-echo "Start migration"
-if [ $PG_TEST_DATA -eq 1 ]
-then
-    echo "Initializing postgres test data"
-    psql -f /opt/app/scripts/sql/init-data.sql postgres://us:us@pg-us:5432/postgres
-fi
-if [ $CH_DEMO_DATA -eq 1 ]
-then
-    echo "Initializing clickhouse demo data"
-    if [ $HC -eq 1 ]
-    then
-        psql -f /opt/app/scripts/sql/demo/hc/init-demo.sql postgres://us:us@pg-us:5432/us-db-ci_purgeable
-    else
-        psql -f /opt/app/scripts/sql/demo/d3/init-demo.sql postgres://us:us@pg-us:5432/us-db-ci_purgeable
-    fi
-fi
+if [ "$SKIP_INSTALL_DB_EXTENSIONS" = "1" ]; then
+    echo 'Skip extensions setting up'
+else
+    echo "Start setting up extensions"
+    node /opt/app/dist/server/db/scripts/extensions.js
+    echo "Finish setting up extensions"
+fi;
 
+echo "Start migration"
 node /opt/app/dist/server/db/scripts/migrate.js
 echo "Finish migration"
+
+if [ "$USE_DEMO_DATA" = "1" ]; then
+    echo "Start setting up demo data"
+    if [ "$HC" = "1" ]; then
+        echo "Use HC demo data"
+        node /opt/app/dist/server/db/scripts/demo/hc.js
+    else
+        echo "Use D3 demo data"
+        node /opt/app/dist/server/db/scripts/demo/d3.js
+    fi
+    echo "Finish setting up demo data"
+fi
 
 supervisorctl start node
 supervisorctl start nginx
