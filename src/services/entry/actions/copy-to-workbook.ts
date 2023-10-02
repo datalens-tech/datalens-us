@@ -1,6 +1,6 @@
 import {TransactionOrKnex, transaction} from 'objection';
 import {AppError} from '@gravity-ui/nodekit';
-import {getParentIds} from '../../new/collection/utils/get-parents';
+
 import {getId} from '../../../db';
 import {Entry} from '../../../db/models/new/entry';
 import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
@@ -9,9 +9,8 @@ import Link from '../../../db/models/links';
 import {CTX} from '../../../types/models';
 import {US_ERRORS, BiTrackingLogs} from '../../../const';
 import Utils, {logInfo, makeUserId} from '../../../utils';
-import {WorkbookPermission} from '../../../entities/workbook';
+
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {registry} from '../../../registry';
 
 interface Params {
     entryId: Entry['entryId'];
@@ -41,13 +40,7 @@ export const validateParams = makeSchemaValidator({
 });
 
 export const copyToWorkbook = async (ctx: CTX, params: Params) => {
-    const {
-        entryId,
-        destinationWorkbookId,
-        tenantIdOverride,
-        skipWorkbookPermissionsCheck = false,
-        trxOverride,
-    } = params;
+    const {entryId, destinationWorkbookId, tenantIdOverride, trxOverride} = params;
 
     logInfo(ctx, 'COPY_ENTRY_TO_WORKBOOK_CALL', {
         entryId: Utils.encodeId(entryId),
@@ -59,8 +52,6 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
 
     const {tenantId, user} = ctx.get('info');
     const createdBy = makeUserId(user.userId);
-
-    const {Workbook} = registry.common.classes.get();
 
     const targetTenantId = tenantIdOverride ?? tenantId;
 
@@ -96,72 +87,6 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
     if (originJoinedEntryRevision.scope === 'folder') {
         throw new AppError('Folders cannot be copied', {
             code: US_ERRORS.FOLDER_COPY_DENIED,
-        });
-    }
-
-    if (!skipWorkbookPermissionsCheck) {
-        const workbookTargetTrx = trxOverride ?? WorkbookModel.replica;
-
-        const [originWorkbookModel, destinationWorkbookModel]: Optional<WorkbookModel>[] =
-            await Promise.all([
-                WorkbookModel.query(workbookTargetTrx)
-                    .findById(originJoinedEntryRevision.workbookId)
-                    .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT),
-                WorkbookModel.query(workbookTargetTrx)
-                    .findById(destinationWorkbookId)
-                    .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT),
-            ]);
-
-        if (originWorkbookModel === undefined || destinationWorkbookModel === undefined) {
-            throw new AppError('Workbook not exists', {
-                code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-            });
-        }
-
-        if (tenantIdOverride === undefined && originWorkbookModel.tenantId !== tenantId) {
-            throw new AppError('Workbook not exists', {
-                code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-            });
-        }
-
-        if (tenantIdOverride === undefined) {
-            const originWorkbook = new Workbook({
-                ctx,
-                model: originWorkbookModel,
-            });
-
-            let originWorkbookParentIds: string[] = [];
-
-            if (originWorkbook.model.collectionId !== null) {
-                originWorkbookParentIds = await getParentIds({
-                    ctx,
-                    collectionId: originWorkbook.model.collectionId,
-                });
-            }
-
-            await originWorkbook.checkPermission({
-                parentIds: originWorkbookParentIds,
-                permission: WorkbookPermission.Copy,
-            });
-        }
-
-        const destinationWorkbook = new Workbook({
-            ctx,
-            model: destinationWorkbookModel,
-        });
-
-        let destinationWorkbookParentIds: string[] = [];
-
-        if (destinationWorkbook.model.collectionId !== null) {
-            destinationWorkbookParentIds = await getParentIds({
-                ctx,
-                collectionId: destinationWorkbook.model.collectionId,
-            });
-        }
-
-        await destinationWorkbook.checkPermission({
-            parentIds: destinationWorkbookParentIds,
-            permission: WorkbookPermission.Update,
         });
     }
 
