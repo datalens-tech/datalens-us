@@ -199,34 +199,16 @@ export const copyWorkbook = async (
             .returning('*')
             .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
-        if (accessServiceEnabled && accessBindingsServiceEnabled) {
-            const workbook = new Workbook({
-                ctx,
-                model: copiedWorkbook,
-            });
-
-            let newCollectionParentIds: string[] = [];
-
-            if (newCollectionId) {
-                newCollectionParentIds = await getParentIds({
-                    ctx,
-                    collectionId: newCollectionId,
+        if (originEntries.length > 0) {
+            if (accessServiceEnabled && accessBindingsServiceEnabled) {
+                await checkPermissionOriginAndDestinationWorkbook(ctx, {
+                    entryIds: originEntries.map((entry) => entry.entryId),
+                    destinationWorkbookId: copiedWorkbook.workbookId,
+                    tenantIdOverride,
+                    skipWorkbookPermissionsCheck: true,
+                    trxOverride: transactionTrx,
                 });
             }
-
-            operation = await workbook.register({
-                parentIds: newCollectionParentIds,
-            });
-        }
-
-        if (originEntries.length > 0) {
-            await checkPermissionOriginAndDestinationWorkbook(ctx, {
-                entryIds: originEntries.map((entry) => entry.entryId),
-                destinationWorkbookId: copiedWorkbook.workbookId,
-                tenantIdOverride,
-                skipWorkbookPermissionsCheck: true,
-                trxOverride: transactionTrx,
-            });
 
             const copiedJoinedEntryRevisions = await Promise.all(
                 originEntries.map((originEntry) => {
@@ -254,6 +236,26 @@ export const copyWorkbook = async (
                 copiedJoinedEntryRevisions: filteredCopiedJoinedEntryRevisions,
                 ctx,
                 trx: transactionTrx,
+            });
+        }
+
+        if (accessServiceEnabled && accessBindingsServiceEnabled) {
+            const workbook = new Workbook({
+                ctx,
+                model: copiedWorkbook,
+            });
+
+            let newCollectionParentIds: string[] = [];
+
+            if (newCollectionId) {
+                newCollectionParentIds = await getParentIds({
+                    ctx,
+                    collectionId: newCollectionId,
+                });
+            }
+
+            operation = await workbook.register({
+                parentIds: newCollectionParentIds,
             });
         }
 
@@ -320,7 +322,7 @@ const checkPermissionOriginAndDestinationWorkbook = async (ctx: CTX, params: Par
 
     const {Workbook} = registry.common.classes.get();
 
-    const originJoinedEntryRevisions = await ((await JoinedEntryRevision.query(Entry.replica)
+    const originJoinedEntryRevisions = await ((await JoinedEntryRevision.query(trxOverride)
         .select(selectedColumns)
         .join(
             RevisionModel.tableName,
@@ -336,6 +338,7 @@ const checkPermissionOriginAndDestinationWorkbook = async (ctx: CTX, params: Par
         .timeout(JoinedEntryRevision.DEFAULT_QUERY_TIMEOUT)) as unknown as Promise<
         JoinedEntryRevisionColumns[]
     >);
+
     if (!originJoinedEntryRevisions[0]?.workbookId) return;
 
     const workbookTargetTrx = trxOverride ?? WorkbookModel.replica;
