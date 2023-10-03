@@ -106,7 +106,7 @@ export const getWorkbooksList = async (
         parents = await getParents({
             ctx,
             trx: targetTrx,
-            collectionId,
+            collectionIds: [collectionId],
         });
 
         if (parents.length === 0) {

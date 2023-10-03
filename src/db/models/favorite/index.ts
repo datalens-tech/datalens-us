@@ -15,7 +15,6 @@ import {getWorkbooksListByIds} from '../../../services/new/workbook/get-workbook
 
 interface Favorite extends MT.FavoriteColumns {}
 class Favorite extends Model {
-    workbookId!: string | null;
     static get tableName() {
         return 'favorites';
     }
@@ -142,58 +141,87 @@ class Favorite extends Model {
             }
         });
 
-        if (ctx.config.dlsEnabled && entryWithoutWorkbook.length) {
-            result = await DLS.checkBulkPermission(
-                {ctx},
-                {
-                    entities: entryWithoutWorkbook,
-                    action: MT.DlsActions.Read,
-                    includePermissionsInfo,
-                },
-            );
-        }
-
-        const {onlyPublic, embeddingInfo} = ctx.get('info');
-        const isEmbedding = Boolean(embeddingInfo);
-        const checkWorkbookEnabled = !onlyPublic && !isEmbedding;
-
-        if (workbookEntries.length && checkWorkbookEnabled) {
-            const workbookList = await getWorkbooksListByIds(
-                {ctx},
-                {
-                    workbookIds: workbookEntries.map((entry) => entry.workbookId),
-                },
-            );
-            const workbookIds = workbookList.map(
-                (workbook: {workbookId: string}) => workbook.workbookId,
-            );
-            workbookEntries.forEach((entry) => {
-                if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
-                    result.push(entry);
-                }
-            });
-        }
-
         // TODO: use originatePermissions
-        if (!ctx.config.dlsEnabled && result.length > 0) {
-            result = result.map((entry) => ({
-                ...entry,
-                ...(includePermissionsInfo && {
-                    permissions: {
-                        execute: true,
-                        read: true,
-                        edit: true,
-                        admin: true,
+        if (entryWithoutWorkbook.length > 0) {
+            if (ctx.config.dlsEnabled) {
+                result = await DLS.checkBulkPermission(
+                    {ctx},
+                    {
+                        entities: entryWithoutWorkbook,
+                        action: MT.DlsActions.Read,
+                        includePermissionsInfo,
                     },
-                }),
-            }));
+                );
+            } else {
+                result = entryWithoutWorkbook.map((entry) => ({
+                    ...entry,
+                    ...(includePermissionsInfo && {
+                        permissions: {
+                            execute: true,
+                            read: true,
+                            edit: true,
+                            admin: true,
+                        },
+                    }),
+                }));
+            }
         }
+
+        if (workbookEntries.length > 0) {
+            if (ctx.config.accessServiceEnabled) {
+                const workbookList = await getWorkbooksListByIds(
+                    {ctx},
+                    {
+                        workbookIds: workbookEntries.map((entry) => entry.workbookId),
+                    },
+                );
+                const workbookIds = workbookList.map(
+                    (workbook: {workbookId: string}) => workbook.workbookId,
+                );
+                workbookEntries.forEach((entry) => {
+                    if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
+                        result.push(entry);
+                    }
+                });
+            } else {
+                result = [
+                    ...result,
+                    workbookEntries.map((entry) => ({
+                        ...entry,
+                        ...(includePermissionsInfo && {
+                            permissions: {
+                                execute: true,
+                                read: true,
+                                edit: true,
+                                admin: true,
+                            },
+                        }),
+                    })),
+                ];
+            }
+        }
+
+        const mapResult = new Map<string, Favorite>();
+
+        result.forEach((entry) => {
+            mapResult.set(entry.entryId, entry);
+        });
+
+        const orderedResult: Favorite[] = [];
+
+        entries.results.forEach((entry) => {
+            const model = mapResult.get(entry.entryId);
+
+            if (model) {
+                orderedResult.push(model);
+            }
+        });
 
         ctx.log('GET_FAVORITES_SUCCESS');
 
         const data: MT.PaginationEntriesResponse = {
             nextPageToken,
-            entries: result,
+            entries: orderedResult,
         };
 
         return data;

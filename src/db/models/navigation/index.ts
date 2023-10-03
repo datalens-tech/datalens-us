@@ -206,22 +206,8 @@ class Navigation extends Model {
 
         const nextPageToken = Utils.getNextPageToken(page, pageSize, entries.total);
 
-        if (isPrivateRoute) {
-            result = entries.results.map((entry) => {
-                entry.isLocked = false;
-                // TODO: use originatePermissions
-                if (includePermissionsInfo) {
-                    entry.permissions = {
-                        execute: true,
-                        read: true,
-                        edit: true,
-                        admin: true,
-                    };
-                }
-                return entry;
-            });
-        } else {
-            if (ctx.config.dlsEnabled && entryWithoutWorkbook.length) {
+        if (entryWithoutWorkbook.length > 0) {
+            if (!isPrivateRoute && ctx.config.dlsEnabled) {
                 result = await DLS.checkBulkPermission(
                     {ctx},
                     {
@@ -230,13 +216,27 @@ class Navigation extends Model {
                         includePermissionsInfo,
                     },
                 );
+            } else {
+                result = entryWithoutWorkbook.map((entry) => ({
+                    ...entry,
+                    ...(includePermissionsInfo && {
+                        permissions: {
+                            execute: true,
+                            read: true,
+                            edit: true,
+                            admin: true,
+                        },
+                    }),
+                }));
             }
+        }
 
-            const {onlyPublic, embeddingInfo} = ctx.get('info');
-            const isEmbedding = Boolean(embeddingInfo);
-            const checkWorkbookEnabled = !onlyPublic && !isEmbedding;
+        const {onlyPublic, embeddingInfo} = ctx.get('info');
+        const isEmbedding = Boolean(embeddingInfo);
+        const checkWorkbookEnabled = !onlyPublic && !isEmbedding;
 
-            if (workbookEntries.length && checkWorkbookEnabled) {
+        if (workbookEntries.length > 0) {
+            if (ctx.config.accessServiceEnabled && checkWorkbookEnabled) {
                 const workbookList = await getWorkbooksListByIds(
                     {ctx},
                     {
@@ -251,10 +251,41 @@ class Navigation extends Model {
                         result.push(entry);
                     }
                 });
+            } else {
+                result = [
+                    ...result,
+                    workbookEntries.map((entry) => ({
+                        ...entry,
+                        ...(includePermissionsInfo && {
+                            permissions: {
+                                execute: true,
+                                read: true,
+                                edit: true,
+                                admin: true,
+                            },
+                        }),
+                    })),
+                ];
             }
         }
 
-        result = Navigation.processEntries(result);
+        const mapResult = new Map<string, Navigation>();
+
+        result.forEach((entry) => {
+            mapResult.set(entry.entryId, entry);
+        });
+
+        const orderedResult: Navigation[] = [];
+
+        entries.results.forEach((entry) => {
+            const model = mapResult.get(entry.entryId);
+
+            if (model) {
+                orderedResult.push(model);
+            }
+        });
+
+        result = Navigation.processEntries(orderedResult);
 
         if (excludeLocked) {
             result = Navigation.filterEntriesByIsLocked(result);
