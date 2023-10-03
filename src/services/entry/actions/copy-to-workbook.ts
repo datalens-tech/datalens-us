@@ -1,4 +1,4 @@
-import {TransactionOrKnex, transaction} from 'objection';
+import {TransactionOrKnex} from 'objection';
 import {AppError} from '@gravity-ui/nodekit';
 
 import {getId} from '../../../db';
@@ -90,70 +90,67 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
         });
     }
 
-    const entryTargetTrx = trxOverride ?? Entry.primary;
+    const transactionTrx = trxOverride ?? Entry.primary;
 
-    const newJoinedEntryRevision = await transaction(entryTargetTrx, async (transactionTrx) => {
-        const [newEntryId, newRevId] = await Promise.all([getId(), getId()]);
+    // const newJoinedEntryRevision =
+    const [newEntryId, newRevId] = await Promise.all([getId(), getId()]);
 
-        const displayKey = `${newEntryId}/${Utils.getNameByKey({
-            key: originJoinedEntryRevision.displayKey,
-        })}`;
-        const key = displayKey.toLowerCase();
+    const displayKey = `${newEntryId}/${Utils.getNameByKey({
+        key: originJoinedEntryRevision.displayKey,
+    })}`;
+    const key = displayKey.toLowerCase();
 
-        const links = originJoinedEntryRevision.links as Nullable<Record<string, string>>;
-        if (links) {
-            await Link.sync({entryId: newEntryId, links, ctx, trxOverride: transactionTrx});
-        }
+    const links = originJoinedEntryRevision.links as Nullable<Record<string, string>>;
+    if (links) {
+        await Link.sync({entryId: newEntryId, links, ctx, trxOverride: transactionTrx});
+    }
 
-        await Entry.query(transactionTrx)
-            .insertGraph({
-                scope: originJoinedEntryRevision.scope,
-                type: originJoinedEntryRevision.type,
-                key,
-                innerMeta: null,
-                createdBy: createdBy,
-                updatedBy: createdBy,
-                deletedAt: null,
-                hidden: originJoinedEntryRevision.hidden,
-                displayKey,
-                entryId: newEntryId,
-                savedId: newRevId,
-                publishedId: originJoinedEntryRevision.publishedId ? newRevId : null,
-                tenantId: targetTenantId,
-                unversionedData: originJoinedEntryRevision.unversionedData,
-                workbookId: destinationWorkbookId,
-                revisions: [
-                    {
-                        data: originJoinedEntryRevision.data,
-                        meta: originJoinedEntryRevision.meta,
-                        createdBy: createdBy,
-                        updatedBy: createdBy,
-                        revId: newRevId,
-                        entryId: newEntryId,
-                        links,
-                    },
-                ],
-            })
-            .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
+    await Entry.query(transactionTrx)
+        .insertGraph({
+            scope: originJoinedEntryRevision.scope,
+            type: originJoinedEntryRevision.type,
+            key,
+            innerMeta: null,
+            createdBy: createdBy,
+            updatedBy: createdBy,
+            deletedAt: null,
+            hidden: originJoinedEntryRevision.hidden,
+            displayKey,
+            entryId: newEntryId,
+            savedId: newRevId,
+            publishedId: originJoinedEntryRevision.publishedId ? newRevId : null,
+            tenantId: targetTenantId,
+            unversionedData: originJoinedEntryRevision.unversionedData,
+            workbookId: destinationWorkbookId,
+            revisions: [
+                {
+                    data: originJoinedEntryRevision.data,
+                    meta: originJoinedEntryRevision.meta,
+                    createdBy: createdBy,
+                    updatedBy: createdBy,
+                    revId: newRevId,
+                    entryId: newEntryId,
+                    links,
+                },
+            ],
+        })
+        .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
-        const copiedJoinedEntryRevision = await JoinedEntryRevision.findOne({
-            where: {
-                [`${Entry.tableName}.entryId`]: newEntryId,
-                [`${Entry.tableName}.tenantId`]: targetTenantId,
-                [`${Entry.tableName}.isDeleted`]: false,
-            },
-            joinRevisionArgs: {
-                isPublishFallback: true,
-            },
-            trx: transactionTrx,
-        });
-
-        return copiedJoinedEntryRevision;
+    const copiedJoinedEntryRevision = await JoinedEntryRevision.findOne({
+        where: {
+            [`${Entry.tableName}.entryId`]: newEntryId,
+            [`${Entry.tableName}.tenantId`]: targetTenantId,
+            [`${Entry.tableName}.isDeleted`]: false,
+        },
+        joinRevisionArgs: {
+            isPublishFallback: true,
+        },
+        trx: transactionTrx,
     });
 
     logInfo(ctx, BiTrackingLogs.CopyEntry, {
         entryId: Utils.encodeId(entryId),
     });
 
-    return newJoinedEntryRevision;
+    return copiedJoinedEntryRevision;
 };

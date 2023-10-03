@@ -15,7 +15,6 @@ import Utils, {logInfo} from '../../../utils';
 import {copyToWorkbook} from '../../entry/actions';
 import {getCollection} from '../collection';
 import {registry} from '../../../registry';
-import {CTX} from '../../../types/models';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -194,16 +193,46 @@ export const copyWorkbook = async (
             .returning('*')
             .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
-        if (originEntries.length > 0) {
-            if (accessServiceEnabled && accessBindingsServiceEnabled) {
-                await checkDestinationWorkbookPermission(ctx, {
-                    destinationWorkbookId: copiedWorkbook.workbookId,
-                    tenantIdOverride,
-                    skipWorkbookPermissionsCheck: true,
-                    trxOverride: transactionTrx,
+        if (accessServiceEnabled && accessBindingsServiceEnabled) {
+            const workbookTargetTrx = transactionTrx ?? WorkbookModel.replica;
+
+            const destinationWorkbookModel: Optional<WorkbookModel> = await WorkbookModel.query(
+                workbookTargetTrx,
+            )
+                .select()
+                .findById(copiedWorkbook.workbookId)
+                .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
+
+            if (
+                destinationWorkbookModel === undefined ||
+                (tenantIdOverride === undefined && originWorkbookModel.tenantId !== tenantId)
+            ) {
+                throw new AppError('Workbook not exists', {
+                    code: US_ERRORS.WORKBOOK_NOT_EXISTS,
                 });
             }
 
+            const destinationWorkbook = new Workbook({
+                ctx,
+                model: destinationWorkbookModel,
+            });
+
+            let destinationWorkbookParentIds: string[] = [];
+
+            if (destinationWorkbook.model.collectionId !== null) {
+                destinationWorkbookParentIds = await getParentIds({
+                    ctx,
+                    collectionId: destinationWorkbook.model.collectionId,
+                });
+            }
+
+            await destinationWorkbook.checkPermission({
+                parentIds: destinationWorkbookParentIds,
+                permission: WorkbookPermission.Update,
+            });
+        }
+
+        if (originEntries.length > 0) {
             const copiedJoinedEntryRevisions = await Promise.all(
                 originEntries.map((originEntry) => {
                     return copyToWorkbook(ctx, {
@@ -264,91 +293,6 @@ export const copyWorkbook = async (
         workbook: newWorkbook,
         operation,
     };
-};
-
-export const validateParams = makeSchemaValidator({
-    type: 'object',
-    required: ['entryId', 'destinationWorkbookId'],
-    properties: {
-        entryId: {
-            type: 'string',
-        },
-        destinationWorkbookId: {
-            type: 'string',
-        },
-        tenantIdOverride: {
-            type: 'string',
-        },
-        skipWorkbookPermissionsCheck: {
-            type: 'boolean',
-        },
-    },
-});
-
-interface Params {
-    destinationWorkbookId: WorkbookModel['workbookId'];
-    tenantIdOverride?: Entry['tenantId'];
-    skipWorkbookPermissionsCheck?: boolean;
-    trxOverride?: TransactionOrKnex;
-}
-
-const checkDestinationWorkbookPermission = async (ctx: CTX, params: Params) => {
-    const {
-        destinationWorkbookId,
-        tenantIdOverride,
-        skipWorkbookPermissionsCheck = false,
-        trxOverride,
-    } = params;
-
-    if (skipWorkbookPermissionsCheck) return;
-
-    logInfo(ctx, 'COPY_ENTRY_TO_WORKBOOK_CALL', {
-        destinationWorkbookId,
-        tenantIdOverride,
-    });
-
-    validateParams(params);
-
-    const {Workbook} = registry.common.classes.get();
-
-    const workbookTargetTrx = trxOverride ?? WorkbookModel.replica;
-
-    const destinationWorkbookModel: Optional<WorkbookModel> = await WorkbookModel.query(
-        workbookTargetTrx,
-    )
-        .select()
-        .findById(destinationWorkbookId)
-        .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
-
-    if (destinationWorkbookModel === undefined || tenantIdOverride === undefined) {
-        throw new AppError('Workbook not exists', {
-            code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-        });
-    }
-
-    const destinationWorkbook = new Workbook({
-        ctx,
-        model: destinationWorkbookModel,
-    });
-
-    let destinationWorkbookParentIds: string[] = [];
-
-    if (destinationWorkbook.model.collectionId !== null) {
-        destinationWorkbookParentIds = await getParentIds({
-            ctx,
-            collectionId: destinationWorkbook.model.collectionId,
-        });
-    }
-
-    await destinationWorkbook.checkPermission({
-        parentIds: destinationWorkbookParentIds,
-        permission: WorkbookPermission.Update,
-    });
-
-    await destinationWorkbook.checkPermission({
-        parentIds: destinationWorkbookParentIds,
-        permission: WorkbookPermission.Copy,
-    });
 };
 
 async function getUniqWorkbookTitle({
@@ -453,11 +397,6 @@ async function crossSyncCopiedJoinedEntryRevisions({
     const arCopiedJoinedEntryRevisionsWithReplacedIds = JSON.parse(
         strCopiedJoinedEntryRevisions,
     ) as JoinedEntryRevisionColumns[];
-
-    console.log(
-        'arCopiedJoinedEntryRevisionsWithReplacedIds: ',
-        arCopiedJoinedEntryRevisionsWithReplacedIds,
-    );
 
     await Promise.all(
         arCopiedJoinedEntryRevisionsWithReplacedIds.map((copiedJoinedEntryRevision) => {
