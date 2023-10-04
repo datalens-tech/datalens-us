@@ -3,13 +3,20 @@ import {AppContext} from '@gravity-ui/nodekit';
 import {getReplica} from '../../utils';
 import {CollectionModel, CollectionModelColumn} from '../../../../db/models/new/collection';
 
-interface GetParentsArgs {
+interface Ctx {
     ctx: AppContext;
     trx?: TransactionOrKnex;
+}
+
+interface GetCollectionsParentIds extends Ctx {
+    collectionIds: Nullable<string>[];
+}
+
+interface GetCollectionParentIds extends Ctx {
     collectionId: string;
 }
 
-export const getParents = async ({ctx, trx, collectionId}: GetParentsArgs) => {
+export const getParents = async ({ctx, trx, collectionIds}: GetCollectionsParentIds) => {
     const {tenantId, projectId} = ctx.get('info');
 
     const targetTrx = getReplica(trx);
@@ -24,8 +31,8 @@ export const getParents = async ({ctx, trx, collectionId}: GetParentsArgs) => {
                     [CollectionModelColumn.TenantId]: tenantId,
                     [CollectionModelColumn.ProjectId]: projectId,
                     [CollectionModelColumn.DeletedAt]: null,
-                    [CollectionModelColumn.CollectionId]: collectionId,
                 })
+                .whereIn([CollectionModelColumn.CollectionId], collectionIds)
                 .union((qb2) => {
                     qb2.select(`${CollectionModel.tableName}.*`)
                         .from(CollectionModel.tableName)
@@ -51,7 +58,16 @@ export const getParents = async ({ctx, trx, collectionId}: GetParentsArgs) => {
     return result;
 };
 
-export const getParentIds = async ({ctx, trx, collectionId}: GetParentsArgs) => {
-    const parents = await getParents({ctx, trx, collectionId});
+export const getParentIds = async ({ctx, trx, collectionId}: GetCollectionParentIds) => {
+    const parents = await getParents({ctx, trx, collectionIds: [collectionId]});
+    return parents.map((item) => item.collectionId);
+};
+
+export const getCollectionsParentIds = async ({
+    ctx,
+    trx,
+    collectionIds,
+}: GetCollectionsParentIds) => {
+    const parents = await getParents({ctx, trx, collectionIds});
     return parents.map((item) => item.collectionId);
 };
