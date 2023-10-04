@@ -46,7 +46,6 @@ export interface CopyWorkbookArgs {
     tenantIdOverride?: string;
 }
 
-// eslint-disable-next-line complexity
 export const copyWorkbook = async (
     {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
     args: CopyWorkbookArgs,
@@ -233,20 +232,13 @@ export const copyWorkbook = async (
         }
 
         if (originEntries.length > 0) {
-            const copiedJoinedEntryRevisions = await Promise.all(
-                originEntries.map((originEntry) => {
-                    return copyToWorkbook(ctx, {
-                        entryId: originEntry.entryId,
-                        destinationWorkbookId: copiedWorkbook.workbookId,
-                        tenantIdOverride,
-                        skipWorkbookPermissionsCheck: true,
-                        trxOverride: transactionTrx,
-                    }).then((newJoinedEntryRevision) => ({
-                        newJoinedEntryRevision,
-                        oldEntryId: originEntry.entryId,
-                    }));
-                }),
-            );
+            const copiedJoinedEntryRevisions = await copyToWorkbook(ctx, {
+                entryIds: originEntries.map((entry) => entry.entryId),
+                destinationWorkbookId: copiedWorkbook.workbookId,
+                tenantIdOverride,
+                skipWorkbookPermissionsCheck: true,
+                trxOverride: transactionTrx,
+            });
 
             const filteredCopiedJoinedEntryRevisions = copiedJoinedEntryRevisions.filter(
                 (item) => item.newJoinedEntryRevision !== undefined,

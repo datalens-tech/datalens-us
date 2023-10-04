@@ -3,17 +3,23 @@ import {AppError} from '@gravity-ui/nodekit';
 
 import {getId} from '../../../db';
 import {Entry} from '../../../db/models/new/entry';
-import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
+import {
+    JoinedEntryRevision,
+    selectedColumns,
+    joinRevision,
+    JoinedEntryRevisionColumns,
+} from '../../../db/presentations/joined-entry-revision';
 import {WorkbookModel} from '../../../db/models/new/workbook';
-import Link from '../../../db/models/links';
 import {CTX} from '../../../types/models';
 import {US_ERRORS, BiTrackingLogs} from '../../../const';
 import Utils, {logInfo, makeUserId} from '../../../utils';
 
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 
+import {RevisionModel} from '../../../db/models/new/revision';
+
 interface Params {
-    entryId: Entry['entryId'];
+    entryIds: Entry['entryId'][];
     destinationWorkbookId: WorkbookModel['workbookId'];
     tenantIdOverride?: Entry['tenantId'];
     skipWorkbookPermissionsCheck?: boolean;
@@ -22,10 +28,10 @@ interface Params {
 
 export const validateParams = makeSchemaValidator({
     type: 'object',
-    required: ['entryId', 'destinationWorkbookId'],
+    required: ['entryIds', 'destinationWorkbookId'],
     properties: {
-        entryId: {
-            type: 'string',
+        entryIds: {
+            type: 'array',
         },
         destinationWorkbookId: {
             type: 'string',
@@ -40,10 +46,10 @@ export const validateParams = makeSchemaValidator({
 });
 
 export const copyToWorkbook = async (ctx: CTX, params: Params) => {
-    const {entryId, destinationWorkbookId, tenantIdOverride, trxOverride} = params;
+    const {entryIds, destinationWorkbookId, tenantIdOverride, trxOverride} = params;
 
     logInfo(ctx, 'COPY_ENTRY_TO_WORKBOOK_CALL', {
-        entryId: Utils.encodeId(entryId),
+        entryIds,
         destinationWorkbookId,
         tenantIdOverride,
     });
@@ -55,102 +61,123 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
 
     const targetTenantId = tenantIdOverride ?? tenantId;
 
-    const originJoinedEntryRevision = await JoinedEntryRevision.findOne({
-        where: {
-            [`${Entry.tableName}.entryId`]: entryId,
-            [`${Entry.tableName}.isDeleted`]: false,
-        },
-        joinRevisionArgs: {
-            isPublishFallback: true,
-        },
-        trx: Entry.replica,
-    });
-
-    if (originJoinedEntryRevision === undefined) {
-        throw new AppError('Entry not exists', {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
-    }
-
-    if (tenantIdOverride === undefined && originJoinedEntryRevision.tenantId !== tenantId) {
-        throw new AppError('Entry not exists', {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
-    }
-
-    if (originJoinedEntryRevision.workbookId === null) {
-        throw new AppError("Entry without workbookId, can't be copied to workbook", {
-            code: US_ERRORS.ENTRY_WITHOUT_WORKBOOK_ID_COPY_DENIED,
-        });
-    }
-
-    if (originJoinedEntryRevision.scope === 'folder') {
-        throw new AppError('Folders cannot be copied', {
-            code: US_ERRORS.FOLDER_COPY_DENIED,
-        });
-    }
-
     const transactionTrx = trxOverride ?? Entry.primary;
 
-    // const newJoinedEntryRevision =
-    const [newEntryId, newRevId] = await Promise.all([getId(), getId()]);
-
-    const displayKey = `${newEntryId}/${Utils.getNameByKey({
-        key: originJoinedEntryRevision.displayKey,
-    })}`;
-    const key = displayKey.toLowerCase();
-
-    const links = originJoinedEntryRevision.links as Nullable<Record<string, string>>;
-    if (links) {
-        await Link.sync({entryId: newEntryId, links, ctx, trxOverride: transactionTrx});
-    }
-
-    await Entry.query(transactionTrx)
-        .insertGraph({
-            scope: originJoinedEntryRevision.scope,
-            type: originJoinedEntryRevision.type,
-            key,
-            innerMeta: null,
-            createdBy: createdBy,
-            updatedBy: createdBy,
-            deletedAt: null,
-            hidden: originJoinedEntryRevision.hidden,
-            displayKey,
-            entryId: newEntryId,
-            savedId: newRevId,
-            publishedId: originJoinedEntryRevision.publishedId ? newRevId : null,
-            tenantId: targetTenantId,
-            unversionedData: originJoinedEntryRevision.unversionedData,
-            workbookId: destinationWorkbookId,
-            revisions: [
-                {
-                    data: originJoinedEntryRevision.data,
-                    meta: originJoinedEntryRevision.meta,
-                    createdBy: createdBy,
-                    updatedBy: createdBy,
-                    revId: newRevId,
-                    entryId: newEntryId,
-                    links,
-                },
-            ],
+    const originJoinedEntryRevisions = await (JoinedEntryRevision.query(Entry.replica)
+        .select(selectedColumns)
+        .join(
+            RevisionModel.tableName,
+            joinRevision({
+                isPublishFallback: true,
+            }),
+        )
+        .where({
+            [`${Entry.tableName}.isDeleted`]: false,
         })
-        .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
+        .whereIn([`${Entry.tableName}.entryId`], entryIds)
+        .timeout(JoinedEntryRevision.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<
+        JoinedEntryRevisionColumns[]
+    >);
 
-    const copiedJoinedEntryRevision = await JoinedEntryRevision.findOne({
-        where: {
-            [`${Entry.tableName}.entryId`]: newEntryId,
+    const mapEntryIdsWithOldIds: {[key: string]: string} = {};
+
+    const newEntries = await Promise.all(
+        originJoinedEntryRevisions.map(async (originJoinedEntryRevision) => {
+            if (originJoinedEntryRevision === undefined) {
+                throw new AppError('Entry not exists', {
+                    code: US_ERRORS.NOT_EXIST_ENTRY,
+                });
+            }
+
+            if (tenantIdOverride === undefined && originJoinedEntryRevision.tenantId !== tenantId) {
+                throw new AppError('Entry not exists', {
+                    code: US_ERRORS.NOT_EXIST_ENTRY,
+                });
+            }
+
+            if (originJoinedEntryRevision.workbookId === null) {
+                throw new AppError("Entry without workbookId, can't be copied to workbook", {
+                    code: US_ERRORS.ENTRY_WITHOUT_WORKBOOK_ID_COPY_DENIED,
+                });
+            }
+
+            if (originJoinedEntryRevision.scope === 'folder') {
+                throw new AppError('Folders cannot be copied', {
+                    code: US_ERRORS.FOLDER_COPY_DENIED,
+                });
+            }
+
+            const [newEntryId, newRevId] = await Promise.all([getId(), getId()]);
+
+            mapEntryIdsWithOldIds[newEntryId] = originJoinedEntryRevision.entryId;
+
+            const displayKey = `${newEntryId}/${Utils.getNameByKey({
+                key: originJoinedEntryRevision.displayKey,
+            })}`;
+            const key = displayKey.toLowerCase();
+
+            const links = originJoinedEntryRevision.links as Nullable<Record<string, string>>;
+
+            return {
+                scope: originJoinedEntryRevision.scope,
+                type: originJoinedEntryRevision.type,
+                key,
+                innerMeta: null,
+                createdBy: createdBy,
+                updatedBy: createdBy,
+                deletedAt: null,
+                hidden: originJoinedEntryRevision.hidden,
+                displayKey,
+                entryId: newEntryId,
+                savedId: newRevId,
+                publishedId: originJoinedEntryRevision.publishedId ? newRevId : null,
+                tenantId: targetTenantId,
+                unversionedData: originJoinedEntryRevision.unversionedData,
+                workbookId: destinationWorkbookId,
+                revisions: [
+                    {
+                        data: originJoinedEntryRevision.data,
+                        meta: originJoinedEntryRevision.meta,
+                        createdBy: createdBy,
+                        updatedBy: createdBy,
+                        revId: newRevId,
+                        entryId: newEntryId,
+                        links,
+                    },
+                ],
+            };
+        }),
+    );
+
+    await Entry.query(transactionTrx).insertGraph(newEntries).timeout(Entry.DEFAULT_QUERY_TIMEOUT);
+
+    const copiedJoinedEntryRevisions = await (JoinedEntryRevision.query(transactionTrx)
+        .select(selectedColumns)
+        .join(
+            RevisionModel.tableName,
+            joinRevision({
+                isPublishFallback: true,
+            }),
+        )
+        .where({
             [`${Entry.tableName}.tenantId`]: targetTenantId,
             [`${Entry.tableName}.isDeleted`]: false,
-        },
-        joinRevisionArgs: {
-            isPublishFallback: true,
-        },
-        trx: transactionTrx,
+        })
+        .whereIn([`${Entry.tableName}.entryId`], Object.keys(mapEntryIdsWithOldIds))
+        .timeout(JoinedEntryRevision.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<
+        JoinedEntryRevisionColumns[]
+    >);
+
+    const result = copiedJoinedEntryRevisions.map((entry: {entryId: string | number}) => {
+        return {
+            newJoinedEntryRevision: entry,
+            oldEntryId: mapEntryIdsWithOldIds[entry.entryId],
+        };
     });
 
     logInfo(ctx, BiTrackingLogs.CopyEntry, {
-        entryId: Utils.encodeId(entryId),
+        entryIds,
     });
 
-    return copiedJoinedEntryRevision;
+    return result;
 };

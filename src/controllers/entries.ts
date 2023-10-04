@@ -109,39 +109,30 @@ export default {
     },
 
     createEntry: async (req: Request, res: Response) => {
-        // const {body} = req;
+        const {body} = req;
 
-        for (let i = 1; i < 1000; i++) {
-            await EntryService.create({
-                workbookId: '1466785678003012649',
-                name: `New ${i}`,
-                scope: 'dash',
-                ctx: req.ctx,
-            });
-        }
+        const result = await EntryService.create({
+            workbookId: body.workbookId,
+            name: body.name,
+            scope: body.scope,
+            type: body.type,
+            key: body.key,
+            meta: body.meta,
+            recursion: body.recursion,
+            hidden: body.hidden,
+            data: body.data,
+            unversionedData: body.unversionedData,
+            links: body.links,
+            permissionsMode: body.permissionsMode,
+            includePermissionsInfo: Utils.isTrueArg(body.includePermissionsInfo),
+            initialPermissions: body.initialPermissions,
+            initialParentId: body.initialParentId,
+            ctx: req.ctx,
+        });
 
-        // const result = await EntryService.create({
-        //     workbookId: body.workbookId,
-        //     name: body.name,
-        //     scope: body.scope,
-        //     type: body.type,
-        //     key: body.key,
-        //     meta: body.meta,
-        //     recursion: body.recursion,
-        //     hidden: body.hidden,
-        //     data: body.data,
-        //     unversionedData: body.unversionedData,
-        //     links: body.links,
-        //     permissionsMode: body.permissionsMode,
-        //     includePermissionsInfo: Utils.isTrueArg(body.includePermissionsInfo),
-        //     initialPermissions: body.initialPermissions,
-        //     initialParentId: body.initialParentId,
-        //     ctx: req.ctx,
-        // });
+        const {code, response} = prepareResponse({data: result});
 
-        // const {code, response} = prepareResponse({data: result});
-
-        res.status(200).send({});
+        res.status(code).send(response);
     },
 
     _createEntry: async (req: Request, res: Response) => {

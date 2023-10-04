@@ -91,9 +91,6 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
             route: 'POST /v1/entries',
             handler: entriesController.createEntry,
             write: true,
-
-            // authPolicy: AuthPolicy.disabled,
-            // private: true,
         }),
         privateCreateEntry: makeRoute({
             route: 'POST /private/entries',
@@ -322,9 +319,6 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
                 route: 'POST /v2/workbooks/:workbookId/copy',
                 handler: workbooksController.copy,
                 write: true,
-
-                // authPolicy: AuthPolicy.disabled,
-                // private: true,
             }),
             copyWorkbookTemplate: makeRoute({
                 route: 'POST /v2/workbooks/:workbookId/copyTemplate',
