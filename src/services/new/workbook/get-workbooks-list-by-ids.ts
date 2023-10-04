@@ -29,15 +29,15 @@ type GetWorkbooksListAndAllParentsArgs = {
 
 export const getParentsIdsFromMap = (
     collectionId: string | null,
-    map: {[key: string]: string | null},
+    parentsMap: Map<string, Nullable<string>>,
 ): string[] => {
-    let id: string | null = collectionId;
+    let id: Nullable<string> = collectionId;
     const arr: string[] = id ? [id] : [];
 
     while (id !== null) {
-        const curr: string | null = map[id];
+        const curr: Nullable<string> = parentsMap.get(id) || null;
 
-        if (curr !== null) arr.push(curr);
+        if (curr) arr.push(curr);
 
         id = curr;
     }
@@ -91,41 +91,48 @@ export const getWorkbooksListByIds = async (
 
     const workbooksMap = new Map<WorkbookModel, string[]>();
 
-    const result: WorkbookModel[] = [];
+    let result: WorkbookModel[] = [];
 
-    const map: {[key: string]: string | null} = {};
+    const parentsMap = new Map<string, Nullable<string>>();
 
     parents.forEach((parent: CollectionModel) => {
-        map[parent.collectionId] = parent.parentId;
+        parentsMap.set(parent.collectionId, parent.parentId);
     });
 
     workbookList.forEach((model) => {
         const collectionId = model.collectionId;
 
-        const parentsforWorkbook = getParentsIdsFromMap(collectionId, map);
+        const parentsforWorkbook = getParentsIdsFromMap(collectionId, parentsMap);
 
         workbooksMap.set(model, parentsforWorkbook);
     });
 
-    for await (const pair of workbooksMap) {
-        const [workbookModel, parentIds] = pair;
+    const checkPermissionPromises: Promise<WorkbookModel | void>[] = [];
 
+    workbooksMap.forEach((parentIds, workbookModel) => {
         const workbook = new Workbook({
             ctx,
             model: workbookModel,
         });
 
-        try {
-            await workbook.checkPermission({
+        const promise = workbook
+            .checkPermission({
                 parentIds,
                 permission: isEnabledFeature(ctx, Feature.UseLimitedView)
                     ? WorkbookPermission.LimitedView
                     : WorkbookPermission.View,
-            });
+            })
+            .then(() => {
+                return workbookModel;
+            })
+            .catch(() => {});
 
-            result.push(workbookModel);
-        } catch (e) {}
-    }
+        checkPermissionPromises.push(promise);
+    });
+
+    const responses = await Promise.all(checkPermissionPromises);
+
+    result = responses.filter((item) => Boolean(item)) as WorkbookModel[];
 
     logInfo(ctx, 'GET_WORKBOOKS_LIST_BY_IDS_FINISHED', {
         workbookIds: workbookList.map((workbook) => Utils.encodeId(workbook.workbookId)),

@@ -180,7 +180,10 @@ class Favorite extends Model {
                 );
                 workbookEntries.forEach((entry) => {
                     if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
-                        result.push(entry);
+                        result.push({
+                            ...entry,
+                            isLocked: false,
+                        });
                     }
                 });
             } else {
@@ -188,6 +191,7 @@ class Favorite extends Model {
                     ...result,
                     workbookEntries.map((entry) => ({
                         ...entry,
+                        isLocked: false,
                         ...(includePermissionsInfo && {
                             permissions: {
                                 execute: true,

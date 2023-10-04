@@ -231,12 +231,8 @@ class Navigation extends Model {
             }
         }
 
-        const {onlyPublic, embeddingInfo} = ctx.get('info');
-        const isEmbedding = Boolean(embeddingInfo);
-        const checkWorkbookEnabled = !onlyPublic && !isEmbedding;
-
         if (workbookEntries.length > 0) {
-            if (ctx.config.accessServiceEnabled && checkWorkbookEnabled) {
+            if (!isPrivateRoute && ctx.config.accessServiceEnabled) {
                 const workbookList = await getWorkbooksListByIds(
                     {ctx},
                     {
@@ -248,7 +244,10 @@ class Navigation extends Model {
                 );
                 workbookEntries.forEach((entry) => {
                     if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
-                        result.push(entry);
+                        result.push({
+                            ...entry,
+                            isLocked: false,
+                        });
                     }
                 });
             } else {
@@ -256,6 +255,7 @@ class Navigation extends Model {
                     ...result,
                     workbookEntries.map((entry) => ({
                         ...entry,
+                        isLocked: false,
                         ...(includePermissionsInfo && {
                             permissions: {
                                 execute: true,
