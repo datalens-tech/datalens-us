@@ -49,7 +49,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
     const {entryIds, destinationWorkbookId, tenantIdOverride, trxOverride} = params;
 
     logInfo(ctx, 'COPY_ENTRY_TO_WORKBOOK_CALL', {
-        entryIds,
+        entryIds: entryIds.map((entryId) => Utils.encodeId(entryId)),
         destinationWorkbookId,
         tenantIdOverride,
     });
@@ -176,7 +176,9 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
     });
 
     logInfo(ctx, BiTrackingLogs.CopyEntry, {
-        entryIds,
+        entryIds: result.map(({newJoinedEntryRevision}) =>
+            Utils.encodeId(newJoinedEntryRevision.entryId),
+        ),
     });
 
     return result;
