@@ -202,7 +202,7 @@ class Favorite extends Model {
                             workbookPermissionsMap.set(workbook.workbookId, permissions);
                         } catch (e) {}
                     }),
-                ).catch(() => {});
+                );
 
                 workbookEntries.forEach((entry) => {
                     if (entry?.workbookId && workbookPermissionsMap.has(entry.workbookId)) {

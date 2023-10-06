@@ -123,7 +123,7 @@ export const getWorkbooksListByIds = async (
 
     const checkPermissionPromises: Promise<WorkbookModel | void>[] = [];
 
-    workbooksMap.forEach(async (parentIds, workbookModel) => {
+    workbooksMap.forEach((parentIds, workbookModel) => {
         const workbook = new Workbook({
             ctx,
             model: workbookModel,
@@ -152,7 +152,7 @@ export const getWorkbooksListByIds = async (
 
                 return workbookModel;
             })
-            .catch(async () => {});
+            .catch(() => {});
 
         checkPermissionPromises.push(promise);
     });
