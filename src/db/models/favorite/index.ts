@@ -13,6 +13,10 @@ import {getWorkbook} from '../../../services/new/workbook';
 
 import {getWorkbooksListByIds} from '../../../services/new/workbook/get-workbooks-list-by-ids';
 
+import {getEntryPermissionsByWorkbook} from '../../../services/new/workbook/utils';
+
+import {WorkbookPermissions} from '../../../entities/workbook';
+
 interface Favorite extends MT.FavoriteColumns {}
 class Favorite extends Model {
     static get tableName() {
@@ -40,6 +44,7 @@ class Favorite extends Model {
         tenantId,
         requestedBy,
         ctx,
+        trx,
         filters,
         orderBy,
         page = 0,
@@ -173,15 +178,37 @@ class Favorite extends Model {
                     {ctx},
                     {
                         workbookIds: workbookEntries.map((entry) => entry.workbookId),
+                        includePermissionsInfo: true,
                     },
                 );
-                const workbookIds = workbookList.map(
-                    (workbook: {workbookId: string}) => workbook.workbookId,
-                );
+                const workbookPermissionsMap = new Map<string, WorkbookPermissions>();
+
+                const {Workbook} = registry.common.classes.get();
+
+                await Promise.all(
+                    workbookList.map(async (workbook) => {
+                        try {
+                            const workbookInstance = new Workbook({
+                                ctx,
+                                model: workbook,
+                            });
+
+                            const permissions = await getEntryPermissionsByWorkbook({
+                                ctx,
+                                trx,
+                                workbook: workbookInstance,
+                                bypassEnabled: false,
+                            });
+                            workbookPermissionsMap.set(workbook.workbookId, permissions);
+                        } catch (e) {}
+                    }),
+                ).catch(() => {});
+
                 workbookEntries.forEach((entry) => {
-                    if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
+                    if (entry?.workbookId && workbookPermissionsMap.has(entry.workbookId)) {
                         result.push({
                             ...entry,
+                            permissions: workbookPermissionsMap.get(entry.workbookId),
                             isLocked: false,
                         });
                     }

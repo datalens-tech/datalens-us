@@ -1,4 +1,4 @@
-import {raw} from 'objection';
+import {raw, TransactionOrKnex} from 'objection';
 import {Model} from '../..';
 import Utils from '../../../utils';
 import Revision from '../revision';
@@ -8,6 +8,9 @@ import * as MT from '../../../types/models';
 import {RETURN_NAVIGATION_COLUMNS, COMPARISON_OPERATORS} from '../../../const';
 import {validateGetEntries, validateInterTenantGetEntries} from './scheme';
 import {registry} from '../../../registry';
+
+import {WorkbookPermissions} from '../../../entities/workbook';
+import {getEntryPermissionsByWorkbook} from '../../../services/new/workbook/utils';
 
 import {getWorkbooksListByIds} from '../../../services/new/workbook/get-workbooks-list-by-ids';
 
@@ -66,6 +69,7 @@ class Navigation extends Model {
             isPrivateRoute,
         }: MT.GetEntriesConfig,
         ctx: MT.CTX,
+        trx?: TransactionOrKnex,
     ) {
         ctx.log('GET_ENTRIES_REQUEST', {
             tenantId,
@@ -232,20 +236,42 @@ class Navigation extends Model {
         }
 
         if (workbookEntries.length > 0) {
-            if (!isPrivateRoute && ctx.config.accessServiceEnabled) {
+            if (ctx.config.accessServiceEnabled) {
                 const workbookList = await getWorkbooksListByIds(
                     {ctx},
                     {
                         workbookIds: workbookEntries.map((entry) => entry.workbookId),
+                        includePermissionsInfo: true,
                     },
                 );
-                const workbookIds = workbookList.map(
-                    (workbook: {workbookId: string}) => workbook.workbookId,
-                );
+                const workbookPermissionsMap = new Map<string, WorkbookPermissions>();
+
+                const {Workbook} = registry.common.classes.get();
+
+                await Promise.all(
+                    workbookList.map(async (workbook) => {
+                        try {
+                            const workbookInstance = new Workbook({
+                                ctx,
+                                model: workbook,
+                            });
+
+                            const permissions = await getEntryPermissionsByWorkbook({
+                                ctx,
+                                trx,
+                                workbook: workbookInstance,
+                                bypassEnabled: false,
+                            });
+                            workbookPermissionsMap.set(workbook.workbookId, permissions);
+                        } catch (e) {}
+                    }),
+                ).catch(() => {});
+
                 workbookEntries.forEach((entry) => {
-                    if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
+                    if (entry?.workbookId && workbookPermissionsMap.has(entry.workbookId)) {
                         result.push({
                             ...entry,
+                            permissions: workbookPermissionsMap.get(entry.workbookId),
                             isLocked: false,
                         });
                     }

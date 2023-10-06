@@ -12,6 +12,7 @@ import {WorkbookPermission} from '../../../entities/workbook';
 import {Feature, isEnabledFeature} from '../../../components/features';
 
 import {CollectionModel} from '../../../db/models/new/collection';
+import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -20,11 +21,15 @@ const validateArgs = makeSchemaValidator({
         workbookId: {
             type: ['array', 'string'],
         },
+        includePermissionsInfo: {
+            type: 'boolean',
+        },
     },
 });
 
 type GetWorkbooksListAndAllParentsArgs = {
     workbookIds: Nullable<string>[];
+    includePermissionsInfo?: boolean;
 };
 
 export const getParentsIdsFromMap = (
@@ -49,7 +54,7 @@ export const getWorkbooksListByIds = async (
     {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
     args: GetWorkbooksListAndAllParentsArgs,
 ) => {
-    const {workbookIds} = args;
+    const {workbookIds, includePermissionsInfo = false} = args;
 
     logInfo(ctx, 'GET_WORKBOOKS_LIST_BY_IDS_STARTED', {
         workbookIds: workbookIds.map((id) => Utils.encodeId(id)),
@@ -69,15 +74,26 @@ export const getWorkbooksListByIds = async (
             [WorkbookModelColumn.TenantId]: tenantId,
             [WorkbookModelColumn.ProjectId]: projectId,
         })
-        .whereIn([WorkbookModelColumn.WorkbookId], workbookIds);
+        .whereIn([WorkbookModelColumn.WorkbookId], workbookIds)
+        .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
     const {accessServiceEnabled} = ctx.config;
 
+    const {Workbook} = registry.common.classes.get();
+
     if (!accessServiceEnabled || skipCheckPermissions || isPrivateRoute) {
+        if (includePermissionsInfo) {
+            return workbookList.map((model) => {
+                const workbook = new Workbook({ctx, model});
+
+                workbook.enableAllPermissions();
+
+                return workbook.model;
+            });
+        }
+
         return workbookList;
     }
-
-    const {Workbook} = registry.common.classes.get();
 
     const collectionIds = workbookList
         .map((workbook) => workbook.collectionId)
@@ -90,8 +106,6 @@ export const getWorkbooksListByIds = async (
     });
 
     const workbooksMap = new Map<WorkbookModel, string[]>();
-
-    let result: WorkbookModel[] = [];
 
     const parentsMap = new Map<string, Nullable<string>>();
 
@@ -109,7 +123,7 @@ export const getWorkbooksListByIds = async (
 
     const checkPermissionPromises: Promise<WorkbookModel | void>[] = [];
 
-    workbooksMap.forEach((parentIds, workbookModel) => {
+    workbooksMap.forEach(async (parentIds, workbookModel) => {
         const workbook = new Workbook({
             ctx,
             model: workbookModel,
@@ -122,17 +136,30 @@ export const getWorkbooksListByIds = async (
                     ? WorkbookPermission.LimitedView
                     : WorkbookPermission.View,
             })
-            .then(() => {
+            .then(async () => {
+                if (includePermissionsInfo) {
+                    const {bulkFetchWorkbooksAllPermissions} = registry.common.functions.get();
+
+                    const res: WorkbookInstance[] = await bulkFetchWorkbooksAllPermissions(ctx, [
+                        {
+                            model: workbook.model,
+                            parentIds,
+                        },
+                    ]);
+
+                    return res[0].model;
+                }
+
                 return workbookModel;
             })
-            .catch(() => {});
+            .catch(async () => {});
 
         checkPermissionPromises.push(promise);
     });
 
-    const responses = await Promise.all(checkPermissionPromises);
+    const workbooks = await Promise.all(checkPermissionPromises);
 
-    result = responses.filter((item) => Boolean(item)) as WorkbookModel[];
+    const result: WorkbookModel[] = workbooks.filter((item) => Boolean(item)) as WorkbookModel[];
 
     logInfo(ctx, 'GET_WORKBOOKS_LIST_BY_IDS_FINISHED', {
         workbookIds: workbookList.map((workbook) => Utils.encodeId(workbook.workbookId)),
