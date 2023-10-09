@@ -75,17 +75,28 @@ export class JoinedEntryRevision extends Model {
 
     static find({
         where,
+        whereIn,
         joinRevisionArgs,
         trx,
     }: {
         where: Record<string, unknown> | ((builder: Knex.QueryBuilder) => void);
+        whereIn?: {
+            columnName: string;
+            values: any[];
+        };
         joinRevisionArgs: JoinRevisionArgs;
         trx: TransactionOrKnex;
     }) {
         return JoinedEntryRevision.query(trx)
             .select(selectedColumns)
             .join(RevisionModel.tableName, joinRevision(joinRevisionArgs))
-            .where(where)
+            .where((builder) => {
+                builder.where(where);
+
+                if (whereIn) {
+                    builder.whereIn(whereIn.columnName, whereIn.values);
+                }
+            })
             .timeout(JoinedEntryRevision.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<
             JoinedEntryRevisionColumns[]
         >;

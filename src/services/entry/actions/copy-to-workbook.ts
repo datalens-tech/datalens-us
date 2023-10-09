@@ -3,12 +3,7 @@ import {AppError} from '@gravity-ui/nodekit';
 
 import {getId} from '../../../db';
 import {Entry} from '../../../db/models/new/entry';
-import {
-    JoinedEntryRevision,
-    selectedColumns,
-    joinRevision,
-    JoinedEntryRevisionColumns,
-} from '../../../db/presentations/joined-entry-revision';
+import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
 import {WorkbookModel} from '../../../db/models/new/workbook';
 import {CTX} from '../../../types/models';
 import {US_ERRORS, BiTrackingLogs} from '../../../const';
@@ -17,8 +12,6 @@ import Utils, {logInfo, makeUserId} from '../../../utils';
 import Link from '../../../db/models/links';
 
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-
-import {RevisionModel} from '../../../db/models/new/revision';
 
 interface Params {
     entryIds: Entry['entryId'][];
@@ -66,21 +59,18 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
 
     const transactionTrx = trxOverride ?? Entry.primary;
 
-    const originJoinedEntryRevisions = await (JoinedEntryRevision.query(Entry.replica)
-        .select(selectedColumns)
-        .join(
-            RevisionModel.tableName,
-            joinRevision({
-                isPublishFallback: true,
-            }),
-        )
-        .where({
-            [`${Entry.tableName}.isDeleted`]: false,
-        })
-        .whereIn([`${Entry.tableName}.entryId`], entryIds)
-        .timeout(JoinedEntryRevision.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<
-        JoinedEntryRevisionColumns[]
-    >);
+    const originJoinedEntryRevisions = await JoinedEntryRevision.find({
+        where: (builder) => {
+            builder.where({
+                [`${Entry.tableName}.isDeleted`]: false,
+            });
+        },
+        whereIn: {columnName: `${Entry.tableName}.entryId`, values: entryIds},
+        joinRevisionArgs: {
+            isPublishFallback: true,
+        },
+        trx: Entry.replica,
+    });
 
     const mapEntryIdsWithOldIds = new Map<string, string>();
 
@@ -158,22 +148,20 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
 
     await Entry.query(transactionTrx).insertGraph(newEntries).timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
-    const copiedJoinedEntryRevisions = await (JoinedEntryRevision.query(transactionTrx)
-        .select(selectedColumns)
-        .join(
-            RevisionModel.tableName,
-            joinRevision({
-                isPublishFallback: true,
-            }),
-        )
-        .where({
+    const copiedJoinedEntryRevisions = await JoinedEntryRevision.find({
+        where: {
             [`${Entry.tableName}.tenantId`]: targetTenantId,
             [`${Entry.tableName}.isDeleted`]: false,
-        })
-        .whereIn([`${Entry.tableName}.entryId`], Array.from(mapEntryIdsWithOldIds.keys()))
-        .timeout(JoinedEntryRevision.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<
-        JoinedEntryRevisionColumns[]
-    >);
+        },
+        whereIn: {
+            columnName: `${Entry.tableName}.entryId`,
+            values: Array.from(mapEntryIdsWithOldIds.keys()),
+        },
+        joinRevisionArgs: {
+            isPublishFallback: true,
+        },
+        trx: transactionTrx,
+    });
 
     const result = copiedJoinedEntryRevisions.map((entry: {entryId: string}) => {
         return {
