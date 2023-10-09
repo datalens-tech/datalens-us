@@ -72,7 +72,7 @@ export const copyEntriesToWorkbook = async (
         const isConnection = entry.scope === EntryScope.Connection;
         const isFile = entry.type === EntryType.File || entry.type === EntryType.GsheetsV2;
 
-        return (isConnection && isFile) === false;
+        return !(isConnection && isFile);
     });
 
     logInfo(ctx, 'ENTRIES_TO_COPY', {
