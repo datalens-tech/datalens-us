@@ -201,6 +201,7 @@ export const copyWorkbook = async (
                 destinationWorkbookId: copiedWorkbook.workbookId,
                 tenantIdOverride,
                 trxOverride: transactionTrx,
+                skipLinkSync: true,
             });
 
             const filteredCopiedJoinedEntryRevisions = copiedJoinedEntryRevisions.filter(

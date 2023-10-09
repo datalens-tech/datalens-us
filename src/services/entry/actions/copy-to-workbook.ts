@@ -14,6 +14,8 @@ import {CTX} from '../../../types/models';
 import {US_ERRORS, BiTrackingLogs} from '../../../const';
 import Utils, {logInfo, makeUserId} from '../../../utils';
 
+import Link from '../../../db/models/links';
+
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 
 import {RevisionModel} from '../../../db/models/new/revision';
@@ -23,6 +25,7 @@ interface Params {
     destinationWorkbookId: WorkbookModel['workbookId'];
     tenantIdOverride?: Entry['tenantId'];
     trxOverride?: TransactionOrKnex;
+    skipLinkSync?: boolean;
 }
 
 export const validateParams = makeSchemaValidator({
@@ -39,11 +42,14 @@ export const validateParams = makeSchemaValidator({
         tenantIdOverride: {
             type: 'string',
         },
+        skipLinkSync: {
+            type: 'boolean',
+        },
     },
 });
 
 export const copyToWorkbook = async (ctx: CTX, params: Params) => {
-    const {entryIds, destinationWorkbookId, tenantIdOverride, trxOverride} = params;
+    const {entryIds, destinationWorkbookId, tenantIdOverride, trxOverride, skipLinkSync} = params;
 
     logInfo(ctx, 'COPY_ENTRY_TO_WORKBOOK_CALL', {
         entryIds: entryIds.map((entryId) => Utils.encodeId(entryId)),
@@ -114,6 +120,10 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
             const key = displayKey.toLowerCase();
 
             const links = originJoinedEntryRevision.links as Nullable<Record<string, string>>;
+
+            if (!skipLinkSync && links) {
+                await Link.sync({entryId: newEntryId, links, ctx, trxOverride: transactionTrx});
+            }
 
             return {
                 scope: originJoinedEntryRevision.scope,
