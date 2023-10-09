@@ -23,6 +23,7 @@ interface Params {
     trxOverride?: TransactionOrKnex;
     skipLinkSync?: boolean;
     skipWorkbookPermissionsCheck?: boolean;
+    entryNamesOverride?: Map<string, string>;
 }
 
 export const validateParams = makeSchemaValidator({
@@ -56,6 +57,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
         trxOverride,
         skipLinkSync,
         skipWorkbookPermissionsCheck = false,
+        entryNamesOverride,
     } = params;
 
     logInfo(ctx, 'COPY_ENTRY_TO_WORKBOOK_CALL', {
@@ -146,9 +148,10 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
 
             mapEntryIdsWithOldIds.set(newEntryId, originJoinedEntryRevision.entryId);
 
-            const displayKey = `${newEntryId}/${Utils.getNameByKey({
+            const name = entryNamesOverride?.get(originJoinedEntryRevision.entryId) ?? Utils.getNameByKey({
                 key: originJoinedEntryRevision.displayKey,
-            })}`;
+            });
+            const displayKey = `${newEntryId}/${name}`;
             const key = displayKey.toLowerCase();
 
             const links = originJoinedEntryRevision.links as Nullable<Record<string, string>>;

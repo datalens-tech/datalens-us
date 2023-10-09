@@ -57,6 +57,10 @@ export const RETURN_META_COLUMNS = [
 
 export const RETURN_RELATION_COLUMNS = [
     'entries.entryId',
+    'entries.created_at',
+    'publishedId',
+    'savedId',
+    'key as displayKey',
     'scope',
     'type',
     'display_key as key',

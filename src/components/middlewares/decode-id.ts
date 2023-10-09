@@ -23,8 +23,14 @@ export const decodeId = (req: Request, _res: Response, next: NextFunction) => {
             }
 
             if (req.body && req.body[idVariable]) {
-                const encodedId = req.body[idVariable];
-                req.body[idVariable] = Utils.decodeId(encodedId);
+                const entity = req.body[idVariable] as string | string[];
+
+                if (Array.isArray(entity)) {
+                    req.body[idVariable] = entity.map((encodedId) => Utils.decodeId(encodedId));
+                } else {
+                    const encodedId = req.body[idVariable];
+                    req.body[idVariable] = Utils.decodeId(encodedId);
+                }
             }
         }
     } catch {

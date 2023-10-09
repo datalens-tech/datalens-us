@@ -21,6 +21,7 @@ import {
     getEntryMetaPrivate,
     GetEntryMetaPrivateArgs,
     copyEntryToWorkbook,
+    copyEntriesToWorkbook,
 } from '../services/new/entry';
 import {
     formatGetEntryResponse,
@@ -238,6 +239,21 @@ export default {
         const formattedResponse = formatEntryModel(result);
 
         const {code, response} = prepareResponse({data: formattedResponse});
+        res.status(code).send(response);
+    },
+
+    copyEntriesToWorkbook: async (req: Request, res: Response) => {
+        const {body} = req;
+
+        const result = await copyEntriesToWorkbook(
+            {ctx: req.ctx},
+            {
+                entryIds: body.ids,
+                workbookId: body.workbookId,
+            },
+        );
+
+        const {code, response} = prepareResponse({data: result});
         res.status(code).send(response);
     },
 
