@@ -243,7 +243,7 @@ export default {
 
     getEntries: async (req: Request, res: Response) => {
         const query = req.query as unknown as ST.GetEntries;
-        console.log('query.ignoreWorkbookEntasdries: ', query.ignoreWorkbookEntries);
+
         const result = await NavigationService.getEntries({
             ids: query.ids,
             scope: query.scope,
