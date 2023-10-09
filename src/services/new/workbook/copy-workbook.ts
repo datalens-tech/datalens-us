@@ -70,7 +70,7 @@ export const copyWorkbook = async (
         validateArgs(args);
     }
 
-    const {accessServiceEnabled, accessBindingsServiceEnabled} = ctx.config;
+    const {accessServiceEnabled} = ctx.config;
 
     const {
         tenantId,
@@ -218,25 +218,23 @@ export const copyWorkbook = async (
             });
         }
 
-        if (accessServiceEnabled && accessBindingsServiceEnabled) {
-            const workbook = new Workbook({
+        const workbook = new Workbook({
+            ctx,
+            model: copiedWorkbook,
+        });
+
+        let newCollectionParentIds: string[] = [];
+
+        if (newCollectionId) {
+            newCollectionParentIds = await getParentIds({
                 ctx,
-                model: copiedWorkbook,
-            });
-
-            let newCollectionParentIds: string[] = [];
-
-            if (newCollectionId) {
-                newCollectionParentIds = await getParentIds({
-                    ctx,
-                    collectionId: newCollectionId,
-                });
-            }
-
-            operation = await workbook.register({
-                parentIds: newCollectionParentIds,
+                collectionId: newCollectionId,
             });
         }
+
+        operation = await workbook.register({
+            parentIds: newCollectionParentIds,
+        });
 
         return copiedWorkbook;
     });
