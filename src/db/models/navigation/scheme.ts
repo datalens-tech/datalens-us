@@ -60,6 +60,9 @@ export const validateGetEntries = compileSchema({
         includePermissionsInfo: {
             type: 'boolean',
         },
+        ignoreWorkbookEntries: {
+            type: 'boolean',
+        },
         includeData: {
             type: 'boolean',
         },

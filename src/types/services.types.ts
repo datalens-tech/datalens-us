@@ -57,6 +57,7 @@ export interface GetEntries extends NavigationServiceParams {
     filters?: EntriesFilters;
     isPrivateRoute?: any;
     includePermissionsInfo?: boolean;
+    ignoreWorkbookEntries?: boolean;
     includeData?: boolean;
     includeLinks?: boolean;
     excludeLocked?: boolean;
@@ -92,6 +93,7 @@ export interface GetFavorite extends StdServiceParams {
     pageSize?: number;
     scope?: string | string[];
     includePermissionsInfo?: boolean;
+    ignoreWorkbookEntries?: boolean;
 }
 export interface AddFavorite extends StdServiceParams {
     entryId: string;

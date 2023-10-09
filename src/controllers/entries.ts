@@ -243,7 +243,7 @@ export default {
 
     getEntries: async (req: Request, res: Response) => {
         const query = req.query as unknown as ST.GetEntries;
-
+        console.log('query.ignoreWorkbookEntasdries: ', query.ignoreWorkbookEntries);
         const result = await NavigationService.getEntries({
             ids: query.ids,
             scope: query.scope,
@@ -255,6 +255,7 @@ export default {
             page: query.page && Number(query.page),
             pageSize: query.pageSize && Number(query.pageSize),
             includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
+            ignoreWorkbookEntries: Utils.isTrueArg(query.ignoreWorkbookEntries),
             includeData: Utils.isTrueArg(query.includeData),
             includeLinks: Utils.isTrueArg(query.includeLinks),
             excludeLocked: Utils.isTrueArg(query.excludeLocked),

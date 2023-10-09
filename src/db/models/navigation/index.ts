@@ -59,6 +59,7 @@ class Navigation extends Model {
             pageSize = 100,
             requestedBy,
             includePermissionsInfo,
+            ignoreWorkbookEntries,
             includeData,
             includeLinks,
             excludeLocked,
@@ -80,6 +81,7 @@ class Navigation extends Model {
             pageSize,
             requestedBy,
             includePermissionsInfo,
+            ignoreWorkbookEntries,
             includeData,
             includeLinks,
             dlContext,
@@ -162,6 +164,11 @@ class Navigation extends Model {
                         Array.isArray(createdBy) ? createdBy : [createdBy],
                     );
                 }
+
+                if (ignoreWorkbookEntries) {
+                    builder.where('entries.workbookId', null);
+                }
+
                 if (metaFilters) {
                     Object.entries(metaFilters).map(([metaField, value]) => {
                         return builder.whereRaw('meta->>?::text = ?::text', [metaField, value]);
