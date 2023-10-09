@@ -22,7 +22,6 @@ interface Params {
     entryIds: Entry['entryId'][];
     destinationWorkbookId: WorkbookModel['workbookId'];
     tenantIdOverride?: Entry['tenantId'];
-    skipWorkbookPermissionsCheck?: boolean;
     trxOverride?: TransactionOrKnex;
 }
 
@@ -32,15 +31,13 @@ export const validateParams = makeSchemaValidator({
     properties: {
         entryIds: {
             type: 'array',
+            items: {type: 'string'},
         },
         destinationWorkbookId: {
             type: 'string',
         },
         tenantIdOverride: {
             type: 'string',
-        },
-        skipWorkbookPermissionsCheck: {
-            type: 'boolean',
         },
     },
 });
@@ -79,7 +76,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
         JoinedEntryRevisionColumns[]
     >);
 
-    const mapEntryIdsWithOldIds: {[key: string]: string} = {};
+    const mapEntryIdsWithOldIds = new Map<string, string>();
 
     const newEntries = await Promise.all(
         originJoinedEntryRevisions.map(async (originJoinedEntryRevision) => {
@@ -109,7 +106,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
 
             const [newEntryId, newRevId] = await Promise.all([getId(), getId()]);
 
-            mapEntryIdsWithOldIds[newEntryId] = originJoinedEntryRevision.entryId;
+            mapEntryIdsWithOldIds.set(newEntryId, originJoinedEntryRevision.entryId);
 
             const displayKey = `${newEntryId}/${Utils.getNameByKey({
                 key: originJoinedEntryRevision.displayKey,
@@ -163,22 +160,22 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
             [`${Entry.tableName}.tenantId`]: targetTenantId,
             [`${Entry.tableName}.isDeleted`]: false,
         })
-        .whereIn([`${Entry.tableName}.entryId`], Object.keys(mapEntryIdsWithOldIds))
+        .whereIn([`${Entry.tableName}.entryId`], Array.from(mapEntryIdsWithOldIds.keys()))
         .timeout(JoinedEntryRevision.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<
         JoinedEntryRevisionColumns[]
     >);
 
-    const result = copiedJoinedEntryRevisions.map((entry: {entryId: string | number}) => {
+    const result = copiedJoinedEntryRevisions.map((entry: {entryId: string}) => {
         return {
             newJoinedEntryRevision: entry,
-            oldEntryId: mapEntryIdsWithOldIds[entry.entryId],
+            oldEntryId: mapEntryIdsWithOldIds.get(entry.entryId),
         };
     });
 
-    logInfo(ctx, BiTrackingLogs.CopyEntry, {
-        entryIds: result.map(({newJoinedEntryRevision}) =>
-            Utils.encodeId(newJoinedEntryRevision.entryId),
-        ),
+    result.forEach(({newJoinedEntryRevision}) => {
+        logInfo(ctx, BiTrackingLogs.CopyEntry, {
+            entryId: Utils.encodeId(newJoinedEntryRevision.entryId),
+        });
     });
 
     return result;

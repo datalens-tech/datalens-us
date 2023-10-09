@@ -85,6 +85,9 @@ export const copyWorkbook = async (
     const originWorkbookModel: Optional<WorkbookModel> = await WorkbookModel.query(targetTrx)
         .select()
         .findById(workbookId)
+        .where({
+            [WorkbookModelColumn.DeletedAt]: null,
+        })
         .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
     if (originWorkbookModel === undefined) {
@@ -192,51 +195,11 @@ export const copyWorkbook = async (
             .returning('*')
             .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
-        if (accessServiceEnabled && accessBindingsServiceEnabled) {
-            const workbookTargetTrx = transactionTrx ?? WorkbookModel.replica;
-
-            const destinationWorkbookModel: Optional<WorkbookModel> = await WorkbookModel.query(
-                workbookTargetTrx,
-            )
-                .select()
-                .findById(copiedWorkbook.workbookId)
-                .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
-
-            if (
-                destinationWorkbookModel === undefined ||
-                (tenantIdOverride === undefined && originWorkbookModel.tenantId !== tenantId)
-            ) {
-                throw new AppError('Workbook not exists', {
-                    code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-                });
-            }
-
-            const destinationWorkbook = new Workbook({
-                ctx,
-                model: destinationWorkbookModel,
-            });
-
-            let destinationWorkbookParentIds: string[] = [];
-
-            if (destinationWorkbook.model.collectionId !== null) {
-                destinationWorkbookParentIds = await getParentIds({
-                    ctx,
-                    collectionId: destinationWorkbook.model.collectionId,
-                });
-            }
-
-            await destinationWorkbook.checkPermission({
-                parentIds: destinationWorkbookParentIds,
-                permission: WorkbookPermission.Update,
-            });
-        }
-
         if (originEntries.length > 0) {
             const copiedJoinedEntryRevisions = await copyToWorkbook(ctx, {
                 entryIds: originEntries.map((entry) => entry.entryId),
                 destinationWorkbookId: copiedWorkbook.workbookId,
                 tenantIdOverride,
-                skipWorkbookPermissionsCheck: true,
                 trxOverride: transactionTrx,
             });
 
