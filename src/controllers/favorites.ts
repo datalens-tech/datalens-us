@@ -16,6 +16,7 @@ export default {
             pageSize: query.pageSize && Number(query.pageSize),
             scope: query.scope,
             includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
+            ignoreWorkbookEntries: Utils.isTrueArg(query.ignoreWorkbookEntries),
             ctx: req.ctx,
         });
 

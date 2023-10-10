@@ -6,6 +6,7 @@ export interface GetFavoriteConfig extends BasicRequestParams {
     tenantId?: any;
     ctx: CTX;
     includePermissionsInfo?: boolean;
+    ignoreWorkbookEntries?: boolean;
     orderBy?: EntriesOrderByFilter;
     createdBy?: string;
     page?: number;

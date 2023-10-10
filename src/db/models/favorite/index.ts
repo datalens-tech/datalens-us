@@ -46,6 +46,7 @@ class Favorite extends Model {
         pageSize = 100,
         scope,
         includePermissionsInfo,
+        ignoreWorkbookEntries,
         dlContext,
     }: MT.GetFavoriteConfig) {
         ctx.log('GET_FAVORITES_REQUEST', {
@@ -57,6 +58,7 @@ class Favorite extends Model {
             pageSize,
             scope,
             includePermissionsInfo,
+            ignoreWorkbookEntries,
             dlContext,
         });
 
@@ -68,6 +70,7 @@ class Favorite extends Model {
             tenantId,
             login,
             includePermissionsInfo,
+            ignoreWorkbookEntries,
             filters,
             orderBy,
             page,
@@ -107,6 +110,10 @@ class Favorite extends Model {
                         : scope.replace(/\s/g, '').split(',');
 
                     builder.whereIn('scope', ['folder', ...scopes]);
+                }
+
+                if (ignoreWorkbookEntries) {
+                    builder.where('entries.workbookId', null);
                 }
             })
             .orderByRaw("CASE WHEN scope = 'folder' THEN 0 ELSE 1 END")

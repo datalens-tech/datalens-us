@@ -255,6 +255,7 @@ export default {
             page: query.page && Number(query.page),
             pageSize: query.pageSize && Number(query.pageSize),
             includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
+            ignoreWorkbookEntries: Utils.isTrueArg(query.ignoreWorkbookEntries),
             includeData: Utils.isTrueArg(query.includeData),
             includeLinks: Utils.isTrueArg(query.includeLinks),
             excludeLocked: Utils.isTrueArg(query.excludeLocked),

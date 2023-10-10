@@ -9,6 +9,7 @@ export default class FavoriteService {
         pageSize,
         scope,
         includePermissionsInfo,
+        ignoreWorkbookEntries,
         ctx,
     }: ST.GetFavorite) {
         const {requestId, tenantId, user, dlContext} = ctx.get('info');
@@ -22,6 +23,7 @@ export default class FavoriteService {
             pageSize,
             scope,
             includePermissionsInfo,
+            ignoreWorkbookEntries,
             requestedBy: user,
             dlContext,
             ctx,

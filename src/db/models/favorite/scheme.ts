@@ -14,6 +14,9 @@ export const validateGetFavorites = compileSchema({
         includePermissionsInfo: {
             type: 'boolean',
         },
+        ignoreWorkbookEntries: {
+            type: 'boolean',
+        },
         filters: {
             type: 'object',
             patternProperties: AJV_PATTERN_KEYS_NOT_OBJECT,
