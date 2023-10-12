@@ -35,6 +35,9 @@ const validateArgs = makeSchemaValidator({
         tenantIdOverride: {
             type: 'string',
         },
+        accessBindingsServiceEnabled: {
+            type: 'boolean',
+        },
     },
 });
 
@@ -44,6 +47,7 @@ export interface CopyWorkbookArgs {
     title: string;
     projectIdOverride?: Nullable<string>;
     tenantIdOverride?: string;
+    accessBindingsServiceEnabled?: boolean;
 }
 
 export const copyWorkbook = async (
@@ -70,7 +74,7 @@ export const copyWorkbook = async (
         validateArgs(args);
     }
 
-    const {accessServiceEnabled} = ctx.config;
+    const {accessServiceEnabled, accessBindingsServiceEnabled} = ctx.config;
 
     const {
         tenantId,
@@ -80,9 +84,7 @@ export const copyWorkbook = async (
 
     const {Workbook} = registry.common.classes.get();
 
-    const targetTrx = getReplica(trx);
-
-    const originWorkbookModel: Optional<WorkbookModel> = await WorkbookModel.query(targetTrx)
+    const originWorkbookModel: Optional<WorkbookModel> = await WorkbookModel.query(getReplica(trx))
         .select()
         .findById(workbookId)
         .where({
@@ -150,7 +152,7 @@ export const copyWorkbook = async (
         });
     }
 
-    const originEntries = await Entry.query(targetTrx)
+    const originEntries = await Entry.query(getReplica(trx))
         .where({
             workbookId,
             tenantId: originTenantId,
@@ -202,6 +204,7 @@ export const copyWorkbook = async (
                 tenantIdOverride,
                 trxOverride: transactionTrx,
                 skipLinkSync: true,
+                skipWorkbookPermissionsCheck: true,
             });
 
             const filteredCopiedJoinedEntryRevisions = copiedJoinedEntryRevisions.filter(
@@ -218,23 +221,25 @@ export const copyWorkbook = async (
             });
         }
 
-        const workbook = new Workbook({
-            ctx,
-            model: copiedWorkbook,
-        });
-
-        let newCollectionParentIds: string[] = [];
-
-        if (newCollectionId) {
-            newCollectionParentIds = await getParentIds({
+        if (accessServiceEnabled && accessBindingsServiceEnabled) {
+            const workbook = new Workbook({
                 ctx,
-                collectionId: newCollectionId,
+                model: copiedWorkbook,
+            });
+
+            let newCollectionParentIds: string[] = [];
+
+            if (newCollectionId) {
+                newCollectionParentIds = await getParentIds({
+                    ctx,
+                    collectionId: newCollectionId,
+                });
+            }
+
+            operation = await workbook.register({
+                parentIds: newCollectionParentIds,
             });
         }
-
-        operation = await workbook.register({
-            parentIds: newCollectionParentIds,
-        });
 
         return copiedWorkbook;
     });

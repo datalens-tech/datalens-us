@@ -8,6 +8,9 @@ import {WorkbookModel} from '../../../db/models/new/workbook';
 import {CTX} from '../../../types/models';
 import {US_ERRORS, BiTrackingLogs} from '../../../const';
 import Utils, {logInfo, makeUserId} from '../../../utils';
+import {registry} from '../../../registry';
+import {WorkbookPermission} from '../../../entities/workbook';
+import {getParentIds} from '../../new/collection/utils/get-parents';
 
 import Link from '../../../db/models/links';
 
@@ -19,6 +22,7 @@ interface Params {
     tenantIdOverride?: Entry['tenantId'];
     trxOverride?: TransactionOrKnex;
     skipLinkSync?: boolean;
+    skipWorkbookPermissionsCheck?: boolean;
 }
 
 export const validateParams = makeSchemaValidator({
@@ -38,11 +42,21 @@ export const validateParams = makeSchemaValidator({
         skipLinkSync: {
             type: 'boolean',
         },
+        skipWorkbookPermissionsCheck: {
+            type: 'boolean',
+        },
     },
 });
 
 export const copyToWorkbook = async (ctx: CTX, params: Params) => {
-    const {entryIds, destinationWorkbookId, tenantIdOverride, trxOverride, skipLinkSync} = params;
+    const {
+        entryIds,
+        destinationWorkbookId,
+        tenantIdOverride,
+        trxOverride,
+        skipLinkSync,
+        skipWorkbookPermissionsCheck = false,
+    } = params;
 
     logInfo(ctx, 'COPY_ENTRY_TO_WORKBOOK_CALL', {
         entryIds: entryIds.map((entryId) => Utils.encodeId(entryId)),
@@ -64,13 +78,16 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
             builder.where({
                 [`${Entry.tableName}.isDeleted`]: false,
             });
+
+            builder.whereIn(`${Entry.tableName}.entryId`, entryIds);
         },
-        whereIn: {columnName: `${Entry.tableName}.entryId`, values: entryIds},
         joinRevisionArgs: {
             isPublishFallback: true,
         },
         trx: Entry.replica,
     });
+
+    const workbookId = originJoinedEntryRevisions[0].workbookId;
 
     const mapEntryIdsWithOldIds = new Map<string, string>();
 
@@ -91,6 +108,12 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
             if (originJoinedEntryRevision.workbookId === null) {
                 throw new AppError("Entry without workbookId, can't be copied to workbook", {
                     code: US_ERRORS.ENTRY_WITHOUT_WORKBOOK_ID_COPY_DENIED,
+                });
+            }
+
+            if (workbookId !== originJoinedEntryRevision.workbookId) {
+                throw new AppError('Workbook not exists', {
+                    code: US_ERRORS.WORKBOOK_NOT_EXISTS,
                 });
             }
 
@@ -146,16 +169,83 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
         }),
     );
 
+    if (!skipWorkbookPermissionsCheck && workbookId) {
+        const workbookTargetTrx = trxOverride ?? WorkbookModel.replica;
+
+        const [originWorkbookModel, destinationWorkbookModel]: Optional<WorkbookModel>[] =
+            await Promise.all([
+                WorkbookModel.query(workbookTargetTrx)
+                    .findById(workbookId)
+                    .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT),
+                WorkbookModel.query(workbookTargetTrx)
+                    .findById(destinationWorkbookId)
+                    .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT),
+            ]);
+
+        if (originWorkbookModel === undefined || destinationWorkbookModel === undefined) {
+            throw new AppError('Workbook not exists', {
+                code: US_ERRORS.WORKBOOK_NOT_EXISTS,
+            });
+        }
+
+        if (tenantIdOverride === undefined && originWorkbookModel.tenantId !== tenantId) {
+            throw new AppError('Workbook not exists', {
+                code: US_ERRORS.WORKBOOK_NOT_EXISTS,
+            });
+        }
+        const {Workbook} = registry.common.classes.get();
+
+        if (tenantIdOverride === undefined) {
+            const originWorkbook = new Workbook({
+                ctx,
+                model: originWorkbookModel,
+            });
+
+            let originWorkbookParentIds: string[] = [];
+
+            if (originWorkbook.model.collectionId !== null) {
+                originWorkbookParentIds = await getParentIds({
+                    ctx,
+                    collectionId: originWorkbook.model.collectionId,
+                });
+            }
+
+            await originWorkbook.checkPermission({
+                parentIds: originWorkbookParentIds,
+                permission: WorkbookPermission.Copy,
+            });
+        }
+
+        const destinationWorkbook = new Workbook({
+            ctx,
+            model: destinationWorkbookModel,
+        });
+
+        let destinationWorkbookParentIds: string[] = [];
+
+        if (destinationWorkbook.model.collectionId !== null) {
+            destinationWorkbookParentIds = await getParentIds({
+                ctx,
+                collectionId: destinationWorkbook.model.collectionId,
+            });
+        }
+
+        await destinationWorkbook.checkPermission({
+            parentIds: destinationWorkbookParentIds,
+            permission: WorkbookPermission.Update,
+        });
+    }
+
     await Entry.query(transactionTrx).insertGraph(newEntries).timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
     const copiedJoinedEntryRevisions = await JoinedEntryRevision.find({
-        where: {
-            [`${Entry.tableName}.tenantId`]: targetTenantId,
-            [`${Entry.tableName}.isDeleted`]: false,
-        },
-        whereIn: {
-            columnName: `${Entry.tableName}.entryId`,
-            values: Array.from(mapEntryIdsWithOldIds.keys()),
+        where: (builder) => {
+            builder.where({
+                [`${Entry.tableName}.tenantId`]: targetTenantId,
+                [`${Entry.tableName}.isDeleted`]: false,
+            });
+
+            builder.whereIn(`${Entry.tableName}.entryId`, Array.from(mapEntryIdsWithOldIds.keys()));
         },
         joinRevisionArgs: {
             isPublishFallback: true,
