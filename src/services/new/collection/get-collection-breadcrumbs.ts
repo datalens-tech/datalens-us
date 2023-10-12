@@ -41,7 +41,7 @@ export const getCollectionBreadcrumbs = async (
 
     const targetTrx = getReplica(trx);
 
-    const breadcrumbs = await getParents({ctx, trx: targetTrx, collectionId});
+    const breadcrumbs = await getParents({ctx, trx: targetTrx, collectionIds: [collectionId]});
 
     if (breadcrumbs.length === 0) {
         throw new AppError(US_ERRORS.COLLECTION_NOT_EXISTS, {
