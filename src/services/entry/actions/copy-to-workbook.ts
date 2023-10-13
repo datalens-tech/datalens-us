@@ -87,7 +87,59 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
         trx: Entry.replica,
     });
 
-    const workbookId = originJoinedEntryRevisions[0].workbookId;
+    if (originJoinedEntryRevisions.length === 0) {
+        throw new AppError("Entries don't exist", {
+            code: US_ERRORS.NOT_EXIST_ENTRY,
+        });
+    }
+
+    let workbookId: Optional<string>;
+    originJoinedEntryRevisions.forEach((joinedEntryRevision) => {
+        if (tenantIdOverride === undefined && joinedEntryRevision.tenantId !== tenantId) {
+            throw new AppError(
+                `Entry ${Utils.encodeId(joinedEntryRevision.entryId)} doesn't exist`,
+                {
+                    code: US_ERRORS.NOT_EXIST_ENTRY,
+                },
+            );
+        }
+
+        if (joinedEntryRevision.scope === 'folder') {
+            throw new AppError('Folders cannot be copied', {
+                code: US_ERRORS.FOLDER_COPY_DENIED,
+            });
+        }
+
+        if (joinedEntryRevision.workbookId === null) {
+            throw new AppError(
+                `Entry ${Utils.encodeId(
+                    joinedEntryRevision.entryId,
+                )} doesn't have a workbookId and cannot be copied to a workbook.`,
+                {
+                    code: US_ERRORS.ENTRY_WITHOUT_WORKBOOK_ID_COPY_DENIED,
+                },
+            );
+        }
+
+        if (workbookId === undefined) {
+            workbookId = joinedEntryRevision.workbookId;
+        } else if (joinedEntryRevision.workbookId !== workbookId) {
+            throw new AppError(
+                `Copying entries from different workbooks is denied – ${Utils.encodeId(
+                    workbookId,
+                )} and ${Utils.encodeId(joinedEntryRevision.workbookId)}`,
+                {
+                    code: US_ERRORS.ENTRIES_WITH_DIFFERENT_WORKBOOK_IDS_COPY_DENIED, // <-- new error code
+                },
+            );
+        }
+    });
+
+    if (workbookId === undefined) {
+        throw new AppError(`Entries don't have a workbookId and cannot be copied to a workbook.`, {
+            code: US_ERRORS.ENTRY_WITHOUT_WORKBOOK_ID_COPY_DENIED,
+        });
+    }
 
     const mapEntryIdsWithOldIds = new Map<string, string>();
 
@@ -169,7 +221,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
         }),
     );
 
-    if (!skipWorkbookPermissionsCheck && workbookId) {
+    if (!skipWorkbookPermissionsCheck) {
         const workbookTargetTrx = trxOverride ?? WorkbookModel.replica;
 
         const [originWorkbookModel, destinationWorkbookModel]: Optional<WorkbookModel>[] =

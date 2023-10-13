@@ -379,6 +379,14 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
+        case US_ERRORS.ENTRIES_WITH_DIFFERENT_WORKBOOK_IDS_COPY_DENIED: {
+            return {
+                code: 403,
+                response: {
+                    message: 'Entry with different workbookIds, cannot be copy denied',
+                },
+            };
+        }
         case US_ERRORS.INIT_TENANT_MIGRATING: {
             return {
                 code: 409,
