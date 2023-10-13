@@ -35,6 +35,9 @@ const validateArgs = makeSchemaValidator({
         tenantIdOverride: {
             type: 'string',
         },
+        accessBindingsServiceEnabled: {
+            type: 'boolean',
+        },
     },
 });
 
@@ -44,9 +47,9 @@ export interface CopyWorkbookArgs {
     title: string;
     projectIdOverride?: Nullable<string>;
     tenantIdOverride?: string;
+    accessBindingsServiceEnabled?: boolean;
 }
 
-// eslint-disable-next-line complexity
 export const copyWorkbook = async (
     {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
     args: CopyWorkbookArgs,
@@ -84,6 +87,9 @@ export const copyWorkbook = async (
     const originWorkbookModel: Optional<WorkbookModel> = await WorkbookModel.query(getReplica(trx))
         .select()
         .findById(workbookId)
+        .where({
+            [WorkbookModelColumn.DeletedAt]: null,
+        })
         .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
     if (originWorkbookModel === undefined) {
@@ -125,8 +131,6 @@ export const copyWorkbook = async (
         );
     }
 
-    const targetTrx = getReplica(trx);
-
     if (
         accessServiceEnabled &&
         !skipCheckPermissions &&
@@ -148,7 +152,7 @@ export const copyWorkbook = async (
         });
     }
 
-    const originEntries = await Entry.query(targetTrx)
+    const originEntries = await Entry.query(getReplica(trx))
         .where({
             workbookId,
             tenantId: originTenantId,
@@ -193,6 +197,30 @@ export const copyWorkbook = async (
             .returning('*')
             .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
+        if (originEntries.length > 0) {
+            const copiedJoinedEntryRevisions = await copyToWorkbook(ctx, {
+                entryIds: originEntries.map((entry) => entry.entryId),
+                destinationWorkbookId: copiedWorkbook.workbookId,
+                tenantIdOverride,
+                trxOverride: transactionTrx,
+                skipLinkSync: true,
+                skipWorkbookPermissionsCheck: true,
+            });
+
+            const filteredCopiedJoinedEntryRevisions = copiedJoinedEntryRevisions.filter(
+                (item) => item.newJoinedEntryRevision !== undefined,
+            ) as {
+                newJoinedEntryRevision: JoinedEntryRevisionColumns;
+                oldEntryId: string;
+            }[];
+
+            await crossSyncCopiedJoinedEntryRevisions({
+                copiedJoinedEntryRevisions: filteredCopiedJoinedEntryRevisions,
+                ctx,
+                trx: transactionTrx,
+            });
+        }
+
         if (accessServiceEnabled && accessBindingsServiceEnabled) {
             const workbook = new Workbook({
                 ctx,
@@ -210,36 +238,6 @@ export const copyWorkbook = async (
 
             operation = await workbook.register({
                 parentIds: newCollectionParentIds,
-            });
-        }
-
-        if (originEntries.length > 0) {
-            const copiedJoinedEntryRevisions = await Promise.all(
-                originEntries.map((originEntry) => {
-                    return copyToWorkbook(ctx, {
-                        entryId: originEntry.entryId,
-                        destinationWorkbookId: copiedWorkbook.workbookId,
-                        tenantIdOverride,
-                        skipWorkbookPermissionsCheck: true,
-                        trxOverride: transactionTrx,
-                    }).then((newJoinedEntryRevision) => ({
-                        newJoinedEntryRevision,
-                        oldEntryId: originEntry.entryId,
-                    }));
-                }),
-            );
-
-            const filteredCopiedJoinedEntryRevisions = copiedJoinedEntryRevisions.filter(
-                (item) => item.newJoinedEntryRevision !== undefined,
-            ) as {
-                newJoinedEntryRevision: JoinedEntryRevisionColumns;
-                oldEntryId: string;
-            }[];
-
-            await crossSyncCopiedJoinedEntryRevisions({
-                copiedJoinedEntryRevisions: filteredCopiedJoinedEntryRevisions,
-                ctx,
-                trx: transactionTrx,
             });
         }
 
@@ -337,14 +335,15 @@ async function crossSyncCopiedJoinedEntryRevisions({
     trx: TransactionOrKnex;
 }) {
     const newByOldEntryIdMap = new Map<string, string>();
-    copiedJoinedEntryRevisions.forEach(({newJoinedEntryRevision, oldEntryId}) => {
-        const newEntryIdEncoded = Utils.encodeId(newJoinedEntryRevision.entryId);
-        const oldEntryIdEncoded = Utils.encodeId(oldEntryId);
-        newByOldEntryIdMap.set(newEntryIdEncoded, oldEntryIdEncoded);
-    });
 
     const arCopiedJoinedEntryRevisions = copiedJoinedEntryRevisions.map(
-        (item) => item.newJoinedEntryRevision,
+        ({newJoinedEntryRevision, oldEntryId}) => {
+            const newEntryIdEncoded = Utils.encodeId(newJoinedEntryRevision.entryId);
+            const oldEntryIdEncoded = Utils.encodeId(oldEntryId);
+            newByOldEntryIdMap.set(newEntryIdEncoded, oldEntryIdEncoded);
+
+            return newJoinedEntryRevision;
+        },
     );
 
     let strCopiedJoinedEntryRevisions = JSON.stringify(arCopiedJoinedEntryRevisions);
