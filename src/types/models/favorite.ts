@@ -1,12 +1,10 @@
 import {BasicRequestParams} from './common';
 import {CTX} from './core';
 import {EntriesOrderByFilter, EntriesFilters} from './filters';
-import {TransactionOrKnex} from 'objection';
 
 export interface GetFavoriteConfig extends BasicRequestParams {
     tenantId?: any;
     ctx: CTX;
-    trx?: TransactionOrKnex;
     includePermissionsInfo?: boolean;
     orderBy?: EntriesOrderByFilter;
     createdBy?: string;

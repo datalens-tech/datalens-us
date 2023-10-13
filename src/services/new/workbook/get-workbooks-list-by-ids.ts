@@ -58,6 +58,7 @@ export const getWorkbooksListByIds = async (
 
     logInfo(ctx, 'GET_WORKBOOKS_LIST_BY_IDS_STARTED', {
         workbookIds: workbookIds.map((id) => Utils.encodeId(id)),
+        includePermissionsInfo,
     });
 
     const {tenantId, isPrivateRoute, projectId} = ctx.get('info');
