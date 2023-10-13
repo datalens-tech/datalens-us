@@ -19,10 +19,3 @@ export enum WorkbookPermission {
 }
 
 export type Permissions = Record<WorkbookPermission, boolean>;
-
-export type WorkbookPermissions = {
-    execute: boolean;
-    read: boolean;
-    edit: boolean;
-    admin: boolean;
-};

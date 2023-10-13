@@ -12,7 +12,6 @@ import {WorkbookPermission} from '../../../entities/workbook';
 import {Feature, isEnabledFeature} from '../../../components/features';
 
 import {CollectionModel} from '../../../db/models/new/collection';
-import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -138,27 +137,38 @@ export const getWorkbooksListByIds = async (
                     : WorkbookPermission.View,
             })
             .then(async () => {
-                if (includePermissionsInfo) {
-                    const {bulkFetchWorkbooksAllPermissions} = registry.common.functions.get();
-
-                    const res: WorkbookInstance[] = await bulkFetchWorkbooksAllPermissions(ctx, [
-                        {
-                            model: workbook.model,
-                            parentIds,
-                        },
-                    ]);
-
-                    return res[0].model;
-                }
-
                 return workbookModel;
             })
-            .catch(() => {});
+            .catch(() => {
+                workbooksMap.delete(workbookModel);
+            });
 
         checkPermissionPromises.push(promise);
     });
 
-    const workbooks = await Promise.all(checkPermissionPromises);
+    let workbooks = await Promise.all(checkPermissionPromises);
+
+    if (includePermissionsInfo) {
+        const {bulkFetchWorkbooksAllPermissions} = registry.common.functions.get();
+
+        const mappedWorkbooks: {model: WorkbookModel; parentIds: string[]}[] = [];
+
+        workbooksMap.forEach((parentIds, workbookModel) => {
+            const workbook = new Workbook({
+                ctx,
+                model: workbookModel,
+            });
+
+            mappedWorkbooks.push({
+                model: workbook.model,
+                parentIds,
+            });
+        });
+
+        const workbooksInstances = await bulkFetchWorkbooksAllPermissions(ctx, mappedWorkbooks);
+
+        workbooks = workbooksInstances.map((workbook) => workbook.model);
+    }
 
     const result: WorkbookModel[] = workbooks.filter((item) => Boolean(item)) as WorkbookModel[];
 

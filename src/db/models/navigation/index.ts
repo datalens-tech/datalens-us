@@ -9,7 +9,7 @@ import {RETURN_NAVIGATION_COLUMNS, COMPARISON_OPERATORS} from '../../../const';
 import {validateGetEntries, validateInterTenantGetEntries} from './scheme';
 import {registry} from '../../../registry';
 
-import {WorkbookPermissions} from '../../../entities/workbook';
+import {EntryPermissions} from '../../../services/new/entry/types';
 import {getEntryPermissionsByWorkbook} from '../../../services/new/workbook/utils';
 
 import {getWorkbooksListByIds} from '../../../services/new/workbook/get-workbooks-list-by-ids';
@@ -236,7 +236,7 @@ class Navigation extends Model {
         }
 
         if (workbookEntries.length > 0) {
-            if (ctx.config.accessServiceEnabled) {
+            if (!isPrivateRoute && ctx.config.accessServiceEnabled) {
                 const workbookList = await getWorkbooksListByIds(
                     {ctx},
                     {
@@ -244,7 +244,11 @@ class Navigation extends Model {
                         includePermissionsInfo: true,
                     },
                 );
-                const workbookPermissionsMap = new Map<string, WorkbookPermissions>();
+                const workbookIds = workbookList.map(
+                    (workbook: {workbookId: string}) => workbook.workbookId,
+                );
+
+                const workbookPermissionsMap = new Map<string, EntryPermissions>();
 
                 const {Workbook} = registry.common.classes.get();
 
@@ -268,10 +272,12 @@ class Navigation extends Model {
                 );
 
                 workbookEntries.forEach((entry) => {
-                    if (entry?.workbookId && workbookPermissionsMap.has(entry.workbookId)) {
+                    if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
                         result.push({
                             ...entry,
-                            permissions: workbookPermissionsMap.get(entry.workbookId),
+                            permissions: includePermissionsInfo
+                                ? workbookPermissionsMap.get(entry.workbookId)
+                                : undefined,
                             isLocked: false,
                         });
                     }

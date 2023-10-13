@@ -15,7 +15,7 @@ import {getWorkbooksListByIds} from '../../../services/new/workbook/get-workbook
 
 import {getEntryPermissionsByWorkbook} from '../../../services/new/workbook/utils';
 
-import {WorkbookPermissions} from '../../../entities/workbook';
+import {EntryPermissions} from '../../../services/new/entry/types';
 
 interface Favorite extends MT.FavoriteColumns {}
 class Favorite extends Model {
@@ -180,7 +180,11 @@ class Favorite extends Model {
                         includePermissionsInfo,
                     },
                 );
-                const workbookPermissionsMap = new Map<string, WorkbookPermissions>();
+                const workbookIds = workbookList.map(
+                    (workbook: {workbookId: string}) => workbook.workbookId,
+                );
+
+                const workbookPermissionsMap = new Map<string, EntryPermissions>();
 
                 const {Workbook} = registry.common.classes.get();
 
@@ -204,10 +208,12 @@ class Favorite extends Model {
                     );
 
                     workbookEntries.forEach((entry) => {
-                        if (entry?.workbookId && workbookPermissionsMap.has(entry.workbookId)) {
+                        if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
                             result.push({
                                 ...entry,
-                                permissions: workbookPermissionsMap.get(entry.workbookId),
+                                permissions: includePermissionsInfo
+                                    ? workbookPermissionsMap.get(entry.workbookId)
+                                    : undefined,
                                 isLocked: false,
                             });
                         }
