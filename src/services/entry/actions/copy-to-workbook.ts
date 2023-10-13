@@ -129,7 +129,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
                     workbookId,
                 )} and ${Utils.encodeId(joinedEntryRevision.workbookId)}`,
                 {
-                    code: US_ERRORS.ENTRIES_WITH_DIFFERENT_WORKBOOK_IDS_COPY_DENIED, // <-- new error code
+                    code: US_ERRORS.ENTRIES_WITH_DIFFERENT_WORKBOOK_IDS_COPY_DENIED,
                 },
             );
         }
@@ -145,36 +145,6 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
 
     const newEntries = await Promise.all(
         originJoinedEntryRevisions.map(async (originJoinedEntryRevision) => {
-            if (originJoinedEntryRevision === undefined) {
-                throw new AppError('Entry not exists', {
-                    code: US_ERRORS.NOT_EXIST_ENTRY,
-                });
-            }
-
-            if (tenantIdOverride === undefined && originJoinedEntryRevision.tenantId !== tenantId) {
-                throw new AppError('Entry not exists', {
-                    code: US_ERRORS.NOT_EXIST_ENTRY,
-                });
-            }
-
-            if (originJoinedEntryRevision.workbookId === null) {
-                throw new AppError("Entry without workbookId, can't be copied to workbook", {
-                    code: US_ERRORS.ENTRY_WITHOUT_WORKBOOK_ID_COPY_DENIED,
-                });
-            }
-
-            if (workbookId !== originJoinedEntryRevision.workbookId) {
-                throw new AppError('Workbook not exists', {
-                    code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-                });
-            }
-
-            if (originJoinedEntryRevision.scope === 'folder') {
-                throw new AppError('Folders cannot be copied', {
-                    code: US_ERRORS.FOLDER_COPY_DENIED,
-                });
-            }
-
             const [newEntryId, newRevId] = await Promise.all([getId(), getId()]);
 
             mapEntryIdsWithOldIds.set(newEntryId, originJoinedEntryRevision.entryId);
