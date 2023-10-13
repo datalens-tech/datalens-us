@@ -136,7 +136,7 @@ export const getWorkbooksListByIds = async (
                     ? WorkbookPermission.LimitedView
                     : WorkbookPermission.View,
             })
-            .then(async () => {
+            .then(() => {
                 return workbookModel;
             })
             .catch(() => {
