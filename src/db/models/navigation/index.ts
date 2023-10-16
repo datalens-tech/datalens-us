@@ -240,7 +240,7 @@ class Navigation extends Model {
                 const workbookList = await getWorkbooksListByIds(
                     {ctx},
                     {
-                        workbookIds: workbookEntries.map((entry) => entry.workbookId),
+                        workbookIds: workbookEntries.map((entry) => entry.workbookId) as string[],
                         includePermissionsInfo,
                     },
                 );
@@ -249,19 +249,21 @@ class Navigation extends Model {
 
                 const workbookPermissionsMap = new Map<string, EntryPermissions>();
 
-                await Promise.all(
-                    workbookList.map(async (workbook) => {
-                        try {
-                            const permissions = await getEntryPermissionsByWorkbook({
-                                ctx,
-                                trx,
-                                workbook,
-                                bypassEnabled: false,
-                            });
-                            workbookPermissionsMap.set(workbook.model.workbookId, permissions);
-                        } catch (e) {}
-                    }),
-                );
+                if (includePermissionsInfo) {
+                    await Promise.all(
+                        workbookList.map(async (workbook) => {
+                            try {
+                                const permissions = await getEntryPermissionsByWorkbook({
+                                    ctx,
+                                    trx,
+                                    workbook,
+                                    bypassEnabled: false,
+                                });
+                                workbookPermissionsMap.set(workbook.model.workbookId, permissions);
+                            } catch (e) {}
+                        }),
+                    );
+                }
 
                 workbookEntries.forEach((entry) => {
                     if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {

@@ -28,7 +28,7 @@ const validateArgs = makeSchemaValidator({
 });
 
 type GetWorkbooksListAndAllParentsArgs = {
-    workbookIds: Nullable<string>[];
+    workbookIds: string[];
     includePermissionsInfo?: boolean;
 };
 
@@ -156,13 +156,8 @@ export const getWorkbooksListByIds = async (
         const mappedWorkbooks: {model: WorkbookModel; parentIds: string[]}[] = [];
 
         acceptedWorkbooksMap.forEach((parentIds, workbookModel) => {
-            const workbook = new Workbook({
-                ctx,
-                model: workbookModel,
-            });
-
             mappedWorkbooks.push({
-                model: workbook.model,
+                model: workbookModel,
                 parentIds,
             });
         });
@@ -170,9 +165,7 @@ export const getWorkbooksListByIds = async (
         workbooks = await bulkFetchWorkbooksAllPermissions(ctx, mappedWorkbooks);
     }
 
-    const result: WorkbookInstance[] = workbooks.filter((item) =>
-        Boolean(item),
-    ) as WorkbookInstance[];
+    const result = workbooks.filter((item) => Boolean(item)) as WorkbookInstance[];
 
     logInfo(ctx, 'GET_WORKBOOKS_LIST_BY_IDS_FINISHED', {
         workbookIds: workbookList.map((workbook) => Utils.encodeId(workbook.workbookId)),

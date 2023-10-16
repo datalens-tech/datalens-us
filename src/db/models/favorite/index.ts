@@ -176,7 +176,7 @@ class Favorite extends Model {
                 const workbookList = await getWorkbooksListByIds(
                     {ctx},
                     {
-                        workbookIds: workbookEntries.map((entry) => entry.workbookId),
+                        workbookIds: workbookEntries.map((entry) => entry.workbookId) as string[],
                         includePermissionsInfo,
                     },
                 );
