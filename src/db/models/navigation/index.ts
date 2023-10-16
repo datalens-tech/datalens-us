@@ -230,6 +230,7 @@ class Navigation extends Model {
             } else {
                 result = entryWithoutWorkbook.map((entry) => ({
                     ...entry,
+                    isLocked: false,
                     ...(includePermissionsInfo && {
                         permissions: {
                             execute: true,
