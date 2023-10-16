@@ -177,48 +177,52 @@ class Favorite extends Model {
                     {ctx},
                     {
                         workbookIds: workbookEntries.map((entry) => entry.workbookId),
-                        includePermissionsInfo,
+                        includePermissionsInfo: true,
                     },
                 );
-                const workbookIds = workbookList.map(
-                    (workbook: {workbookId: string}) => workbook.workbookId,
-                );
+
+                const workbookIds = workbookList.map((workbook) => workbook.model.workbookId);
 
                 const workbookPermissionsMap = new Map<string, EntryPermissions>();
-
-                const {Workbook} = registry.common.classes.get();
 
                 if (includePermissionsInfo) {
                     await Promise.all(
                         workbookList.map(async (workbook) => {
                             try {
-                                const workbookInstance = new Workbook({
-                                    ctx,
-                                    model: workbook,
-                                });
-
                                 const permissions = await getEntryPermissionsByWorkbook({
                                     ctx,
-                                    workbook: workbookInstance,
+                                    workbook,
                                     bypassEnabled: false,
                                 });
-                                workbookPermissionsMap.set(workbook.workbookId, permissions);
+                                workbookPermissionsMap.set(workbook.model.workbookId, permissions);
                             } catch (e) {}
                         }),
                     );
-
-                    workbookEntries.forEach((entry) => {
-                        if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
-                            result.push({
-                                ...entry,
-                                permissions: includePermissionsInfo
-                                    ? workbookPermissionsMap.get(entry.workbookId)
-                                    : undefined,
-                                isLocked: false,
-                            });
-                        }
-                    });
                 }
+
+                workbookEntries.forEach((entry) => {
+                    if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
+                        let isLocked = false;
+
+                        if (workbookPermissionsMap.has(entry.workbookId)) {
+                            const isReadPermission = workbookPermissionsMap.get(
+                                entry.workbookId,
+                            )?.read;
+
+                            if (!isReadPermission) {
+                                isLocked = true;
+                            }
+                        }
+
+                        result.push({
+                            ...entry,
+                            permissions: includePermissionsInfo
+                                ? workbookPermissionsMap.get(entry.workbookId)
+                                : undefined,
+                            isLocked,
+                        });
+                    }
+                });
             } else {
                 result = [
                     ...result,

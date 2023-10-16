@@ -12,6 +12,7 @@ import {WorkbookPermission} from '../../../entities/workbook';
 import {Feature, isEnabledFeature} from '../../../components/features';
 
 import {CollectionModel} from '../../../db/models/new/collection';
+import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -88,11 +89,11 @@ export const getWorkbooksListByIds = async (
 
                 workbook.enableAllPermissions();
 
-                return workbook.model;
+                return workbook;
             });
         }
 
-        return workbookList;
+        return workbookList.map((model) => new Workbook({ctx, model}));
     }
 
     const collectionIds = workbookList
@@ -106,6 +107,7 @@ export const getWorkbooksListByIds = async (
     });
 
     const workbooksMap = new Map<WorkbookModel, string[]>();
+    const acceptedWorkbooksMap = new Map<WorkbookModel, string[]>();
 
     const parentsMap = new Map<string, Nullable<string>>();
 
@@ -121,7 +123,7 @@ export const getWorkbooksListByIds = async (
         workbooksMap.set(model, parentsforWorkbook);
     });
 
-    const checkPermissionPromises: Promise<WorkbookModel | void>[] = [];
+    const checkPermissionPromises: Promise<WorkbookInstance | void>[] = [];
 
     workbooksMap.forEach((parentIds, workbookModel) => {
         const workbook = new Workbook({
@@ -137,11 +139,11 @@ export const getWorkbooksListByIds = async (
                     : WorkbookPermission.View,
             })
             .then(() => {
-                return workbookModel;
+                acceptedWorkbooksMap.set(workbookModel, parentIds);
+
+                return workbook;
             })
-            .catch(() => {
-                workbooksMap.delete(workbookModel);
-            });
+            .catch(() => {});
 
         checkPermissionPromises.push(promise);
     });
@@ -153,7 +155,7 @@ export const getWorkbooksListByIds = async (
 
         const mappedWorkbooks: {model: WorkbookModel; parentIds: string[]}[] = [];
 
-        workbooksMap.forEach((parentIds, workbookModel) => {
+        acceptedWorkbooksMap.forEach((parentIds, workbookModel) => {
             const workbook = new Workbook({
                 ctx,
                 model: workbookModel,
@@ -165,12 +167,12 @@ export const getWorkbooksListByIds = async (
             });
         });
 
-        const workbooksInstances = await bulkFetchWorkbooksAllPermissions(ctx, mappedWorkbooks);
-
-        workbooks = workbooksInstances.map((workbook) => workbook.model);
+        workbooks = await bulkFetchWorkbooksAllPermissions(ctx, mappedWorkbooks);
     }
 
-    const result: WorkbookModel[] = workbooks.filter((item) => Boolean(item)) as WorkbookModel[];
+    const result: WorkbookInstance[] = workbooks.filter((item) =>
+        Boolean(item),
+    ) as WorkbookInstance[];
 
     logInfo(ctx, 'GET_WORKBOOKS_LIST_BY_IDS_FINISHED', {
         workbookIds: workbookList.map((workbook) => Utils.encodeId(workbook.workbookId)),
