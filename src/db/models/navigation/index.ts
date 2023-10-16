@@ -241,7 +241,7 @@ class Navigation extends Model {
                     {ctx},
                     {
                         workbookIds: workbookEntries.map((entry) => entry.workbookId),
-                        includePermissionsInfo: true,
+                        includePermissionsInfo,
                     },
                 );
 
