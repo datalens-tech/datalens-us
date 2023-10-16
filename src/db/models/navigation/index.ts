@@ -1,4 +1,4 @@
-import {raw} from 'objection';
+import {raw, TransactionOrKnex} from 'objection';
 import {Model} from '../..';
 import Utils from '../../../utils';
 import Revision from '../revision';
@@ -8,6 +8,9 @@ import * as MT from '../../../types/models';
 import {RETURN_NAVIGATION_COLUMNS, COMPARISON_OPERATORS} from '../../../const';
 import {validateGetEntries, validateInterTenantGetEntries} from './scheme';
 import {registry} from '../../../registry';
+
+import {EntryPermissions} from '../../../services/new/entry/types';
+import {getEntryPermissionsByWorkbook} from '../../../services/new/workbook/utils';
 
 import {getWorkbooksListByIds} from '../../../services/new/workbook/get-workbooks-list-by-ids';
 
@@ -67,6 +70,7 @@ class Navigation extends Model {
             isPrivateRoute,
         }: MT.GetEntriesConfig,
         ctx: MT.CTX,
+        trx?: TransactionOrKnex,
     ) {
         ctx.log('GET_ENTRIES_REQUEST', {
             tenantId,
@@ -243,17 +247,51 @@ class Navigation extends Model {
                 const workbookList = await getWorkbooksListByIds(
                     {ctx},
                     {
-                        workbookIds: workbookEntries.map((entry) => entry.workbookId),
+                        workbookIds: workbookEntries.map((entry) => entry.workbookId) as string[],
+                        includePermissionsInfo,
                     },
                 );
-                const workbookIds = workbookList.map(
-                    (workbook: {workbookId: string}) => workbook.workbookId,
-                );
+
+                const workbookIds = workbookList.map((workbook) => workbook.model.workbookId);
+
+                const workbookPermissionsMap = new Map<string, EntryPermissions>();
+
+                if (includePermissionsInfo) {
+                    await Promise.all(
+                        workbookList.map(async (workbook) => {
+                            try {
+                                const permissions = await getEntryPermissionsByWorkbook({
+                                    ctx,
+                                    trx,
+                                    workbook,
+                                    bypassEnabled: false,
+                                });
+                                workbookPermissionsMap.set(workbook.model.workbookId, permissions);
+                            } catch (e) {}
+                        }),
+                    );
+                }
+
                 workbookEntries.forEach((entry) => {
                     if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
+                        let isLocked = false;
+
+                        if (workbookPermissionsMap.has(entry.workbookId)) {
+                            const isReadPermission = workbookPermissionsMap.get(
+                                entry.workbookId,
+                            )?.read;
+
+                            if (!isReadPermission) {
+                                isLocked = true;
+                            }
+                        }
+
                         result.push({
                             ...entry,
-                            isLocked: false,
+                            permissions: includePermissionsInfo
+                                ? workbookPermissionsMap.get(entry.workbookId)
+                                : undefined,
+                            isLocked,
                         });
                     }
                 });

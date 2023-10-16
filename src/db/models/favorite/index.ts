@@ -13,6 +13,10 @@ import {getWorkbook} from '../../../services/new/workbook';
 
 import {getWorkbooksListByIds} from '../../../services/new/workbook/get-workbooks-list-by-ids';
 
+import {getEntryPermissionsByWorkbook} from '../../../services/new/workbook/utils';
+
+import {EntryPermissions} from '../../../services/new/entry/types';
+
 interface Favorite extends MT.FavoriteColumns {}
 class Favorite extends Model {
     static get tableName() {
@@ -179,17 +183,50 @@ class Favorite extends Model {
                 const workbookList = await getWorkbooksListByIds(
                     {ctx},
                     {
-                        workbookIds: workbookEntries.map((entry) => entry.workbookId),
+                        workbookIds: workbookEntries.map((entry) => entry.workbookId) as string[],
+                        includePermissionsInfo,
                     },
                 );
-                const workbookIds = workbookList.map(
-                    (workbook: {workbookId: string}) => workbook.workbookId,
-                );
+
+                const workbookIds = workbookList.map((workbook) => workbook.model.workbookId);
+
+                const workbookPermissionsMap = new Map<string, EntryPermissions>();
+
+                if (includePermissionsInfo) {
+                    await Promise.all(
+                        workbookList.map(async (workbook) => {
+                            try {
+                                const permissions = await getEntryPermissionsByWorkbook({
+                                    ctx,
+                                    workbook,
+                                    bypassEnabled: false,
+                                });
+                                workbookPermissionsMap.set(workbook.model.workbookId, permissions);
+                            } catch (e) {}
+                        }),
+                    );
+                }
+
                 workbookEntries.forEach((entry) => {
                     if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
+                        let isLocked = false;
+
+                        if (workbookPermissionsMap.has(entry.workbookId)) {
+                            const isReadPermission = workbookPermissionsMap.get(
+                                entry.workbookId,
+                            )?.read;
+
+                            if (!isReadPermission) {
+                                isLocked = true;
+                            }
+                        }
+
                         result.push({
                             ...entry,
-                            isLocked: false,
+                            permissions: includePermissionsInfo
+                                ? workbookPermissionsMap.get(entry.workbookId)
+                                : undefined,
+                            isLocked,
                         });
                     }
                 });

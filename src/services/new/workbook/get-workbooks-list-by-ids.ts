@@ -12,6 +12,7 @@ import {WorkbookPermission} from '../../../entities/workbook';
 import {Feature, isEnabledFeature} from '../../../components/features';
 
 import {CollectionModel} from '../../../db/models/new/collection';
+import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -20,11 +21,15 @@ const validateArgs = makeSchemaValidator({
         workbookId: {
             type: ['array', 'string'],
         },
+        includePermissionsInfo: {
+            type: 'boolean',
+        },
     },
 });
 
 type GetWorkbooksListAndAllParentsArgs = {
-    workbookIds: Nullable<string>[];
+    workbookIds: string[];
+    includePermissionsInfo?: boolean;
 };
 
 export const getParentsIdsFromMap = (
@@ -49,10 +54,11 @@ export const getWorkbooksListByIds = async (
     {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
     args: GetWorkbooksListAndAllParentsArgs,
 ) => {
-    const {workbookIds} = args;
+    const {workbookIds, includePermissionsInfo = false} = args;
 
     logInfo(ctx, 'GET_WORKBOOKS_LIST_BY_IDS_STARTED', {
         workbookIds: workbookIds.map((id) => Utils.encodeId(id)),
+        includePermissionsInfo,
     });
 
     const {tenantId, isPrivateRoute, projectId} = ctx.get('info');
@@ -69,15 +75,26 @@ export const getWorkbooksListByIds = async (
             [WorkbookModelColumn.TenantId]: tenantId,
             [WorkbookModelColumn.ProjectId]: projectId,
         })
-        .whereIn([WorkbookModelColumn.WorkbookId], workbookIds);
+        .whereIn([WorkbookModelColumn.WorkbookId], workbookIds)
+        .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
     const {accessServiceEnabled} = ctx.config;
 
-    if (!accessServiceEnabled || skipCheckPermissions || isPrivateRoute) {
-        return workbookList;
-    }
-
     const {Workbook} = registry.common.classes.get();
+
+    if (!accessServiceEnabled || skipCheckPermissions || isPrivateRoute) {
+        if (includePermissionsInfo) {
+            return workbookList.map((model) => {
+                const workbook = new Workbook({ctx, model});
+
+                workbook.enableAllPermissions();
+
+                return workbook;
+            });
+        }
+
+        return workbookList.map((model) => new Workbook({ctx, model}));
+    }
 
     const collectionIds = workbookList
         .map((workbook) => workbook.collectionId)
@@ -90,8 +107,7 @@ export const getWorkbooksListByIds = async (
     });
 
     const workbooksMap = new Map<WorkbookModel, string[]>();
-
-    let result: WorkbookModel[] = [];
+    const acceptedWorkbooksMap = new Map<WorkbookModel, string[]>();
 
     const parentsMap = new Map<string, Nullable<string>>();
 
@@ -107,7 +123,7 @@ export const getWorkbooksListByIds = async (
         workbooksMap.set(model, parentsforWorkbook);
     });
 
-    const checkPermissionPromises: Promise<WorkbookModel | void>[] = [];
+    const checkPermissionPromises: Promise<WorkbookInstance | void>[] = [];
 
     workbooksMap.forEach((parentIds, workbookModel) => {
         const workbook = new Workbook({
@@ -123,16 +139,33 @@ export const getWorkbooksListByIds = async (
                     : WorkbookPermission.View,
             })
             .then(() => {
-                return workbookModel;
+                acceptedWorkbooksMap.set(workbookModel, parentIds);
+
+                return workbook;
             })
             .catch(() => {});
 
         checkPermissionPromises.push(promise);
     });
 
-    const responses = await Promise.all(checkPermissionPromises);
+    let workbooks = await Promise.all(checkPermissionPromises);
 
-    result = responses.filter((item) => Boolean(item)) as WorkbookModel[];
+    if (includePermissionsInfo) {
+        const {bulkFetchWorkbooksAllPermissions} = registry.common.functions.get();
+
+        const mappedWorkbooks: {model: WorkbookModel; parentIds: string[]}[] = [];
+
+        acceptedWorkbooksMap.forEach((parentIds, workbookModel) => {
+            mappedWorkbooks.push({
+                model: workbookModel,
+                parentIds,
+            });
+        });
+
+        workbooks = await bulkFetchWorkbooksAllPermissions(ctx, mappedWorkbooks);
+    }
+
+    const result = workbooks.filter((item) => Boolean(item)) as WorkbookInstance[];
 
     logInfo(ctx, 'GET_WORKBOOKS_LIST_BY_IDS_FINISHED', {
         workbookIds: workbookList.map((workbook) => Utils.encodeId(workbook.workbookId)),
