@@ -60,7 +60,6 @@ export const RETURN_RELATION_COLUMNS = [
     'entries.created_at',
     'publishedId',
     'savedId',
-    'key as displayKey',
     'scope',
     'type',
     'display_key as key',

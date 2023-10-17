@@ -92,12 +92,6 @@ export const copyEntriesToWorkbook = async (
         });
     }
 
-    if (entriesToCopy.some(({workbookId}) => workbookId !== sourceEntry.workbookId)) {
-        throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-            code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
-        });
-    }
-
     const [sourceWorkbook, targetWorkbook] = await Promise.all([
         getWorkbook(
             {ctx, skipValidation: true, skipCheckPermissions: true},
