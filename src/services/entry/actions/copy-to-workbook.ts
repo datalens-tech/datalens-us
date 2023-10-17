@@ -2,7 +2,7 @@ import {TransactionOrKnex} from 'objection';
 import {AppError} from '@gravity-ui/nodekit';
 
 import {getId} from '../../../db';
-import {Entry} from '../../../db/models/new/entry';
+import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
 import {WorkbookModel} from '../../../db/models/new/workbook';
 import {CTX} from '../../../types/models';
@@ -15,6 +15,7 @@ import {getParentIds} from '../../new/collection/utils/get-parents';
 import Link from '../../../db/models/links';
 
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {resolveEntriesNameCollisions} from '../../new/entry/utils/resolveNameCollisions';
 
 interface Params {
     entryIds: Entry['entryId'][];
@@ -23,7 +24,7 @@ interface Params {
     trxOverride?: TransactionOrKnex;
     skipLinkSync?: boolean;
     skipWorkbookPermissionsCheck?: boolean;
-    entryNamesOverride?: Map<string, string>;
+    resolveNameCollisions?: boolean;
 }
 
 export const validateParams = makeSchemaValidator({
@@ -46,6 +47,9 @@ export const validateParams = makeSchemaValidator({
         skipWorkbookPermissionsCheck: {
             type: 'boolean',
         },
+        resolveNameCollisions: {
+            type: 'boolean',
+        },
     },
 });
 
@@ -57,7 +61,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
         trxOverride,
         skipLinkSync,
         skipWorkbookPermissionsCheck = false,
-        entryNamesOverride,
+        resolveNameCollisions,
     } = params;
 
     logInfo(ctx, 'COPY_ENTRY_TO_WORKBOOK_CALL', {
@@ -140,6 +144,25 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
         });
     }
 
+    let entryNamesOverride = new Map<string, string>();
+
+    if (resolveNameCollisions) {
+        const targetWorkbookEntries = await Entry.query(Entry.replica)
+            .select()
+            .where(EntryColumn.WorkbookId, destinationWorkbookId)
+            .andWhere({
+                [EntryColumn.TenantId]: tenantId,
+                [EntryColumn.IsDeleted]: false,
+            })
+            .orderBy(EntryColumn.SortName, 'asc')
+            .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
+
+        entryNamesOverride = resolveEntriesNameCollisions({
+            existingEntries: targetWorkbookEntries,
+            addingEntries: originJoinedEntryRevisions,
+        });
+    }
+
     const mapEntryIdsWithOldIds = new Map<string, string>();
 
     const newEntries = await Promise.all(
@@ -148,9 +171,11 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
 
             mapEntryIdsWithOldIds.set(newEntryId, originJoinedEntryRevision.entryId);
 
-            const name = entryNamesOverride?.get(originJoinedEntryRevision.entryId) ?? Utils.getNameByKey({
-                key: originJoinedEntryRevision.displayKey,
-            });
+            const name =
+                entryNamesOverride?.get(originJoinedEntryRevision.entryId) ??
+                Utils.getNameByKey({
+                    key: originJoinedEntryRevision.displayKey,
+                });
             const displayKey = `${newEntryId}/${name}`;
             const key = displayKey.toLowerCase();
 

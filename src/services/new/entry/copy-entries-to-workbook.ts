@@ -6,12 +6,11 @@ import {Entry, EntryScope, EntryType, EntryColumn} from '../../../db/models/new/
 import {AppError} from '@gravity-ui/nodekit';
 import {US_ERRORS} from '../../../const';
 import {transaction} from 'objection';
-import {getPrimary, getReplica} from '../utils';
+import {getPrimary} from '../utils';
 import {checkWorkbookPermission} from '../workbook/utils/check-workbook-permission';
 import {WorkbookPermission} from '../../../entities/workbook';
-import {resolveEntriesNameCollisions} from './utils/resolveNameCollisions';
-import { copyToWorkbook } from '../../entry/actions';
-import { JoinedEntryRevisionColumns } from '../../../db/presentations';
+import {copyToWorkbook} from '../../entry/actions';
+import {JoinedEntryRevisionColumns} from '../../../db/presentations';
 
 export type CopyEntriesToWorkbookParams = {
     entryIds: string[];
@@ -134,33 +133,15 @@ export const copyEntriesToWorkbook = async (
         });
     }
 
-    const targetWorkbookEntries = await Entry.query(getReplica(trx))
-        .select()
-        .where(EntryColumn.WorkbookId, targetWorkbookId)
-        .andWhere({
-            [EntryColumn.TenantId]: tenantId,
-            [EntryColumn.IsDeleted]: false,
-        })
-        .orderBy(EntryColumn.SortName, 'asc')
-        .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
-
-    const nonCollisionAddingEntriesNames = resolveEntriesNameCollisions({
-        existingEntries: targetWorkbookEntries,
-        addingEntries: entriesToCopy,
-    });
-
     await transaction(getPrimary(trx), async (transactionTrx) => {
-        const copiedJoinedEntryRevisions = await copyToWorkbook(
-            ctx,
-            {
-                entryIds: entriesToCopy.map(({entryId}) => entryId),
-                destinationWorkbookId: targetWorkbookId,
-                trxOverride: transactionTrx,
-                skipWorkbookPermissionsCheck: true,
-                skipLinkSync: true,
-                entryNamesOverride: nonCollisionAddingEntriesNames,
-            }
-        );
+        const copiedJoinedEntryRevisions = await copyToWorkbook(ctx, {
+            entryIds: entriesToCopy.map(({entryId}) => entryId),
+            destinationWorkbookId: targetWorkbookId,
+            trxOverride: transactionTrx,
+            skipWorkbookPermissionsCheck: true,
+            skipLinkSync: true,
+            resolveNameCollisions: true,
+        });
 
         const filteredCopiedJoinedEntryRevisions = copiedJoinedEntryRevisions.filter(
             (item) => item.newJoinedEntryRevision !== undefined,

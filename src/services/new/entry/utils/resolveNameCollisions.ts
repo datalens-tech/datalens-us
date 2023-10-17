@@ -1,12 +1,11 @@
-import {Entry} from '../../../../db/models/new/entry';
 import Utils from '../../../../utils';
 
 export const resolveEntriesNameCollisions = ({
     existingEntries,
     addingEntries,
 }: {
-    existingEntries: Entry[];
-    addingEntries: Entry[];
+    existingEntries: Array<{entryId: string; displayKey: Nullable<string>}>;
+    addingEntries: Array<{entryId: string; displayKey: Nullable<string>}>;
 }) => {
     const mapCollisions = new Map<string, number>();
 
