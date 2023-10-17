@@ -224,7 +224,6 @@ class Entry extends Model {
         const displayKey = Utils.formatKey(key, isFolder);
         const keyFormatted = Utils.formatKey(keyLowerCase, isFolder);
         const parentFolderKey = Utils.getParentFolderKey({keyFormatted});
-        const parentFolderDisplayKey = Utils.getParentFolderKey({keyFormatted: displayKey});
 
         const {isNeedBypassEntryByKey} = registry.common.functions.get();
 
@@ -396,6 +395,10 @@ class Entry extends Model {
                     .first();
 
                 if (parentFolder) {
+                    const parentFolderDisplayKey = Utils.getParentFolderKey({
+                        keyFormatted: displayKey,
+                    });
+
                     if (parentFolder.key !== parentFolderDisplayKey) {
                         throw new AppError("The parent folder doesn't exist.", {
                             code: 'PARENT_FOLDER_NOT_EXIST',
