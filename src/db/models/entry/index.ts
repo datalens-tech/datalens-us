@@ -189,7 +189,9 @@ class Entry extends Model {
         const isDeleted = false;
         const deletedAt = null;
 
-        if (key.slice(-1) === '/') {
+        const isLastLetterSlash = key.slice(-1) === '/';
+
+        if (isLastLetterSlash) {
             key = key.slice(0, key.length - 1);
         }
 
@@ -208,6 +210,8 @@ class Entry extends Model {
             initialPermissions,
         });
 
+        console.log('keyasd: ', key);
+
         if (!isValid) {
             throw new AppError('Validation error', {
                 code: 'VALIDATION_ERROR',
@@ -220,6 +224,7 @@ class Entry extends Model {
         const displayKey = Utils.formatKey(key, isFolder);
         const keyFormatted = Utils.formatKey(keyLowerCase, isFolder);
         const parentFolderKey = Utils.getParentFolderKey({keyFormatted});
+        const parentFolderDisplayKey = Utils.getParentFolderKey({keyFormatted: displayKey});
 
         const {isNeedBypassEntryByKey} = registry.common.functions.get();
 
@@ -244,8 +249,6 @@ class Entry extends Model {
 
             if (parentFolderKey !== '/') {
                 if (recursion) {
-                    let existedParentFolder: any;
-
                     const folderKeysMap = Utils.getFoldersKeys({
                         folderKey: Utils.getParentFolderKey({keyFormatted: displayKey}),
                     }).reduce((keysMap: {[key: string]: any}, folderKey: string) => {
@@ -258,17 +261,18 @@ class Entry extends Model {
                     const folderKeysLowerCase = Object.keys(folderKeysMap).map((key) =>
                         key.toLowerCase(),
                     );
-
                     const existedFolders = await Entry.query(TRX)
                         .select(['display_key as key', 'entryId'])
                         .where({tenantId})
                         .whereIn('key', folderKeysLowerCase);
 
+                    let existedParentFolder: Entry;
+
                     existedFolders.forEach((existedFolder) => {
                         const existedFolderJSON = existedFolder.toJSON();
-                        // @ts-ignore
+
                         const entryId = existedFolderJSON.entryId;
-                        // @ts-ignore
+
                         const key = existedFolderJSON.key;
 
                         folderKeysMap[key] = entryId;
@@ -392,6 +396,12 @@ class Entry extends Model {
                     .first();
 
                 if (parentFolder) {
+                    if (parentFolder.key !== parentFolderDisplayKey) {
+                        throw new AppError("The parent folder doesn't exist.", {
+                            code: 'PARENT_FOLDER_NOT_EXIST',
+                        });
+                    }
+
                     if (
                         !disableCheckPermission &&
                         !recursion &&
