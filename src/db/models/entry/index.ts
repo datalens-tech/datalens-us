@@ -250,7 +250,7 @@ class Entry extends Model {
                 if (recursion) {
                     const folderKeysMap = Utils.getFoldersKeys({
                         folderKey: Utils.getParentFolderKey({keyFormatted: displayKey}),
-                    }).reduce((keysMap: {[key: string]: any}, folderKey: string) => {
+                    }).reduce((keysMap: {[key: string]: null}, folderKey: string) => {
                         keysMap[folderKey] = null;
 
                         return keysMap;
