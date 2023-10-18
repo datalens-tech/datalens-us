@@ -189,7 +189,9 @@ class Entry extends Model {
         const isDeleted = false;
         const deletedAt = null;
 
-        if (key.slice(-1) === '/') {
+        const isLastLetterSlash = key.slice(-1) === '/';
+
+        if (isLastLetterSlash) {
             key = key.slice(0, key.length - 1);
         }
 
@@ -244,11 +246,9 @@ class Entry extends Model {
 
             if (parentFolderKey !== '/') {
                 if (recursion) {
-                    let existedParentFolder: any;
-
                     const folderKeysMap = Utils.getFoldersKeys({
                         folderKey: Utils.getParentFolderKey({keyFormatted: displayKey}),
-                    }).reduce((keysMap: {[key: string]: any}, folderKey: string) => {
+                    }).reduce((keysMap: {[key: string]: null}, folderKey: string) => {
                         keysMap[folderKey] = null;
 
                         return keysMap;
@@ -258,17 +258,18 @@ class Entry extends Model {
                     const folderKeysLowerCase = Object.keys(folderKeysMap).map((key) =>
                         key.toLowerCase(),
                     );
-
                     const existedFolders = await Entry.query(TRX)
                         .select(['display_key as key', 'entryId'])
                         .where({tenantId})
                         .whereIn('key', folderKeysLowerCase);
 
+                    let existedParentFolder: Entry;
+
                     existedFolders.forEach((existedFolder) => {
                         const existedFolderJSON = existedFolder.toJSON();
-                        // @ts-ignore
+
                         const entryId = existedFolderJSON.entryId;
-                        // @ts-ignore
+
                         const key = existedFolderJSON.key;
 
                         folderKeysMap[key] = entryId;
@@ -386,7 +387,7 @@ class Entry extends Model {
                     .join('revisions', 'entries.savedId', 'revisions.revId')
                     .where({
                         tenantId,
-                        key: parentFolderKey,
+                        displayKey: Utils.getParentFolderKey({keyFormatted: displayKey}),
                         isDeleted: false,
                     })
                     .first();
