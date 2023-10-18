@@ -81,9 +81,6 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
 
             builder.whereIn(`${Entry.tableName}.entryId`, entryIds);
         },
-        joinRevisionArgs: {
-            isPublishFallback: true,
-        },
         trx: Entry.replica,
     });
 
@@ -268,9 +265,6 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
             });
 
             builder.whereIn(`${Entry.tableName}.entryId`, Array.from(mapEntryIdsWithOldIds.keys()));
-        },
-        joinRevisionArgs: {
-            isPublishFallback: true,
         },
         trx: transactionTrx,
     });
