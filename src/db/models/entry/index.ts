@@ -210,8 +210,6 @@ class Entry extends Model {
             initialPermissions,
         });
 
-        console.log('keyasd: ', key);
-
         if (!isValid) {
             throw new AppError('Validation error', {
                 code: 'VALIDATION_ERROR',
@@ -389,22 +387,12 @@ class Entry extends Model {
                     .join('revisions', 'entries.savedId', 'revisions.revId')
                     .where({
                         tenantId,
-                        key: parentFolderKey,
+                        displayKey: Utils.getParentFolderKey({keyFormatted: displayKey}),
                         isDeleted: false,
                     })
                     .first();
 
                 if (parentFolder) {
-                    const parentFolderDisplayKey = Utils.getParentFolderKey({
-                        keyFormatted: displayKey,
-                    });
-
-                    if (parentFolder.key !== parentFolderDisplayKey) {
-                        throw new AppError("The parent folder doesn't exist.", {
-                            code: 'PARENT_FOLDER_NOT_EXIST',
-                        });
-                    }
-
                     if (
                         !disableCheckPermission &&
                         !recursion &&
