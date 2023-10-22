@@ -43,7 +43,12 @@ export async function getRelatedEntries(
         })
         .select()
         .from((qb) => {
-            qb.select(raw('distinct on (??) ??', ['entries.entryId', RETURN_RELATION_COLUMNS]))
+            qb.select(
+                raw('distinct on (??) ??', [
+                    'entries.entryId',
+                    RETURN_RELATION_COLUMNS.concat('entries.created_at'),
+                ]),
+            )
                 .from('relatedEntries')
                 .join(
                     'entries',

@@ -2,7 +2,7 @@ import {TransactionOrKnex} from 'objection';
 import {AppError} from '@gravity-ui/nodekit';
 
 import {getId} from '../../../db';
-import {Entry, EntryColumn} from '../../../db/models/new/entry';
+import {Entry, EntryColumn, EntryScope, EntryType} from '../../../db/models/new/entry';
 import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
 import {WorkbookModel} from '../../../db/models/new/workbook';
 import {CTX} from '../../../types/models';
@@ -52,6 +52,8 @@ export const validateParams = makeSchemaValidator({
         },
     },
 });
+
+const fileConnectionTypes: string[] = [EntryType.File, EntryType.GsheetsV2];
 
 export const copyToWorkbook = async (ctx: CTX, params: Params) => {
     const {
@@ -120,6 +122,21 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
                 )} doesn't have a workbookId and cannot be copied to a workbook.`,
                 {
                     code: US_ERRORS.ENTRY_WITHOUT_WORKBOOK_ID_COPY_DENIED,
+                },
+            );
+        }
+
+        const isFileConnection =
+            joinedEntryRevision.scope === EntryScope.Connection &&
+            fileConnectionTypes.includes(joinedEntryRevision.type);
+
+        if (isFileConnection) {
+            throw new AppError(
+                `Entry ${Utils.encodeId(
+                    joinedEntryRevision.entryId,
+                )} is a file connection and cannot be copied to a workbook.`,
+                {
+                    code: US_ERRORS.WORKBOOK_COPY_FILE_CONNECTION_ERROR,
                 },
             );
         }

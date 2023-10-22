@@ -1,14 +1,9 @@
 import {ServiceArgs} from '../types';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import Utils, {logInfo, makeUserId} from '../../../utils';
-import {crossSyncCopiedJoinedEntryRevisions, getWorkbook} from '../workbook';
-import {Entry, EntryScope, EntryType, EntryColumn} from '../../../db/models/new/entry';
-import {AppError} from '@gravity-ui/nodekit';
-import {US_ERRORS} from '../../../const';
+import {crossSyncCopiedJoinedEntryRevisions} from '../workbook';
 import {transaction} from 'objection';
 import {getPrimary} from '../utils';
-import {checkWorkbookPermission} from '../workbook/utils/check-workbook-permission';
-import {WorkbookPermission} from '../../../entities/workbook';
 import {copyToWorkbook} from '../../entry/actions';
 import {JoinedEntryRevisionColumns} from '../../../db/presentations';
 
@@ -42,7 +37,7 @@ export const copyEntriesToWorkbook = async (
     }
 
     const {entryIds, workbookId: targetWorkbookId} = args;
-    const {tenantId, user} = ctx.get('info');
+    const {user} = ctx.get('info');
     const updatedBy = makeUserId(user.userId);
 
     logInfo(ctx, 'COPY_ENTRIES_TO_WORKBOOK_START', {
@@ -51,89 +46,13 @@ export const copyEntriesToWorkbook = async (
         copiedBy: updatedBy,
     });
 
-    if (entryIds.length === 0) {
-        throw new AppError(US_ERRORS.VALIDATION_ERROR, {
-            code: US_ERRORS.VALIDATION_ERROR,
-        });
-    }
-
-    const entries = await Entry.query(Entry.replica)
-        .select()
-        .whereIn(EntryColumn.EntryId, entryIds)
-        .andWhere({
-            [EntryColumn.TenantId]: tenantId,
-            [EntryColumn.IsDeleted]: false,
-        })
-        .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
-
-    // File connections are not supported at the moment.
-    const entriesToCopy = entries.filter((entry) => {
-        const isConnection = entry.scope === EntryScope.Connection;
-        const isFile = entry.type === EntryType.File || entry.type === EntryType.GsheetsV2;
-
-        return !(isConnection && isFile);
-    });
-
-    logInfo(ctx, 'ENTRIES_TO_COPY', {
-        entryIds: entriesToCopy.map(({entryId}) => Utils.encodeId(entryId)),
-    });
-
-    if (entriesToCopy.length === 0) {
-        throw new AppError(US_ERRORS.VALIDATION_ERROR, {
-            code: US_ERRORS.VALIDATION_ERROR,
-        });
-    }
-
-    const sourceEntry = entriesToCopy[0];
-
-    if (!sourceEntry.workbookId) {
-        throw new AppError(US_ERRORS.ENTRY_IS_NOT_IN_WORKBOOK, {
-            code: US_ERRORS.ENTRY_IS_NOT_IN_WORKBOOK,
-        });
-    }
-
-    const [sourceWorkbook, targetWorkbook] = await Promise.all([
-        getWorkbook(
-            {ctx, skipValidation: true, skipCheckPermissions: true},
-            {workbookId: sourceEntry.workbookId},
-        ),
-        getWorkbook(
-            {ctx, skipValidation: true, skipCheckPermissions: true},
-            {workbookId: targetWorkbookId},
-        ),
-    ]);
-
-    if (!skipCheckPermissions) {
-        logInfo(ctx, 'CHECK_ACCESS_TO_SOURCE_WORKBOOK', {
-            workbookId: Utils.encodeId(sourceWorkbook.model.workbookId),
-        });
-
-        await checkWorkbookPermission({
-            ctx,
-            trx,
-            workbook: sourceWorkbook,
-            permission: WorkbookPermission.View,
-        });
-
-        logInfo(ctx, 'CHECK_ACCESS_TO_TARGET_WORKBOOK', {
-            workbookId: Utils.encodeId(targetWorkbookId),
-        });
-
-        await checkWorkbookPermission({
-            ctx,
-            trx,
-            workbook: targetWorkbook,
-            permission: WorkbookPermission.Update,
-        });
-    }
-
     await transaction(getPrimary(trx), async (transactionTrx) => {
         const copiedJoinedEntryRevisions = await copyToWorkbook(ctx, {
-            entryIds: entriesToCopy.map(({entryId}) => entryId),
+            entryIds,
             destinationWorkbookId: targetWorkbookId,
             trxOverride: transactionTrx,
-            skipWorkbookPermissionsCheck: true,
             skipLinkSync: true,
+            skipWorkbookPermissionsCheck: skipCheckPermissions,
             resolveNameCollisions: true,
         });
 

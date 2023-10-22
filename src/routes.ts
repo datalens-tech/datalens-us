@@ -402,7 +402,7 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
             }),
 
             copyEntriesToWorkbook: makeRoute({
-                route: 'POST /v2/entries/copy',
+                route: 'POST /v2/copy-entries',
                 handler: entriesController.copyEntriesToWorkbook,
                 write: true,
             }),
