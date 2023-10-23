@@ -74,6 +74,35 @@ describe('Copy entries', () => {
             .expect(200);
 
         expect(entries).toHaveLength(2);
+
+        const entryNames = entries.map((entry: {key: string}) => entry.key.split('/')[1]);
+
+        expect(entryNames).toContain('EntryName1');
+        expect(entryNames).toContain('EntryName2');
+    });
+
+    test('Copy entries with duplicate names - [POST /v2/copy-entries]', async () => {
+        await withScopeHeaders(request(app).post('/v2/copy-entries'))
+            .send({
+                ids: [workbookId1EntryId1, workbookId1EntryId2],
+                workbookId: workbookId2,
+            })
+            .expect(200);
+
+        const {
+            body: {entries},
+        } = await withScopeHeaders(request(app).get(`/v2/workbooks/${workbookId2}/entries`))
+            .send()
+            .expect(200);
+
+        expect(entries).toHaveLength(4);
+
+        const entryNames = entries.map((entry: {key: string}) => entry.key.split('/')[1]);
+
+        expect(entryNames).toContain('EntryName1');
+        expect(entryNames).toContain('EntryName2');
+        expect(entryNames).toContain('EntryName1 (COPY 1)');
+        expect(entryNames).toContain('EntryName2 (COPY 1)');
     });
 
     test('Delete workbooks - [DELETE /v2/workbooks/:workbookId]', async () => {
