@@ -56,7 +56,7 @@
     "dev": "node ./scripts/setup-dev-env.js opensource && npm run clear:dist && APP_DEV_MODE=1 tsc-watch --onSuccess 'node dist/server'",
     "test:unit": "jest -c './jest/unit/jest.config.js'",
     "build:test:unit": "npm run build && npm run test:unit",
-    "test:int": "ENV=int-testing node ./scripts/setup-dev-env.js opensource && JEST_TESTCONTAINERS_CONFIG_PATH='./jest/int/testcontainers-config.js' NODE_TLS_REJECT_UNAUTHORIZED=0 jest -c './jest/int/jest.config.js' --testMatch '**/dist/server/tests/int/opensource/**/(*.)+(test|spec).[tj]s' --runInBand --detectOpenHandles",
+    "test:int": "ENV=int-testing node ./scripts/setup-dev-env.js opensource && JEST_TESTCONTAINERS_CONFIG_PATH='./jest/int/testcontainers-config.js' NODE_TLS_REJECT_UNAUTHORIZED=0 jest -c './jest/int/jest.config.js' --testMatch '**/dist/server/tests/int/opensource/**/(*.)+(test|spec).[tj]s' --detectOpenHandles",
     "build:test:int": "npm run build && npm run test:int",
     "test": "npm run build && npm run test:unit && npm run test:int",
     "console": "node dist/server/console",

@@ -75,4 +75,9 @@ describe('Copy entries', () => {
 
         expect(entries).toHaveLength(2);
     });
+
+    test('Delete workbooks - [DELETE /v2/workbooks/:workbookId]', async () => {
+        await withScopeHeaders(request(app).delete(`/v2/workbooks/${workbookId1}`)).expect(200);
+        await withScopeHeaders(request(app).delete(`/v2/workbooks/${workbookId2}`)).expect(200);
+    });
 });
