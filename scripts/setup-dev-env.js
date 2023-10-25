@@ -2,7 +2,7 @@
 'use strict';
 
 const path = require('path');
-const {readFileSync, writeFileSync} = require('fs');
+const {readFileSync, writeFileSync, openSync} = require('fs');
 
 const SECRETS_SECTION_START = '### TEMPLATE SECRETS BEGIN';
 const SECRETS_SECTION_END = '### TEMPLATE SECRETS END';
@@ -28,7 +28,14 @@ if (envName === 'development') {
     }
 }
 
-const secretsSection = `${SECRETS_SECTION_START}\n${templateContent}\n${SECRETS_SECTION_END}`;
+let currentEnv;
 
-const currentEnv = readFileSync(path.join(appPath, '.env')).toString();
+try {
+    currentEnv = readFileSync(path.join(appPath, '.env')).toString();
+} catch (__) {
+    openSync(path.join(appPath, '.env'), 'w');
+
+    currentEnv = `${SECRETS_SECTION_START}\n${SECRETS_SECTION_END}`;
+}
+
 writeFileSync(path.join(appPath, '.env'), currentEnv.replace(REPLACE_REGEXP, secretsSection));
