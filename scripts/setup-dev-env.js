@@ -16,6 +16,7 @@ const appPath = path.join(__dirname, '..');
 const templateFilePath = path.join(appPath, `dev/env/${templateName}`);
 
 let templateContent = readFileSync(templateFilePath).toString();
+const secretsSection = `${SECRETS_SECTION_START}\n${templateContent}\n${SECRETS_SECTION_END}`;
 
 if (envName === 'development') {
     try {
