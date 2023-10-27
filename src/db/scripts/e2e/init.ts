@@ -3,7 +3,7 @@ require('../../../index');
 import * as fs from 'fs';
 import {db} from '../../index';
 
-const DEMO_WORKBOOK_ID = '1540491943966934028';
+const E2E_WORKBOOK_ID = '1540491943966934028';
 const PATH_TO_DATA = `/opt/e2e-data/us-e2e-data.sql`;
 
 (async function () {
@@ -11,7 +11,7 @@ const PATH_TO_DATA = `/opt/e2e-data/us-e2e-data.sql`;
         await db.ready();
 
         const result = await db.primary.raw(
-            `SELECT COUNT(*) AS count FROM workbooks WHERE workbook_id = ${DEMO_WORKBOOK_ID};`,
+            `SELECT COUNT(*) AS count FROM workbooks WHERE workbook_id = ${E2E_WORKBOOK_ID};`,
         );
 
         if (result && result.rows && result.rows[0] && result.rows[0].count === '0') {
