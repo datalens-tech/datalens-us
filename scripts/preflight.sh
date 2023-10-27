@@ -25,5 +25,12 @@ if [ "$USE_DEMO_DATA" = "1" ]; then
     echo "Finish setting up demo data"
 fi
 
+if [ "$USE_E2E_MOCK_DATA" = "1" ]; then
+    echo "Start setting up e2e data"
+    sh /opt/e2e-data/init.sh
+    node /opt/app/dist/server/db/scripts/e2e/init.js
+    echo "Finish setting up e2e data"
+fi
+
 supervisorctl start node
 supervisorctl start nginx
