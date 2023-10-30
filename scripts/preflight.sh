@@ -27,7 +27,7 @@ fi
 
 if [ "$USE_E2E_MOCK_DATA" = "1" ]; then
     echo "Start setting up e2e data"
-    node /opt/app/dist/server/db/scripts/e2e/init.js
+    node /opt/app/dist/server/db/scripts/e2e/init-united-storage-data.js
     echo "Finish setting up e2e data"
 fi
 
