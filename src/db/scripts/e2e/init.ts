@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import {db} from '../../index';
 
 const E2E_WORKBOOK_ID = '1540491943966934028';
-const PATH_TO_DATA = `/opt/e2e-data/us-e2e-data.sql`;
+const PATH_TO_DATA = `/opt/e2e-data/us-e2e-data`;
 
 (async function () {
     try {
