@@ -50,7 +50,7 @@ export const getEntry = async (
     {ctx, trx, skipValidation = false}: ServiceArgs,
     args: GetEntryArgs,
 ) => {
-    const {entryId, revId, branch, includePermissionsInfo, includeLinks} = args;
+    const {entryId, revId, branch = 'saved', includePermissionsInfo, includeLinks} = args;
 
     logInfo(ctx, 'GET_ENTRY_REQUEST', {
         entryId: Utils.encodeId(entryId),

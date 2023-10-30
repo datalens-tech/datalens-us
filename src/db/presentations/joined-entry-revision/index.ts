@@ -1,5 +1,5 @@
 import type {Knex} from 'knex';
-import {TransactionOrKnex} from 'objection';
+import {TransactionOrKnex, raw} from 'objection';
 import {Model} from '../..';
 import {Entry} from '../../models/new/entry';
 import {RevisionModel} from '../../models/new/revision';
@@ -43,21 +43,24 @@ export const selectedColumns = [
 export interface JoinRevisionArgs {
     revId?: RevisionModel['revId'];
     branch?: 'saved' | 'published';
-    isPublishFallback?: boolean;
 }
 
 export const joinRevision =
-    ({revId, branch, isPublishFallback}: JoinRevisionArgs) =>
+    ({revId, branch}: JoinRevisionArgs) =>
     (builder: Knex.JoinClause) => {
         if (revId) {
             builder.on(`${Entry.tableName}.entryId`, `${RevisionModel.tableName}.entryId`);
         } else if (branch === 'published') {
             builder.on(`${Entry.tableName}.publishedId`, `${RevisionModel.tableName}.revId`);
-        } else {
+        } else if (branch === 'saved') {
             builder.on(`${Entry.tableName}.savedId`, `${RevisionModel.tableName}.revId`);
-            if (isPublishFallback) {
-                builder.orOn(`${Entry.tableName}.publishedId`, `${RevisionModel.tableName}.revId`);
-            }
+        } else {
+            builder.on(
+                raw(
+                    `COALESCE(${Entry.tableName}.published_id, ${Entry.tableName}.saved_id)`,
+                ) as unknown as string,
+                `${RevisionModel.tableName}.revId`,
+            );
         }
     };
 
@@ -75,11 +78,11 @@ export class JoinedEntryRevision extends Model {
 
     static find({
         where,
-        joinRevisionArgs,
+        joinRevisionArgs = {},
         trx,
     }: {
         where: Record<string, unknown> | ((builder: Knex.QueryBuilder) => void);
-        joinRevisionArgs: JoinRevisionArgs;
+        joinRevisionArgs?: JoinRevisionArgs;
         trx: TransactionOrKnex;
     }) {
         return JoinedEntryRevision.query(trx)
@@ -93,11 +96,11 @@ export class JoinedEntryRevision extends Model {
 
     static findOne({
         where,
-        joinRevisionArgs,
+        joinRevisionArgs = {},
         trx,
     }: {
         where: Record<string, unknown> | ((builder: Knex.QueryBuilder) => void);
-        joinRevisionArgs: JoinRevisionArgs;
+        joinRevisionArgs?: JoinRevisionArgs;
         trx: TransactionOrKnex;
     }) {
         return JoinedEntryRevision.query(trx)
