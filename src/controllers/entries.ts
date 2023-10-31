@@ -248,7 +248,7 @@ export default {
         const result = await copyEntriesToWorkbook(
             {ctx: req.ctx},
             {
-                entryIds: body.ids,
+                entryIds: body.entryIds,
                 workbookId: body.workbookId,
             },
         );

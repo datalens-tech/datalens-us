@@ -120,6 +120,7 @@ export const ALLOWED_SCOPE_VALUES = [
 export const ID_VARIABLES = [
     'ids',
     'entryId',
+    'entryIds',
     'oldEntryId',
     'revId',
     'draftId',

@@ -60,7 +60,7 @@ describe('Copy entries', () => {
     test('Copy entries - [POST /v2/copy-entries]', async () => {
         const {body} = await withScopeHeaders(request(app).post('/v2/copy-entries'))
             .send({
-                ids: [workbookId1EntryId1, workbookId1EntryId2],
+                entryIds: [workbookId1EntryId1, workbookId1EntryId2],
                 workbookId: workbookId2,
             })
             .expect(200);
@@ -84,7 +84,7 @@ describe('Copy entries', () => {
     test('Copy entries with duplicate names - [POST /v2/copy-entries]', async () => {
         await withScopeHeaders(request(app).post('/v2/copy-entries'))
             .send({
-                ids: [workbookId1EntryId1, workbookId1EntryId2],
+                entryIds: [workbookId1EntryId1, workbookId1EntryId2],
                 workbookId: workbookId2,
             })
             .expect(200);
@@ -103,6 +103,44 @@ describe('Copy entries', () => {
         expect(entryNames).toContain('EntryName2');
         expect(entryNames).toContain('EntryName1 (COPY 1)');
         expect(entryNames).toContain('EntryName2 (COPY 1)');
+    });
+
+    test('Copy entries with incremented duplicate names  - [POST /v2/copy-entries]', async () => {
+        const {
+            body: {entryId: workbookId1EntryId3},
+        } = await withScopeHeaders(request(app).post('/v1/entries'))
+            .send({
+                scope: 'dataset',
+                type: 'graph',
+                meta: {},
+                data: {},
+                name: 'EntryName1 (COPY 1)',
+                workbookId: workbookId1,
+            })
+            .expect(200);
+
+        await withScopeHeaders(request(app).post('/v2/copy-entries'))
+            .send({
+                entryIds: [workbookId1EntryId3],
+                workbookId: workbookId2,
+            })
+            .expect(200);
+
+        const {
+            body: {entries},
+        } = await withScopeHeaders(request(app).get(`/v2/workbooks/${workbookId2}/entries`))
+            .send()
+            .expect(200);
+
+        expect(entries).toHaveLength(5);
+
+        const entryNames = entries.map((entry: {key: string}) => entry.key.split('/')[1]);
+
+        expect(entryNames).toContain('EntryName1');
+        expect(entryNames).toContain('EntryName2');
+        expect(entryNames).toContain('EntryName1 (COPY 1)');
+        expect(entryNames).toContain('EntryName2 (COPY 1)');
+        expect(entryNames).toContain('EntryName1 (COPY 2)');
     });
 
     test('Delete workbooks - [DELETE /v2/workbooks/:workbookId]', async () => {
