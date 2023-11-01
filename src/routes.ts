@@ -400,6 +400,12 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
                 handler: entriesController.copyEntryToWorkbook,
                 write: true,
             }),
+
+            copyEntriesToWorkbook: makeRoute({
+                route: 'POST /v2/copy-entries',
+                handler: entriesController.copyEntriesToWorkbook,
+                write: true,
+            }),
         };
     }
 

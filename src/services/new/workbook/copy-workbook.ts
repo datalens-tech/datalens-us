@@ -322,7 +322,7 @@ async function getUniqWorkbookTitle({
     return uniqTitle;
 }
 
-async function crossSyncCopiedJoinedEntryRevisions({
+export async function crossSyncCopiedJoinedEntryRevisions({
     copiedJoinedEntryRevisions,
     ctx,
     trx,

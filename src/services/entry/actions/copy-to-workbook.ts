@@ -2,7 +2,7 @@ import {TransactionOrKnex} from 'objection';
 import {AppError} from '@gravity-ui/nodekit';
 
 import {getId} from '../../../db';
-import {Entry} from '../../../db/models/new/entry';
+import {Entry, EntryColumn, EntryScope, EntryType} from '../../../db/models/new/entry';
 import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
 import {WorkbookModel} from '../../../db/models/new/workbook';
 import {CTX} from '../../../types/models';
@@ -15,6 +15,7 @@ import {getParentIds} from '../../new/collection/utils/get-parents';
 import Link from '../../../db/models/links';
 
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {resolveEntriesNameCollisions} from '../../new/entry/utils/resolveNameCollisions';
 
 interface Params {
     entryIds: Entry['entryId'][];
@@ -23,6 +24,7 @@ interface Params {
     trxOverride?: TransactionOrKnex;
     skipLinkSync?: boolean;
     skipWorkbookPermissionsCheck?: boolean;
+    resolveNameCollisions?: boolean;
 }
 
 export const validateParams = makeSchemaValidator({
@@ -45,8 +47,13 @@ export const validateParams = makeSchemaValidator({
         skipWorkbookPermissionsCheck: {
             type: 'boolean',
         },
+        resolveNameCollisions: {
+            type: 'boolean',
+        },
     },
 });
+
+const fileConnectionTypes: string[] = [EntryType.File, EntryType.GsheetsV2];
 
 export const copyToWorkbook = async (ctx: CTX, params: Params) => {
     const {
@@ -56,6 +63,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
         trxOverride,
         skipLinkSync,
         skipWorkbookPermissionsCheck = false,
+        resolveNameCollisions,
     } = params;
 
     logInfo(ctx, 'COPY_ENTRY_TO_WORKBOOK_CALL', {
@@ -118,6 +126,21 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
             );
         }
 
+        const isFileConnection =
+            joinedEntryRevision.scope === EntryScope.Connection &&
+            fileConnectionTypes.includes(joinedEntryRevision.type);
+
+        if (isFileConnection) {
+            throw new AppError(
+                `Entry ${Utils.encodeId(
+                    joinedEntryRevision.entryId,
+                )} is a file connection and cannot be copied to a workbook.`,
+                {
+                    code: US_ERRORS.WORKBOOK_COPY_FILE_CONNECTION_ERROR,
+                },
+            );
+        }
+
         if (workbookId === undefined) {
             workbookId = joinedEntryRevision.workbookId;
         } else if (joinedEntryRevision.workbookId !== workbookId) {
@@ -138,6 +161,25 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
         });
     }
 
+    let entryNamesOverride = new Map<string, string>();
+
+    if (resolveNameCollisions) {
+        const targetWorkbookEntries = await Entry.query(Entry.replica)
+            .select()
+            .where(EntryColumn.WorkbookId, destinationWorkbookId)
+            .andWhere({
+                [EntryColumn.TenantId]: tenantId,
+                [EntryColumn.IsDeleted]: false,
+            })
+            .orderBy(EntryColumn.SortName, 'asc')
+            .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
+
+        entryNamesOverride = resolveEntriesNameCollisions({
+            existingEntries: targetWorkbookEntries,
+            addingEntries: originJoinedEntryRevisions,
+        });
+    }
+
     const mapEntryIdsWithOldIds = new Map<string, string>();
 
     const newEntries = await Promise.all(
@@ -146,9 +188,12 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
 
             mapEntryIdsWithOldIds.set(newEntryId, originJoinedEntryRevision.entryId);
 
-            const displayKey = `${newEntryId}/${Utils.getNameByKey({
-                key: originJoinedEntryRevision.displayKey,
-            })}`;
+            const name =
+                entryNamesOverride?.get(originJoinedEntryRevision.entryId) ??
+                Utils.getNameByKey({
+                    key: originJoinedEntryRevision.displayKey,
+                });
+            const displayKey = `${newEntryId}/${name}`;
             const key = displayKey.toLowerCase();
 
             const links = originJoinedEntryRevision.links as Nullable<Record<string, string>>;
