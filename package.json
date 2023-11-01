@@ -21,7 +21,7 @@
     "crc-32": "1.2.0",
     "dotenv": "^8.2.0",
     "minimist": "^1.2.5",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "pg-error-constants": "^1.0.0",
     "power-radix": "^2.5.6",
     "utility-types": "^3.10.0",
