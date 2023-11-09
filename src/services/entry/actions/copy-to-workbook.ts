@@ -68,7 +68,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
 
     logInfo(ctx, 'COPY_ENTRY_TO_WORKBOOK_CALL', {
         entryIds: entryIds.map((entryId) => Utils.encodeId(entryId)),
-        destinationWorkbookId,
+        destinationWorkbookId: Utils.encodeId(destinationWorkbookId),
         tenantIdOverride,
     });
 

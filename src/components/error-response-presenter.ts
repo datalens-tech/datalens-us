@@ -617,6 +617,15 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
+        case US_ERRORS.MOVE_TENANT_CONTENT_DENIED: {
+            return {
+                code: 403,
+                response: {
+                    code,
+                    message: message ?? 'Move tenant content denied',
+                },
+            };
+        }
         default:
             return {
                 code: 500,
