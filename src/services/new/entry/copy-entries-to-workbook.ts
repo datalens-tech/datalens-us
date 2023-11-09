@@ -10,6 +10,7 @@ import {JoinedEntryRevisionColumns} from '../../../db/presentations';
 export type CopyEntriesToWorkbookParams = {
     entryIds: string[];
     workbookId: string;
+    isMigrateCopiedEntries?: boolean;
 };
 
 const validateArgs = makeSchemaValidator({
@@ -25,6 +26,9 @@ const validateArgs = makeSchemaValidator({
         workbookId: {
             type: 'string',
         },
+        isMigrateCopiedEntries: {
+            type: 'boolean',
+        },
     },
 });
 
@@ -36,7 +40,7 @@ export const copyEntriesToWorkbook = async (
         validateArgs(args);
     }
 
-    const {entryIds, workbookId: targetWorkbookId} = args;
+    const {entryIds, workbookId: targetWorkbookId, isMigrateCopiedEntries} = args;
     const {user} = ctx.get('info');
     const updatedBy = makeUserId(user.userId);
 
@@ -54,6 +58,7 @@ export const copyEntriesToWorkbook = async (
             skipLinkSync: true,
             skipWorkbookPermissionsCheck: skipCheckPermissions,
             resolveNameCollisions: true,
+            isMigrateCopiedEntries,
         });
 
         const filteredCopiedJoinedEntryRevisions = copiedJoinedEntryRevisions.filter(

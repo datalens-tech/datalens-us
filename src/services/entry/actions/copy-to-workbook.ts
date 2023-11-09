@@ -25,6 +25,7 @@ interface Params {
     skipLinkSync?: boolean;
     skipWorkbookPermissionsCheck?: boolean;
     resolveNameCollisions?: boolean;
+    isMigrateCopiedEntries?: boolean;
 }
 
 export const validateParams = makeSchemaValidator({
@@ -50,6 +51,9 @@ export const validateParams = makeSchemaValidator({
         resolveNameCollisions: {
             type: 'boolean',
         },
+        isMigrateCopiedEntries: {
+            type: 'boolean',
+        },
     },
 });
 
@@ -64,6 +68,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
         skipLinkSync,
         skipWorkbookPermissionsCheck = false,
         resolveNameCollisions,
+        isMigrateCopiedEntries,
     } = params;
 
     logInfo(ctx, 'COPY_ENTRY_TO_WORKBOOK_CALL', {
@@ -115,15 +120,30 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
             });
         }
 
-        if (joinedEntryRevision.workbookId === null) {
-            throw new AppError(
-                `Entry ${Utils.encodeId(
-                    joinedEntryRevision.entryId,
-                )} doesn't have a workbookId and cannot be copied to a workbook.`,
-                {
-                    code: US_ERRORS.ENTRY_WITHOUT_WORKBOOK_ID_COPY_DENIED,
-                },
-            );
+        if (!isMigrateCopiedEntries) {
+            if (joinedEntryRevision.workbookId === null) {
+                throw new AppError(
+                    `Entry ${Utils.encodeId(
+                        joinedEntryRevision.entryId,
+                    )} doesn't have a workbookId and cannot be copied to a workbook.`,
+                    {
+                        code: US_ERRORS.ENTRY_WITHOUT_WORKBOOK_ID_COPY_DENIED,
+                    },
+                );
+            }
+
+            if (workbookId === undefined) {
+                workbookId = joinedEntryRevision.workbookId;
+            } else if (joinedEntryRevision.workbookId !== workbookId) {
+                throw new AppError(
+                    `Copying entries from different workbooks is denied – ${Utils.encodeId(
+                        workbookId,
+                    )} and ${Utils.encodeId(joinedEntryRevision.workbookId)}`,
+                    {
+                        code: US_ERRORS.ENTRIES_WITH_DIFFERENT_WORKBOOK_IDS_COPY_DENIED,
+                    },
+                );
+            }
         }
 
         const isFileConnection =
@@ -140,22 +160,9 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
                 },
             );
         }
-
-        if (workbookId === undefined) {
-            workbookId = joinedEntryRevision.workbookId;
-        } else if (joinedEntryRevision.workbookId !== workbookId) {
-            throw new AppError(
-                `Copying entries from different workbooks is denied – ${Utils.encodeId(
-                    workbookId,
-                )} and ${Utils.encodeId(joinedEntryRevision.workbookId)}`,
-                {
-                    code: US_ERRORS.ENTRIES_WITH_DIFFERENT_WORKBOOK_IDS_COPY_DENIED,
-                },
-            );
-        }
     });
 
-    if (workbookId === undefined) {
+    if (workbookId === undefined && !isMigrateCopiedEntries) {
         throw new AppError(`Entries don't have a workbookId and cannot be copied to a workbook.`, {
             code: US_ERRORS.ENTRY_WITHOUT_WORKBOOK_ID_COPY_DENIED,
         });
@@ -235,48 +242,56 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
 
     if (!skipWorkbookPermissionsCheck) {
         const workbookTargetTrx = trxOverride ?? WorkbookModel.replica;
-
-        const [originWorkbookModel, destinationWorkbookModel]: Optional<WorkbookModel>[] =
-            await Promise.all([
-                WorkbookModel.query(workbookTargetTrx)
-                    .findById(workbookId)
-                    .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT),
-                WorkbookModel.query(workbookTargetTrx)
-                    .findById(destinationWorkbookId)
-                    .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT),
-            ]);
-
-        if (originWorkbookModel === undefined || destinationWorkbookModel === undefined) {
-            throw new AppError('Workbook not exists', {
-                code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-            });
-        }
-
-        if (tenantIdOverride === undefined && originWorkbookModel.tenantId !== tenantId) {
-            throw new AppError('Workbook not exists', {
-                code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-            });
-        }
         const {Workbook} = registry.common.classes.get();
 
-        if (tenantIdOverride === undefined) {
-            const originWorkbook = new Workbook({
-                ctx,
-                model: originWorkbookModel,
-            });
+        const destinationWorkbookModel: Optional<WorkbookModel> = await WorkbookModel.query(
+            workbookTargetTrx,
+        )
+            .findById(destinationWorkbookId)
+            .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
-            let originWorkbookParentIds: string[] = [];
+        if (workbookId) {
+            const originWorkbookModel = await WorkbookModel.query(workbookTargetTrx)
+                .findById(workbookId)
+                .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
-            if (originWorkbook.model.collectionId !== null) {
-                originWorkbookParentIds = await getParentIds({
-                    ctx,
-                    collectionId: originWorkbook.model.collectionId,
+            if (originWorkbookModel === undefined) {
+                throw new AppError('Workbook not exists', {
+                    code: US_ERRORS.WORKBOOK_NOT_EXISTS,
                 });
             }
 
-            await originWorkbook.checkPermission({
-                parentIds: originWorkbookParentIds,
-                permission: WorkbookPermission.Copy,
+            if (tenantIdOverride === undefined && originWorkbookModel.tenantId !== tenantId) {
+                throw new AppError('Workbook not exists', {
+                    code: US_ERRORS.WORKBOOK_NOT_EXISTS,
+                });
+            }
+
+            if (tenantIdOverride === undefined) {
+                const originWorkbook = new Workbook({
+                    ctx,
+                    model: originWorkbookModel,
+                });
+
+                let originWorkbookParentIds: string[] = [];
+
+                if (originWorkbook.model.collectionId !== null) {
+                    originWorkbookParentIds = await getParentIds({
+                        ctx,
+                        collectionId: originWorkbook.model.collectionId,
+                    });
+                }
+
+                await originWorkbook.checkPermission({
+                    parentIds: originWorkbookParentIds,
+                    permission: WorkbookPermission.Copy,
+                });
+            }
+        }
+
+        if (destinationWorkbookModel === undefined) {
+            throw new AppError('Workbook not exists', {
+                code: US_ERRORS.WORKBOOK_NOT_EXISTS,
             });
         }
 
