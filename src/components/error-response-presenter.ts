@@ -626,6 +626,15 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
+        case US_ERRORS.MOVE_TENANT_CONTENT_ERROR: {
+            return {
+                code: 500,
+                response: {
+                    code,
+                    message: message ?? 'Move tenant content error',
+                },
+            };
+        }
         default:
             return {
                 code: 500,

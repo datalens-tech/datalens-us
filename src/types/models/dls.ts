@@ -8,7 +8,7 @@ export enum DlsActions {
     Edit = 'edit',
     SetPermissions = 'set_permissions',
 }
-enum DlsPermissions {
+export enum DlsPermissions {
     Execute = 'acl_execute',
     Read = 'acl_view',
     Write = 'acl_edit',
