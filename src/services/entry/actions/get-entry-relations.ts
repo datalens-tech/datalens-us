@@ -71,14 +71,13 @@ export async function getEntryRelations(ctx: CTX, params: GetEntryRelationsData)
                 ctx,
                 trx: Entry.replica,
             },
-            {workbookId: entry.workbookId, includePermissionsInfo},
+            {workbookId: entry.workbookId, includePermissionsInfo: true},
         );
 
         if (includePermissionsInfo) {
             iamPermissions = await getEntryPermissionsByWorkbook({
                 ctx,
                 workbook,
-                bypassEnabled: isPrivateRoute,
             });
         }
     } else if (!isPrivateRoute) {

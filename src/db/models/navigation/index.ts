@@ -1,4 +1,4 @@
-import {raw, TransactionOrKnex} from 'objection';
+import {raw} from 'objection';
 import {Model} from '../..';
 import Utils from '../../../utils';
 import Revision from '../revision';
@@ -70,7 +70,6 @@ class Navigation extends Model {
             isPrivateRoute,
         }: MT.GetEntriesConfig,
         ctx: MT.CTX,
-        trx?: TransactionOrKnex,
     ) {
         ctx.log('GET_ENTRIES_REQUEST', {
             tenantId,
@@ -249,7 +248,7 @@ class Navigation extends Model {
                     {ctx},
                     {
                         workbookIds: workbookEntries.map((entry) => entry.workbookId) as string[],
-                        includePermissionsInfo,
+                        includePermissionsInfo: true,
                     },
                 );
 
@@ -257,24 +256,19 @@ class Navigation extends Model {
 
                 const workbookPermissionsMap = new Map<string, EntryPermissions>();
 
-                if (includePermissionsInfo) {
-                    await Promise.all(
-                        workbookList.map(async (workbook) => {
-                            try {
-                                const permissions = await getEntryPermissionsByWorkbook({
-                                    ctx,
-                                    trx,
-                                    workbook,
-                                    bypassEnabled: false,
-                                });
-                                workbookPermissionsMap.set(workbook.model.workbookId, permissions);
-                            } catch (e) {}
-                        }),
-                    );
-                }
-
                 workbookEntries.forEach((entry) => {
                     if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
+                        if (includePermissionsInfo) {
+                            workbookList.map(async (workbook) => {
+                                const permissions = getEntryPermissionsByWorkbook({
+                                    ctx,
+                                    workbook,
+                                    scope: entry.scope,
+                                });
+                                workbookPermissionsMap.set(workbook.model.workbookId, permissions);
+                            });
+                        }
+
                         let isLocked = false;
 
                         if (workbookPermissionsMap.has(entry.workbookId)) {

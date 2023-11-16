@@ -106,7 +106,7 @@ export async function createEntryInWorkbook(
     const createdEntry = await transaction(Entry.primary, async (trx) => {
         const workbook = await getWorkbook(
             {ctx, trx, skipCheckPermissions: isPrivateRoute},
-            {workbookId},
+            {workbookId, includePermissionsInfo: true},
         );
 
         if (accessServiceEnabled && !isPrivateRoute) {
@@ -122,7 +122,6 @@ export async function createEntryInWorkbook(
             permissions = await getEntryPermissionsByWorkbook({
                 ctx,
                 workbook,
-                bypassEnabled: isPrivateRoute,
             });
         }
 

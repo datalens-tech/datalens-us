@@ -184,7 +184,7 @@ class Favorite extends Model {
                     {ctx},
                     {
                         workbookIds: workbookEntries.map((entry) => entry.workbookId) as string[],
-                        includePermissionsInfo,
+                        includePermissionsInfo: true,
                     },
                 );
 
@@ -192,23 +192,19 @@ class Favorite extends Model {
 
                 const workbookPermissionsMap = new Map<string, EntryPermissions>();
 
-                if (includePermissionsInfo) {
-                    await Promise.all(
-                        workbookList.map(async (workbook) => {
-                            try {
-                                const permissions = await getEntryPermissionsByWorkbook({
-                                    ctx,
-                                    workbook,
-                                    bypassEnabled: false,
-                                });
-                                workbookPermissionsMap.set(workbook.model.workbookId, permissions);
-                            } catch (e) {}
-                        }),
-                    );
-                }
-
                 workbookEntries.forEach((entry) => {
                     if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
+                        if (includePermissionsInfo) {
+                            workbookList.map(async (workbook) => {
+                                const permissions = getEntryPermissionsByWorkbook({
+                                    ctx,
+                                    workbook,
+                                    scope: entry.scope,
+                                });
+                                workbookPermissionsMap.set(workbook.model.workbookId, permissions);
+                            });
+                        }
+
                         let isLocked = false;
 
                         if (workbookPermissionsMap.has(entry.workbookId)) {

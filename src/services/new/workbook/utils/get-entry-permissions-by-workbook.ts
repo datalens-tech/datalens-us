@@ -1,55 +1,37 @@
 import {TransactionOrKnex} from 'objection';
 import {AppContext} from '@gravity-ui/nodekit';
 import {Permissions} from '../../../../entities/workbook';
-import {getParentIds} from '../../collection/utils';
-import {getReplica} from '../../utils';
 import type {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
 import {Feature, isEnabledFeature} from '../../../../components/features';
+import type {EntryScope as EntryScopeType} from '../../../../types/models';
+import {EntryScope} from '../../../../db/models/new/entry';
 
-export const getEntryPermissionsByWorkbook = async ({
+export const getEntryPermissionsByWorkbook = ({
     ctx,
-    trx,
     workbook,
-    bypassEnabled,
+    scope,
 }: {
     ctx: AppContext;
     trx?: TransactionOrKnex;
     workbook: WorkbookInstance;
-    bypassEnabled?: boolean;
+    scope?: EntryScopeType | null;
 }) => {
-    const {accessServiceEnabled} = ctx.config;
-
-    if (!accessServiceEnabled || bypassEnabled) {
-        return {
-            execute: true,
-            read: true,
-            edit: true,
-            admin: true,
-        };
-    }
-
-    if (workbook.permissions === undefined) {
-        let parentIds: string[] = [];
-
-        if (workbook.model.collectionId !== null) {
-            parentIds = await getParentIds({
-                ctx,
-                trx: getReplica(trx),
-                collectionId: workbook.model.collectionId,
-            });
-        }
-
-        await workbook.fetchAllPermissions({parentIds});
-    }
-
     const permissions = workbook.permissions as Permissions;
 
-    return {
-        execute: isEnabledFeature(ctx, Feature.UseLimitedView)
-            ? permissions.limitedView
-            : permissions.view,
+    const view = isEnabledFeature(ctx, Feature.UseLimitedView)
+        ? permissions.limitedView
+        : permissions.view;
+
+    const mapperPermission = {
+        execute: view,
         read: permissions.view,
         edit: permissions.update,
         admin: permissions.updateAccessBindings,
     };
+
+    if (scope === EntryScope.Dash || scope === EntryScope.Widget) {
+        mapperPermission.read = view;
+    }
+
+    return mapperPermission;
 };

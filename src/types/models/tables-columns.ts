@@ -83,6 +83,7 @@ export interface LinksColumns {
 
 export interface FavoriteColumns {
     workbookId: string | null;
+    scope: EntryScope;
     entryId: string;
     tenantId: string;
     login: string;
