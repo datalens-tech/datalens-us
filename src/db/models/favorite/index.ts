@@ -17,6 +17,8 @@ import {getEntryPermissionsByWorkbook} from '../../../services/new/workbook/util
 
 import {EntryPermissions} from '../../../services/new/entry/types';
 
+import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+
 interface Favorite extends MT.FavoriteColumns {}
 class Favorite extends Model {
     static get tableName() {
@@ -188,21 +190,28 @@ class Favorite extends Model {
                     },
                 );
 
-                const workbookIds = workbookList.map((workbook) => workbook.model.workbookId);
-
                 const workbookPermissionsMap = new Map<string, EntryPermissions>();
+                const workbooksMap = new Map<string, WorkbookInstance>();
+
+                workbookList.forEach((workbook) => {
+                    workbooksMap.set(workbook.model.workbookId, workbook);
+                });
 
                 workbookEntries.forEach((entry) => {
-                    if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
-                        if (includePermissionsInfo) {
-                            workbookList.map(async (workbook) => {
-                                const permissions = getEntryPermissionsByWorkbook({
-                                    ctx,
-                                    workbook,
-                                    scope: entry.scope,
-                                });
-                                workbookPermissionsMap.set(workbook.model.workbookId, permissions);
+                    if (
+                        entry?.workbookId &&
+                        workbooksMap.has(entry.workbookId) &&
+                        includePermissionsInfo
+                    ) {
+                        const workbook = workbooksMap.get(entry.workbookId);
+
+                        if (workbook) {
+                            const permissions = getEntryPermissionsByWorkbook({
+                                ctx,
+                                workbook,
+                                scope: entry.scope,
                             });
+                            workbookPermissionsMap.set(workbook.model.workbookId, permissions);
                         }
 
                         let isLocked = false;
