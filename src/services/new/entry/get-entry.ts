@@ -120,7 +120,7 @@ export const getEntry = async (
                     {ctx, trx},
                     {
                         workbookId: joinedEntryRevisionFavorite.workbookId,
-                        includePermissionsInfo: true,
+                        includePermissionsInfo,
                     },
                 );
 

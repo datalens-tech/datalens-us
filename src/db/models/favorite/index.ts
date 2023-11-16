@@ -186,7 +186,7 @@ class Favorite extends Model {
                     {ctx},
                     {
                         workbookIds: workbookEntries.map((entry) => entry.workbookId) as string[],
-                        includePermissionsInfo: true,
+                        includePermissionsInfo,
                     },
                 );
 

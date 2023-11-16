@@ -71,7 +71,7 @@ export async function getEntryRelations(ctx: CTX, params: GetEntryRelationsData)
                 ctx,
                 trx: Entry.replica,
             },
-            {workbookId: entry.workbookId, includePermissionsInfo: true},
+            {workbookId: entry.workbookId, includePermissionsInfo},
         );
 
         if (includePermissionsInfo) {
