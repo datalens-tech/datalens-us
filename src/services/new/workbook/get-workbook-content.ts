@@ -112,7 +112,7 @@ export const getWorkbookContent = async (
         {ctx, trx, skipValidation: true, skipCheckPermissions},
         {
             workbookId,
-            includePermissionsInfo,
+            includePermissionsInfo: true,
         },
     );
 

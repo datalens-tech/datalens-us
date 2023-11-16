@@ -101,27 +101,18 @@ export async function createEntryInWorkbook(
 
     const {accessServiceEnabled} = ctx.config;
 
-    let permissions: Optional<UsPermission>;
+    const workbook = await getWorkbook(
+        {ctx, skipCheckPermissions: isPrivateRoute},
+        {workbookId, includePermissionsInfo},
+    );
 
     const createdEntry = await transaction(Entry.primary, async (trx) => {
-        const workbook = await getWorkbook(
-            {ctx, trx, skipCheckPermissions: isPrivateRoute},
-            {workbookId, includePermissionsInfo},
-        );
-
         if (accessServiceEnabled && !isPrivateRoute) {
             await checkWorkbookPermission({
                 ctx,
                 trx,
                 workbook,
                 permission: WorkbookPermission.Update,
-            });
-        }
-
-        if (includePermissionsInfo) {
-            permissions = getEntryPermissionsByWorkbook({
-                ctx,
-                workbook,
             });
         }
 
@@ -173,6 +164,15 @@ export async function createEntryInWorkbook(
     });
 
     const resultEntry: Entry & {permissions?: UsPermission} = createdEntry!;
+    let permissions: Optional<UsPermission>;
+
+    if (includePermissionsInfo) {
+        permissions = getEntryPermissionsByWorkbook({
+            ctx,
+            workbook,
+            scope: resultEntry.scope,
+        });
+    }
 
     if (includePermissionsInfo) {
         resultEntry.permissions = permissions;
