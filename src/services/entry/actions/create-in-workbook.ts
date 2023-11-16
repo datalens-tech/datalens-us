@@ -119,7 +119,7 @@ export async function createEntryInWorkbook(
         }
 
         if (includePermissionsInfo) {
-            permissions = await getEntryPermissionsByWorkbook({
+            permissions = getEntryPermissionsByWorkbook({
                 ctx,
                 workbook,
             });

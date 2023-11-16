@@ -22,7 +22,7 @@ export const getEntryPermissionsByWorkbook = ({
         ? permissions.limitedView
         : permissions.view;
 
-    const mapperPermission = {
+    const mappedPermission = {
         execute: view,
         read: permissions.view,
         edit: permissions.update,
@@ -30,8 +30,8 @@ export const getEntryPermissionsByWorkbook = ({
     };
 
     if (scope === EntryScope.Dash || scope === EntryScope.Widget) {
-        mapperPermission.read = view;
+        mappedPermission.read = view;
     }
 
-    return mapperPermission;
+    return mappedPermission;
 };

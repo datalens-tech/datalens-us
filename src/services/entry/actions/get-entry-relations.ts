@@ -75,9 +75,10 @@ export async function getEntryRelations(ctx: CTX, params: GetEntryRelationsData)
         );
 
         if (includePermissionsInfo) {
-            iamPermissions = await getEntryPermissionsByWorkbook({
+            iamPermissions = getEntryPermissionsByWorkbook({
                 ctx,
                 workbook,
+                scope: entry.scope,
             });
         }
     } else if (!isPrivateRoute) {
