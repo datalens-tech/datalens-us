@@ -172,9 +172,7 @@ export async function createEntryInWorkbook(
             workbook,
             scope: resultEntry.scope,
         });
-    }
 
-    if (includePermissionsInfo) {
         resultEntry.permissions = permissions;
     }
 

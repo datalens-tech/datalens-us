@@ -1,4 +1,3 @@
-import {TransactionOrKnex} from 'objection';
 import {AppContext} from '@gravity-ui/nodekit';
 import {Permissions} from '../../../../entities/workbook';
 import type {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
@@ -12,7 +11,6 @@ export const getEntryPermissionsByWorkbook = ({
     scope,
 }: {
     ctx: AppContext;
-    trx?: TransactionOrKnex;
     workbook: WorkbookInstance;
     scope?: EntryScopeType | null;
 }) => {

@@ -190,7 +190,7 @@ class Favorite extends Model {
                     },
                 );
 
-                const workbookPermissionsMap = new Map<string, EntryPermissions>();
+                const entryPermissionsMap = new Map<string, EntryPermissions>();
                 const workbooksMap = new Map<string, WorkbookInstance>();
 
                 workbookList.forEach((workbook) => {
@@ -198,28 +198,22 @@ class Favorite extends Model {
                 });
 
                 workbookEntries.forEach((entry) => {
-                    if (
-                        entry?.workbookId &&
-                        workbooksMap.has(entry.workbookId) &&
-                        includePermissionsInfo
-                    ) {
+                    if (entry?.workbookId && workbooksMap.has(entry.workbookId)) {
                         const workbook = workbooksMap.get(entry.workbookId);
 
-                        if (workbook) {
+                        if (workbook && includePermissionsInfo) {
                             const permissions = getEntryPermissionsByWorkbook({
                                 ctx,
                                 workbook,
                                 scope: entry.scope,
                             });
-                            workbookPermissionsMap.set(workbook.model.workbookId, permissions);
+                            entryPermissionsMap.set(entry.entryId, permissions);
                         }
 
                         let isLocked = false;
 
-                        if (workbookPermissionsMap.has(entry.workbookId)) {
-                            const isReadPermission = workbookPermissionsMap.get(
-                                entry.workbookId,
-                            )?.read;
+                        if (entryPermissionsMap.has(entry.entryId)) {
+                            const isReadPermission = entryPermissionsMap.get(entry.entryId)?.read;
 
                             if (!isReadPermission) {
                                 isLocked = true;
@@ -229,7 +223,7 @@ class Favorite extends Model {
                         result.push({
                             ...entry,
                             permissions: includePermissionsInfo
-                                ? workbookPermissionsMap.get(entry.workbookId)
+                                ? entryPermissionsMap.get(entry.entryId)
                                 : undefined,
                             isLocked,
                         });

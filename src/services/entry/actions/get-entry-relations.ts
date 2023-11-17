@@ -65,23 +65,7 @@ export async function getEntryRelations(ctx: CTX, params: GetEntryRelationsData)
 
     let iamPermissions: Optional<EntryPermissions>;
 
-    if (entry.workbookId) {
-        const workbook = await getWorkbook(
-            {
-                ctx,
-                trx: Entry.replica,
-            },
-            {workbookId: entry.workbookId, includePermissionsInfo},
-        );
-
-        if (includePermissionsInfo) {
-            iamPermissions = getEntryPermissionsByWorkbook({
-                ctx,
-                workbook,
-                scope: entry.scope,
-            });
-        }
-    } else if (!isPrivateRoute) {
+    if (!entry.workbookId && !isPrivateRoute) {
         await checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
     }
 
@@ -91,10 +75,30 @@ export async function getEntryRelations(ctx: CTX, params: GetEntryRelationsData)
     });
 
     if (entry.workbookId) {
-        relations = relations.map((item) => ({
-            ...item,
-            permissions: iamPermissions,
-        })) as Entry[];
+        relations = (await Promise.all(
+            relations.map(async (item) => {
+                if (item.workbookId && includePermissionsInfo) {
+                    const workbook = await getWorkbook(
+                        {
+                            ctx,
+                            trx: Entry.replica,
+                        },
+                        {workbookId: item.workbookId, includePermissionsInfo},
+                    );
+
+                    iamPermissions = getEntryPermissionsByWorkbook({
+                        ctx,
+                        workbook,
+                        scope: entry.scope,
+                    });
+                }
+
+                return {
+                    ...item,
+                    permissions: iamPermissions,
+                };
+            }),
+        )) as Entry[];
     } else {
         if (!isPrivateRoute && ctx.config.dlsEnabled) {
             relations = await DLS.checkBulkPermission(
