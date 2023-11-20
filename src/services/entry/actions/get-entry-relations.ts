@@ -63,8 +63,6 @@ export async function getEntryRelations(ctx: CTX, params: GetEntryRelationsData)
         });
     }
 
-    let iamPermissions: Optional<EntryPermissions>;
-
     if (!entry.workbookId && !isPrivateRoute) {
         await checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
     }
@@ -75,29 +73,33 @@ export async function getEntryRelations(ctx: CTX, params: GetEntryRelationsData)
     });
 
     if (entry.workbookId) {
+        const workbook = await getWorkbook(
+            {
+                ctx,
+                trx: Entry.replica,
+            },
+            {workbookId: entry.workbookId, includePermissionsInfo},
+        );
+
         relations = (await Promise.all(
-            relations.map(async (item) => {
-                if (item.workbookId && includePermissionsInfo) {
-                    const workbook = await getWorkbook(
-                        {
+            relations
+                .filter((relationItem: Entry) => relationItem.workbookId === entry.workbookId)
+                ?.map(async (item: Entry) => {
+                    let iamPermissions: Optional<EntryPermissions>;
+
+                    if (includePermissionsInfo) {
+                        iamPermissions = getEntryPermissionsByWorkbook({
                             ctx,
-                            trx: Entry.replica,
-                        },
-                        {workbookId: item.workbookId, includePermissionsInfo},
-                    );
+                            workbook,
+                            scope: entry.scope,
+                        });
+                    }
 
-                    iamPermissions = getEntryPermissionsByWorkbook({
-                        ctx,
-                        workbook,
-                        scope: entry.scope,
-                    });
-                }
-
-                return {
-                    ...item,
-                    permissions: iamPermissions,
-                };
-            }),
+                    return {
+                        ...item,
+                        permissions: iamPermissions,
+                    };
+                }),
         )) as Entry[];
     } else {
         if (!isPrivateRoute && ctx.config.dlsEnabled) {
