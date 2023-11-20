@@ -81,25 +81,27 @@ export async function getEntryRelations(ctx: CTX, params: GetEntryRelationsData)
             {workbookId: entry.workbookId, includePermissionsInfo},
         );
 
+        relations = relations.filter(
+            (relationEntry) => relationEntry.workbookId === entry.workbookId,
+        );
+
         relations = (await Promise.all(
-            relations
-                .filter((relationItem: Entry) => relationItem.workbookId === entry.workbookId)
-                ?.map(async (item: Entry) => {
-                    let iamPermissions: Optional<EntryPermissions>;
+            relations.map(async (item) => {
+                let iamPermissions: Optional<EntryPermissions>;
 
-                    if (includePermissionsInfo) {
-                        iamPermissions = getEntryPermissionsByWorkbook({
-                            ctx,
-                            workbook,
-                            scope: entry.scope,
-                        });
-                    }
+                if (includePermissionsInfo) {
+                    iamPermissions = getEntryPermissionsByWorkbook({
+                        ctx,
+                        workbook,
+                        scope: entry.scope,
+                    });
+                }
 
-                    return {
-                        ...item,
-                        permissions: iamPermissions,
-                    };
-                }),
+                return {
+                    ...item,
+                    permissions: iamPermissions,
+                };
+            }),
         )) as Entry[];
     } else {
         if (!isPrivateRoute && ctx.config.dlsEnabled) {
