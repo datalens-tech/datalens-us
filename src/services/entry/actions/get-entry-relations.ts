@@ -63,7 +63,14 @@ export async function getEntryRelations(ctx: CTX, params: GetEntryRelationsData)
         });
     }
 
-    let iamPermissions: Optional<EntryPermissions>;
+    if (!entry.workbookId && !isPrivateRoute) {
+        await checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
+    }
+
+    let relations = await getRelatedEntries(ctx, {
+        entryIds: [entryId],
+        direction: validatedDirection,
+    });
 
     if (entry.workbookId) {
         const workbook = await getWorkbook(
@@ -74,27 +81,26 @@ export async function getEntryRelations(ctx: CTX, params: GetEntryRelationsData)
             {workbookId: entry.workbookId, includePermissionsInfo},
         );
 
-        if (includePermissionsInfo) {
-            iamPermissions = await getEntryPermissionsByWorkbook({
-                ctx,
-                workbook,
-                bypassEnabled: isPrivateRoute,
-            });
-        }
-    } else if (!isPrivateRoute) {
-        await checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
-    }
+        relations = relations.filter(
+            (relationEntry) => relationEntry.workbookId === entry.workbookId,
+        );
 
-    let relations = await getRelatedEntries(ctx, {
-        entryIds: [entryId],
-        direction: validatedDirection,
-    });
+        relations = relations.map((item) => {
+            let iamPermissions: Optional<EntryPermissions>;
 
-    if (entry.workbookId) {
-        relations = relations.map((item) => ({
-            ...item,
-            permissions: iamPermissions,
-        })) as Entry[];
+            if (includePermissionsInfo) {
+                iamPermissions = getEntryPermissionsByWorkbook({
+                    ctx,
+                    workbook,
+                    scope: entry.scope,
+                });
+            }
+
+            return {
+                ...item,
+                permissions: iamPermissions,
+            };
+        }) as Entry[];
     } else {
         if (!isPrivateRoute && ctx.config.dlsEnabled) {
             relations = await DLS.checkBulkPermission(

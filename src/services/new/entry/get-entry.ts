@@ -3,7 +3,7 @@ import {EntryPermissions} from './types';
 import {checkFetchedEntry} from './utils';
 import {getReplica, checkEntryIdInEmbed} from '../utils';
 import {ServiceArgs} from '../types';
-import {Entry} from '../../../db/models/new/entry';
+import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {JoinedEntryRevisionFavorite} from '../../../db/presentations/joined-entry-revision-favorite';
 import {DlsActions} from '../../../types/models';
 import Utils, {logInfo} from '../../../utils';
@@ -118,13 +118,17 @@ export const getEntry = async (
             if (checkWorkbookEnabled) {
                 const workbook = await getWorkbook(
                     {ctx, trx},
-                    {workbookId: joinedEntryRevisionFavorite.workbookId},
+                    {
+                        workbookId: joinedEntryRevisionFavorite.workbookId,
+                        includePermissionsInfo,
+                    },
                 );
 
                 if (includePermissionsInfo) {
-                    iamPermissions = await getEntryPermissionsByWorkbook({
+                    iamPermissions = getEntryPermissionsByWorkbook({
                         ctx,
                         workbook,
+                        scope: joinedEntryRevisionFavorite[EntryColumn.Scope],
                     });
                 }
             }

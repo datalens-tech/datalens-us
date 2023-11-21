@@ -162,19 +162,18 @@ export const getWorkbookContent = async (
 
     const nextPageToken = Utils.getNextPageToken(page, pageSize, entriesPage.total);
 
-    let permissions: Optional<UsPermission>;
-
-    if (includePermissionsInfo) {
-        permissions = await getEntryPermissionsByWorkbook({
-            ctx,
-            trx: targetTrx,
-            workbook,
-            bypassEnabled: skipCheckPermissions,
-        });
-    }
-
     const entries: Array<Navigation & {permissions?: UsPermission; isLocked?: boolean}> =
         entriesPage.results.map((entry) => {
+            let permissions: Optional<UsPermission>;
+
+            if (includePermissionsInfo) {
+                permissions = getEntryPermissionsByWorkbook({
+                    ctx,
+                    workbook,
+                    scope: entry.scope,
+                });
+            }
+
             entry.permissions = permissions;
             entry.isLocked = false;
             return entry;

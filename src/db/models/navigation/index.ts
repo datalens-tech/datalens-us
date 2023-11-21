@@ -1,4 +1,4 @@
-import {raw, TransactionOrKnex} from 'objection';
+import {raw} from 'objection';
 import {Model} from '../..';
 import Utils from '../../../utils';
 import Revision from '../revision';
@@ -13,6 +13,7 @@ import {EntryPermissions} from '../../../services/new/entry/types';
 import {getEntryPermissionsByWorkbook} from '../../../services/new/workbook/utils';
 
 import {getWorkbooksListByIds} from '../../../services/new/workbook/get-workbooks-list-by-ids';
+import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
 
 interface Navigation extends MT.EntryColumns {
     isLocked?: boolean;
@@ -70,7 +71,6 @@ class Navigation extends Model {
             isPrivateRoute,
         }: MT.GetEntriesConfig,
         ctx: MT.CTX,
-        trx?: TransactionOrKnex,
     ) {
         ctx.log('GET_ENTRIES_REQUEST', {
             tenantId,
@@ -253,34 +253,30 @@ class Navigation extends Model {
                     },
                 );
 
-                const workbookIds = workbookList.map((workbook) => workbook.model.workbookId);
+                const entryPermissionsMap = new Map<string, EntryPermissions>();
+                const workbooksMap = new Map<string, WorkbookInstance>();
 
-                const workbookPermissionsMap = new Map<string, EntryPermissions>();
-
-                if (includePermissionsInfo) {
-                    await Promise.all(
-                        workbookList.map(async (workbook) => {
-                            try {
-                                const permissions = await getEntryPermissionsByWorkbook({
-                                    ctx,
-                                    trx,
-                                    workbook,
-                                    bypassEnabled: false,
-                                });
-                                workbookPermissionsMap.set(workbook.model.workbookId, permissions);
-                            } catch (e) {}
-                        }),
-                    );
-                }
+                workbookList.forEach((workbook) => {
+                    workbooksMap.set(workbook.model.workbookId, workbook);
+                });
 
                 workbookEntries.forEach((entry) => {
-                    if (entry?.workbookId && workbookIds.includes(entry.workbookId)) {
+                    if (entry?.workbookId && workbooksMap.has(entry.workbookId)) {
+                        const workbook = workbooksMap.get(entry.workbookId);
+
+                        if (workbook && includePermissionsInfo) {
+                            const permissions = getEntryPermissionsByWorkbook({
+                                ctx,
+                                workbook,
+                                scope: entry.scope,
+                            });
+                            entryPermissionsMap.set(entry.entryId, permissions);
+                        }
+
                         let isLocked = false;
 
-                        if (workbookPermissionsMap.has(entry.workbookId)) {
-                            const isReadPermission = workbookPermissionsMap.get(
-                                entry.workbookId,
-                            )?.read;
+                        if (entryPermissionsMap.has(entry.entryId)) {
+                            const isReadPermission = entryPermissionsMap.get(entry.entryId)?.read;
 
                             if (!isReadPermission) {
                                 isLocked = true;
@@ -290,7 +286,7 @@ class Navigation extends Model {
                         result.push({
                             ...entry,
                             permissions: includePermissionsInfo
-                                ? workbookPermissionsMap.get(entry.workbookId)
+                                ? entryPermissionsMap.get(entry.entryId)
                                 : undefined,
                             isLocked,
                         });

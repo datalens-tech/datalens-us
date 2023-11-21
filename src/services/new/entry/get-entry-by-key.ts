@@ -3,7 +3,7 @@ import {checkFetchedEntry} from './utils';
 import {EntryPermissions} from './types';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
-import {Entry} from '../../../db/models/new/entry';
+import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {DlsActions} from '../../../types/models';
 import {US_ERRORS} from '../../../const';
 import Utils, {logInfo} from '../../../utils';
@@ -118,13 +118,14 @@ export const getEntryByKey = async (
             if (!isPrivateRoute) {
                 const workbook = await getWorkbook(
                     {ctx, trx},
-                    {workbookId: joinedEntryRevision.workbookId},
+                    {workbookId: joinedEntryRevision.workbookId, includePermissionsInfo},
                 );
 
                 if (includePermissionsInfo) {
-                    iamPermissions = await getEntryPermissionsByWorkbook({
+                    iamPermissions = getEntryPermissionsByWorkbook({
                         ctx,
                         workbook,
+                        scope: joinedEntryRevision[EntryColumn.Scope],
                     });
                 }
             }
