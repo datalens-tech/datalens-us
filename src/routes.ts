@@ -333,6 +333,14 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
                 write: true,
             }),
 
+            privateRestoreWorkbook: makeRoute({
+                route: 'POST /private/v2/workbooks/:workbookId/restore',
+                handler: workbooksController.restore,
+                authPolicy: AuthPolicy.disabled,
+                private: true,
+                write: true,
+            }),
+
             privateGetAllWorkbooks: makeRoute({
                 route: 'GET /private/all-workbooks',
                 handler: workbooksController.getAll,
