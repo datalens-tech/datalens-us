@@ -179,7 +179,7 @@ describe('Private for one workboook managment', () => {
 
         const response = await withScopeHeaders(
             request(app)
-                .get(`/private/v2/workbooks/${testWorkbookId}/restore`)
+                .post(`/private/v2/workbooks/${testWorkbookId}/restore`)
                 .set({[US_MASTER_TOKEN_HEADER]: usApp.config.masterToken}),
         ).expect(200);
 
