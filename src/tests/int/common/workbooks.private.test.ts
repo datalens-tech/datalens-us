@@ -173,6 +173,8 @@ describe('Private for one workboook managment', () => {
     });
 
     test('Restore workbook with entries – [POST /private/v2/workbooks/:workbookId/restore]', async () => {
+        await withScopeHeaders(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
+
         await request(app).post(`/private/v2/workbooks/${testWorkbookId}/restore`).expect(403);
 
         const response = await withScopeHeaders(
@@ -185,6 +187,35 @@ describe('Private for one workboook managment', () => {
 
         expect(body).toStrictEqual({
             workbookId: testWorkbookId,
+        });
+
+        const responseEntries = await withScopeHeaders(
+            request(app)
+                .get(`/private/v2/workbooks/${testWorkbookId}/entries`)
+                .set({[US_MASTER_TOKEN_HEADER]: usApp.config.masterToken}),
+        ).expect(200);
+
+        const {body: bodyEntries} = responseEntries;
+
+        expect(bodyEntries).toStrictEqual({
+            entries: expect.arrayContaining([
+                {
+                    createdAt: expect.any(String),
+                    createdBy: expect.any(String),
+                    entryId: expect.any(String),
+                    hidden: false,
+                    isLocked: false,
+                    key: expect.any(String),
+                    meta: {},
+                    publishedId: null,
+                    savedId: expect.any(String),
+                    scope: 'dataset',
+                    type: 'graph',
+                    updatedAt: expect.any(String),
+                    updatedBy: expect.any(String),
+                    workbookId: testWorkbookId,
+                },
+            ]),
         });
 
         await withScopeHeaders(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
