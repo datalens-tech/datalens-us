@@ -142,6 +142,36 @@ describe('Private Entries in workboooks managment', () => {
 });
 
 describe('Private for one workboook managment', () => {
+    test('Create workbook with entries – [POST /private/v2/workbooks]', async () => {
+        const testTitle = 'Test private workbook with entries title';
+        const testDescription = 'Test private workbook with entries description';
+
+        const entry1Name = 'Entry in test workbook 1';
+
+        const responseWorkbook = await withScopeHeaders(request(app).post('/private/v2/workbooks'))
+            .set({[US_MASTER_TOKEN_HEADER]: usApp.config.masterToken})
+            .send({
+                title: testTitle,
+                description: testDescription,
+            })
+            .expect(200);
+
+        const {body: bodyWorkbook} = responseWorkbook;
+
+        testWorkbookId = bodyWorkbook.workbookId;
+
+        await withScopeHeaders(request(app).post('/v1/entries'))
+            .send({
+                scope: 'dataset',
+                type: 'graph',
+                meta: {},
+                data: {},
+                name: entry1Name,
+                workbookId: testWorkbookId,
+            })
+            .expect(200);
+    });
+
     test('Restore workbook with entries – [POST /private/v2/workbooks/:workbookId/restore]', async () => {
         await withScopeHeaders(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
 
