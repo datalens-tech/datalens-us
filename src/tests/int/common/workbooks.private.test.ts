@@ -175,7 +175,7 @@ describe('Private for one workboook managment', () => {
     test('Restore workbook with entries – [POST /private/v2/workbooks/:workbookId/restore]', async () => {
         await withScopeHeaders(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
 
-        await request(app).get(`/private/v2/workbooks/${testWorkbookId}/restore`).expect(403);
+        await request(app).post(`/private/v2/workbooks/${testWorkbookId}/restore`).expect(403);
 
         const response = await withScopeHeaders(
             request(app)
