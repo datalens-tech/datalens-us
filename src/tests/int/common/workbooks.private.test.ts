@@ -140,3 +140,23 @@ describe('Private Entries in workboooks managment', () => {
         await withScopeHeaders(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
     });
 });
+
+describe('Private for one workboook managment', () => {
+    test('Restore workbook with entries – [POST /private/v2/workbooks/:workbookId/restore]', async () => {
+        await withScopeHeaders(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
+
+        await request(app).get(`/private/v2/workbooks/${testWorkbookId}/restore`).expect(403);
+
+        const response = await withScopeHeaders(
+            request(app)
+                .get(`/private/v2/workbooks/${testWorkbookId}/restore`)
+                .set({[US_MASTER_TOKEN_HEADER]: usApp.config.masterToken}),
+        ).expect(200);
+
+        const {body} = response;
+
+        expect(body).toStrictEqual({
+            workbookId: testWorkbookId,
+        });
+    });
+});
