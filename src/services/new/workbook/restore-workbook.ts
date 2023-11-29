@@ -42,8 +42,8 @@ export const restoreWorkbook = async (
     const targetTrx = getReplica(trx);
 
     const model: Optional<WorkbookModel> = await WorkbookModel.query(targetTrx)
-        .skipUndefined()
         .select()
+        .skipUndefined()
         .where({
             [WorkbookModelColumn.TenantId]: tenantId,
             [WorkbookModelColumn.WorkbookId]: workbookId,
@@ -58,19 +58,15 @@ export const restoreWorkbook = async (
         });
     }
 
-    console.log('modelasd: ', model);
-
     const entries = await Entry.query(targetTrx)
-        .skipUndefined()
         .select()
+        .skipUndefined()
         .where({
             [EntryColumn.WorkbookId]: workbookId,
             [EntryColumn.TenantId]: tenantId,
             [EntryColumn.IsDeleted]: true,
         })
         .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
-
-    console.log('etrniess: ', entries);
 
     const primaryTrx = getPrimary(trx);
 
@@ -79,7 +75,7 @@ export const restoreWorkbook = async (
             .skipUndefined()
             .patch({
                 [WorkbookModelColumn.DeletedBy]: null,
-                [WorkbookModelColumn.DeletedAt]: raw(CURRENT_TIMESTAMP),
+                [WorkbookModelColumn.DeletedAt]: null,
                 [WorkbookModelColumn.UpdatedAt]: raw(CURRENT_TIMESTAMP),
             })
             .where({
@@ -100,11 +96,10 @@ export const restoreWorkbook = async (
                     oldDisplayKey: displayKey as string,
                 };
 
-                Entry.query(trx)
-                    .skipUndefined()
+                return await Entry.query(transactionTrx)
                     .patch({
-                        key: key?.replace(TRASH_FOLDER, ''),
-                        displayKey: displayKey?.replace(TRASH_FOLDER, ''),
+                        key: key?.replace(TRASH_FOLDER + '/', ''),
+                        displayKey: displayKey?.replace(TRASH_FOLDER + '/', ''),
                         innerMeta: newInnerMeta,
                         isDeleted: false,
                         deletedAt: null,
@@ -113,6 +108,7 @@ export const restoreWorkbook = async (
                     .where({
                         entryId,
                     })
+                    .andWhere(EntryColumn.DeletedAt, '>=', model.deletedAt)
                     .timeout(DEFAULT_QUERY_TIMEOUT);
             }),
         );
