@@ -188,5 +188,7 @@ describe('Private for one workboook managment', () => {
         expect(body).toStrictEqual({
             workbookId: testWorkbookId,
         });
+
+        await withScopeHeaders(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
     });
 });
