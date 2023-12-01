@@ -21,6 +21,7 @@ export type CtxInfo = {
     isPrivateRoute: boolean;
     dlContext: string;
     onlyPublic: boolean;
+    onlyMirrored?: boolean;
     privatePermissions: PrivatePermissions;
     projectId: string | null;
     embeddingInfo?: EmbeddingInfo;
