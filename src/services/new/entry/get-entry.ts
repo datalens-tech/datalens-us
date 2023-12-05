@@ -62,7 +62,7 @@ export const getEntry = async (
 
     const {DLS} = registry.common.classes.get();
 
-    const {isPrivateRoute, user, onlyPublic, embeddingInfo} = ctx.get('info');
+    const {isPrivateRoute, user, onlyPublic, onlyMirrored, embeddingInfo} = ctx.get('info');
 
     if (!skipValidation) {
         validateArgs(args);
@@ -92,6 +92,10 @@ export const getEntry = async (
             if (onlyPublic) {
                 builder.andWhere({public: true});
             }
+
+            if (onlyMirrored) {
+                builder.andWhere({mirrored: true});
+            }
         },
         joinRevisionArgs: {
             revId,
@@ -113,7 +117,8 @@ export const getEntry = async (
         let iamPermissions: Optional<EntryPermissions>;
 
         if (joinedEntryRevisionFavorite.workbookId) {
-            const checkWorkbookEnabled = !isPrivateRoute && !onlyPublic && !isEmbedding;
+            const checkWorkbookEnabled =
+                !isPrivateRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
 
             if (checkWorkbookEnabled) {
                 const workbook = await getWorkbook(
@@ -134,9 +139,14 @@ export const getEntry = async (
             }
         } else {
             const checkPermissionEnabled =
-                !dlsBypassByKeyEnabled && !isPrivateRoute && ctx.config.dlsEnabled && !onlyPublic;
+                !dlsBypassByKeyEnabled &&
+                !isPrivateRoute &&
+                ctx.config.dlsEnabled &&
+                !onlyPublic &&
+                !onlyMirrored;
 
-            const checkEntryEnabled = !isPrivateRoute && !onlyPublic && !isEmbedding;
+            const checkEntryEnabled =
+                !isPrivateRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
 
             if (checkPermissionEnabled) {
                 dlsPermissions = await DLS.checkPermission(
