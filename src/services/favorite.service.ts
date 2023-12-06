@@ -55,4 +55,18 @@ export default class FavoriteService {
             ctx,
         });
     }
+
+    static async rename({entryId, name, ctx}: ST.RenameFavorite) {
+        const {requestId, tenantId, user, dlContext} = ctx.get('info');
+
+        return await Favorite.rename({
+            requestId,
+            tenantId,
+            entryId,
+            name,
+            requestedBy: user,
+            dlContext,
+            ctx,
+        });
+    }
 }

@@ -64,4 +64,17 @@ export default {
 
         res.status(code).send(response);
     },
+    renameFavorite: async (req: Request, res: Response) => {
+        const {params, body} = req;
+
+        const result = await FavoriteService.rename({
+            entryId: params.entryId,
+            name: body.name,
+            ctx: req.ctx,
+        });
+
+        const {code, response} = prepareResponse({data: result});
+
+        res.status(code).send(response);
+    },
 };
