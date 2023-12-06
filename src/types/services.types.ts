@@ -98,6 +98,10 @@ export interface GetFavorite extends StdServiceParams {
 export interface AddFavorite extends StdServiceParams {
     entryId: string;
 }
+export interface RenameFavorite extends StdServiceParams {
+    entryId: string;
+    name: string;
+}
 export interface DeleteFavorite extends StdServiceParams {
     entryId: string;
 }
