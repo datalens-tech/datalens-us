@@ -48,13 +48,18 @@ export const restoreWorkbook = async (
             [WorkbookModelColumn.TenantId]: tenantId,
             [WorkbookModelColumn.WorkbookId]: workbookId,
         })
-        .andWhereNot(WorkbookModelColumn.DeletedAt, null)
         .first()
         .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
     if (!model) {
         throw new AppError(US_ERRORS.WORKBOOK_NOT_EXISTS, {
             code: US_ERRORS.WORKBOOK_NOT_EXISTS,
+        });
+    }
+
+    if (model.deletedAt !== null) {
+        throw new AppError(US_ERRORS.WORKBOOK_IS_ALREADY_RESTORED, {
+            code: US_ERRORS.WORKBOOK_IS_ALREADY_RESTORED,
         });
     }
 
