@@ -41,9 +41,8 @@ export const restoreWorkbook = async (
 
     const targetTrx = getReplica(trx);
 
-    const model: Optional<WorkbookModel> = await WorkbookModel.query(targetTrx)
+    const model = await WorkbookModel.query(targetTrx)
         .select()
-        .skipUndefined()
         .where({
             [WorkbookModelColumn.TenantId]: tenantId,
             [WorkbookModelColumn.WorkbookId]: workbookId,
@@ -57,27 +56,16 @@ export const restoreWorkbook = async (
         });
     }
 
-    if (model.deletedAt !== null) {
+    if (model.deletedAt === null) {
         throw new AppError(US_ERRORS.WORKBOOK_IS_ALREADY_RESTORED, {
             code: US_ERRORS.WORKBOOK_IS_ALREADY_RESTORED,
         });
     }
 
-    const entries = await Entry.query(targetTrx)
-        .select()
-        .skipUndefined()
-        .where({
-            [EntryColumn.WorkbookId]: workbookId,
-            [EntryColumn.TenantId]: tenantId,
-            [EntryColumn.IsDeleted]: true,
-        })
-        .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
-
     const primaryTrx = getPrimary(trx);
 
     const result = await transaction(primaryTrx, async (transactionTrx) => {
         const restoredWorkbook = await WorkbookModel.query(transactionTrx)
-            .skipUndefined()
             .patch({
                 [WorkbookModelColumn.DeletedBy]: null,
                 [WorkbookModelColumn.DeletedAt]: null,
@@ -91,32 +79,21 @@ export const restoreWorkbook = async (
             .first()
             .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
-        await Promise.all(
-            entries.map(async (entry) => {
-                const {entryId, displayKey, key} = entry;
-
-                const newInnerMeta = {
-                    ...entry.innerMeta,
-                    oldKey: key as string,
-                    oldDisplayKey: displayKey as string,
-                };
-
-                return await Entry.query(transactionTrx)
-                    .patch({
-                        key: key?.replace(TRASH_FOLDER + '/', ''),
-                        displayKey: displayKey?.replace(TRASH_FOLDER + '/', ''),
-                        innerMeta: newInnerMeta,
-                        isDeleted: false,
-                        deletedAt: null,
-                        updatedAt: raw(CURRENT_TIMESTAMP),
-                    })
-                    .where({
-                        entryId,
-                    })
-                    .andWhere(EntryColumn.DeletedAt, '>=', model.deletedAt)
-                    .timeout(DEFAULT_QUERY_TIMEOUT);
-            }),
-        );
+        await Entry.query(transactionTrx)
+            .patch({
+                key: raw(`regexp_replace(key, '${TRASH_FOLDER}/', '')`),
+                displayKey: raw(`regexp_replace(display_key, '${TRASH_FOLDER}/', '')`),
+                innerMeta: raw(`inner_meta - 'oldKey' - 'oldDisplayKey'`),
+                isDeleted: false,
+                deletedAt: null,
+                updatedAt: raw(CURRENT_TIMESTAMP),
+            })
+            .where({
+                [EntryColumn.WorkbookId]: workbookId,
+                [EntryColumn.TenantId]: tenantId,
+            })
+            .andWhere(EntryColumn.DeletedAt, '>=', model.deletedAt)
+            .timeout(DEFAULT_QUERY_TIMEOUT);
 
         return restoredWorkbook;
     });
