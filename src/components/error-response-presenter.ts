@@ -454,6 +454,14 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
+        case US_ERRORS.WORKBOOK_IS_ALREADY_RESTORED: {
+            return {
+                code: 400,
+                response: {
+                    message: 'The workbook is alredy restored',
+                },
+            };
+        }
         case US_ERRORS.WORKBOOK_ENTITY_ERROR: {
             return {
                 code: 500,
