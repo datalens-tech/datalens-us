@@ -253,6 +253,11 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
             handler: favoritesController.deleteFavorite,
             write: true,
         }),
+        renameFavorite: makeRoute({
+            route: 'POST /v1/favorites/:entryId/rename',
+            handler: favoritesController.renameFavorite,
+            write: true,
+        }),
     };
 
     if (isEnabledFeature(ctx, Feature.CollectionsEnabled)) {

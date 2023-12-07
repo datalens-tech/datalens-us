@@ -26,6 +26,7 @@ export class Favorite extends Model {
     entryId!: string;
     tenantId!: string;
     login!: string;
+    alias!: string | null;
     createdAt!: string;
 
     entry?: Entry;

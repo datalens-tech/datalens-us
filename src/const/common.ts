@@ -84,6 +84,7 @@ export const RETURN_NAVIGATION_COLUMNS = [
 ];
 
 export const RETURN_FAVORITES_COLUMNS = [
+    'favorites.alias',
     'entries.entryId',
     'entries.scope',
     'entries.type',

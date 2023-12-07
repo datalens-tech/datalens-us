@@ -5,7 +5,12 @@ import {AppError} from '@gravity-ui/nodekit';
 import * as MT from '../../../types/models';
 import {DlsActions} from '../../../types/models';
 import Utils from '../../../utils';
-import {validateGetFavorites, validateAddFavorite, validateDeleteFavorite} from './scheme';
+import {
+    validateGetFavorites,
+    validateAddFavorite,
+    validateDeleteFavorite,
+    validateRenameFavorite,
+} from './scheme';
 import {RETURN_FAVORITES_COLUMNS} from '../../../const';
 import {registry} from '../../../registry';
 
@@ -359,6 +364,35 @@ class Favorite extends Model {
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);
 
         ctx.log('DELETE_FROM_FAVORITES_SUCCESS');
+
+        return result;
+    }
+
+    static async rename({
+        tenantId,
+        entryId,
+        name,
+        requestedBy,
+        ctx,
+        dlContext,
+    }: MT.RenameFavoriteConfig) {
+        ctx.log('RENAME_FAVORITE_REQUEST', {
+            tenantId,
+            entryId,
+            name,
+            requestedBy,
+            dlContext,
+        });
+
+        validateRenameFavorite({entryId, name});
+
+        const result = await Favorite.query(this.primary)
+            .where({entryId})
+            .update({alias: name})
+            .returning('*')
+            .timeout(Model.DEFAULT_QUERY_TIMEOUT);
+
+        ctx.log('RENAME_FAVORITE_SUCCESS');
 
         return result;
     }

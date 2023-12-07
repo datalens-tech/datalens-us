@@ -24,3 +24,9 @@ export interface DeleteFavoriteConfig extends BasicRequestParams {
     entryId?: any;
     ctx: CTX;
 }
+export interface RenameFavoriteConfig extends BasicRequestParams {
+    entryId: string;
+    name: string;
+    ctx: CTX;
+    dlContext?: string;
+}
