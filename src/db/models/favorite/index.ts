@@ -386,10 +386,13 @@ class Favorite extends Model {
 
         validateRenameFavorite({entryId, name});
 
+        const {login} = requestedBy;
+
         const result = await Favorite.query(this.primary)
-            .where({entryId})
             .update({alias: name})
+            .where({entryId, tenantId, login})
             .returning('*')
+            .first()
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);
 
         ctx.log('RENAME_FAVORITE_SUCCESS');
