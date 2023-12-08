@@ -311,7 +311,7 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
                 write: true,
             }),
             moveWorkbooks: makeRoute({
-                route: 'POST /v2/workbooks/move-workbooks',
+                route: 'POST /v2/workbooks/moveList',
                 handler: workbooksController.moveList,
                 write: true,
             }),
@@ -385,7 +385,7 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
                 write: true,
             }),
             moveCollections: makeRoute({
-                route: 'POST /v1/collections/move-collections',
+                route: 'POST /v1/collections/moveList',
                 handler: collectionsController.moveList,
                 write: true,
             }),
