@@ -44,7 +44,7 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
         validateArgs(args);
     }
 
-    const {tenantId, projectId, isPrivateRoute} = ctx.get('info');
+    const {tenantId, projectId, isPrivateRoute, onlyMirrored} = ctx.get('info');
 
     const {accessServiceEnabled} = ctx.config;
 
@@ -55,7 +55,7 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
         .where({
             [WorkbookModelColumn.DeletedAt]: null,
             [WorkbookModelColumn.WorkbookId]: workbookId,
-            ...(isPrivateRoute
+            ...(isPrivateRoute || onlyMirrored
                 ? {}
                 : {
                       [WorkbookModelColumn.TenantId]: tenantId,
@@ -78,7 +78,7 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
         model,
     });
 
-    if (accessServiceEnabled && !skipCheckPermissions && !isPrivateRoute) {
+    if (accessServiceEnabled && !skipCheckPermissions && !isPrivateRoute && !onlyMirrored) {
         let parentIds: string[] = [];
 
         if (workbook.model.collectionId !== null) {

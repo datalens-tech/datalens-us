@@ -253,6 +253,11 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
             handler: favoritesController.deleteFavorite,
             write: true,
         }),
+        renameFavorite: makeRoute({
+            route: 'POST /v1/favorites/:entryId/rename',
+            handler: favoritesController.renameFavorite,
+            write: true,
+        }),
     };
 
     if (isEnabledFeature(ctx, Feature.CollectionsEnabled)) {
@@ -328,6 +333,14 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
             privateSetIsTemplateWorkbook: makeRoute({
                 route: 'POST /private/v2/workbooks/:workbookId/setIsTemplate',
                 handler: workbooksController.setIsTemplate,
+                authPolicy: AuthPolicy.disabled,
+                private: true,
+                write: true,
+            }),
+
+            privateRestoreWorkbook: makeRoute({
+                route: 'POST /private/v2/workbooks/:workbookId/restore',
+                handler: workbooksController.restore,
                 authPolicy: AuthPolicy.disabled,
                 private: true,
                 write: true,

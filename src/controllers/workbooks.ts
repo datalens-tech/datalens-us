@@ -16,6 +16,7 @@ import {
     getAllWorkbooks,
     OrderField,
     OrderDirection,
+    restoreWorkbook,
 } from '../services/new/workbook';
 import {
     formatWorkbookModel,
@@ -25,6 +26,7 @@ import {
     formatWorkbookModelWithOperation,
     formatWorkbooksList,
     formatSetWorkbookIsTemplate,
+    formatRestoreWorkbook,
 } from '../services/new/workbook/formatters';
 
 export default {
@@ -257,6 +259,23 @@ export default {
         );
 
         const formattedResponse = formatWorkbookModelsList(result);
+        const {code, response} = prepareResponse({data: formattedResponse});
+        res.status(code).send(response);
+    },
+
+    restore: async (req: Request, res: Response) => {
+        const {params} = req;
+
+        const result = await restoreWorkbook(
+            {
+                ctx: req.ctx,
+            },
+            {
+                workbookId: params.workbookId,
+            },
+        );
+
+        const formattedResponse = formatRestoreWorkbook(result);
         const {code, response} = prepareResponse({data: formattedResponse});
         res.status(code).send(response);
     },

@@ -17,7 +17,7 @@ interface GetCollectionParentIds extends Ctx {
 }
 
 export const getParents = async ({ctx, trx, collectionIds}: GetCollectionsParentIds) => {
-    const {tenantId, projectId} = ctx.get('info');
+    const {tenantId, projectId, onlyMirrored} = ctx.get('info');
 
     const targetTrx = getReplica(trx);
 
@@ -28,7 +28,7 @@ export const getParents = async ({ctx, trx, collectionIds}: GetCollectionsParent
             qb1.select()
                 .from(CollectionModel.tableName)
                 .where({
-                    [CollectionModelColumn.TenantId]: tenantId,
+                    ...(onlyMirrored ? {} : {[CollectionModelColumn.TenantId]: tenantId}),
                     [CollectionModelColumn.ProjectId]: projectId,
                     [CollectionModelColumn.DeletedAt]: null,
                 })
@@ -37,8 +37,12 @@ export const getParents = async ({ctx, trx, collectionIds}: GetCollectionsParent
                     qb2.select(`${CollectionModel.tableName}.*`)
                         .from(CollectionModel.tableName)
                         .where({
-                            [`${CollectionModel.tableName}.${CollectionModelColumn.TenantId}`]:
-                                tenantId,
+                            ...(onlyMirrored
+                                ? {}
+                                : {
+                                      [`${CollectionModel.tableName}.${CollectionModelColumn.TenantId}`]:
+                                          tenantId,
+                                  }),
                             [`${CollectionModel.tableName}.${CollectionModelColumn.ProjectId}`]:
                                 projectId,
                             [`${CollectionModel.tableName}.${CollectionModelColumn.DeletedAt}`]:

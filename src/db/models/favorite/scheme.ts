@@ -1,4 +1,4 @@
-import compileSchema from '../../../components/validation-schema-compiler';
+import compileSchema, {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {AJV_PATTERN_KEYS_NOT_OBJECT} from '../../../const';
 
 export const validateGetFavorites = compileSchema({
@@ -73,6 +73,19 @@ export const validateDeleteFavorite = compileSchema({
         },
         login: {
             type: 'string',
+        },
+    },
+});
+export const validateRenameFavorite = makeSchemaValidator({
+    type: 'object',
+    required: ['entryId', 'name'],
+    properties: {
+        entryId: {
+            type: 'string',
+        },
+        name: {
+            type: ['string', 'null'],
+            verifyEntryName: true,
         },
     },
 });
