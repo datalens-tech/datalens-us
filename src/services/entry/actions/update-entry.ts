@@ -84,6 +84,7 @@ type UpdateEntryData = {
     type?: EntryColumns['type'];
     unversionedData?: EntryColumns['unversionedData'];
     hidden?: EntryColumns['hidden'];
+    mirrored?: EntryColumns['mirrored'];
     meta?: RevisionColumns['meta'];
     data?: RevisionColumns['data'];
     revId?: RevisionColumns['revId'];
@@ -106,6 +107,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         mode = 'save',
         type,
         hidden,
+        mirrored,
         revId,
         lockToken,
         skipSyncLinks,
@@ -119,6 +121,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         mode,
         type,
         hidden,
+        mirrored,
         revId,
         lockToken,
         skipSyncLinks,
@@ -215,11 +218,14 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                     const revId = revision.revId;
 
                     const hiddenNext = typeof hidden === 'undefined' ? entry.hidden : hidden;
+                    const mirroredNext =
+                        typeof mirrored === 'undefined' ? entry.mirrored : mirrored;
 
                     const patch: Partial<EntryColumns> = {
                         savedId: revId,
                         updatedBy: updatedBy,
                         hidden: hiddenNext,
+                        mirrored: mirroredNext,
                     };
 
                     if (type) {

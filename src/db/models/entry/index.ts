@@ -146,6 +146,7 @@ class Entry extends Model {
             innerMeta = null,
             unversionedData,
             hidden = false,
+            mirrored = false,
             recursion,
             requestedBy,
             data,
@@ -173,6 +174,7 @@ class Entry extends Model {
             meta,
             links,
             hidden,
+            mirrored,
             recursion,
             createdBy,
             requestedBy,
@@ -208,6 +210,7 @@ class Entry extends Model {
             unversionedData,
             permissionsMode,
             initialPermissions,
+            mirrored,
         });
 
         if (!isValid) {
@@ -341,6 +344,7 @@ class Entry extends Model {
                                     isDeleted,
                                     deletedAt,
                                     hidden,
+                                    mirrored,
                                 })
                                 .returning('*');
 
@@ -452,6 +456,7 @@ class Entry extends Model {
                     isDeleted,
                     deletedAt,
                     hidden,
+                    mirrored,
                 })
                 .returning('*');
 
@@ -539,6 +544,7 @@ class Entry extends Model {
             key,
             meta,
             hidden = false,
+            mirrored = false,
             recursion,
             requestedBy,
             data,
@@ -561,6 +567,7 @@ class Entry extends Model {
             meta,
             links,
             hidden,
+            mirrored,
             recursion,
             permissionsMode,
             initialPermissions,
@@ -581,6 +588,7 @@ class Entry extends Model {
                     key,
                     meta,
                     hidden,
+                    mirrored,
                     recursion,
                     data,
                     unversionedData,
