@@ -41,7 +41,6 @@
     "eslint": "^8.35.0",
     "husky": "^8.0.3",
     "jest": "^28.1.1",
-    "jest-silent-reporter": "0.0.5",
     "lint-staged": "^13.2.3",
     "prettier": "^2.3.2",
     "source-map-support": "^0.5.19",
