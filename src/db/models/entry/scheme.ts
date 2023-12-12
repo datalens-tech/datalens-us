@@ -48,6 +48,9 @@ export const validateCreateEntry = compileSchema({
         initialPermissions: {
             type: 'object',
         },
+        mirrored: {
+            type: 'boolean',
+        },
     },
 });
 

@@ -28,6 +28,7 @@ export interface CreateEntry extends StdServiceParams {
     key?: any;
     meta?: any;
     hidden?: any;
+    mirrored?: boolean;
     recursion?: any;
     createdBy?: any;
     data?: any;

@@ -44,6 +44,9 @@ export const validateCreateEntryInWorkbook = makeSchemaValidator({
         hidden: {
             type: 'boolean',
         },
+        mirrored: {
+            type: 'boolean',
+        },
         meta: {
             type: ['object', 'null'],
             patternProperties: AJV_PATTERN_KEYS_NOT_OBJECT,
@@ -73,6 +76,7 @@ export type CreateEntryInWorkbookData = {
     type?: EntryColumns['type'];
     links?: SyncLinks;
     hidden?: EntryColumns['hidden'];
+    mirrored?: EntryColumns['mirrored'];
     unversionedData?: EntryColumns['unversionedData'];
     meta?: RevisionColumns['meta'];
     data?: RevisionColumns['data'];
@@ -88,6 +92,7 @@ export async function createEntryInWorkbook(
         type = '',
         links,
         hidden,
+        mirrored,
         unversionedData,
         meta,
         data,
@@ -140,6 +145,7 @@ export async function createEntryInWorkbook(
             updatedBy: createdBy,
             deletedAt: null,
             hidden,
+            mirrored,
         });
 
         await Revision.query(trx).insert({

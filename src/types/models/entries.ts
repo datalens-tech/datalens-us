@@ -49,6 +49,7 @@ export interface CreationEntryConfig extends BasicRequestParams {
     verbose?: any;
     trxOverride?: any;
     useLegacyLogin?: boolean;
+    mirrored?: boolean;
 }
 export interface PrivateCreationEntryConfig extends CreationEntryConfig {
     masterToken?: any;

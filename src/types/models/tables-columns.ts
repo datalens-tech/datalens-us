@@ -42,6 +42,7 @@ export interface EntryColumns {
     isDeleted: boolean;
     deletedAt: string | null;
     hidden: boolean;
+    mirrored: boolean;
     entryId: string;
     savedId: string;
     publishedId: string | null;
