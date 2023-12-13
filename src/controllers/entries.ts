@@ -121,6 +121,7 @@ export default {
             meta: body.meta,
             recursion: body.recursion,
             hidden: body.hidden,
+            mirrored: body.mirrored,
             data: body.data,
             unversionedData: body.unversionedData,
             links: body.links,
