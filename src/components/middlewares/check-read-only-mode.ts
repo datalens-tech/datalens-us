@@ -7,7 +7,7 @@ export const checkReadOnlyMode = (req: Request, res: Response, next: NextFunctio
 
     if (readOnlyMode && req.routeInfo.write) {
         req.ctx.logError(US_ERRORS.READ_ONLY_MODE_ENABLED);
-        res.status(503).send({code: US_ERRORS.READ_ONLY_MODE_ENABLED});
+        res.status(451).send({code: US_ERRORS.READ_ONLY_MODE_ENABLED});
         return;
     }
 
