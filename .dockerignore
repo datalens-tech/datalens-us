@@ -17,4 +17,3 @@ scripts/*.json
 dist/server
 dist/run/*
 !dist/run/.keep
-
