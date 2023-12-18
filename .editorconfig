@@ -15,5 +15,5 @@ indent_size = 4
 [{*.json,*.yaml,*.md}]
 indent_size = 4
 
-[datalens-platform-version]
+[platform-version]
 insert_final_newline = false
