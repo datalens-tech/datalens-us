@@ -2,6 +2,8 @@
 
 United Storage is part of [DataLens](https://datalens.tech) that provides universal API for storing, updating and retrieving various configuration objects.
 
+Hofixed 0.129.0 version.
+
 ## Getting started
 
 ```sh
