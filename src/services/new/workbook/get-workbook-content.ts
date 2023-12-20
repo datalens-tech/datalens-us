@@ -1,3 +1,4 @@
+import {raw} from 'objection';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {RETURN_NAVIGATION_COLUMNS, DEFAULT_PAGE, DEFAULT_PAGE_SIZE} from '../../../const';
 import Navigation from '../../../db/models/navigation';
@@ -9,6 +10,7 @@ import {getReplica} from '../utils';
 import {getWorkbook} from './get-workbook';
 import {getEntryPermissionsByWorkbook} from './utils';
 import {Feature, isEnabledFeature} from '../../../components/features';
+import Favorite from '../../../db/models/favorite';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -116,10 +118,20 @@ export const getWorkbookContent = async (
         },
     );
 
+    const selectColumnNames = [
+        ...RETURN_NAVIGATION_COLUMNS,
+        raw('CASE sub.entry_id WHEN sub.entry_id THEN TRUE ELSE FALSE END AS is_favorite'),
+    ];
+
     // TODO: Get rid of Navigation
     const entriesPage = await Navigation.query(targetTrx)
-        .select(RETURN_NAVIGATION_COLUMNS)
+        .select(selectColumnNames)
         .join('revisions', 'entries.savedId', 'revisions.revId')
+        .leftJoin(
+            Favorite.query(targetTrx).select('favorites.entryId').as('sub'),
+            'sub.entryId',
+            'entries.entryId',
+        )
         .where({
             workbookId: workbookId,
             isDeleted: false,
