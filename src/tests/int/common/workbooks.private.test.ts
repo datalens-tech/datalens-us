@@ -205,6 +205,7 @@ describe('Private for one workboook managment', () => {
                     entryId: expect.any(String),
                     hidden: false,
                     isLocked: false,
+                    isFavorite: false,
                     key: expect.any(String),
                     meta: {},
                     publishedId: null,
