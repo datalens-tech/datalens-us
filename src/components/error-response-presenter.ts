@@ -643,6 +643,24 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
+        case US_ERRORS.INCORRECT_WORKBOOK_ID_HEADER: {
+            return {
+                code: 400,
+                response: {
+                    code,
+                    message: 'Incorrect x-dl-workbookid header',
+                },
+            };
+        }
+        case US_ERRORS.WORKBOOK_ISOLATION_INTERRUPTION: {
+            return {
+                code: 403,
+                response: {
+                    code,
+                    message: 'Workbook isolation interruption',
+                },
+            };
+        }
         default:
             return {
                 code: 500,

@@ -153,6 +153,7 @@ export const AJV_PATTERN_KEYS_NOT_OBJECT = {
 
 export const US_MASTER_TOKEN_HEADER = 'x-us-master-token';
 export const DL_COMPONENT_HEADER = 'x-dl-component';
+export const DL_WORKBOOK_ID_HEADER = 'x-dl-workbookid';
 
 export const COMPARISON_OPERATORS: {[key: string]: string} = {
     eq: '=',
