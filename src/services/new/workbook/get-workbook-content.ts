@@ -110,6 +110,8 @@ export const getWorkbookContent = async (
 
     const targetTrx = getReplica(trx);
 
+    const {user, tenantId} = ctx.get('info');
+
     const workbook = await getWorkbook(
         {ctx, trx, skipValidation: true, skipCheckPermissions},
         {
@@ -128,7 +130,11 @@ export const getWorkbookContent = async (
         .select(selectColumnNames)
         .join('revisions', 'entries.savedId', 'revisions.revId')
         .leftJoin(
-            Favorite.query(targetTrx).select('favorites.entryId').as('sub'),
+            Favorite.query(targetTrx)
+                .select('favorites.entryId')
+                .where('login', user.login)
+                .andWhere('tenantId', '=', tenantId)
+                .as('sub'),
             'sub.entryId',
             'entries.entryId',
         )
