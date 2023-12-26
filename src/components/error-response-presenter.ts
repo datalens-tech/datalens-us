@@ -648,7 +648,7 @@ export default (error: AppError | DBError) => {
                 code: 400,
                 response: {
                     code,
-                    message: 'Incorrect x-dl-workbookid header',
+                    message: 'Workbook id header is incorrect',
                 },
             };
         }

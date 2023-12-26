@@ -4,7 +4,7 @@ import {US_ERRORS, DL_WORKBOOK_ID_HEADER} from '../../const';
 import Utils from '../../utils';
 import {Feature, isEnabledFeature} from '../../components/features';
 
-export const resolveWorkbookId = async (req: Request, res: Response, next: NextFunction) => {
+export const resolveWorkbookId = (req: Request, res: Response, next: NextFunction) => {
     if (isEnabledFeature(req.ctx, Feature.WorkbookIsolationEnabled)) {
         try {
             res.locals.workbookId = req.headers[DL_WORKBOOK_ID_HEADER]
