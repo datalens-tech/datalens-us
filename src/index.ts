@@ -11,6 +11,7 @@ import {
     ctx,
     finalRequestHandler,
     checkReadOnlyMode,
+    resolveWorkbookId,
 } from './components/middlewares';
 import {AppEnv} from './const';
 import {registry} from './registry';
@@ -37,6 +38,7 @@ afterAuth.push(decodeId);
 afterAuth.push(
     dlContext,
     resolveTenantId,
+    resolveWorkbookId,
     waitDatabase,
     resolveSpecialTokens,
     ctx,

@@ -5,6 +5,7 @@ import {DL_COMPONENT_HEADER} from '../../const';
 export const ctx = async (req: Request, res: Response, next: NextFunction) => {
     const {
         tenantId,
+        workbookId,
         userId,
         login,
         isPrivateRoute = false,
@@ -20,6 +21,7 @@ export const ctx = async (req: Request, res: Response, next: NextFunction) => {
     req.originalContext.set('info', {
         requestId: req.id,
         tenantId,
+        workbookId,
         user: {userId, login},
         isPrivateRoute,
         dlContext,

@@ -1,6 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {EntryPermissions} from './types';
-import {checkFetchedEntry} from './utils';
+import {checkFetchedEntry, checkWorkbookIsolation} from './utils';
 import {getReplica, checkEntryIdInEmbed} from '../utils';
 import {ServiceArgs} from '../types';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
@@ -13,6 +13,7 @@ import OldEntry from '../../../db/models/entry';
 import {getWorkbook} from '../workbook';
 import {getEntryPermissionsByWorkbook} from '../workbook/utils';
 import {registry} from '../../../registry';
+import {Feature, isEnabledFeature} from '../../../components/features';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -121,6 +122,13 @@ export const getEntry = async (
                 !isPrivateRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
 
             if (checkWorkbookEnabled) {
+                if (isEnabledFeature(ctx, Feature.WorkbookIsolationEnabled)) {
+                    checkWorkbookIsolation({
+                        ctx,
+                        workbookId: joinedEntryRevisionFavorite.workbookId,
+                    });
+                }
+
                 const workbook = await getWorkbook(
                     {ctx, trx},
                     {

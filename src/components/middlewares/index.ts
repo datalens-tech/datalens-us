@@ -1,5 +1,6 @@
 export {decodeId} from './decode-id';
 export {resolveTenantId} from './resolve-tenant-id';
+export {resolveWorkbookId} from './resolve-workbook-id';
 export {resolveSpecialTokens} from './resolve-special-tokens';
 export {waitDatabase} from './wait-database';
 export {setCiEnv} from './set-ci-env';

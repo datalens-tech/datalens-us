@@ -5,6 +5,7 @@ export enum Feature {
     UseIpV6 = 'UseIpV6',
     ProjectsEnabled = 'ProjectsEnabled',
     UseLimitedView = 'UseLimitedView',
+    WorkbookIsolationEnabled = 'WorkbookIsolationEnabled',
 }
 
 export type FeaturesConfig = {
