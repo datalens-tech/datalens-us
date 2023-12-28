@@ -51,26 +51,20 @@ interface DlsModifyPermissionSubject extends DlsPermissionSubject {
         grantType: string;
     };
 }
+
+export type DlsPermissionDiff = {
+    [permission in DlsPermissions]?: DlsPermissionSubject[];
+};
+
+export type DlsModifyPermissionDiff = {
+    [permission in DlsPermissions]?: DlsModifyPermissionSubject[];
+};
+
 interface DlsModifyBody {
     diff: {
-        added?: {
-            [DlsPermissions.Read]?: DlsPermissionSubject[];
-            [DlsPermissions.Write]?: DlsPermissionSubject[];
-            [DlsPermissions.Admin]?: DlsPermissionSubject[];
-            [DlsPermissions.Execute]?: DlsPermissionSubject[];
-        };
-        removed?: {
-            [DlsPermissions.Read]?: DlsPermissionSubject[];
-            [DlsPermissions.Write]?: DlsPermissionSubject[];
-            [DlsPermissions.Admin]?: DlsPermissionSubject[];
-            [DlsPermissions.Execute]?: DlsPermissionSubject[];
-        };
-        modified?: {
-            [DlsPermissions.Read]?: DlsModifyPermissionSubject[];
-            [DlsPermissions.Write]?: DlsModifyPermissionSubject[];
-            [DlsPermissions.Admin]?: DlsModifyPermissionSubject[];
-            [DlsPermissions.Execute]?: DlsModifyPermissionSubject[];
-        };
+        added?: DlsPermissionDiff;
+        removed?: DlsPermissionDiff;
+        modified?: DlsModifyPermissionDiff;
     };
 }
 export interface ModifyPermissionDlsConfig {
