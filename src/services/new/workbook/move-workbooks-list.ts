@@ -23,7 +23,7 @@ const validateArgs = makeSchemaValidator({
             items: {type: 'string'},
         },
         collectionId: {
-            type: 'string',
+            type: ['string', 'null'],
         },
     },
 });
