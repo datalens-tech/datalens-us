@@ -65,6 +65,8 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
+        case US_ERRORS.FOLDER_ALREADY_EXIST_IN_TENANT:
+        case US_ERRORS.FOLDER_MOVE_FILE_CONNECTION_ERROR:
         case US_ERRORS.ENTRY_IS_ALREADY_IN_WORKBOOK:
         case US_ERRORS.ENTRY_IS_NOT_IN_WORKBOOK:
         case US_ERRORS.FOLDER_DESTINATION_NOT_EXIST:

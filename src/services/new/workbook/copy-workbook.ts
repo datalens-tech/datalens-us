@@ -9,7 +9,7 @@ import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workboo
 import {JoinedEntryRevisionColumns} from '../../../db/presentations/joined-entry-revision';
 import {RevisionModel} from '../../../db/models/new/revision';
 import Link from '../../../db/models/links';
-import {Entry, EntryScope, EntryType} from '../../../db/models/new/entry';
+import {Entry} from '../../../db/models/new/entry';
 import {WorkbookPermission} from '../../../entities/workbook';
 import Utils, {logInfo} from '../../../utils';
 import {copyToWorkbook} from '../../entry/actions';
@@ -160,10 +160,7 @@ export const copyWorkbook = async (
         })
         .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
-    const fileConnectionTypes: string[] = [EntryType.File, EntryType.GsheetsV2];
-    const fileConnectionExists = originEntries.some((entry) => {
-        return entry.scope === EntryScope.Connection && fileConnectionTypes.includes(entry.type);
-    });
+    const fileConnectionExists = Utils.checkFileConnectionsExistence(originEntries);
 
     if (fileConnectionExists) {
         throw new AppError(US_ERRORS.WORKBOOK_COPY_FILE_CONNECTION_ERROR, {
