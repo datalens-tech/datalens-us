@@ -3,7 +3,17 @@ const PowerRadix = require('power-radix');
 
 import {EntryScope, USAPIResponse} from '../types/models';
 
-import {ID_VARIABLES, CODING_BASE, TRUE_FLAGS, COPY_START, COPY_END} from '../const';
+import {
+    ID_VARIABLES,
+    CODING_BASE,
+    TRUE_FLAGS,
+    COPY_START,
+    COPY_END,
+    ENTRY_SCOPE,
+    ENTRY_TYPE,
+} from '../const';
+
+import {Entry} from '../db/models/new/entry';
 
 const PROFILES: {
     [key: string]: any;
@@ -334,5 +344,15 @@ export class Utils {
         return words
             .map((word, index) => (index === 0 ? word : word[0].toUpperCase() + word.slice(1)))
             .join('');
+    }
+
+    static checkFileConnectionsExistence(entries: Entry[]) {
+        const fileConnectionTypes: string[] = [ENTRY_TYPE.File, ENTRY_TYPE.GsheetsV2];
+
+        return entries.some((entry) => {
+            return (
+                entry.scope === ENTRY_SCOPE.Connection && fileConnectionTypes.includes(entry.type)
+            );
+        });
     }
 }

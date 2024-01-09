@@ -199,3 +199,18 @@ export enum AppEnv {
 
 export const COPY_START = '(COPY';
 export const COPY_END = ')';
+
+export const ENTRY_SCOPE = {
+    Connection: 'connection',
+    Dataset: 'dataset',
+    Widget: 'widget',
+    Dash: 'dash',
+    Folder: 'folder',
+    Config: 'config',
+    Pdf: 'pdf',
+};
+
+export const ENTRY_TYPE = {
+    File: 'file',
+    GsheetsV2: 'gsheets_v2',
+};
