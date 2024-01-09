@@ -1,6 +1,5 @@
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {RETURN_NAVIGATION_COLUMNS, DEFAULT_PAGE, DEFAULT_PAGE_SIZE} from '../../../const';
-import Navigation from '../../../db/models/navigation';
+import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE} from '../../../const';
 import {EntryScope} from '../../../db/models/new/entry';
 import Utils, {logInfo} from '../../../utils';
 import {UsPermission} from '../../../types/models';
@@ -9,6 +8,8 @@ import {getReplica} from '../utils';
 import {getWorkbook} from './get-workbook';
 import {getEntryPermissionsByWorkbook} from './utils';
 import {Feature, isEnabledFeature} from '../../../components/features';
+
+import {JoinedEntryRevisionFavorite} from '../../../db/presentations';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -57,6 +58,13 @@ const validateArgs = makeSchemaValidator({
         scope: {
             type: ['array', 'string'],
         },
+        revId: {
+            type: 'string',
+        },
+        branch: {
+            type: 'string',
+            enum: ['saved', 'published'],
+        },
     },
 });
 
@@ -74,6 +82,8 @@ export interface GetWorkbookContentArgs {
         direction: 'asc' | 'desc';
     };
     scope?: EntryScope | EntryScope[];
+    revId?: string;
+    branch?: 'saved' | 'published';
 }
 
 export const getWorkbookContent = async (
@@ -89,6 +99,8 @@ export const getWorkbookContent = async (
         filters,
         orderBy,
         scope,
+        revId,
+        branch,
     } = args;
 
     logInfo(ctx, 'GET_WORKBOOK_CONTENT_START', {
@@ -108,6 +120,8 @@ export const getWorkbookContent = async (
 
     const targetTrx = getReplica(trx);
 
+    const {user} = ctx.get('info');
+
     const workbook = await getWorkbook(
         {ctx, trx, skipValidation: true, skipCheckPermissions},
         {
@@ -116,15 +130,13 @@ export const getWorkbookContent = async (
         },
     );
 
-    // TODO: Get rid of Navigation
-    const entriesPage = await Navigation.query(targetTrx)
-        .select(RETURN_NAVIGATION_COLUMNS)
-        .join('revisions', 'entries.savedId', 'revisions.revId')
-        .where({
-            workbookId: workbookId,
-            isDeleted: false,
-        })
-        .where((builder) => {
+    const entriesPage = await JoinedEntryRevisionFavorite.findWithPagination({
+        where: (builder) => {
+            builder.where({
+                workbookId: workbookId,
+                isDeleted: false,
+            });
+
             if (isEnabledFeature(ctx, Feature.UseLimitedView) && !workbook.permissions?.view) {
                 builder.whereNotIn('scope', ['dataset', 'connection']);
             }
@@ -141,8 +153,8 @@ export const getWorkbookContent = async (
             if (scope) {
                 builder.whereIn('scope', Array.isArray(scope) ? scope : [scope]);
             }
-        })
-        .modify((builder) => {
+        },
+        modify: (builder) => {
             if (orderBy) {
                 switch (orderBy.field) {
                     case 'updatedAt':
@@ -156,28 +168,36 @@ export const getWorkbookContent = async (
                         break;
                 }
             }
-        })
-        .page(page, pageSize)
-        .timeout(Navigation.DEFAULT_QUERY_TIMEOUT);
+        },
+        trx: targetTrx,
+        joinRevisionArgs: {
+            revId,
+            branch,
+        },
+        userLogin: user.login,
+        page,
+        pageSize,
+    });
 
     const nextPageToken = Utils.getNextPageToken(page, pageSize, entriesPage.total);
 
-    const entries: Array<Navigation & {permissions?: UsPermission; isLocked?: boolean}> =
-        entriesPage.results.map((entry) => {
-            let permissions: Optional<UsPermission>;
+    const entries = entriesPage.results.map((entry) => {
+        let permissions: Optional<UsPermission>;
 
-            if (includePermissionsInfo) {
-                permissions = getEntryPermissionsByWorkbook({
-                    ctx,
-                    workbook,
-                    scope: entry.scope,
-                });
-            }
+        if (includePermissionsInfo) {
+            permissions = getEntryPermissionsByWorkbook({
+                ctx,
+                workbook,
+                scope: entry.scope,
+            });
+        }
 
-            entry.permissions = permissions;
-            entry.isLocked = false;
-            return entry;
-        });
+        return {
+            ...entry,
+            permissions,
+            isLocked: false,
+        };
+    });
 
     ctx.log('GET_WORKBOOK_CONTENT_FINISH');
 
