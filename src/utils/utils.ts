@@ -299,6 +299,18 @@ export class Utils {
             const pgPassword = pgRdsConfig.password;
             const pgUsername = pgRdsConfig.username;
             dsnList = `postgres://${pgUsername}:${pgPassword}@${pgHost}:${pgPort}/${pgDb}?ssl=true`;
+        } else if (
+            process.env.POSTGRES_HOSTS &&
+            process.env.POSTGRES_PORT &&
+            process.env.POSTGRES_USER_PASSWD &&
+            process.env.POSTGRES_USER_NAME &&
+            process.env.POSTGRES_DB_NAME
+        ) {
+            dsnList = process.env.POSTGRES_HOSTS.split(',')
+                .map((host) => {
+                    return `postgres://${process.env.POSTGRES_USER_NAME}:${process.env.POSTGRES_USER_PASSWD}@${host}:${process.env.POSTGRES_PORT}/${process.env.POSTGRES_DB_NAME}?ssl=true`;
+                })
+                .join(',');
         } else {
             dsnList = process.env.POSTGRES_DSN_LIST;
         }
