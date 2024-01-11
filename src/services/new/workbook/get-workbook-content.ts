@@ -9,7 +9,7 @@ import {getWorkbook} from './get-workbook';
 import {getEntryPermissionsByWorkbook} from './utils';
 import {Feature, isEnabledFeature} from '../../../components/features';
 
-import {JoinedEntryRevisionFavorite} from '../../../db/presentations';
+import {JoinedEntryFavorite} from '../../../db/presentations';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -58,13 +58,6 @@ const validateArgs = makeSchemaValidator({
         scope: {
             type: ['array', 'string'],
         },
-        revId: {
-            type: 'string',
-        },
-        branch: {
-            type: 'string',
-            enum: ['saved', 'published'],
-        },
     },
 });
 
@@ -82,8 +75,6 @@ export interface GetWorkbookContentArgs {
         direction: 'asc' | 'desc';
     };
     scope?: EntryScope | EntryScope[];
-    revId?: string;
-    branch?: 'saved' | 'published';
 }
 
 export const getWorkbookContent = async (
@@ -99,8 +90,6 @@ export const getWorkbookContent = async (
         filters,
         orderBy,
         scope,
-        revId,
-        branch,
     } = args;
 
     logInfo(ctx, 'GET_WORKBOOK_CONTENT_START', {
@@ -130,7 +119,7 @@ export const getWorkbookContent = async (
         },
     );
 
-    const entriesPage = await JoinedEntryRevisionFavorite.findWithPagination({
+    const entriesPage = await JoinedEntryFavorite.find({
         where: (builder) => {
             builder.where({
                 workbookId: workbookId,
@@ -170,10 +159,6 @@ export const getWorkbookContent = async (
             }
         },
         trx: targetTrx,
-        joinRevisionArgs: {
-            revId,
-            branch,
-        },
         userLogin: user.login,
         page,
         pageSize,

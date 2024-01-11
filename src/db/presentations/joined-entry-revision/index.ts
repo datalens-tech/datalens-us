@@ -4,27 +4,7 @@ import {Model} from '../..';
 import {Entry} from '../../models/new/entry';
 import {RevisionModel} from '../../models/new/revision';
 
-const selectedEntryColumns = [
-    'scope',
-    'type',
-    'key',
-    'innerMeta',
-    'createdBy',
-    'createdAt',
-    'isDeleted',
-    'deletedAt',
-    'hidden',
-    'displayKey',
-    'entryId',
-    'savedId',
-    'publishedId',
-    'tenantId',
-    'name',
-    'sortName',
-    'public',
-    'unversionedData',
-    'workbookId',
-] as const;
+import {selectedEntryColumns} from '../constants';
 
 const selectedRevisionColumns = [
     'data',
