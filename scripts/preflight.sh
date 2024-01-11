@@ -31,5 +31,5 @@ if [ "$USE_E2E_MOCK_DATA" = "1" ]; then
     echo "Finish setting up e2e data"
 fi
 
-supervisorctl start node
-supervisorctl start nginx
+supervisorctl -c /etc/supervisor/conf.d/supervisor.conf start node
+supervisorctl -c /etc/supervisor/conf.d/supervisor.conf start nginx

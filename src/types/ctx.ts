@@ -17,6 +17,7 @@ export type EmbeddingInfo = {
 export type CtxInfo = {
     requestId: string;
     tenantId: string;
+    workbookId?: string;
     user: UserCtxInfo;
     isPrivateRoute: boolean;
     dlContext: string;
