@@ -2,7 +2,8 @@ import {TransactionOrKnex} from 'objection';
 import {AppError} from '@gravity-ui/nodekit';
 
 import {getId} from '../../../db';
-import {Entry, EntryColumn, EntryScope, EntryType} from '../../../db/models/new/entry';
+import {Entry, EntryColumn} from '../../../db/models/new/entry';
+import {EntryScope, EntryType} from '../../../db/models/new/entry/types';
 import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
 import {WorkbookModel} from '../../../db/models/new/workbook';
 import {CTX} from '../../../types/models';

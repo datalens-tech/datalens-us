@@ -5,6 +5,9 @@ import {EntryScope, USAPIResponse} from '../types/models';
 
 import {ID_VARIABLES, CODING_BASE, TRUE_FLAGS, COPY_START, COPY_END} from '../const';
 
+import type {Entry} from '../db/models/new/entry';
+import {EntryScope as EntryScopeEnum, EntryType} from '../db/models/new/entry/types';
+
 const PROFILES: {
     [key: string]: any;
 } = {};
@@ -346,5 +349,16 @@ export class Utils {
         return words
             .map((word, index) => (index === 0 ? word : word[0].toUpperCase() + word.slice(1)))
             .join('');
+    }
+
+    static checkFileConnectionsExistence(entries: Entry[]) {
+        const fileConnectionTypes: string[] = [EntryType.File, EntryType.GsheetsV2];
+
+        return entries.some((entry) => {
+            return (
+                entry.scope === EntryScopeEnum.Connection &&
+                fileConnectionTypes.includes(entry.type)
+            );
+        });
     }
 }

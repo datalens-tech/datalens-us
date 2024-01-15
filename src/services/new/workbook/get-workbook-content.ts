@@ -1,6 +1,6 @@
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE} from '../../../const';
-import {EntryScope} from '../../../db/models/new/entry';
+import {EntryScope} from '../../../db/models/new/entry/types';
 import Utils, {logInfo} from '../../../utils';
 import {UsPermission} from '../../../types/models';
 import {ServiceArgs} from '../types';
