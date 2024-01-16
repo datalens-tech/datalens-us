@@ -13,8 +13,6 @@ const selectedColumns = [
     raw(`CASE WHEN ${Favorite.tableName}.entry_id IS NULL THEN FALSE ELSE TRUE END AS is_favorite`),
 ];
 
-export type JoinedEntryFavoriteColumns = Pick<Entry, ArrayElement<typeof selectedEntryColumns>>;
-
 export class JoinedEntryFavorite extends Model {
     static get tableName() {
         return Entry.tableName;

@@ -4,7 +4,7 @@ import {Model} from '../..';
 import {Entry} from '../../models/new/entry';
 import {RevisionModel} from '../../models/new/revision';
 
-import {selectedEntryColumns} from '../constants';
+import {selectedEntryColumnsForJoin} from '../constants';
 
 const selectedRevisionColumns = [
     'data',
@@ -16,7 +16,7 @@ const selectedRevisionColumns = [
 ] as const;
 
 export const selectedColumns = [
-    ...selectedEntryColumns.map((col) => `${Entry.tableName}.${col}`),
+    ...selectedEntryColumnsForJoin.map((col) => `${Entry.tableName}.${col}`),
     ...selectedRevisionColumns.map((col) => `${RevisionModel.tableName}.${col}`),
 ];
 
@@ -44,7 +44,10 @@ export const joinRevision =
         }
     };
 
-export type JoinedEntryRevisionColumns = Pick<Entry, ArrayElement<typeof selectedEntryColumns>> &
+export type JoinedEntryRevisionColumns = Pick<
+    Entry,
+    ArrayElement<typeof selectedEntryColumnsForJoin>
+> &
     Pick<RevisionModel, ArrayElement<typeof selectedRevisionColumns>>;
 
 export class JoinedEntryRevision extends Model {
