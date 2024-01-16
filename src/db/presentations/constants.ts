@@ -5,6 +5,7 @@ export const selectedEntryColumns = [
     'innerMeta',
     'createdBy',
     'createdAt',
+    'updatedAt',
     'isDeleted',
     'deletedAt',
     'hidden',
