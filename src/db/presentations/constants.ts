@@ -6,6 +6,7 @@ export const selectedEntryColumns = [
     'createdBy',
     'createdAt',
     'updatedAt',
+    'updatedBy',
     'isDeleted',
     'deletedAt',
     'hidden',
