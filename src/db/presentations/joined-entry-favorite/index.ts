@@ -10,6 +10,7 @@ import {selectedEntryColumns} from '../constants';
 
 const selectedColumns = [
     ...selectedEntryColumns.map((col) => `${Entry.tableName}.${col}`),
+    'display_key as key',
     raw(`CASE WHEN ${Favorite.tableName}.entry_id IS NULL THEN FALSE ELSE TRUE END AS is_favorite`),
 ];
 

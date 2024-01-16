@@ -1,7 +1,6 @@
 export const selectedEntryColumns = [
     'scope',
     'type',
-    'key',
     'createdBy',
     'createdAt',
     'updatedAt',
@@ -10,17 +9,18 @@ export const selectedEntryColumns = [
     'savedId',
     'hidden',
     'entryId',
-    'name',
     'workbookId',
 ] as const;
 
 export const selectedEntryColumnsForJoin = [
     ...selectedEntryColumns,
     'innerMeta',
+    'key',
     'isDeleted',
     'deletedAt',
     'displayKey',
     'sortName',
+    'name',
     'tenantId',
     'public',
     'unversionedData',
