@@ -29,7 +29,7 @@ export async function down(knex: Knex): Promise<void> {
         DROP TRIGGER before_favorites_insert_or_update on favorites;
         DROP FUNCTION update_favorites();
 
-        DROP INDEX sort_favorites_alias_idx;
+        DROP INDEX favorites_sort_alias_idx;
         DROP INDEX favorites_alias_idx;
 
         ALTER TABLE favorites DROP COLUMN sort_alias;
