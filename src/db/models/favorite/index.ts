@@ -389,7 +389,7 @@ class Favorite extends Model {
 
         const {login} = requestedBy;
 
-        const alias = name ? name.toLowerCase() : name;
+        const alias = name;
 
         const result = await Favorite.query(this.primary)
             .update({alias, displayAlias: name})
