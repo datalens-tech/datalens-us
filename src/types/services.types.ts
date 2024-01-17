@@ -101,7 +101,7 @@ export interface AddFavorite extends StdServiceParams {
 }
 export interface RenameFavorite extends StdServiceParams {
     entryId: string;
-    name: string;
+    name: string | null;
 }
 export interface DeleteFavorite extends StdServiceParams {
     entryId: string;
