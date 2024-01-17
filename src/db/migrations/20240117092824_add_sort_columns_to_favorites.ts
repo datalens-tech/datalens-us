@@ -9,7 +9,7 @@ export async function up(knex: Knex): Promise<void> {
         CREATE INDEX favorites_alias_idx ON favorites(alias);
 
         UPDATE favorites SET sort_alias = naturalsort(alias);
-        CREATE INDEX sort_favorites_alias_idx ON favorites(sort_alias);
+        CREATE INDEX favorites_sort_alias_idx ON favorites(sort_alias);
 
         CREATE FUNCTION update_favorites() RETURNS trigger AS $$
             BEGIN
