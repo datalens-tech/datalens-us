@@ -8,7 +8,7 @@ import {db} from '../index';
         await db.ready();
 
         const favorites = await db.primary.raw(
-            `SELECT entry_id, tenant_id, login, display_alias FROM favorites`,
+            `SELECT entry_id, tenant_id, login, display_alias FROM favorites WHERE display_alias IS NOT NULL AND display_alias != ''`,
         );
 
         for (const entry of favorites.rows) {
