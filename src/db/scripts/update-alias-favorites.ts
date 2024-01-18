@@ -11,7 +11,7 @@ import {db} from '../index';
         const favorites = await db.primary.raw(
             `SELECT entry_id, tenant_id, login, alias, display_alias 
              FROM favorites 
-             WHERE alias IS NOT NULL AND alias != '' AND display_alias IS NULL`,
+             WHERE alias IS NOT NULL AND alias != '' AND (display_alias != alias OR display_alias IS NULL)`,
         );
 
         for (const entry of favorites.rows) {
