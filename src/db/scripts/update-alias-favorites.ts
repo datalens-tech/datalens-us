@@ -11,16 +11,18 @@ import {db} from '../index';
         const favorites = await db.primary.raw(
             `SELECT entry_id, tenant_id, login, alias, display_alias 
              FROM favorites 
-             WHERE alias IS NOT NULL AND alias != '' AND (display_alias != alias OR display_alias IS NULL)`,
+             WHERE alias IS NOT NULL AND alias != ''`,
         );
 
         for (const entry of favorites.rows) {
-            const {entry_id, tenant_id, login, alias} = entry;
+            const {entry_id, tenant_id, login, alias, display_alias} = entry;
 
-            await db.primary
-                .table('favorites')
-                .update({alias: alias.toLowerCase(), display_alias: alias})
-                .where({entry_id, tenant_id, login});
+            if (display_alias === null || alias.toLowerCase() !== display_alias.toLowerCase()) {
+                 await db.primary
+                    .table('favorites')
+                    .update({alias: alias.toLowerCase(), display_alias: alias})
+                    .where({entry_id, tenant_id, login});
+            }
         }
 
         process.exit(0);
