@@ -18,7 +18,7 @@ import {db} from '../index';
             const {entry_id, tenant_id, login, alias, display_alias} = entry;
 
             if (display_alias === null || alias.toLowerCase() !== display_alias.toLowerCase()) {
-                 await db.primary
+                await db.primary
                     .table('favorites')
                     .update({alias: alias.toLowerCase(), display_alias: alias})
                     .where({entry_id, tenant_id, login});
