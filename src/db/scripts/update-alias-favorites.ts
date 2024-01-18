@@ -8,6 +8,12 @@ import {db} from '../index';
     try {
         await db.ready();
 
+        await db.primary.raw(
+            `UPDATE favorites 
+             SET display_alias = NULL 
+             WHERE display_alias IS NOT NULL AND display_alias != '' AND alias IS NULL`,
+        );
+
         const favorites = await db.primary.raw(
             `SELECT entry_id, tenant_id, login, alias, display_alias 
              FROM favorites 
