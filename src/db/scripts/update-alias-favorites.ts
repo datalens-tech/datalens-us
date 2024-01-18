@@ -8,13 +8,18 @@ import {db} from '../index';
         await db.ready();
 
         const favorites = await db.primary.raw(
-            `SELECT entry_id, tenant_id, login, display_alias FROM favorites WHERE display_alias IS NOT NULL AND display_alias != ''`,
+            `SELECT entry_id, tenant_id, login, alias, display_alias 
+             FROM favorites 
+             WHERE alias IS NOT NULL AND alias != '' AND display_alias IS NULL`,
         );
 
         for (const entry of favorites.rows) {
-            const {entry_id, tenant_id, login, display_alias} = entry;
-            const alias = display_alias ? display_alias.toLowerCase() : display_alias;
-            await db.primary.table('favorites').update({alias}).where({entry_id, tenant_id, login});
+            const {entry_id, tenant_id, login, alias} = entry;
+
+            await db.primary
+                .table('favorites')
+                .update({alias: alias.toLowerCase(), display_alias: alias})
+                .where({entry_id, tenant_id, login});
         }
 
         process.exit(0);
