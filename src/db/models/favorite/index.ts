@@ -139,7 +139,10 @@ class Favorite extends Model {
                             builder.orderBy('entries.createdAt', orderBy.direction);
                             break;
                         case 'name':
-                            builder.orderBy('sortName', orderBy.direction);
+                            builder.orderBy(
+                                raw('COALESCE(favorites.sort_alias, entries.sort_name)'),
+                                orderBy.direction,
+                            );
                             break;
                     }
                 }
