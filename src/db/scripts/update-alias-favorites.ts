@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+/* This script facilitates migration of aliases for favorites and can be deleted after release */
 require('dotenv').config();
 require('../../index');
 import {db} from '../index';
