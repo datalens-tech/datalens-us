@@ -23,7 +23,11 @@ import {db} from '../index';
         for (const entry of favorites.rows) {
             const {entry_id, tenant_id, login, alias, display_alias} = entry;
 
-            if (display_alias === null || alias.toLowerCase() !== display_alias.toLowerCase()) {
+            if (
+                display_alias === null ||
+                alias !== alias.toLowerCase() ||
+                alias.toLowerCase() !== display_alias.toLowerCase()
+            ) {
                 await db.primary
                     .table('favorites')
                     .update({alias: alias.toLowerCase(), display_alias: alias})
