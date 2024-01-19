@@ -89,5 +89,6 @@ export interface FavoriteColumns {
     tenantId: string;
     login: string;
     alias: string | null;
+    displayAlias: string | null;
     createdAt: string;
 }

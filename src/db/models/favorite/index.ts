@@ -1,3 +1,4 @@
+import {raw} from 'objection';
 import {Model} from '../..';
 import Entry from '../entry';
 import {Entry as EntryModel} from '../new/entry';
@@ -110,7 +111,7 @@ class Favorite extends Model {
             .where((builder) => {
                 if (filters && filters.name) {
                     builder.where(
-                        'name',
+                        raw('coalesce(favorites.alias, entries.name)'),
                         'like',
                         `%${Utils.escapeStringForLike(filters.name.toLowerCase())}%`,
                     );
@@ -138,7 +139,10 @@ class Favorite extends Model {
                             builder.orderBy('entries.createdAt', orderBy.direction);
                             break;
                         case 'name':
-                            builder.orderBy('sortName', orderBy.direction);
+                            builder.orderBy(
+                                raw('COALESCE(favorites.sort_alias, entries.sort_name)'),
+                                orderBy.direction,
+                            );
                             break;
                     }
                 }
@@ -388,8 +392,11 @@ class Favorite extends Model {
 
         const {login} = requestedBy;
 
+        const displayAlias = name ? name : null;
+        const alias = displayAlias ? displayAlias.toLowerCase() : null;
+
         const result = await Favorite.query(this.primary)
-            .update({alias: name})
+            .update({alias, displayAlias})
             .where({entryId, tenantId, login})
             .returning('*')
             .first()

@@ -153,6 +153,7 @@ export async function deleteEntry(
                         ...entity.innerMeta,
                         oldKey: key,
                         oldDisplayKey: displayKey,
+                        lastDeletionUserId: user.userId,
                     };
 
                     return markEntryAsDeleted(trx, {
