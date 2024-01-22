@@ -23,7 +23,7 @@ export class JoinedEntryFavorite extends Model {
         return Entry.idColumn;
     }
 
-    static find({
+    static findPage({
         where,
         userLogin,
         modify,

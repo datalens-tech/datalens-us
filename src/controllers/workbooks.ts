@@ -27,6 +27,7 @@ import {
     formatWorkbooksList,
     formatSetWorkbookIsTemplate,
     formatRestoreWorkbook,
+    formatGetWorkbookContent,
 } from '../services/new/workbook/formatters';
 
 export default {
@@ -84,7 +85,8 @@ export default {
             },
         );
 
-        const {code, response} = prepareResponse({data: result});
+        const formattedResponse = formatGetWorkbookContent(req.ctx, result);
+        const {code, response} = prepareResponse({data: formattedResponse});
         res.status(code).send(response);
     },
 
