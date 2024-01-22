@@ -2,7 +2,7 @@ import {EntryPermissions} from '../types';
 import {JoinedEntryRevisionFavoriteColumns} from '../../../../db/presentations/joined-entry-revision-favorite';
 import {CTX} from '../../../../types/models';
 
-export interface GetEntryResult {
+interface GetEntryResult {
     joinedEntryRevisionFavorite: JoinedEntryRevisionFavoriteColumns;
     permissions: EntryPermissions;
     includePermissionsInfo: boolean;
@@ -55,20 +55,4 @@ export const formatGetEntryResponse = (
         isFavorite: isHiddenIsFavorite ? undefined : joinedEntryRevisionFavorite.isFavorite,
         permissions: includePermissionsInfo ? permissions : undefined,
     };
-
-    // [
-    //     'entries.entryId',
-    //     'scope',
-    //     'type',
-    //     'display_key as key',
-    //     'revisions.meta',
-    //     'entries.createdBy',
-    //     'entries.createdAt',
-    //     'revisions.updatedBy',
-    //     'revisions.updatedAt',
-    //     'savedId',
-    //     'publishedId',
-    //     'hidden',
-    //     'entries.workbookId',
-    // ];
 };
