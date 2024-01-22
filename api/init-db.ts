@@ -1,1 +1,1 @@
-export {initDB} from '../src/db/init-db';
+export {getKnexOptions, initDB} from '../src/db/init-db';
