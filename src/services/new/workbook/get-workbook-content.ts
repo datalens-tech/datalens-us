@@ -109,7 +109,7 @@ export const getWorkbookContent = async (
 
     const targetTrx = getReplica(trx);
 
-    const {user, tenantId, projectId} = ctx.get('info');
+    const {user, tenantId} = ctx.get('info');
 
     const workbook = await getWorkbook(
         {ctx, trx, skipValidation: true, skipCheckPermissions},
@@ -122,8 +122,7 @@ export const getWorkbookContent = async (
     const entriesPage = await JoinedEntryRevisionFavorite.findPage({
         where: (builder) => {
             builder.where({
-                tenantId,
-                projectId,
+                'entries.tenantId': tenantId,
                 workbookId: workbookId,
                 isDeleted: false,
             });
