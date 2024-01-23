@@ -71,7 +71,7 @@ export class JoinedEntryRevisionFavorite extends JoinedEntryRevision {
     static findPage({
         where,
         modify,
-        joinRevisionArgs,
+        joinRevisionArgs = {},
         userLogin,
         page,
         pageSize,
@@ -79,7 +79,7 @@ export class JoinedEntryRevisionFavorite extends JoinedEntryRevision {
     }: {
         where: Record<string, unknown> | ((builder: Knex.QueryBuilder) => void);
         modify: Modifier;
-        joinRevisionArgs: JoinRevisionArgs;
+        joinRevisionArgs?: JoinRevisionArgs;
         userLogin: string;
         page: number;
         pageSize: number;

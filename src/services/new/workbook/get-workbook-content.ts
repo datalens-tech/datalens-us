@@ -58,13 +58,6 @@ const validateArgs = makeSchemaValidator({
         scope: {
             type: ['array', 'string'],
         },
-        revId: {
-            type: 'string',
-        },
-        branch: {
-            type: 'string',
-            enum: ['saved', 'published'],
-        },
     },
 });
 
@@ -82,8 +75,6 @@ export interface GetWorkbookContentArgs {
         direction: 'asc' | 'desc';
     };
     scope?: EntryScope | EntryScope[];
-    revId?: string;
-    branch?: 'saved' | 'published';
 }
 
 export const getWorkbookContent = async (
@@ -99,8 +90,6 @@ export const getWorkbookContent = async (
         filters,
         orderBy,
         scope,
-        revId,
-        branch,
     } = args;
 
     logInfo(ctx, 'GET_WORKBOOK_CONTENT_START', {
@@ -120,7 +109,7 @@ export const getWorkbookContent = async (
 
     const targetTrx = getReplica(trx);
 
-    const {user} = ctx.get('info');
+    const {user, tenantId, projectId} = ctx.get('info');
 
     const workbook = await getWorkbook(
         {ctx, trx, skipValidation: true, skipCheckPermissions},
@@ -133,6 +122,8 @@ export const getWorkbookContent = async (
     const entriesPage = await JoinedEntryRevisionFavorite.findPage({
         where: (builder) => {
             builder.where({
+                tenantId,
+                projectId,
                 workbookId: workbookId,
                 isDeleted: false,
             });
@@ -170,10 +161,6 @@ export const getWorkbookContent = async (
             }
         },
         trx: targetTrx,
-        joinRevisionArgs: {
-            revId,
-            branch,
-        },
         userLogin: user.login,
         page,
         pageSize,

@@ -85,7 +85,7 @@ export default {
             },
         );
 
-        const formattedResponse = formatGetWorkbookContent(req.ctx, result);
+        const formattedResponse = formatGetWorkbookContent(result);
         const {code, response} = prepareResponse({data: formattedResponse});
         res.status(code).send(response);
     },

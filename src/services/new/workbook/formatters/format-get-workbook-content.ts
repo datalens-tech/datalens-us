@@ -1,5 +1,3 @@
-import {CTX} from '../../../../types/models';
-
 import {EntryPermissions} from '../../entry/types';
 import {JoinedEntryRevisionFavoriteColumns} from '../../../../db/presentations/joined-entry-revision-favorite';
 
@@ -9,7 +7,6 @@ export type GetContentResult = {
 } & JoinedEntryRevisionFavoriteColumns;
 
 export const formatGetJoinedEntryRevisionFavorite = (
-    ctx: CTX,
     joinedEntryRevisionFavorite: GetContentResult,
 ) => {
     return {
@@ -32,18 +29,15 @@ export const formatGetJoinedEntryRevisionFavorite = (
     };
 };
 
-export const formatGetWorkbookContent = (
-    ctx: CTX,
-    {
-        entries,
-        nextPageToken,
-    }: {
-        entries: GetContentResult[];
-        nextPageToken?: string;
-    },
-) => {
+export const formatGetWorkbookContent = ({
+    entries,
+    nextPageToken,
+}: {
+    entries: GetContentResult[];
+    nextPageToken?: string;
+}) => {
     return {
-        entries: entries.map((entry) => formatGetJoinedEntryRevisionFavorite(ctx, entry)),
+        entries: entries.map((entry) => formatGetJoinedEntryRevisionFavorite(entry)),
         nextPageToken,
     };
 };
