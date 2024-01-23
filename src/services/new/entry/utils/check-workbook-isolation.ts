@@ -11,7 +11,7 @@ export const checkWorkbookIsolation = ({
 }) => {
     const {workbookId: requestWorkbookId} = ctx.get('info');
 
-    if (!requestWorkbookId || requestWorkbookId !== entryWorkbookId) {
+    if (requestWorkbookId && requestWorkbookId !== entryWorkbookId) {
         throw new AppError(US_ERRORS.WORKBOOK_ISOLATION_INTERRUPTION, {
             code: US_ERRORS.WORKBOOK_ISOLATION_INTERRUPTION,
         });
