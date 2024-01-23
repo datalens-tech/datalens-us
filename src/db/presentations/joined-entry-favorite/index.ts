@@ -1,99 +1,89 @@
 import type {Knex} from 'knex';
 import {TransactionOrKnex, raw, Modifier, Page} from 'objection';
-import {
-    selectedColumns as joinedEntryRevisionColumns,
-    joinRevision,
-    JoinedEntryRevision,
-    JoinedEntryRevisionColumns,
-    JoinRevisionArgs,
-} from '../joined-entry-revision';
-
+import {Model} from '../..';
 import {Entry} from '../../models/new/entry';
-
-import {RevisionModel} from '../../models/new/revision';
 import {Favorite} from '../../models/new/favorite';
 
 import {leftJoinFavorite} from '../utils';
 
+import {selectedEntryColumns} from '../constants';
+
 const selectedColumns = [
-    ...joinedEntryRevisionColumns,
+    ...selectedEntryColumns.map((col) => `${Entry.tableName}.${col}`),
     raw(`CASE WHEN ${Favorite.tableName}.entry_id IS NULL THEN FALSE ELSE TRUE END AS is_favorite`),
 ];
 
-export type JoinedEntryRevisionFavoriteColumns = JoinedEntryRevisionColumns & {
+export type JoinedEntryFavoriteColumns = Pick<Entry, ArrayElement<typeof selectedEntryColumns>> & {
     isFavorite: boolean;
 };
 
-export class JoinedEntryRevisionFavorite extends JoinedEntryRevision {
+export class JoinedEntryFavorite extends Model {
+    static get tableName() {
+        return Entry.tableName;
+    }
+
+    static get idColumn() {
+        return Entry.idColumn;
+    }
+
     static find({
         where,
-        joinRevisionArgs,
         userLogin,
         trx,
     }: {
         where: Record<string, unknown> | ((builder: Knex.QueryBuilder) => void);
-        joinRevisionArgs: JoinRevisionArgs;
         userLogin: string;
         trx: TransactionOrKnex;
     }) {
-        return JoinedEntryRevisionFavorite.query(trx)
+        return JoinedEntryFavorite.query(trx)
             .select(selectedColumns)
-            .join(RevisionModel.tableName, joinRevision(joinRevisionArgs))
             .leftJoin(Favorite.tableName, leftJoinFavorite(userLogin))
             .where(where)
-            .timeout(JoinedEntryRevisionFavorite.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<
-            JoinedEntryRevisionFavoriteColumns[]
+            .timeout(JoinedEntryFavorite.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<
+            JoinedEntryFavoriteColumns[]
         >;
     }
 
     static findOne({
         where,
-        joinRevisionArgs,
         userLogin,
         trx,
     }: {
         where: Record<string, unknown> | ((builder: Knex.QueryBuilder) => void);
-        joinRevisionArgs: JoinRevisionArgs;
         userLogin: string;
         trx: TransactionOrKnex;
     }) {
-        return JoinedEntryRevisionFavorite.query(trx)
+        return JoinedEntryFavorite.query(trx)
             .select(selectedColumns)
-            .join(RevisionModel.tableName, joinRevision(joinRevisionArgs))
             .leftJoin(Favorite.tableName, leftJoinFavorite(userLogin))
             .where(where)
             .first()
-            .timeout(JoinedEntryRevisionFavorite.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<
-            JoinedEntryRevisionFavoriteColumns | undefined
+            .timeout(JoinedEntryFavorite.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<
+            JoinedEntryFavoriteColumns | undefined
         >;
     }
 
     static findPage({
         where,
-        modify,
-        joinRevisionArgs = {},
         userLogin,
+        modify,
         page,
         pageSize,
         trx,
     }: {
         where: Record<string, unknown> | ((builder: Knex.QueryBuilder) => void);
+        trx: TransactionOrKnex;
         modify: Modifier;
-        joinRevisionArgs?: JoinRevisionArgs;
         userLogin: string;
         page: number;
         pageSize: number;
-        trx: TransactionOrKnex;
     }) {
-        return JoinedEntryRevisionFavorite.query(trx)
+        return JoinedEntryFavorite.query(trx)
             .select(selectedColumns)
-            .join(RevisionModel.tableName, joinRevision(joinRevisionArgs))
             .leftJoin(Favorite.tableName, leftJoinFavorite(userLogin))
             .where(where)
             .modify(modify)
             .page(page, pageSize)
-            .timeout(JoinedEntryRevisionFavorite.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<
-            Page<Entry & JoinedEntryRevisionFavoriteColumns>
-        >;
+            .timeout(JoinedEntryFavorite.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<Page<Entry>>;
     }
 }
