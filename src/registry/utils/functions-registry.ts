@@ -1,4 +1,4 @@
-import {objectKeys} from './object-keys';
+import {objectKeys} from '../../utils/utility-types';
 
 export const createFunctionsRegistry = function <FunctionsMap extends Record<string, any>>(
     functionsMap: FunctionsMap,
