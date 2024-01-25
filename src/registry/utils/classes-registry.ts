@@ -1,4 +1,4 @@
-import {objectKeys} from './object-keys';
+import {objectKeys} from '../../utils/utility-types';
 
 export const createClassesRegistry = function <ClassesMap extends Record<string, any>>(
     classesMap: ClassesMap,
