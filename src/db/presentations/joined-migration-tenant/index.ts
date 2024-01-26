@@ -13,6 +13,10 @@ const selectedTenantColumns = [
     TenantColumn.RetriesCount,
     TenantColumn.CollectionsEnabled,
     TenantColumn.FoldersEnabled,
+    TenantColumn.BillingRate,
+    TenantColumn.AccountBillingId,
+    TenantColumn.InstanceServiceBillingId,
+    TenantColumn.BillingStartedAt,
 ] as const;
 
 const selectedMigrationTenantColumns = [
@@ -32,6 +36,10 @@ export const JoinedMigrationTenantColumn = {
     RetriesCount: TenantColumn.RetriesCount,
     CollectionsEnabled: TenantColumn.CollectionsEnabled,
     FoldersEnabled: TenantColumn.FoldersEnabled,
+    BillingRate: TenantColumn.BillingRate,
+    AccountBillingId: TenantColumn.AccountBillingId,
+    InstanceServiceBillingId: TenantColumn.InstanceServiceBillingId,
+    BillingStartedAt: TenantColumn.BillingStartedAt,
     FromId: MigrationTenantColumn.FromId,
     ToId: MigrationTenantColumn.ToId,
     Migrating: MigrationTenantColumn.Migrating,
@@ -58,7 +66,7 @@ export const joinMigrationTenant =
         );
     };
 
-type SelectedTenantColumns = Pick<Tenant, ArrayElement<typeof selectedTenantColumns>>;
+export type SelectedTenantColumns = Pick<Tenant, ArrayElement<typeof selectedTenantColumns>>;
 
 type SelectedMigrationTenantColumns = Pick<
     MigrationTenant,
