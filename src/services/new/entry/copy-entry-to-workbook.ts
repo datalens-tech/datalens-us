@@ -86,9 +86,13 @@ export const copyEntryToWorkbook = async (
         }
 
         if (copingEntry.scope === EntryScope.Connection) {
-            throw new AppError('Connections cannot be copied', {
-                code: US_ERRORS.CONNECTION_COPY_DENIED,
-            });
+            const fileConnectionExists = Utils.checkFileConnectionsExistence([copingEntry]);
+
+            if (fileConnectionExists) {
+                throw new AppError(US_ERRORS.WORKBOOK_COPY_FILE_CONNECTION_ERROR, {
+                    code: US_ERRORS.WORKBOOK_COPY_FILE_CONNECTION_ERROR,
+                });
+            }
         }
 
         ctx.log('GET_ENTRY_MODEL');
