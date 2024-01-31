@@ -11,6 +11,8 @@ export async function up(knex: Knex): Promise<void> {
         ALTER TABLE tenants ADD COLUMN billing_instance_service_id VARCHAR(255) DEFAULT NULL;
 
         ALTER TABLE tenants ADD COLUMN billing_started_at TIMESTAMPTZ DEFAULT NULL;
+
+        CREATE INDEX tenants_billing_instance_service_id_idx ON tenants USING BTREE (billing_instance_service_id);
     `);
 }
 
@@ -25,5 +27,7 @@ export async function down(knex: Knex): Promise<void> {
         ALTER TABLE tenants DROP COLUMN billing_rate;
 
         DROP TYPE BILLING_RATE_TYPE;
+
+        DROP INDEX tenants_billing_instance_service_id_idx;
     `);
 }
