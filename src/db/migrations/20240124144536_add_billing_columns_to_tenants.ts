@@ -18,6 +18,8 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
     return knex.raw(`
+        DROP INDEX tenants_billing_instance_service_id_idx;
+
         ALTER TABLE tenants DROP COLUMN billing_started_at;
 
         ALTER TABLE tenants DROP COLUMN billing_instance_service_id;
@@ -27,7 +29,5 @@ export async function down(knex: Knex): Promise<void> {
         ALTER TABLE tenants DROP COLUMN billing_rate;
 
         DROP TYPE BILLING_RATE_TYPE;
-
-        DROP INDEX tenants_billing_instance_service_id_idx;
     `);
 }
