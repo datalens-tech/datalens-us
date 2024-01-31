@@ -18,4 +18,5 @@ export const selectedEntryColumns = [
     'public',
     'unversionedData',
     'workbookId',
+    'mirrored',
 ] as const;

@@ -26,6 +26,7 @@ export const EntryColumn = {
     Public: 'public',
     UnversionedData: 'unversionedData',
     WorkbookId: 'workbookId',
+    Mirrored: 'mirrored',
 } as const;
 
 export class Entry extends Model {
@@ -103,6 +104,7 @@ export class Entry extends Model {
     [EntryColumn.Public]!: boolean;
     [EntryColumn.UnversionedData]!: Record<string, unknown>;
     [EntryColumn.WorkbookId]!: Nullable<string>;
+    [EntryColumn.Mirrored]!: boolean;
 
     revisions?: RevisionModel[];
     savedRevision?: RevisionModel;
