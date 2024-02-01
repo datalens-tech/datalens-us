@@ -30,6 +30,7 @@ describe('Get entry by private route', () => {
             data: {},
             entryId: expect.any(String),
             hidden: false,
+            mirrored: false,
             key: testEntryName,
             links: null,
             meta: {},
