@@ -26,6 +26,7 @@ export const formatGetJoinedEntryRevisionFavorite = (
         isFavorite: joinedEntryRevisionFavorite.isFavorite,
         isLocked: joinedEntryRevisionFavorite.isLocked,
         permissions: joinedEntryRevisionFavorite.permissions,
+        mirrored: joinedEntryRevisionFavorite.mirrored,
     };
 };
 
