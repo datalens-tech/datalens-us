@@ -59,6 +59,7 @@ RUN npm prune --production
 RUN rm -rf /tmp/*
 
 RUN chown -R ${USER} /opt/app/dist/run
+RUN sed -i 's/\r//g' /opt/app/scripts/preflight.sh
 
 # adding certificate
 RUN echo $CERT > /usr/local/share/ca-certificates/cert.pem

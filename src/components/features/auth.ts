@@ -26,7 +26,7 @@ export const isAuthFeature = (req: any, callback: (status: number) => void) => {
 
         const data = JSON.stringify({
             action: 'shell',
-            method: 'servertime',
+            method: 'datalens',
             data: [{}],
             type: 'rpc',
             tid: 0,
