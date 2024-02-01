@@ -4,6 +4,7 @@ export interface TemplateData {
     templatePath: string;
     connectionId?: string;
     defaultTargetPath?: string;
+    workbookId?: string;
 }
 
 export interface GetAllTemplate {
