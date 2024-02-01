@@ -20,6 +20,7 @@ export const ALL_COLUMNS = [
     'innerMeta',
     'hidden',
     'links',
+    'workbookId',
 ];
 
 export const RETURN_COLUMNS = [
