@@ -8,3 +8,4 @@ export {dlContext} from './x-dl-context';
 export {ctx} from './ctx';
 export {finalRequestHandler} from './final-request-handler';
 export {checkReadOnlyMode} from './check-read-only-mode';
+export {rpcAuthorization} from './rpc-authorization';

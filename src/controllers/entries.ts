@@ -47,7 +47,6 @@ export default {
         const formattedResponse = formatGetEntryResponse(req.ctx, result);
 
         const {code, response} = prepareResponse({data: formattedResponse});
-
         res.status(code).send(response);
     },
 

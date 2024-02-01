@@ -12,6 +12,7 @@ import {
     finalRequestHandler,
     checkReadOnlyMode,
     resolveWorkbookId,
+    rpcAuthorization,
 } from './components/middlewares';
 import {AppEnv} from './const';
 import {registry} from './registry';
@@ -43,6 +44,7 @@ afterAuth.push(
     resolveSpecialTokens,
     ctx,
     checkReadOnlyMode,
+    rpcAuthorization,
 );
 
 nodekit.config.appFinalErrorHandler = finalRequestHandler;
