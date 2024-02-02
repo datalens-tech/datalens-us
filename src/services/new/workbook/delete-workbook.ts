@@ -54,6 +54,12 @@ export const deleteWorkbook = async (
         {workbookId},
     );
 
+    if (workbook.model.isTemplate) {
+        throw new AppError("Workbook template can't be deleted", {
+            code: US_ERRORS.WORKBOOK_TEMPLATE_CANT_BE_DELETED,
+        });
+    }
+
     if (accessServiceEnabled && !skipCheckPermissions) {
         let parentIds: string[] = [];
 
@@ -72,7 +78,7 @@ export const deleteWorkbook = async (
     }
 
     const result = await transaction(targetTrx, async (transactionTrx) => {
-        const deletedWorkbook = await WorkbookModel.query(transactionTrx)
+        const deletedWorkbook: WorkbookModel | undefined = await WorkbookModel.query(transactionTrx)
             .patch({
                 [WorkbookModelColumn.DeletedBy]: userId,
                 [WorkbookModelColumn.DeletedAt]: raw(CURRENT_TIMESTAMP),

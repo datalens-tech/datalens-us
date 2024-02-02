@@ -663,6 +663,24 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
+        case US_ERRORS.WORKBOOK_TEMPLATE_CANT_BE_DELETED: {
+            return {
+                code: 403,
+                response: {
+                    code,
+                    message: "Workbook template can't be deleted",
+                },
+            };
+        }
+        case US_ERRORS.COLLECTION_WITH_WORKBOOK_TEMPLATE_CANT_BE_DELETED: {
+            return {
+                code: 403,
+                response: {
+                    code,
+                    message: "Collection with workbook template can't be deleted",
+                },
+            };
+        }
         default:
             return {
                 code: 500,

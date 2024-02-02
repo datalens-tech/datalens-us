@@ -4,12 +4,13 @@ import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
 import {deleteWorkbook} from '../workbook';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {CURRENT_TIMESTAMP} from '../../../const';
+import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {raw, transaction} from 'objection';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import Utils, {logInfo} from '../../../utils';
 import {CollectionPermission} from '../../../entities/collection';
+import {AppError} from '@gravity-ui/nodekit';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -127,6 +128,14 @@ export const deleteCollection = async (
                 [WorkbookModelColumn.DeletedAt]: null,
             })
             .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
+
+        for (const workbook of workbooksForDelete) {
+            if (workbook.isTemplate) {
+                throw new AppError("Collection with workbook template can't be deleted", {
+                    code: US_ERRORS.COLLECTION_WITH_WORKBOOK_TEMPLATE_CANT_BE_DELETED,
+                });
+            }
+        }
 
         // TODO: Rewrite the deletion for the optimal number of requests
         await Promise.all(
