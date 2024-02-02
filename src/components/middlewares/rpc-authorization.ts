@@ -2,7 +2,7 @@ import {Request, Response, NextFunction} from '@gravity-ui/expresskit';
 import {isAuthFeature} from '../features';
 
 export const rpcAuthorization = (req: Request, res: Response, next: NextFunction) => {
-    isAuthFeature(req, (status: number) => {
+    isAuthFeature(req, res, (status: number) => {
         if (status == 200) {
             next();
         } else {

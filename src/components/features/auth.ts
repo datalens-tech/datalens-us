@@ -1,7 +1,7 @@
 const http = require('http');
 const https = require('https');
 
-export const isAuthFeature = (req: any, callback: (status: number) => void) => {
+export const isAuthFeature = (req: any, res: any, callback: (status: number) => void) => {
     function getReferer(req: any) {
         const referer = req.headers['referer'];
         if (referer) {

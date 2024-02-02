@@ -9,10 +9,10 @@ import {
     setCiEnv,
     dlContext,
     ctx,
+    rpcAuthorization,
     finalRequestHandler,
     checkReadOnlyMode,
     resolveWorkbookId,
-    rpcAuthorization,
 } from './components/middlewares';
 import {AppEnv} from './const';
 import {registry} from './registry';
