@@ -4,7 +4,7 @@ export interface RequestedBy {
 }
 
 export interface BasicRequestParams {
-    requestId: string;
+    requestId?: string;
     dlContext?: string;
     onlyPublic?: boolean;
     tenantId?: string;
