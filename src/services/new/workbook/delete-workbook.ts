@@ -78,7 +78,7 @@ export const deleteWorkbook = async (
     }
 
     const result = await transaction(targetTrx, async (transactionTrx) => {
-        const deletedWorkbook: WorkbookModel | undefined = await WorkbookModel.query(transactionTrx)
+        const deletedWorkbook = await WorkbookModel.query(transactionTrx)
             .patch({
                 [WorkbookModelColumn.DeletedBy]: userId,
                 [WorkbookModelColumn.DeletedAt]: raw(CURRENT_TIMESTAMP),
