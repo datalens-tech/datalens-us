@@ -54,6 +54,12 @@ export const deleteWorkbook = async (
         {workbookId},
     );
 
+    if (workbook.model.isTemplate) {
+        throw new AppError("Workbook template can't be deleted", {
+            code: US_ERRORS.WORKBOOK_TEMPLATE_CANT_BE_DELETED,
+        });
+    }
+
     if (accessServiceEnabled && !skipCheckPermissions) {
         let parentIds: string[] = [];
 
