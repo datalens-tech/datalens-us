@@ -27,13 +27,13 @@ export const ctx = async (req: Request, res: Response, next: NextFunction) => {
         dlContext,
         onlyPublic,
         privatePermissions,
-        projectId: projectId || null
+        projectId: projectId || null,
     });
 
     if (process.env.NODE_RPC_URL) {
-        var r: any = req;
+        const r: any = req;
 
-        var ctx: any = req.originalContext;
+        const ctx: any = req.originalContext;
         ctx.appParams.rpc = r.rpc;
     }
     next();

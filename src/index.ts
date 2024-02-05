@@ -44,7 +44,7 @@ afterAuth.push(
     resolveSpecialTokens,
     rpcAuthorization,
     ctx,
-    checkReadOnlyMode
+    checkReadOnlyMode,
 );
 
 nodekit.config.appFinalErrorHandler = finalRequestHandler;

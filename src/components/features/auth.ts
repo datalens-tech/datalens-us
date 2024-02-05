@@ -1,7 +1,11 @@
 const http = require('http');
 const https = require('https');
 
-export const isAuthFeature = (req: any, res: any, callback: (status: number, responseData: any) => void) => {
+export const isAuthFeature = (
+    req: any,
+    res: any,
+    callback: (status: number, responseData: any) => void,
+) => {
     function getRpcAuthorization(req: any) {
         const authorization = req.headers['x-rpc-authorization'];
         if (authorization) {
@@ -26,7 +30,7 @@ export const isAuthFeature = (req: any, res: any, callback: (status: number, res
         const data = JSON.stringify({
             action: 'shell',
             method: 'datalens',
-            data: [{ 'url': req.url }],
+            data: [{url: req.url}],
             type: 'rpc',
             tid: 0,
         });
@@ -42,25 +46,24 @@ export const isAuthFeature = (req: any, res: any, callback: (status: number, res
                 'Content-Type': 'application/json',
                 'Content-Length': data.length,
                 'rpc-authorization': token,
-            }
+            },
         };
 
         const postRequest = (urlRpc.protocol == 'http:' ? http : https)
             .request(options, (response: any) => {
+                let body = '';
 
-                let body = "";
-
-                response.on("data", (chunk: any) => {
+                response.on('data', (chunk: any) => {
                     body += chunk;
                 });
 
-                response.on("end", () => {
+                response.on('end', () => {
                     try {
-                        let json = JSON.parse(body);
+                        const json = JSON.parse(body);
                         callback(response.statusCode, json[0].result.records);
                     } catch (error: any) {
-                        callback(response.statusCode, { msg: error.message });
-                    };
+                        callback(response.statusCode, {msg: error.message});
+                    }
                 });
             })
             .on('error', (error: any) => {
