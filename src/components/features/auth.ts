@@ -62,12 +62,13 @@ export const isAuthFeature = (
                         const json = JSON.parse(body);
                         callback(response.statusCode, json[0].result.records);
                     } catch (error: any) {
+                        req.ctx.logError(`RESPONSE ERR ${process.env.NODE_RPC_URL}: ` + error.stack);
                         callback(response.statusCode, {msg: error.message});
                     }
                 });
             })
             .on('error', (error: any) => {
-                req.ctx.logError(error.stack);
+                req.ctx.logError(`REQUEST ERR ${process.env.NODE_RPC_URL}: ` + error.stack);
                 callback(401, null);
             });
 
@@ -80,6 +81,7 @@ export const isAuthFeature = (
         if (token) {
             responseCode(token);
         } else {
+            req.ctx.log(`Token empty NODE_RPC_URL: ${process.env.NODE_RPC_URL}`);
             callback(401, null);
         }
     } else {
