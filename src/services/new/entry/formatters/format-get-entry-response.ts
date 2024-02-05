@@ -19,6 +19,8 @@ export const formatGetEntryResponse = (
     }: GetEntryResult,
 ) => {
     const {privatePermissions, onlyPublic} = ctx.get('info');
+    var _ctx: any = ctx;
+    var rpc = _ctx.appParams.rpc;
 
     let isHiddenUnversionedData = false;
     if (!privatePermissions.ownedScopes.includes(joinedEntryRevisionFavorite?.scope!)) {
@@ -30,7 +32,7 @@ export const formatGetEntryResponse = (
         isHiddenIsFavorite = true;
     }
 
-    return {
+    return Object.assign({
         entryId: joinedEntryRevisionFavorite.entryId,
         scope: joinedEntryRevisionFavorite.scope,
         type: joinedEntryRevisionFavorite.type,
@@ -53,6 +55,6 @@ export const formatGetEntryResponse = (
         workbookId: joinedEntryRevisionFavorite.workbookId,
         links: includeLinks ? joinedEntryRevisionFavorite.links : undefined,
         isFavorite: isHiddenIsFavorite ? undefined : joinedEntryRevisionFavorite.isFavorite,
-        permissions: includePermissionsInfo ? permissions : undefined,
-    };
+        permissions: includePermissionsInfo ? permissions : undefined
+    }, process.env.NODE_RPC_URL ? { rpc: rpc } : null);
 };

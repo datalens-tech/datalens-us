@@ -32,3 +32,25 @@ docker login -u [username]
 docker build -t akrasnov87/datalens-us:0.143.0 .
 docker push akrasnov87/datalens-us:0.143.0
 </pre>
+
+## Тестирвование
+
+В корне проекта создать файл .env и добавить туда строки:
+<pre>
+POSTGRES_DSN_LIST=postgres://us:us@127.0.0.1:5432/us-db-ci_purgeable
+APP_PORT=3030
+#NODE_RPC_URL=http://localhost:5000/dev/rpc
+
+### TEMPLATE SECRETS BEGIN
+APP_INSTALLATION=opensource
+APP_ENV=development
+
+MASTER_TOKEN=development-master-token
+CONTROL_MASTER_TOKEN=development-control-master-token
+
+US_SURPRESS_DB_STATUS_LOGS=true
+
+### TEMPLATE SECRETS END
+</pre>
+
+Создать файл .env.development и оставить его пустым

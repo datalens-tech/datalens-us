@@ -1,18 +1,18 @@
 const http = require('http');
 const https = require('https');
 
-export const isAuthFeature = (req: any, res: any, callback: (status: number) => void) => {
-    function getReferer(req: any) {
-        const referer = req.headers['referer'];
-        if (referer) {
-            return referer;
+export const isAuthFeature = (req: any, res: any, callback: (status: number, responseData: any) => void) => {
+    function getRpcAuthorization(req: any) {
+        const authorization = req.headers['x-rpc-authorization'];
+        if (authorization) {
+            return authorization;
         } else {
             const xDlContext = req.headers['x-dl-context'];
 
             if (xDlContext) {
                 try {
                     const data = JSON.parse(xDlContext);
-                    return data['referer'];
+                    return data['rpcAuthorization'];
                 } catch (e) {}
             }
 
@@ -20,14 +20,13 @@ export const isAuthFeature = (req: any, res: any, callback: (status: number) => 
         }
     }
 
-    function responseCode(urlAddress: string) {
+    function responseCode(token: string) {
         const url = require('url');
-        const queryData = url.parse(urlAddress, true).query;
 
         const data = JSON.stringify({
             action: 'shell',
             method: 'datalens',
-            data: [{}],
+            data: [{ 'url': req.url }],
             type: 'rpc',
             tid: 0,
         });
@@ -42,17 +41,31 @@ export const isAuthFeature = (req: any, res: any, callback: (status: number) => 
             headers: {
                 'Content-Type': 'application/json',
                 'Content-Length': data.length,
-                'rpc-authorization': queryData['RPC_AUTHORIZATION'],
-            },
+                'rpc-authorization': token,
+            }
         };
 
         const postRequest = (urlRpc.protocol == 'http:' ? http : https)
             .request(options, (response: any) => {
-                callback(response.statusCode);
+
+                let body = "";
+
+                response.on("data", (chunk: any) => {
+                    body += chunk;
+                });
+
+                response.on("end", () => {
+                    try {
+                        let json = JSON.parse(body);
+                        callback(response.statusCode, json[0].result.records);
+                    } catch (error: any) {
+                        callback(response.statusCode, { msg: error.message });
+                    };
+                });
             })
             .on('error', (error: any) => {
                 req.ctx.logError(error.stack);
-                callback(401);
+                callback(401, null);
             });
 
         postRequest.write(data);
@@ -60,13 +73,13 @@ export const isAuthFeature = (req: any, res: any, callback: (status: number) => 
     }
 
     if (process.env.NODE_RPC_URL) {
-        const referer = getReferer(req);
-        if (referer) {
-            responseCode(referer);
+        const token = getRpcAuthorization(req);
+        if (token) {
+            responseCode(token);
         } else {
-            callback(401);
+            callback(401, null);
         }
     } else {
-        callback(200);
+        callback(200, null);
     }
 };

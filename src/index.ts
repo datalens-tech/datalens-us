@@ -42,9 +42,9 @@ afterAuth.push(
     resolveWorkbookId,
     waitDatabase,
     resolveSpecialTokens,
-    ctx,
-    checkReadOnlyMode,
     rpcAuthorization,
+    ctx,
+    checkReadOnlyMode
 );
 
 nodekit.config.appFinalErrorHandler = finalRequestHandler;
