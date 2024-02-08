@@ -6,7 +6,7 @@ type ResultError = {
 };
 
 type ResultResponse = {
-    result?: any;
+    response?: any;
 };
 
 export type Operation = {
