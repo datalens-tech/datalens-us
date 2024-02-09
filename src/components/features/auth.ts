@@ -30,7 +30,7 @@ export const isAuthFeature = (
         const data = JSON.stringify({
             action: 'shell',
             method: 'datalens',
-            data: [{url: req.url}],
+            data: [{ url: req.url, method: req.method, rawHeaders: req.rawHeaders }],
             type: 'rpc',
             tid: 0,
         });
