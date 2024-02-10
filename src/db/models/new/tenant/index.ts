@@ -40,3 +40,5 @@ export class Tenant extends Model {
     [TenantColumn.BillingInstanceServiceId]!: Nullable<string>;
     [TenantColumn.BillingStartedAt]!: Nullable<string>;
 }
+
+export {BillingRate};
