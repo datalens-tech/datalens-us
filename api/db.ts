@@ -15,7 +15,7 @@ export {
     RevisionModelColumnRaw,
 } from '../src/db/models/new/revision';
 
-export {Tenant, TenantColumn} from '../src/db/models/new/tenant';
+export {Tenant, TenantColumn, BillingRate} from '../src/db/models/new/tenant';
 export {MigrationTenant, MigrationTenantColumn} from '../src/db/models/new/migration-tenant';
 
 export {WorkbookModel, WorkbookModelColumn} from '../src/db/models/new/workbook';
@@ -61,6 +61,7 @@ export {
     JoinedMigrationTenantColumn,
     joinMigrationTenant,
     LeftJoinedMigrationTenantColumns,
+    SelectedTenantColumns,
 } from '../src/db/presentations/joined-migration-tenant';
 export {JoinedEntryMigrationTenant} from '../src/db/presentations/joined-entry-migration-tenant';
 export {
