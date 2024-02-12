@@ -9,5 +9,10 @@ import {
 export const setCiEnv = (req: Request, res: Response, next: NextFunction) => {
     res.locals.userId = req.headers[TEST_USER_ID_HEADER] ?? testUserId;
     res.locals.login = req.headers[TEST_USER_LOGIN_HEADER] ?? testUserLogin;
+
+    if (req.routeInfo.billing) {
+        res.locals.serviceAccountId = 'test-user-serviceAccountId';
+    }
+
     next();
 };
