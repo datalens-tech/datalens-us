@@ -28,6 +28,5 @@ declare module '@gravity-ui/expresskit' {
     interface AppRouteParams {
         private?: boolean;
         write?: boolean;
-        billing?: boolean;
     }
 }
