@@ -361,4 +361,8 @@ export class Utils {
             );
         });
     }
+
+    static getTimestampInSeconds = () => {
+        return Math.floor(new Date().getTime() / 1000);
+    };
 }

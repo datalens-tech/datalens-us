@@ -1,17 +1,29 @@
+type ResultError = {
+    error?: {
+        code: number;
+        message: string;
+    };
+};
+
+type ResultResponse = {
+    response?: any;
+};
+
 export type Operation = {
     id: string;
-    description: string;
-    createdBy: string;
+    description?: string;
+    createdBy?: string;
     createdAt: {
-        seconds: string;
+        seconds: string | number;
         nanos?: number;
     };
     modifiedAt: {
-        seconds: string;
+        seconds: string | number;
         nanos?: number;
     };
-    metadata: {};
+    metadata?: {};
     done: boolean;
+    result?: ResultError | ResultResponse;
 };
 
 export const formatOperation = (operation: Operation) => {
@@ -23,5 +35,6 @@ export const formatOperation = (operation: Operation) => {
         modifiedAt: operation.modifiedAt,
         metadata: {},
         done: operation.done ?? true,
+        ...(operation.result ? {result: operation.result} : {}),
     };
 };
