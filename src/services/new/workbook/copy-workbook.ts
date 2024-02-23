@@ -322,7 +322,7 @@ async function getUniqWorkbookTitle({
 export async function crossSyncCopiedJoinedEntryRevisions({
     copiedJoinedEntryRevisions,
     encodedTemplateConnectionId,
-    encodedDestinationConnectionId,
+    encodedTargetConnectionId,
     ctx,
     trx,
 }: {
@@ -331,7 +331,7 @@ export async function crossSyncCopiedJoinedEntryRevisions({
         oldEntryId: string;
     }[];
     encodedTemplateConnectionId?: string;
-    encodedDestinationConnectionId?: string;
+    encodedTargetConnectionId?: string;
     ctx: AppContext;
     trx: TransactionOrKnex;
 }) {
@@ -347,8 +347,8 @@ export async function crossSyncCopiedJoinedEntryRevisions({
         },
     );
 
-    if (encodedTemplateConnectionId && encodedDestinationConnectionId) {
-        newByOldEntryIdMap.set(encodedDestinationConnectionId, encodedTemplateConnectionId);
+    if (encodedTemplateConnectionId && encodedTargetConnectionId) {
+        newByOldEntryIdMap.set(encodedTargetConnectionId, encodedTemplateConnectionId);
     }
 
     let strCopiedJoinedEntryRevisions = JSON.stringify(arCopiedJoinedEntryRevisions);
