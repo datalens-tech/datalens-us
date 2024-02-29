@@ -12,5 +12,6 @@ export enum EntryScope {
 export enum EntryType {
     File = 'file',
     GsheetsV2 = 'gsheets_v2',
+    YaDocs = 'yadocs',
     // types can be added as needed
 }
