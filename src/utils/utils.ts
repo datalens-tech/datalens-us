@@ -5,7 +5,6 @@ import {EntryScope, USAPIResponse} from '../types/models';
 
 import {ID_VARIABLES, CODING_BASE, TRUE_FLAGS, COPY_START, COPY_END} from '../const';
 
-import type {Entry} from '../db/models/new/entry';
 import {EntryScope as EntryScopeEnum, EntryType} from '../db/models/new/entry/types';
 
 const PROFILES: {
@@ -351,14 +350,21 @@ export class Utils {
             .join('');
     }
 
-    static checkFileConnectionsExistence(entries: Entry[]) {
-        const fileConnectionTypes: string[] = [EntryType.File, EntryType.GsheetsV2];
+    static isFileConnection(entry: {scope: Nullable<EntryScope>; type: string}) {
+        const fileConnectionTypes: string[] = [
+            EntryType.File,
+            EntryType.GsheetsV2,
+            EntryType.YaDocs,
+        ];
 
+        return (
+            entry.scope === EntryScopeEnum.Connection && fileConnectionTypes.includes(entry.type)
+        );
+    }
+
+    static checkFileConnectionsExistence(entries: {scope: Nullable<EntryScope>; type: string}[]) {
         return entries.some((entry) => {
-            return (
-                entry.scope === EntryScopeEnum.Connection &&
-                fileConnectionTypes.includes(entry.type)
-            );
+            return Utils.isFileConnection(entry);
         });
     }
 

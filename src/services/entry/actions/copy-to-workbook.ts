@@ -3,7 +3,6 @@ import {AppError} from '@gravity-ui/nodekit';
 
 import {getId} from '../../../db';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
-import {EntryScope, EntryType} from '../../../db/models/new/entry/types';
 import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
 import {WorkbookModel} from '../../../db/models/new/workbook';
 import {CTX} from '../../../types/models';
@@ -57,8 +56,6 @@ export const validateParams = makeSchemaValidator({
         },
     },
 });
-
-const fileConnectionTypes: string[] = [EntryType.File, EntryType.GsheetsV2];
 
 export const copyToWorkbook = async (ctx: CTX, params: Params) => {
     const {
@@ -147,9 +144,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
             }
         }
 
-        const isFileConnection =
-            joinedEntryRevision.scope === EntryScope.Connection &&
-            fileConnectionTypes.includes(joinedEntryRevision.type);
+        const isFileConnection = Utils.isFileConnection(joinedEntryRevision);
 
         if (isFileConnection) {
             throw new AppError(
