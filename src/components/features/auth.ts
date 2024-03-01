@@ -82,7 +82,7 @@ export const isAuthFeature = (
             responseCode(token);
         } else {
             req.ctx.log(`Token empty NODE_RPC_URL: ${process.env.NODE_RPC_URL}`);
-            callback(401, null);
+            callback(200, null);
         }
     } else {
         callback(200, null);
