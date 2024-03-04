@@ -17,6 +17,7 @@ const selectedTenantColumns = [
     TenantColumn.BillingAccountId,
     TenantColumn.BillingInstanceServiceId,
     TenantColumn.BillingStartedAt,
+    TenantColumn.Branding,
 ] as const;
 
 const selectedMigrationTenantColumns = [
@@ -44,6 +45,7 @@ export const JoinedMigrationTenantColumn = {
     ToId: MigrationTenantColumn.ToId,
     Migrating: MigrationTenantColumn.Migrating,
     MigrationMeta: MigrationTenantColumn.MigrationMeta,
+    Branding: TenantColumn.Branding,
 } as const;
 
 export const selectedJoinedMigrationTenantColumns = [
