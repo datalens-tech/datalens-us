@@ -5,6 +5,7 @@ import {
     MAX_META_OBJECT_SYMBOLS,
     MAX_UNVERSIONED_DATA_OBJECT_SYMBOLS,
     MAX_PRESET_DATA_OBJECT_SYMBOLS,
+    MAX_BRANDING_OBJECT_SYMBOLS,
 } from '../const';
 import US_ERRORS from '../const/us-error-constants';
 import {AppError} from '@gravity-ui/nodekit';
@@ -110,6 +111,30 @@ ajv.addKeyword('restrictMetaSize', {
             ];
 
             return dataStringified.length <= MAX_META_OBJECT_SYMBOLS;
+        }
+    },
+    errors: true,
+});
+
+ajv.addKeyword('restrictBrandingSize', {
+    validate: function validate(schema: object | string | boolean, data: any) {
+        if (data === null) {
+            return true;
+        } else {
+            const dataStringified = JSON.stringify(data);
+
+            // @ts-ignore
+            validate.errors = [
+                {
+                    format: 'string',
+                    message: `branding jsonb object can contain not greater ${MAX_BRANDING_OBJECT_SYMBOLS} symbols`,
+                    params: {
+                        keyword: 'restrictBrandingSize',
+                    },
+                },
+            ];
+
+            return dataStringified.length <= MAX_BRANDING_OBJECT_SYMBOLS;
         }
     },
     errors: true,
