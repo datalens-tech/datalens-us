@@ -698,6 +698,15 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
+        case US_ERRORS.WORKBOOK_ID_IS_NOT_SET_FOR_TEMPLATE: {
+            return {
+                code: 500,
+                response: {
+                    code,
+                    message: 'Workbook id is not set for template',
+                },
+            };
+        }
         default:
             return {
                 code: 500,
