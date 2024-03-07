@@ -305,6 +305,14 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
+        case US_ERRORS.NOT_EXIST_SERVICE_INSTANCE_ID_PREFIX_IN_CONFIG: {
+            return {
+                code: 500,
+                response: {
+                    message: 'Not found serviceInstanceIdPrefix in config',
+                },
+            };
+        }
         case US_ERRORS.DLS_ADD_ENTITY_ERROR:
         case US_ERRORS.DLS_CHECK_BULK_PERMISSION_ERROR:
         case US_ERRORS.DLS_CHECK_PERMISSION_ERROR: {
