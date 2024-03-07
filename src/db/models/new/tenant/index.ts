@@ -15,6 +15,7 @@ export const TenantColumn = {
     BillingServiceInstanceIsActive: 'billingServiceInstanceIsActive',
     BillingStartedAt: 'billingStartedAt',
     BillingEndedAt: 'billingEndedAt',
+    Branding: 'branding',
 } as const;
 
 export class Tenant extends Model {
@@ -40,4 +41,5 @@ export class Tenant extends Model {
     [TenantColumn.BillingServiceInstanceIsActive]!: boolean;
     [TenantColumn.BillingStartedAt]!: Nullable<string>;
     [TenantColumn.BillingEndedAt]!: Nullable<string>;
+    [TenantColumn.Branding]!: Record<string, unknown>;
 }

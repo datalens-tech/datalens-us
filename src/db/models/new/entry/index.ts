@@ -27,6 +27,7 @@ export const EntryColumn = {
     UnversionedData: 'unversionedData',
     WorkbookId: 'workbookId',
     Mirrored: 'mirrored',
+    Branding: 'branding',
 } as const;
 
 export class Entry extends Model {
