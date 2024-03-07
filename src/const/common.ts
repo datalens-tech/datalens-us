@@ -146,6 +146,7 @@ export const CODING_BASE = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
 export const MAX_META_OBJECT_SYMBOLS = 2000;
 export const MAX_UNVERSIONED_DATA_OBJECT_SYMBOLS = 5000;
 export const MAX_PRESET_DATA_OBJECT_SYMBOLS = 15000;
+export const MAX_BRANDING_OBJECT_SYMBOLS = 15000;
 
 export const AJV_PATTERN_KEYS_NOT_OBJECT = {
     '.*': {

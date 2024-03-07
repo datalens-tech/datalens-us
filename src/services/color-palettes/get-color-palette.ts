@@ -14,7 +14,7 @@ export const getColorPalette = async (
         colorPaletteId,
     });
 
-    const colorPalette = await ColorPaletteModel.query(ColorPaletteModel.primary)
+    const colorPalette = await ColorPaletteModel.query(ColorPaletteModel.replica)
         .select()
         .where({
             [ColorPaletteModelColumn.ColorPaletteId]: colorPaletteId,
