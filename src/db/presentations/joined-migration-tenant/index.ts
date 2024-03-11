@@ -13,11 +13,8 @@ const selectedTenantColumns = [
     TenantColumn.RetriesCount,
     TenantColumn.CollectionsEnabled,
     TenantColumn.FoldersEnabled,
-    TenantColumn.BillingPausedByUser,
-    TenantColumn.BillingServiceInstanceIsActive,
     TenantColumn.BillingInstanceServiceId,
     TenantColumn.BillingStartedAt,
-    TenantColumn.BillingEndedAt,
     TenantColumn.Branding,
 ] as const;
 
@@ -38,11 +35,8 @@ export const JoinedMigrationTenantColumn = {
     RetriesCount: TenantColumn.RetriesCount,
     CollectionsEnabled: TenantColumn.CollectionsEnabled,
     FoldersEnabled: TenantColumn.FoldersEnabled,
-    BillingPausedByUser: TenantColumn.BillingPausedByUser,
-    BillingServiceInstanceIsActive: TenantColumn.BillingServiceInstanceIsActive,
     BillingInstanceServiceId: TenantColumn.BillingInstanceServiceId,
     BillingStartedAt: TenantColumn.BillingStartedAt,
-    BillingEndedAt: TenantColumn.BillingEndedAt,
     FromId: MigrationTenantColumn.FromId,
     ToId: MigrationTenantColumn.ToId,
     Migrating: MigrationTenantColumn.Migrating,
