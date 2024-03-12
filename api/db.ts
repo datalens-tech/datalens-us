@@ -15,7 +15,7 @@ export {
     RevisionModelColumnRaw,
 } from '../src/db/models/new/revision';
 
-export {Tenant, TenantColumn, BillingRate} from '../src/db/models/new/tenant';
+export {Tenant, TenantColumn} from '../src/db/models/new/tenant';
 export {MigrationTenant, MigrationTenantColumn} from '../src/db/models/new/migration-tenant';
 
 export {WorkbookModel, WorkbookModelColumn} from '../src/db/models/new/workbook';

@@ -1,5 +1,4 @@
 import {Model} from '../../..';
-import {BillingRate} from './types';
 
 export const TenantColumn = {
     TenantId: 'tenantId',
@@ -11,8 +10,6 @@ export const TenantColumn = {
     RetriesCount: 'retriesCount',
     FoldersEnabled: 'foldersEnabled',
     CollectionsEnabled: 'collectionsEnabled',
-    BillingRate: 'billingRate',
-    BillingAccountId: 'billingAccountId',
     BillingInstanceServiceId: 'billingInstanceServiceId',
     BillingStartedAt: 'billingStartedAt',
     Branding: 'branding',
@@ -36,11 +33,7 @@ export class Tenant extends Model {
     [TenantColumn.RetriesCount]!: number;
     [TenantColumn.FoldersEnabled]!: boolean;
     [TenantColumn.CollectionsEnabled]!: boolean;
-    [TenantColumn.BillingRate]!: BillingRate;
-    [TenantColumn.BillingAccountId]!: Nullable<string>;
     [TenantColumn.BillingInstanceServiceId]!: Nullable<string>;
     [TenantColumn.BillingStartedAt]!: Nullable<string>;
     [TenantColumn.Branding]!: Record<string, unknown>;
 }
-
-export {BillingRate};
