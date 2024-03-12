@@ -305,11 +305,11 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.NOT_EXIST_SERVICE_INSTANCE_ID_PREFIX_IN_CONFIG: {
+        case US_ERRORS.NOT_EXIST_BILLING_INSTANCE_SERVICE_ID_PREFIX_IN_CONFIG: {
             return {
                 code: 500,
                 response: {
-                    message: 'Not found serviceInstanceIdPrefix in config',
+                    message: 'Not found billingInstanceServiceIdPrefix in config',
                 },
             };
         }
