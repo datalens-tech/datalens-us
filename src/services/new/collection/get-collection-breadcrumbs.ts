@@ -21,18 +21,20 @@ const validateArgs = makeSchemaValidator({
 
 export interface GetCollectionBreadcrumbsArgs {
     collectionId: string;
+    includePermissionsInfo?: boolean;
 }
 
 export const getCollectionBreadcrumbs = async (
     {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
     args: GetCollectionBreadcrumbsArgs,
 ) => {
-    const {collectionId} = args;
+    const {collectionId, includePermissionsInfo} = args;
 
     const {accessServiceEnabled} = ctx.config;
 
     logInfo(ctx, 'GET_COLLECTION_BREADCRUMBS_START', {
         collectionId: Utils.encodeId(collectionId),
+        includePermissionsInfo,
     });
 
     if (!skipValidation) {
@@ -41,40 +43,54 @@ export const getCollectionBreadcrumbs = async (
 
     const targetTrx = getReplica(trx);
 
-    const breadcrumbs = await getParents({ctx, trx: targetTrx, collectionIds: [collectionId]});
+    const parentModels = await getParents({ctx, trx: targetTrx, collectionIds: [collectionId]});
 
-    if (breadcrumbs.length === 0) {
+    if (parentModels.length === 0) {
         throw new AppError(US_ERRORS.COLLECTION_NOT_EXISTS, {
             code: US_ERRORS.COLLECTION_NOT_EXISTS,
         });
     }
 
-    if (accessServiceEnabled && !skipCheckPermissions) {
-        const {Collection} = registry.common.classes.get();
+    const {Collection} = registry.common.classes.get();
 
-        const breadcrumbsIds = breadcrumbs.map((model) => model.collectionId);
-
-        const checkPermissionPromises = breadcrumbs.map((breadcrumb, index) => {
-            const collection = new Collection({
-                ctx,
-                model: breadcrumb,
-            });
-
-            return collection.checkPermission({
-                parentIds: breadcrumbsIds.slice(index + 1),
-                permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                    ? CollectionPermission.LimitedView
-                    : CollectionPermission.View,
-            });
+    const collectionInstances = parentModels.map((parentModel) => {
+        return new Collection({
+            ctx,
+            model: parentModel,
         });
+    });
+
+    if (accessServiceEnabled && !skipCheckPermissions) {
+        const breadcrumbsIds = collectionInstances.map(
+            (collectionInstance) => collectionInstance.model.collectionId,
+        );
+
+        const checkPermissionPromises = collectionInstances.map(
+            async (collectionInstance, index) => {
+                const parentIds = breadcrumbsIds.slice(index + 1);
+
+                await collectionInstance.checkPermission({
+                    parentIds,
+                    permission: isEnabledFeature(ctx, Feature.UseLimitedView)
+                        ? CollectionPermission.LimitedView
+                        : CollectionPermission.View,
+                });
+
+                if (includePermissionsInfo) {
+                    await collectionInstance.fetchAllPermissions({
+                        parentIds,
+                    });
+                }
+            },
+        );
 
         await Promise.all(checkPermissionPromises);
     }
 
     logInfo(ctx, 'GET_COLLECTION_BREADCRUMBS_FINISH', {
         collectionId: Utils.encodeId(collectionId),
-        collectionsLength: breadcrumbs.length,
+        collectionsLength: collectionInstances.length,
     });
 
-    return breadcrumbs.reverse();
+    return collectionInstances.reverse();
 };

@@ -1,8 +1,6 @@
-import {CollectionModel} from '../../../../db/models/new/collection';
+import type {CollectionInstance} from '../../../../registry/common/entities/collection/types';
+import {formatCollection} from './format-collection';
 
-export const formatGetCollectionBreadcrumbs = (collections: CollectionModel[]) => {
-    return collections.map((collection) => ({
-        collectionId: collection.collectionId,
-        title: collection.title,
-    }));
+export const formatGetCollectionBreadcrumbs = (collections: CollectionInstance[]) => {
+    return collections.map(formatCollection);
 };
