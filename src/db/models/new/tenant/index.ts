@@ -11,7 +11,10 @@ export const TenantColumn = {
     FoldersEnabled: 'foldersEnabled',
     CollectionsEnabled: 'collectionsEnabled',
     BillingInstanceServiceId: 'billingInstanceServiceId',
+    BillingPausedByUser: 'billingPausedByUser',
+    BillingInstanceServiceIsActive: 'billingInstanceServiceIsActive',
     BillingStartedAt: 'billingStartedAt',
+    BillingEndedAt: 'billingEndedAt',
     Branding: 'branding',
 } as const;
 
@@ -34,6 +37,9 @@ export class Tenant extends Model {
     [TenantColumn.FoldersEnabled]!: boolean;
     [TenantColumn.CollectionsEnabled]!: boolean;
     [TenantColumn.BillingInstanceServiceId]!: Nullable<string>;
+    [TenantColumn.BillingPausedByUser]!: boolean;
+    [TenantColumn.BillingInstanceServiceIsActive]!: boolean;
     [TenantColumn.BillingStartedAt]!: Nullable<string>;
+    [TenantColumn.BillingEndedAt]!: Nullable<string>;
     [TenantColumn.Branding]!: Record<string, unknown>;
 }
