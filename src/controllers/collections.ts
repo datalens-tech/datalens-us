@@ -118,12 +118,13 @@ export default {
     },
 
     getBreadcrumbs: async (req: Request, res: Response) => {
-        const {params} = req;
+        const {params, query} = req;
 
         const result = await getCollectionBreadcrumbs(
             {ctx: req.ctx},
             {
                 collectionId: params.collectionId,
+                includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
             },
         );
 
