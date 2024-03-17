@@ -537,11 +537,11 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.INCORRECT_INSTALLATION_ERROR: {
+        case US_ERRORS.INCORRECT_CONFIGURATION_ERROR: {
             return {
                 code: 500,
                 response: {
-                    message: message ?? 'Incorrect installation',
+                    message: message ?? 'Incorrect configuration',
                 },
             };
         }
