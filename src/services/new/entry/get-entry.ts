@@ -168,6 +168,13 @@ export const getEntry = async (
             }
 
             if (checkEntryEnabled) {
+                if (isEnabledFeature(ctx, Feature.WorkbookIsolationEnabled)) {
+                    checkWorkbookIsolation({
+                        ctx,
+                        workbookId: null,
+                    });
+                }
+
                 await checkFetchedEntry(ctx, joinedEntryRevisionFavorite, getReplica(trx));
             }
         }
