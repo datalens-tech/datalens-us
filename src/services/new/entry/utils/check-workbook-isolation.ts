@@ -7,7 +7,7 @@ export const checkWorkbookIsolation = ({
     workbookId: entryWorkbookId,
 }: {
     ctx: CTX;
-    workbookId: string;
+    workbookId: string | null;
 }) => {
     const {workbookId: requestWorkbookId} = ctx.get('info');
 
