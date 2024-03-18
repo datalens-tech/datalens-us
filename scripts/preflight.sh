@@ -10,7 +10,7 @@ else
 fi;
 
 echo "Start migration"
-node /opt/app/dist/server/db/scripts/migrate.js
+npm run db:migrate
 echo "Finish migration"
 
 if [ "$USE_DEMO_DATA" = "1" ]; then
