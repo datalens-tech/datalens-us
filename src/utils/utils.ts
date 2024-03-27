@@ -313,7 +313,7 @@ export class Utils {
                     return `postgres://${process.env.POSTGRES_USER_NAME}:${
                         process.env.POSTGRES_USER_PASSWD
                     }@${host}:${process.env.POSTGRES_PORT}/${process.env.POSTGRES_DB_NAME}?${
-                        process.env.POSTGRES_SSL ? `ssl=${process.env.POSTGRES_SSL}` : ''
+                        process.env.POSTGRES_SSL ? 'ssl=true' : ''
                     }`;
                 })
                 .join(',');
