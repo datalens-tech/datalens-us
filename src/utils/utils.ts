@@ -312,8 +312,8 @@ export class Utils {
                 .map((host) => {
                     return `postgres://${process.env.POSTGRES_USER_NAME}:${
                         process.env.POSTGRES_USER_PASSWD
-                    }@${host}:${process.env.POSTGRES_PORT}/${process.env.POSTGRES_DB_NAME}?${
-                        process.env.POSTGRES_DISABLE_SSL ? '' : 'ssl=true'
+                    }@${host}:${process.env.POSTGRES_PORT}/${process.env.POSTGRES_DB_NAME}${
+                        process.env.POSTGRES_DISABLE_SSL ? '' : '?ssl=true'
                     }`;
                 })
                 .join(',');
