@@ -306,12 +306,15 @@ export class Utils {
             process.env.POSTGRES_PORT &&
             process.env.POSTGRES_USER_PASSWD &&
             process.env.POSTGRES_USER_NAME &&
-            process.env.POSTGRES_DB_NAME &&
-            process.env.POSTGRES_SSL
+            process.env.POSTGRES_DB_NAME
         ) {
             dsnList = process.env.POSTGRES_HOSTS.split(',')
                 .map((host) => {
-                    return `postgres://${process.env.POSTGRES_USER_NAME}:${process.env.POSTGRES_USER_PASSWD}@${host}:${process.env.POSTGRES_PORT}/${process.env.POSTGRES_DB_NAME}?ssl=${process.env.POSTGRES_SSL}`;
+                    return `postgres://${process.env.POSTGRES_USER_NAME}:${
+                        process.env.POSTGRES_USER_PASSWD
+                    }@${host}:${process.env.POSTGRES_PORT}/${process.env.POSTGRES_DB_NAME}?${
+                        process.env.POSTGRES_SSL ? `ssl=${process.env.POSTGRES_SSL}` : ''
+                    }`;
                 })
                 .join(',');
         } else {
