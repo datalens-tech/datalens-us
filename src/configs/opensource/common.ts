@@ -8,7 +8,7 @@ export const features: FeaturesConfig = {
     [Feature.UseIpV6]: false,
     [Feature.ProjectsEnabled]: false,
     [Feature.UseLimitedView]: true,
-    [Feature.WorkbookIsolationEnabled]: false,
+    [Feature.WorkbookIsolationEnabled]: true,
 };
 
 export default {
