@@ -289,6 +289,15 @@ export class Utils {
         return undefined;
     }
 
+    static getEnvTokenVariable(envTokenVariableName: string) {
+        const TOKEN_SEPARATOR = ',';
+        const valueFromEnv = Utils.getEnvVariable(envTokenVariableName);
+
+        return valueFromEnv && valueFromEnv.includes(TOKEN_SEPARATOR)
+            ? valueFromEnv.split(TOKEN_SEPARATOR)
+            : [valueFromEnv];
+    }
+
     static getDsnList() {
         let dsnList;
         const pgRdsConfigPath = process.env.POSTGRES_RDS_CONFIG_PATH;

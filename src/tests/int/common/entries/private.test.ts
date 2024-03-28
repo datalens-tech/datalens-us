@@ -5,6 +5,7 @@ import {US_MASTER_TOKEN_HEADER} from '../../../../const';
 import {withScopeHeaders} from '../../utils';
 
 const app = usApp.express;
+const masterToken = usApp.config.masterToken[0];
 
 const testEntryName = 'entries-private-test-entry';
 
@@ -55,7 +56,7 @@ describe('Get entry by private route', () => {
 
         const response = await request(app)
             .get(`/private/entries/${testEntryId}`)
-            .set({[US_MASTER_TOKEN_HEADER]: usApp.config.masterToken})
+            .set({[US_MASTER_TOKEN_HEADER]: masterToken})
             .expect(200);
 
         const {body} = response;

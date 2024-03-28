@@ -12,7 +12,7 @@ declare module '@gravity-ui/nodekit' {
         accessServiceEnabled: boolean;
         accessBindingsServiceEnabled: boolean;
 
-        masterToken: string;
+        masterToken: string[];
     }
 
     interface AppDynamicConfig {
