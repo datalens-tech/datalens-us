@@ -293,9 +293,18 @@ export class Utils {
         const TOKEN_SEPARATOR = ',';
         const valueFromEnv = Utils.getEnvVariable(envTokenVariableName);
 
-        return valueFromEnv && valueFromEnv.includes(TOKEN_SEPARATOR)
-            ? valueFromEnv.split(TOKEN_SEPARATOR)
-            : [valueFromEnv];
+        if (!valueFromEnv) {
+            return undefined;
+        }
+
+        if (valueFromEnv.includes(TOKEN_SEPARATOR)) {
+            return valueFromEnv
+                .split(TOKEN_SEPARATOR)
+                .map((token) => token && token.trim())
+                .filter((token) => token);
+        }
+
+        return [valueFromEnv.trim()];
     }
 
     static getDsnList() {
