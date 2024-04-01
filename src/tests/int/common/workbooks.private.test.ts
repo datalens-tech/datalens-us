@@ -5,6 +5,7 @@ import usApp from '../../..';
 import {withScopeHeaders} from '../utils';
 
 const app = usApp.express;
+const masterToken = usApp.config.masterToken[0];
 
 const workbooksData = {
     id: null,
@@ -19,7 +20,7 @@ describe('Private Workbooks managment', () => {
         await request(app).post('/private/v2/workbooks').expect(403);
 
         const response1 = await withScopeHeaders(request(app).post('/private/v2/workbooks'))
-            .set({[US_MASTER_TOKEN_HEADER]: usApp.config.masterToken})
+            .set({[US_MASTER_TOKEN_HEADER]: masterToken})
             .send({
                 title: workbooksData.title,
                 description: workbooksData.description,
@@ -49,7 +50,7 @@ describe('Private Workbooks managment', () => {
         const response2 = await withScopeHeaders(
             request(app).get(`/private/v2/workbooks/${body1.workbookId}`),
         )
-            .set({[US_MASTER_TOKEN_HEADER]: usApp.config.masterToken})
+            .set({[US_MASTER_TOKEN_HEADER]: masterToken})
             .expect(200);
 
         const {body: body2} = response2;
@@ -82,7 +83,7 @@ describe('Private Entries in workboooks managment', () => {
         const entry1Name = 'Entry in test workbook 1';
 
         const responseWorkbook = await withScopeHeaders(request(app).post('/private/v2/workbooks'))
-            .set({[US_MASTER_TOKEN_HEADER]: usApp.config.masterToken})
+            .set({[US_MASTER_TOKEN_HEADER]: masterToken})
             .send({
                 title: testTitle,
                 description: testDescription,
@@ -111,7 +112,7 @@ describe('Private Entries in workboooks managment', () => {
         const response = await withScopeHeaders(
             request(app)
                 .get(`/private/v2/workbooks/${testWorkbookId}/entries`)
-                .set({[US_MASTER_TOKEN_HEADER]: usApp.config.masterToken}),
+                .set({[US_MASTER_TOKEN_HEADER]: masterToken}),
         ).expect(200);
 
         const {body} = response;
@@ -151,7 +152,7 @@ describe('Private for one workboook managment', () => {
         const entry1Name = 'Entry in test workbook 1';
 
         const responseWorkbook = await withScopeHeaders(request(app).post('/private/v2/workbooks'))
-            .set({[US_MASTER_TOKEN_HEADER]: usApp.config.masterToken})
+            .set({[US_MASTER_TOKEN_HEADER]: masterToken})
             .send({
                 title: testTitle,
                 description: testDescription,
@@ -182,7 +183,7 @@ describe('Private for one workboook managment', () => {
         const response = await withScopeHeaders(
             request(app)
                 .post(`/private/v2/workbooks/${testWorkbookId}/restore`)
-                .set({[US_MASTER_TOKEN_HEADER]: usApp.config.masterToken}),
+                .set({[US_MASTER_TOKEN_HEADER]: masterToken}),
         ).expect(200);
 
         const {body} = response;
@@ -194,7 +195,7 @@ describe('Private for one workboook managment', () => {
         const responseEntries = await withScopeHeaders(
             request(app)
                 .get(`/private/v2/workbooks/${testWorkbookId}/entries`)
-                .set({[US_MASTER_TOKEN_HEADER]: usApp.config.masterToken}),
+                .set({[US_MASTER_TOKEN_HEADER]: masterToken}),
         ).expect(200);
 
         const {body: bodyEntries} = responseEntries;

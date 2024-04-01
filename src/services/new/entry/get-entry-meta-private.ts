@@ -26,7 +26,7 @@ export const getEntryMetaPrivate = async (
 
     const masterTokenReal = ctx.config.masterToken;
 
-    if (masterTokenReal !== masterToken) {
+    if (!masterToken || !masterTokenReal || !masterTokenReal.includes(masterToken)) {
         throw new AppError(US_ERRORS.NOT_VALID_MASTER_TOKEN, {
             code: US_ERRORS.NOT_VALID_MASTER_TOKEN,
         });

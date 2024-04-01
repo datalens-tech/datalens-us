@@ -16,13 +16,14 @@ function resolvePrivateRoute(req: Request, res: Response, next: NextFunction) {
 
     const masterToken = req.ctx.config.masterToken;
 
-    if (!masterToken) {
-        throw new Error('No master token in config');
+    if (!masterToken || masterToken.length === 0) {
+        res.status(403).send({error: 'No master token in config'});
+        return;
     }
 
-    const requestMasterToken = req.headers[US_MASTER_TOKEN_HEADER];
+    const requestMasterToken = req.headers[US_MASTER_TOKEN_HEADER] as Optional<string>;
 
-    if (requestMasterToken !== masterToken) {
+    if (!requestMasterToken || !masterToken.includes(requestMasterToken)) {
         req.ctx.log('PRIVATE_API_CALL_DENIED');
 
         res.status(403).send({error: 'Private API call denied'});

@@ -27,7 +27,7 @@ export default {
     accessServiceEnabled: false,
     accessBindingsServiceEnabled: false,
 
-    masterToken: Utils.getEnvVariable('MASTER_TOKEN'),
+    masterToken: Utils.getEnvTokenVariable('MASTER_TOKEN'),
 
     features: {},
 

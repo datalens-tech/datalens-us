@@ -289,6 +289,24 @@ export class Utils {
         return undefined;
     }
 
+    static getEnvTokenVariable(envTokenVariableName: string) {
+        const TOKEN_SEPARATOR = ',';
+        const valueFromEnv = Utils.getEnvVariable(envTokenVariableName);
+
+        if (!valueFromEnv) {
+            return undefined;
+        }
+
+        if (valueFromEnv.includes(TOKEN_SEPARATOR)) {
+            return valueFromEnv
+                .split(TOKEN_SEPARATOR)
+                .map((token) => token && token.trim())
+                .filter((token) => token);
+        }
+
+        return [valueFromEnv.trim()];
+    }
+
     static getDsnList() {
         let dsnList;
         const pgRdsConfigPath = process.env.POSTGRES_RDS_CONFIG_PATH;

@@ -7,6 +7,7 @@ import {withScopeHeaders} from '../utils';
 import usApp from '../../..';
 
 const app = usApp.express;
+const masterToken = usApp.config.masterToken[0];
 
 const collectionsData = {
     id: null,
@@ -18,7 +19,7 @@ describe('Private Collections managment', () => {
         await request(app).post('/private/v1/collections').expect(403);
 
         const response1 = await withScopeHeaders(request(app).post('/private/v1/collections'))
-            .set({[US_MASTER_TOKEN_HEADER]: usApp.config.masterToken})
+            .set({[US_MASTER_TOKEN_HEADER]: masterToken})
             .send({
                 parentId: null,
                 title: collectionsData.title,
@@ -46,7 +47,7 @@ describe('Private Collections managment', () => {
         const response2 = await withScopeHeaders(
             request(app).get(`/private/v1/collections/${body1.collectionId}`),
         )
-            .set({[US_MASTER_TOKEN_HEADER]: usApp.config.masterToken})
+            .set({[US_MASTER_TOKEN_HEADER]: masterToken})
             .expect(200);
 
         const {body: body2} = response2;

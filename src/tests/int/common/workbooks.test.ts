@@ -5,6 +5,7 @@ import usApp from '../../..';
 import {withScopeHeaders} from '../utils';
 
 const app = usApp.express;
+const masterToken = usApp.config.masterToken[0];
 
 const workbooksData = [
     {
@@ -540,7 +541,7 @@ describe('Workbook template', () => {
 
         const response = await request(app)
             .post(`/private/v2/workbooks/${testTemplateWorkbookData.id}/setIsTemplate`)
-            .set({[US_MASTER_TOKEN_HEADER]: usApp.config.masterToken})
+            .set({[US_MASTER_TOKEN_HEADER]: masterToken})
             .send({
                 workbookId: testTemplateWorkbookData.id,
                 isTemplate: true,
