@@ -221,11 +221,11 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.NOT_EXIST_SERVICE_INSTANCE: {
+        case US_ERRORS.NOT_EXIST_INSTANCE_SERVICE: {
             return {
                 code: 404,
                 response: {
-                    message: "The service instance doesn't exist",
+                    message: "The instance service doesn't exist",
                 },
             };
         }
