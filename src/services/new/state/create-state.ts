@@ -33,7 +33,7 @@ export const createState = async (
 
     const {tenantId} = ctx.get('info');
 
-    logInfo(ctx, 'CREATE_STATE_REQUEST', {tenantId, entryId, data});
+    logInfo(ctx, 'CREATE_STATE_REQUEST', {tenantId, entryId});
 
     if (!skipValidation) {
         validateArgs(args);
