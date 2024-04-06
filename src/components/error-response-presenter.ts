@@ -716,6 +716,15 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
+        case US_ERRORS.FEATURE_IS_NOT_AVAILABLE_IN_COMMUNITY_RATE: {
+            return {
+                code: 403,
+                response: {
+                    code,
+                    message: 'Feature is not available in Community rate',
+                },
+            };
+        }
         default:
             return {
                 code: 500,
