@@ -716,12 +716,12 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.FEATURE_IS_NOT_AVAILABLE_IN_COMMUNITY_RATE: {
+        case US_ERRORS.FEATURE_IS_AVAILABLE_ONLY_IN_BUSINESS_RATE: {
             return {
                 code: 403,
                 response: {
                     code,
-                    message: 'Feature is not available in Community rate',
+                    message: 'Feature is available only in Business rate',
                 },
             };
         }
