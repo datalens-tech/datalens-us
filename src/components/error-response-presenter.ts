@@ -716,6 +716,15 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
+        case US_ERRORS.FEATURE_IS_AVAILABLE_ONLY_IN_BUSINESS_RATE: {
+            return {
+                code: 403,
+                response: {
+                    code,
+                    message: 'Feature is available only in Business rate',
+                },
+            };
+        }
         default:
             return {
                 code: 500,
