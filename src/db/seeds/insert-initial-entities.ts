@@ -1,5 +1,7 @@
 import type {Knex} from 'knex';
+import {raw} from 'objection';
 import {testTenantId} from '../../tests/int/constants';
+import {CURRENT_TIMESTAMP} from '../../const';
 
 export const seed = async (knex: Knex) => {
     const curTenantId = testTenantId;
@@ -64,6 +66,8 @@ export const seed = async (knex: Knex) => {
             tenantId: curTenantId,
             meta: {cloudId: 'test-cloud-id'},
             enabled: true,
+            billingStartedAt: raw(CURRENT_TIMESTAMP),
+            billingInstanceServiceIsActive: true,
         },
     ]);
 
