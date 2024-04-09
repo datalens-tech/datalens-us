@@ -6,7 +6,7 @@ import {bulkFetchCollectionsAllPermissions} from './entities/collection/utils';
 import {checkOrganizationPermission, checkProjectPermission} from './components/iam/utils';
 import {isNeedBypassEntryByKey} from './utils/entry/utils';
 import {colorPalettesAdminValidator} from './utils/color-palettes/utils';
-import {checkBusinessRate} from './utils/billing/utils';
+import {checkEmbeddingAvailability} from './utils/embedding/utils';
 
 import {registry} from '../index';
 
@@ -24,6 +24,6 @@ export const registerCommonPlugins = () => {
         checkProjectPermission,
         isNeedBypassEntryByKey,
         colorPalettesAdminValidator,
-        checkBusinessRate,
+        checkEmbeddingAvailability,
     });
 };
