@@ -76,8 +76,8 @@ export const getEntry = async (
             });
         }
 
-        const {checkBusinessRate} = registry.common.functions.get();
-        await checkBusinessRate(embeddingInfo.chart[EntryColumn.TenantId] as string);
+        const {checkEmbeddingAvailability} = registry.common.functions.get();
+        await checkEmbeddingAvailability(embeddingInfo.chart[EntryColumn.TenantId] as string);
     }
 
     const isEmbedding = Boolean(embeddingInfo);

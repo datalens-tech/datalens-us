@@ -716,12 +716,12 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.FEATURE_IS_AVAILABLE_ONLY_IN_BUSINESS_RATE: {
+        case US_ERRORS.EMBEDDING_IS_NOT_AVAILABLE: {
             return {
                 code: 403,
                 response: {
                     code,
-                    message: 'Feature is available only in Business rate',
+                    message: 'Embedding is not available',
                 },
             };
         }
