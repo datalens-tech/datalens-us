@@ -120,6 +120,14 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
             write: true,
         }),
 
+        privateSwitchRevisionEntry: makeRoute({
+            route: 'POST /private/entries/:entryId/switchRevision',
+            handler: entriesController.updateEntry,
+            authPolicy: AuthPolicy.disabled,
+            private: true,
+            write: true,
+        }),
+
         renameEntry: makeRoute({
             route: 'POST /v1/entries/:entryId/rename',
             handler: entriesController.renameEntry,
