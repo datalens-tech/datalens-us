@@ -192,7 +192,7 @@ export default {
         const {params, body} = req;
 
         const result = await switchRevisionEntry(
-            {ctx: req.ctx, skipValidation: true},
+            {ctx: req.ctx},
             {
                 entryId: params.entryId,
                 savedId: body.savedId,
@@ -200,9 +200,11 @@ export default {
             },
         );
 
-        const {code, response} = prepareResponse({data: result});
-
-        res.status(code).send(response);
+        if (result.isSuccess === true) {
+            res.status(200).send({result: 'ok'});
+        } else {
+            res.status(500).send(result.error);
+        }
     },
 
     renameEntry: async (req: Request, res: Response) => {
