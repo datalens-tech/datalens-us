@@ -8,7 +8,7 @@ import {ServiceArgs} from '../../new/types';
 import Revision from '../../../db/models/revision';
 import {RevisionModelColumn} from '../../../db/models/new/revision';
 import {EntryColumn} from '../../../db/models/new/entry';
-import {getReplica} from '../../new/utils';
+import {getPrimary, getReplica} from '../../new/utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -82,7 +82,7 @@ export async function switchRevisionEntry(
 
         const updatedBy = makeUserId(SYSTEM_USER.ID);
 
-        await Entry.query(Entry.primary)
+        await Entry.query(getPrimary(trx))
             .patch({
                 [EntryColumn.SavedId]: savedId,
                 [EntryColumn.PublishedId]: publishedId,
