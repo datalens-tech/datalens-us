@@ -109,18 +109,6 @@ export const deleteCollection = async (
 
         const collectionsForDeleteIds = collectionsForDelete.map((item) => item.collectionId);
 
-        const deletedCollections = await CollectionModel.query(transactionTrx)
-            .patch({
-                [CollectionModelColumn.DeletedBy]: userId,
-                [CollectionModelColumn.DeletedAt]: raw(CURRENT_TIMESTAMP),
-            })
-            .where(CollectionModelColumn.CollectionId, 'in', collectionsForDeleteIds)
-            .where({
-                [CollectionModelColumn.DeletedAt]: null,
-            })
-            .returning('*')
-            .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
-
         const workbooksForDelete = await WorkbookModel.query(transactionTrx)
             .select()
             .where(WorkbookModelColumn.CollectionId, 'in', collectionsForDeleteIds)
@@ -148,6 +136,18 @@ export const deleteCollection = async (
                 );
             }),
         );
+
+        const deletedCollections = await CollectionModel.query(transactionTrx)
+            .patch({
+                [CollectionModelColumn.DeletedBy]: userId,
+                [CollectionModelColumn.DeletedAt]: raw(CURRENT_TIMESTAMP),
+            })
+            .where(CollectionModelColumn.CollectionId, 'in', collectionsForDeleteIds)
+            .where({
+                [CollectionModelColumn.DeletedAt]: null,
+            })
+            .returning('*')
+            .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
 
         return deletedCollections;
     });

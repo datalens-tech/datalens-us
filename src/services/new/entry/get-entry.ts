@@ -75,6 +75,9 @@ export const getEntry = async (
                 code: US_ERRORS.INCORRECT_ENTRY_ID_FOR_EMBED,
             });
         }
+
+        const {checkEmbeddingAvailability} = registry.common.functions.get();
+        await checkEmbeddingAvailability(embeddingInfo.chart[EntryColumn.TenantId] as string);
     }
 
     const isEmbedding = Boolean(embeddingInfo);

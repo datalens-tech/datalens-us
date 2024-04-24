@@ -716,6 +716,15 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
+        case US_ERRORS.EMBEDDING_IS_NOT_AVAILABLE: {
+            return {
+                code: 403,
+                response: {
+                    code,
+                    message: 'Embedding is not available',
+                },
+            };
+        }
         default:
             return {
                 code: 500,

@@ -64,6 +64,8 @@ export const seed = async (knex: Knex) => {
             tenantId: curTenantId,
             meta: {cloudId: 'test-cloud-id'},
             enabled: true,
+            billingStartedAt: new Date().toUTCString(),
+            billingInstanceServiceIsActive: true,
         },
     ]);
 
