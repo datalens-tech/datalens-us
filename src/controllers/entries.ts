@@ -13,6 +13,7 @@ import {
     getEntryRevisions,
     GetEntryRevisionsData,
     getEntryRelations,
+    switchRevisionEntry,
 } from '../services/entry';
 import {
     getEntry,
@@ -181,6 +182,22 @@ export default {
             lockToken: body.lockToken,
             skipSyncLinks: body.skipSyncLinks,
         });
+
+        const {code, response} = prepareResponse({data: result});
+
+        res.status(code).send(response);
+    },
+
+    switchRevisionEntry: async (req: Request, res: Response) => {
+        const {params, body} = req;
+
+        const result = await switchRevisionEntry(
+            {ctx: req.ctx},
+            {
+                entryId: params.entryId,
+                revId: body.revId,
+            },
+        );
 
         const {code, response} = prepareResponse({data: result});
 
