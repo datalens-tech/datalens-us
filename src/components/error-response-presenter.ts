@@ -229,6 +229,14 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
+        case US_ERRORS.NOT_EXIST_INSTANCE_SERVICES: {
+            return {
+                code: 404,
+                response: {
+                    message,
+                },
+            };
+        }
         case US_ERRORS.NOT_EXIST_REVISION: {
             return {
                 code: 404,
