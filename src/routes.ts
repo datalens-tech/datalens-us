@@ -124,7 +124,7 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
             route: 'POST /private/entries/:entryId/switch-revision',
             handler: entriesController.switchRevisionEntry,
             authPolicy: AuthPolicy.disabled,
-            // private: true,
+            private: true,
             write: true,
         }),
 
