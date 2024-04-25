@@ -195,16 +195,13 @@ export default {
             {ctx: req.ctx},
             {
                 entryId: params.entryId,
-                savedId: body.savedId,
-                publishedId: body.publishedId,
+                revId: body.revId,
             },
         );
 
-        if (result.isSuccess === true) {
-            res.status(200).send({result: 'ok'});
-        } else {
-            res.status(500).send(result.error);
-        }
+        const {code, response} = prepareResponse({data: result});
+
+        res.status(code).send(response);
     },
 
     renameEntry: async (req: Request, res: Response) => {

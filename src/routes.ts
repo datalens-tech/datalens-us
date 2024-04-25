@@ -121,10 +121,10 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
         }),
 
         privateSwitchRevisionEntry: makeRoute({
-            route: 'POST /private/entries/:entryId/switchRevision',
+            route: 'POST /private/entries/:entryId/switch-revision',
             handler: entriesController.switchRevisionEntry,
             authPolicy: AuthPolicy.disabled,
-            private: true,
+            // private: true,
             write: true,
         }),
 

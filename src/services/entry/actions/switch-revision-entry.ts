@@ -12,15 +12,12 @@ import {getPrimary, getReplica} from '../../new/utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
-    required: ['entryId', 'publishedId', 'savedId'],
+    required: ['entryId', 'revId'],
     properties: {
         entryId: {
             type: 'string',
         },
-        publishedId: {
-            type: 'string',
-        },
-        savedId: {
+        revId: {
             type: 'string',
         },
     },
@@ -28,83 +25,71 @@ const validateArgs = makeSchemaValidator({
 
 export type SwitchRevisionEntryData = {
     entryId: string;
-    savedId: string;
-    publishedId: string;
+    revId: string;
 };
 
 export async function switchRevisionEntry(
     {ctx, trx, skipValidation = false}: ServiceArgs,
     args: SwitchRevisionEntryData,
 ) {
-    try {
-        const {entryId, publishedId, savedId} = args;
+    const {entryId, revId} = args;
 
-        logInfo(ctx, 'SWITCH_REVISION_ENTRY_REQUEST', {
-            entryId: Utils.encodeId(entryId),
-            publishedId: Utils.encodeId(publishedId),
-            savedId: Utils.encodeId(savedId),
-        });
+    logInfo(ctx, 'SWITCH_REVISION_ENTRY_REQUEST', {
+        entryId: Utils.encodeId(entryId),
+        revId: Utils.encodeId(revId),
+    });
 
-        if (!skipValidation) {
-            validateArgs(args);
-        }
-
-        const replica = getReplica(trx);
-
-        const entry = await Entry.query(replica)
-            .select()
-            .where({[EntryColumn.EntryId]: entryId})
-            .first()
-            .timeout(DEFAULT_QUERY_TIMEOUT);
-
-        if (!entry) {
-            throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-                code: US_ERRORS.NOT_EXIST_ENTRY,
-            });
-        }
-
-        const revision = await Revision.query(replica)
-            .select()
-            .where((builder) => {
-                builder
-                    .where({[RevisionModelColumn.RevId]: publishedId})
-                    .orWhere({[RevisionModelColumn.RevId]: savedId});
-            })
-            .andWhere({[RevisionModelColumn.EntryId]: entryId})
-            .first()
-            .timeout(DEFAULT_QUERY_TIMEOUT);
-
-        if (!revision) {
-            throw new AppError(US_ERRORS.NOT_EXIST_REVISION, {
-                code: US_ERRORS.NOT_EXIST_REVISION,
-            });
-        }
-
-        const updatedBy = makeUserId(SYSTEM_USER.ID);
-
-        await Entry.query(getPrimary(trx))
-            .patch({
-                [EntryColumn.SavedId]: savedId,
-                [EntryColumn.PublishedId]: publishedId,
-                [EntryColumn.UpdatedAt]: raw(CURRENT_TIMESTAMP),
-                [EntryColumn.UpdatedBy]: updatedBy,
-            })
-            .where({
-                [EntryColumn.EntryId]: entryId,
-            })
-            .timeout(DEFAULT_QUERY_TIMEOUT);
-
-        ctx.log('SWITCH_REVISION_ENTRY_SUCCESS');
-
-        return {
-            isSuccess: true,
-        };
-    } catch (error) {
-        ctx.logError('SWITCH_REVISION_ENTRY_FAILED', error);
-
-        return {
-            isSuccess: false,
-            error,
-        };
+    if (!skipValidation) {
+        validateArgs(args);
     }
+
+    const replica = getReplica(trx);
+
+    const entry = await Entry.query(replica)
+        .select()
+        .where({
+            [EntryColumn.EntryId]: entryId,
+            [EntryColumn.IsDeleted]: false,
+        })
+        .first()
+        .timeout(DEFAULT_QUERY_TIMEOUT);
+
+    if (!entry) {
+        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
+            code: US_ERRORS.NOT_EXIST_ENTRY,
+        });
+    }
+
+    const revision = await Revision.query(replica)
+        .select()
+        .where({[RevisionModelColumn.RevId]: revId})
+        .andWhere({[RevisionModelColumn.EntryId]: entryId})
+        .first()
+        .timeout(DEFAULT_QUERY_TIMEOUT);
+
+    if (!revision) {
+        throw new AppError(US_ERRORS.NOT_EXIST_REVISION, {
+            code: US_ERRORS.NOT_EXIST_REVISION,
+        });
+    }
+
+    const updatedBy = makeUserId(SYSTEM_USER.ID);
+
+    await Entry.query(getPrimary(trx))
+        .patch({
+            [EntryColumn.SavedId]: revId,
+            [EntryColumn.PublishedId]: revId,
+            [EntryColumn.UpdatedAt]: raw(CURRENT_TIMESTAMP),
+            [EntryColumn.UpdatedBy]: updatedBy,
+        })
+        .where({
+            [EntryColumn.EntryId]: entryId,
+        })
+        .timeout(DEFAULT_QUERY_TIMEOUT);
+
+    ctx.log('SWITCH_REVISION_ENTRY_SUCCESS');
+
+    return {
+        isSuccess: true,
+    };
 }
