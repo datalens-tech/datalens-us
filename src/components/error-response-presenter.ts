@@ -5,6 +5,7 @@
 import {DBError} from 'db-errors';
 import {AppError} from '@gravity-ui/nodekit';
 import US_ERRORS from '../const/us-error-constants';
+
 const PG_ERRORS = require('pg-error-constants');
 
 function getDBErrorCode(error: DBError): string {
@@ -12,281 +13,280 @@ function getDBErrorCode(error: DBError): string {
     return nativeError?.code || '';
 }
 
+const dbErrorsMap = new Map([
+    [
+        PG_ERRORS.UNIQUE_VIOLATION,
+        {
+            code: 400,
+            response: {
+                code: US_ERRORS.DB_UNIQUE_VIOLATION,
+                message: 'The entity already exists',
+            },
+        },
+    ],
+    [
+        PG_ERRORS.NUMERIC_VALUE_OUT_OF_RANGE,
+        {
+            code: 400,
+            response: {
+                message: 'Wrong passed entryId (it can be in links)',
+            },
+        },
+    ],
+    [
+        'DEFAULT',
+        {
+            code: 500,
+            response: {
+                message: 'Database error',
+            },
+        },
+    ],
+]);
+
+const wrongPassedEntryIdError = {
+    code: 400,
+    response: {
+        message: 'Wrong passed entryId (it can be in links)',
+    },
+};
+
 // eslint-disable-next-line complexity
 export default (error: AppError | DBError) => {
     if (error instanceof DBError) {
         const dbCode = getDBErrorCode(error);
-        switch (dbCode) {
-            case PG_ERRORS.UNIQUE_VIOLATION: {
-                return {
-                    code: 400,
-                    response: {
-                        code: US_ERRORS.DB_UNIQUE_VIOLATION,
-                        message: 'The entity already exists',
-                    },
-                };
-            }
-            case PG_ERRORS.NUMERIC_VALUE_OUT_OF_RANGE: {
-                return {
-                    code: 400,
-                    response: {
-                        message: 'Wrong passed entryId (it can be in links)',
-                    },
-                };
-            }
-            default:
-                return {
-                    code: 500,
-                    response: {
-                        message: 'Database error',
-                    },
-                };
+
+        if (dbErrorsMap.has(dbCode)) {
+            return dbErrorsMap.get(dbCode);
         }
+
+        return dbErrorsMap.get('DEFAULT');
     }
 
     const {code, message, details, debug} = error as AppError;
 
-    switch (code) {
-        case US_ERRORS.COLLECTIONS_ALREADY_ENABLED: {
-            return {
+    const badRequestError = {
+        code: 400,
+        response: {
+            code,
+            message,
+            details,
+        },
+    };
+
+    const usErrorsMap = new Map([
+        [
+            US_ERRORS.COLLECTIONS_ALREADY_ENABLED,
+            {
                 code: 400,
                 response: {
-                    message: 'Collections alredy enabled',
+                    message: 'Collections already enabled',
                 },
-            };
-        }
-        case US_ERRORS.DURATION_IS_LIMITED:
-        case US_ERRORS.TENANTS_PER_CLOUD_QUOTA_EXCEEDED:
-        case US_ERRORS.LOCK_TOKEN_REQUIRED: {
-            return {
-                code: 400,
-                response: {
-                    message,
-                },
-            };
-        }
-        case US_ERRORS.FOLDER_ALREADY_EXIST_IN_TENANT:
-        case US_ERRORS.FOLDER_MOVE_FILE_CONNECTION_ERROR:
-        case US_ERRORS.ENTRY_IS_ALREADY_IN_WORKBOOK:
-        case US_ERRORS.ENTRY_IS_NOT_IN_WORKBOOK:
-        case US_ERRORS.FOLDER_DESTINATION_NOT_EXIST:
-        case US_ERRORS.PARENT_FOLDER_NOT_EXIST:
-        case US_ERRORS.MODE_NOT_ALLOWED:
-        case US_ERRORS.CURRENT_TENANT_IS_NOT_MASTER:
-        case US_ERRORS.DECODE_ID_FAILED:
-        case US_ERRORS.USER_SETTINGS_NOT_EXISTS:
-        case US_ERRORS.TENANT_IS_BEING_DELETED:
-        case US_ERRORS.INCORRECT_ACTION:
-        case US_ERRORS.VALIDATION_ERROR: {
-            return {
-                code: 400,
-                response: {
-                    code,
-                    message,
-                    details,
-                },
-            };
-        }
-        case US_ERRORS.ENTRIES_WITH_INSUFFICIENT_PERMISSIONS: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.ENTRIES_WITH_INSUFFICIENT_PERMISSIONS,
+            {
                 code: 403,
                 response: {
                     message:
                         "You can't do this action because of you don't have enough permissions for some entries",
                 },
-            };
-        }
-        case US_ERRORS.WORKBOOK_OPERATION_FORBIDDEN:
-        case US_ERRORS.DLS_FORBIDDEN: {
-            return {
-                code: 403,
-                response: {
-                    code,
-                    message,
-                    details,
-                },
-            };
-        }
-        case US_ERRORS.NOT_VALID_MASTER_TOKEN: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.NOT_VALID_MASTER_TOKEN,
+            {
                 code: 403,
                 response: {
                     message: "Master token isn't valid",
                 },
-            };
-        }
-        case US_ERRORS.NOT_EXIST_LOCKED_ENTRY: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.NOT_EXIST_LOCKED_ENTRY,
+            {
                 code: 404,
                 response: {
                     message: "The entity isn't locked",
                 },
-            };
-        }
-        case US_ERRORS.DLS_NOT_EXIST_ENTRY: {
-            return {
-                code: 404,
-                response: {
-                    dlsResponse: message,
-                },
-            };
-        }
-        case US_ERRORS.NOT_EXIST_TEMPLATE_FOLDER: {
-            return {
-                code: 404,
-                response: {
-                    message: 'Not exists template folder',
-                },
-            };
-        }
-        case US_ERRORS.NOT_EXIST_DRAFT: {
-            return {
-                code: 404,
-                response: {
-                    message: "The draft doesn't exist",
-                },
-            };
-        }
-        case US_ERRORS.NOT_FOUND_COMMENT: {
-            return {
-                code: 404,
-                response: {
-                    message: "The comment wasn't found",
-                },
-            };
-        }
-        case US_ERRORS.NOT_EXIST_CONFIG: {
-            return {
-                code: 404,
-                response: {
-                    message: 'Not exists config with this template name',
-                },
-            };
-        }
-        case US_ERRORS.TEMPLATE_NOT_EXISTS: {
-            return {
-                code: 404,
-                response: {
-                    message: "A template with this name doesn't exist",
-                },
-            };
-        }
-
-        case US_ERRORS.NOT_EXIST_DELETED_ENTRY:
-        case US_ERRORS.NOT_EXIST_ENTRY: {
-            return {
-                code: 404,
-                response: {
-                    message: "The entity doesn't exist",
-                },
-            };
-        }
-        case US_ERRORS.FOLDER_COPY_DENIED: {
-            return {
-                code: 403,
-                response: {
-                    message: 'Folders cannot be copied',
-                },
-            };
-        }
-        case US_ERRORS.CONNECTION_COPY_DENIED: {
-            return {
-                code: 403,
-                response: {
-                    message: 'Connections cannot be copied',
-                },
-            };
-        }
-        case US_ERRORS.NOT_EXIST_STATE_BY_HASH: {
-            return {
-                code: 404,
-                response: {
-                    message: "The state by this hash has doesn't exist",
-                },
-            };
-        }
-        case US_ERRORS.NOT_EXIST_FOLDER: {
-            return {
-                code: 404,
-                response: {
-                    message: "The folder doesn't exist",
-                },
-            };
-        }
-        case US_ERRORS.NOT_EXIST_TENANT: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.NOT_EXIST_TENANT,
+            {
                 code: 404,
                 response: {
                     message: "The specified tenant doesn't exist",
                 },
-            };
-        }
-        case US_ERRORS.NOT_EXIST_INSTANCE_SERVICE: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.NOT_EXIST_FOLDER,
+            {
+                code: 404,
+                response: {
+                    message: "The folder doesn't exist",
+                },
+            },
+        ],
+        [
+            US_ERRORS.NOT_EXIST_STATE_BY_HASH,
+            {
+                code: 404,
+                response: {
+                    message: "The state by this hash has doesn't exist",
+                },
+            },
+        ],
+        [
+            US_ERRORS.CONNECTION_COPY_DENIED,
+            {
+                code: 403,
+                response: {
+                    message: 'Connections cannot be copied',
+                },
+            },
+        ],
+        [
+            US_ERRORS.FOLDER_COPY_DENIED,
+            {
+                code: 403,
+                response: {
+                    message: 'Folders cannot be copied',
+                },
+            },
+        ],
+
+        [
+            US_ERRORS.TEMPLATE_NOT_EXISTS,
+            {
+                code: 404,
+                response: {
+                    message: "A template with this name doesn't exist",
+                },
+            },
+        ],
+        [
+            US_ERRORS.NOT_EXIST_CONFIG,
+            {
+                code: 404,
+                response: {
+                    message: 'Not exists config with this template name',
+                },
+            },
+        ],
+        [
+            US_ERRORS.NOT_FOUND_COMMENT,
+            {
+                code: 404,
+                response: {
+                    message: "The comment wasn't found",
+                },
+            },
+        ],
+        [
+            US_ERRORS.NOT_EXIST_DRAFT,
+            {
+                code: 404,
+                response: {
+                    message: "The draft doesn't exist",
+                },
+            },
+        ],
+        [
+            US_ERRORS.NOT_EXIST_TEMPLATE_FOLDER,
+            {
+                code: 404,
+                response: {
+                    message: 'Not exists template folder',
+                },
+            },
+        ],
+        [
+            US_ERRORS.DLS_NOT_EXIST_ENTRY,
+            {
+                code: 404,
+                response: {
+                    dlsResponse: message,
+                },
+            },
+        ],
+        [
+            US_ERRORS.NOT_EXIST_INSTANCE_SERVICE,
+            {
                 code: 404,
                 response: {
                     message: "The instance service doesn't exist",
                 },
-            };
-        }
-        case US_ERRORS.NOT_EXIST_INSTANCE_SERVICES: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.NOT_EXIST_INSTANCE_SERVICES,
+            {
                 code: 404,
                 response: {
                     message,
                 },
-            };
-        }
-        case US_ERRORS.NOT_EXIST_REVISION: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.NOT_EXIST_REVISION,
+            {
                 code: 404,
                 response: {
                     message: "The revision doesn't exist",
                 },
-            };
-        }
-        case US_ERRORS.DLS_METHOD_NOT_IMPLEMENTED: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.DLS_METHOD_NOT_IMPLEMENTED,
+            {
                 code: 405,
                 response: {},
-            };
-        }
-        case US_ERRORS.SCOPE_NOT_ALLOWED: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.SCOPE_NOT_ALLOWED,
+            {
                 code: 405,
                 response: {
                     message: 'The scope not allowed',
                 },
-            };
-        }
-        case US_ERRORS.NOT_MATCH_TOGETHER: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.NOT_MATCH_TOGETHER,
+            {
                 code: 409,
                 response: {
                     message: 'Not correct folderId',
                 },
-            };
-        }
-        case US_ERRORS.EXIST_ENTRY_WITH_THIS_KEY: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.EXIST_ENTRY_WITH_THIS_KEY,
+            {
                 code: 409,
                 response: {
                     message,
                 },
-            };
-        }
-        case US_ERRORS.ENTRY_ALREADY_EXISTS: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.ENTRY_ALREADY_EXISTS,
+            {
                 code: 409,
                 response: {
                     code,
                     message: 'The entry already exists',
                     details,
                 },
-            };
-        }
-        case US_ERRORS.ENTRY_IS_LOCKED: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.ENTRY_IS_LOCKED,
+            {
                 code: 423,
                 response: {
                     code,
@@ -294,31 +294,310 @@ export default (error: AppError | DBError) => {
                     details,
                     debug,
                 },
-            };
-        }
-        case US_ERRORS.ENTRY_LOCK_FORCE_CONFLICT: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.ENTRY_LOCK_FORCE_CONFLICT,
+            {
                 code: 409,
                 response: {
                     code,
                     message: 'Conflict occurred while setting a forced lock',
                     details,
                 },
-            };
-        }
-        case US_ERRORS.NOT_EXIST_TEMPLATES_CONFIG: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.NOT_EXIST_TEMPLATES_CONFIG,
+            {
                 code: 500,
                 response: {
                     message: 'Not found templates config on server',
                 },
-            };
-        }
-        case US_ERRORS.NOT_EXIST_BILLING_INSTANCE_SERVICE_ID_PREFIX_IN_CONFIG: {
-            return {
+            },
+        ],
+        [
+            US_ERRORS.NOT_EXIST_BILLING_INSTANCE_SERVICE_ID_PREFIX_IN_CONFIG,
+            {
                 code: 500,
                 response: {
                     message: 'Not found billingInstanceServiceIdPrefix in config',
+                },
+            },
+        ],
+        [
+            US_ERRORS.ACCESS_SERVICE_CHECK_PERMISSION_ERROR,
+            {
+                code: 530,
+                response: {
+                    type: 'access_service_error',
+                },
+            },
+        ],
+        [
+            US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
+            {
+                code: 403,
+                response: {
+                    message: 'Auth denied',
+                    code,
+                },
+            },
+        ],
+        [
+            US_ERRORS.ACCESS_SERVICE_UNAUTHENTICATED,
+            {
+                code: 401,
+                response: {
+                    message: 'Unauthenticated',
+                    code,
+                },
+            },
+        ],
+        [
+            US_ERRORS.BILLING_SERVICE_ACCOUNT_UNAUTHENTICATED,
+            {
+                code: 401,
+                response: {
+                    message: 'Unauthenticated',
+                    code,
+                },
+            },
+        ],
+        [
+            US_ERRORS.DLS_MODIFY_PERMISSIONS_BAD_REQUEST,
+            {
+                code: 400,
+                response: {
+                    message: 'Bad Request',
+                    code,
+                },
+            },
+        ],
+        [
+            US_ERRORS.NOT_EXIST_PRESET,
+            {
+                code: 404,
+                response: {
+                    message: "The preset doesn't exist",
+                },
+            },
+        ],
+        [
+            US_ERRORS.WORKBOOK_TEMPLATE_NOT_EXISTS,
+            {
+                code: 404,
+                response: {
+                    message: "The workbook template doesn't exist",
+                },
+            },
+        ],
+        [
+            US_ERRORS.ENTRY_WITHOUT_WORKBOOK_ID_COPY_DENIED,
+            {
+                code: 403,
+                response: {
+                    message: 'Entry without workbookId, cannot be copied to workbook',
+                },
+            },
+        ],
+        [
+            US_ERRORS.ENTRIES_WITH_DIFFERENT_WORKBOOK_IDS_COPY_DENIED,
+            {
+                code: 403,
+                response: {
+                    message: 'Entry with different workbookIds, cannot be copy denied',
+                },
+            },
+        ],
+        [
+            US_ERRORS.INIT_TENANT_MIGRATING,
+            {
+                code: 409,
+                response: {
+                    code,
+                    message: "The tenant can't be created because it's in the process of migration",
+                },
+            },
+        ],
+        [
+            US_ERRORS.MIGRATION_DENIED,
+            {
+                code: 403,
+                response: {
+                    code,
+                    message: 'Migration denied',
+                },
+            },
+        ],
+        [
+            US_ERRORS.MIGRATION_ORG_EXISTS,
+            {
+                code: 409,
+                response: {
+                    code,
+                    message: 'The migration organization already exists',
+                },
+            },
+        ],
+        [
+            US_ERRORS.COLLECTION_ALREADY_EXISTS,
+            {
+                code: 409,
+                response: {
+                    message: 'The collection already exists',
+                },
+            },
+        ],
+        [
+            US_ERRORS.COLLECTION_CIRCULAR_REFERENCE_ERROR,
+            {
+                code: 409,
+                response: {
+                    message: message ?? 'Circular reference error between collections',
+                },
+            },
+        ],
+        [
+            US_ERRORS.WORKBOOK_ALREADY_EXISTS,
+            {
+                code: 409,
+                response: {
+                    message: 'The workbook already exists',
+                },
+            },
+        ],
+        [
+            US_ERRORS.COLLECTION_NOT_EXISTS,
+            {
+                code: 404,
+                response: {
+                    message: "The collection doesn't exist",
+                },
+            },
+        ],
+        [
+            US_ERRORS.WORKBOOK_NOT_EXISTS,
+            {
+                code: 404,
+                response: {
+                    message: "The workbook doesn't exist",
+                },
+            },
+        ],
+        [
+            US_ERRORS.WORKBOOK_IS_ALREADY_RESTORED,
+            {
+                code: 400,
+                response: {
+                    message: 'The workbook is alredy restored',
+                },
+            },
+        ],
+        [
+            US_ERRORS.WORKBOOK_ENTITY_ERROR,
+            {
+                code: 500,
+                response: {
+                    message: message ?? 'Workbook entity error',
+                },
+            },
+        ],
+        [
+            US_ERRORS.WORKBOOK_COPY_FILE_CONNECTION_ERROR,
+            {
+                code: 400,
+                response: {
+                    message: 'Copying workbooks with file connections is forbidden',
+                },
+            },
+        ],
+        [
+            US_ERRORS.SERVICE_ACCOUNT_ERROR,
+            {
+                code: 500,
+                response: {
+                    message: message ?? 'Service account error',
+                },
+            },
+        ],
+        [
+            US_ERRORS.ACCESS_SERVICE_ERROR,
+            {
+                code: 500,
+                response: {
+                    message: message ?? 'Access service error',
+                },
+            },
+        ],
+        [
+            US_ERRORS.ACCESS_BINDINGS_SERVICE_ERROR,
+            {
+                code: 500,
+                response: {
+                    message: message ?? 'Access bindings service error',
+                },
+            },
+        ],
+        [
+            US_ERRORS.NOT_ORG_INSTANCE_ERROR,
+            {
+                code: 500,
+                response: {
+                    message: message ?? 'The action is only available in an organization instance',
+                },
+            },
+        ],
+        [
+            'DEFAULT',
+            [
+                {
+                    code: 500,
+                    response: {
+                        message: 'Database error',
+                    },
+                },
+            ],
+        ],
+    ]);
+
+    usErrorsMap.set(US_ERRORS.DURATION_IS_LIMITED, wrongPassedEntryIdError);
+    usErrorsMap.set(US_ERRORS.TENANTS_PER_CLOUD_QUOTA_EXCEEDED, wrongPassedEntryIdError);
+    usErrorsMap.set(US_ERRORS.LOCK_TOKEN_REQUIRED, wrongPassedEntryIdError);
+
+    usErrorsMap.set(US_ERRORS.FOLDER_ALREADY_EXIST_IN_TENANT, badRequestError);
+    usErrorsMap.set(US_ERRORS.FOLDER_MOVE_FILE_CONNECTION_ERROR, badRequestError);
+    usErrorsMap.set(US_ERRORS.ENTRY_IS_ALREADY_IN_WORKBOOK, badRequestError);
+    usErrorsMap.set(US_ERRORS.ENTRY_IS_NOT_IN_WORKBOOK, badRequestError);
+    usErrorsMap.set(US_ERRORS.FOLDER_DESTINATION_NOT_EXIST, badRequestError);
+    usErrorsMap.set(US_ERRORS.PARENT_FOLDER_NOT_EXIST, badRequestError);
+    usErrorsMap.set(US_ERRORS.MODE_NOT_ALLOWED, badRequestError);
+    usErrorsMap.set(US_ERRORS.CURRENT_TENANT_IS_NOT_MASTER, badRequestError);
+    usErrorsMap.set(US_ERRORS.DECODE_ID_FAILED, badRequestError);
+    usErrorsMap.set(US_ERRORS.USER_SETTINGS_NOT_EXISTS, badRequestError);
+    usErrorsMap.set(US_ERRORS.TENANT_IS_BEING_DELETED, badRequestError);
+    usErrorsMap.set(US_ERRORS.INCORRECT_ACTION, badRequestError);
+    usErrorsMap.set(US_ERRORS.VALIDATION_ERROR, badRequestError);
+
+    const forbiddenError = {
+        code: 403,
+        response: {
+            code,
+            message,
+            details,
+        },
+    };
+
+    usErrorsMap.set(US_ERRORS.WORKBOOK_OPERATION_FORBIDDEN, badRequestError);
+    usErrorsMap.set(US_ERRORS.DLS_FORBIDDEN, forbiddenError);
+
+    switch (code) {
+        case US_ERRORS.NOT_EXIST_DELETED_ENTRY:
+        case US_ERRORS.NOT_EXIST_ENTRY: {
+            return {
+                code: 404,
+                response: {
+                    message: "The entity doesn't exist",
                 },
             };
         }
@@ -329,50 +608,6 @@ export default (error: AppError | DBError) => {
                 code: 530,
                 response: {
                     type: 'dls_error',
-                },
-            };
-        }
-        case US_ERRORS.ACCESS_SERVICE_CHECK_PERMISSION_ERROR: {
-            return {
-                code: 530,
-                response: {
-                    type: 'access_service_error',
-                },
-            };
-        }
-        case US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED: {
-            return {
-                code: 403,
-                response: {
-                    message: 'Auth denied',
-                    code,
-                },
-            };
-        }
-        case US_ERRORS.ACCESS_SERVICE_UNAUTHENTICATED: {
-            return {
-                code: 401,
-                response: {
-                    message: 'Unauthenticated',
-                    code,
-                },
-            };
-        }
-        case US_ERRORS.BILLING_SERVICE_ACCOUNT_UNAUTHENTICATED: {
-            return {
-                code: 401,
-                response: {
-                    message: 'Unauthenticated',
-                    code,
-                },
-            };
-        }
-        case US_ERRORS.DLS_MODIFY_PERMISSIONS_BAD_REQUEST: {
-            return {
-                code: 400,
-                response: {
-                    message: 'Bad Request',
-                    code,
                 },
             };
         }
@@ -388,161 +623,6 @@ export default (error: AppError | DBError) => {
                 response: {
                     code,
                     message,
-                },
-            };
-        }
-        case US_ERRORS.NOT_EXIST_PRESET: {
-            return {
-                code: 404,
-                response: {
-                    message: "The preset doesn't exist",
-                },
-            };
-        }
-        case US_ERRORS.WORKBOOK_TEMPLATE_NOT_EXISTS: {
-            return {
-                code: 404,
-                response: {
-                    message: "The workbook template doesn't exist",
-                },
-            };
-        }
-        case US_ERRORS.ENTRY_WITHOUT_WORKBOOK_ID_COPY_DENIED: {
-            return {
-                code: 403,
-                response: {
-                    message: 'Entry without workbookId, cannot be copied to workbook',
-                },
-            };
-        }
-        case US_ERRORS.ENTRIES_WITH_DIFFERENT_WORKBOOK_IDS_COPY_DENIED: {
-            return {
-                code: 403,
-                response: {
-                    message: 'Entry with different workbookIds, cannot be copy denied',
-                },
-            };
-        }
-        case US_ERRORS.INIT_TENANT_MIGRATING: {
-            return {
-                code: 409,
-                response: {
-                    code,
-                    message: "The tenant can't be created because it's in the process of migration",
-                },
-            };
-        }
-        case US_ERRORS.MIGRATION_DENIED: {
-            return {
-                code: 403,
-                response: {
-                    code,
-                    message: 'Migration denied',
-                },
-            };
-        }
-        case US_ERRORS.MIGRATION_ORG_EXISTS: {
-            return {
-                code: 409,
-                response: {
-                    code,
-                    message: 'The migration organization already exists',
-                },
-            };
-        }
-        case US_ERRORS.COLLECTION_ALREADY_EXISTS: {
-            return {
-                code: 409,
-                response: {
-                    message: 'The collection already exists',
-                },
-            };
-        }
-        case US_ERRORS.COLLECTION_CIRCULAR_REFERENCE_ERROR: {
-            return {
-                code: 409,
-                response: {
-                    message: message ?? 'Circular reference error between collections',
-                },
-            };
-        }
-        case US_ERRORS.WORKBOOK_ALREADY_EXISTS: {
-            return {
-                code: 409,
-                response: {
-                    message: 'The workbook already exists',
-                },
-            };
-        }
-        case US_ERRORS.COLLECTION_NOT_EXISTS: {
-            return {
-                code: 404,
-                response: {
-                    message: "The collection doesn't exist",
-                },
-            };
-        }
-        case US_ERRORS.WORKBOOK_NOT_EXISTS: {
-            return {
-                code: 404,
-                response: {
-                    message: "The workbook doesn't exist",
-                },
-            };
-        }
-        case US_ERRORS.WORKBOOK_IS_ALREADY_RESTORED: {
-            return {
-                code: 400,
-                response: {
-                    message: 'The workbook is alredy restored',
-                },
-            };
-        }
-        case US_ERRORS.WORKBOOK_ENTITY_ERROR: {
-            return {
-                code: 500,
-                response: {
-                    message: message ?? 'Workbook entity error',
-                },
-            };
-        }
-        case US_ERRORS.WORKBOOK_COPY_FILE_CONNECTION_ERROR: {
-            return {
-                code: 400,
-                response: {
-                    message: 'Copying workbooks with file connections is forbidden',
-                },
-            };
-        }
-        case US_ERRORS.SERVICE_ACCOUNT_ERROR: {
-            return {
-                code: 500,
-                response: {
-                    message: message ?? 'Service account error',
-                },
-            };
-        }
-        case US_ERRORS.ACCESS_SERVICE_ERROR: {
-            return {
-                code: 500,
-                response: {
-                    message: message ?? 'Access service error',
-                },
-            };
-        }
-        case US_ERRORS.ACCESS_BINDINGS_SERVICE_ERROR: {
-            return {
-                code: 500,
-                response: {
-                    message: message ?? 'Access bindings service error',
-                },
-            };
-        }
-        case US_ERRORS.NOT_ORG_INSTANCE_ERROR: {
-            return {
-                code: 500,
-                response: {
-                    message: message ?? 'The action is only available in an organization instance',
                 },
             };
         }
