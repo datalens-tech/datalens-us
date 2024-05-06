@@ -6,8 +6,8 @@ import Utils from '../utils';
 export default {
     appName: 'united-storage',
 
-    //appSocket: 'dist/run/server.sock',
-    appPort: 8083,
+    appSocket: 'dist/run/server.sock',
+
     expressTrustProxyNumber: 3,
     expressBodyParserJSONConfig: {
         limit: '50mb',
