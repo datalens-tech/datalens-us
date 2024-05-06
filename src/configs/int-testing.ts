@@ -1,3 +1,6 @@
+import {AuthPolicy} from '@gravity-ui/expresskit';
 import {AppConfig} from '@gravity-ui/nodekit';
 
-export default {} as Partial<AppConfig>;
+export default {
+    appAuthPolicy: AuthPolicy.disabled,
+} as Partial<AppConfig>;
