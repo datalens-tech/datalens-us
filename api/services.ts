@@ -2,7 +2,10 @@ export {ServiceArgs, CountAggregation} from '../src/services/new/types';
 export {getPrimary, getReplica} from '../src/services/new/utils';
 
 export {checkEntry} from '../src/services/entry/actions/check-entry';
-export {getRelatedEntries} from '../src/services/entry/actions/get-related-entries';
+export {
+    getRelatedEntries,
+    RelationDirection,
+} from '../src/services/entry/actions/get-related-entries';
 
 export {getCollection} from '../src/services/new/collection/get-collection';
 export {getParentIds} from '../src/services/new/collection/utils/get-parents';

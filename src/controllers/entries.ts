@@ -14,6 +14,7 @@ import {
     GetEntryRevisionsData,
     getEntryRelations,
     switchRevisionEntry,
+    RelationDirection,
 } from '../services/entry';
 import {
     getEntry,
@@ -233,11 +234,14 @@ export default {
     getRelations: async (req: Request, res: Response) => {
         const {params, query} = req;
 
-        const result = await getEntryRelations(req.ctx, {
-            entryId: params.entryId,
-            direction: query.direction as Optional<string>,
-            includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
-        });
+        const result = await getEntryRelations(
+            {ctx: req.ctx},
+            {
+                entryId: params.entryId,
+                direction: query.direction as Optional<RelationDirection>,
+                includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
+            },
+        );
 
         const {code, response} = prepareResponse({data: result});
 

@@ -1,27 +1,51 @@
 import {raw} from 'objection';
 import Entry from '../../../db/models/entry';
-import {CTX} from '../../../types/models';
+import {ServiceArgs} from '../../new/types';
 import {
     DEFAULT_QUERY_TIMEOUT,
     EXTENDED_QUERY_TIMEOUT,
     RETURN_RELATION_COLUMNS,
 } from '../../../const';
+import {getReplica} from '../../new/utils';
+import {EntryScope} from '../../../db/models/new/entry/types';
+
+export enum RelationDirection {
+    Parent = 'parent',
+    Child = 'child',
+}
 
 type GetRelatedEntriesData = {
     entryIds: string[];
-    direction?: 'parent' | 'child';
+    direction?: RelationDirection;
     extendedTimeout?: boolean;
 };
 
+type GetRelatedEntriesResult = {
+    entryId: string;
+    key: string;
+    scope: EntryScope;
+    type: string;
+    createdAt: string;
+    meta: Record<string, unknown>;
+    public: boolean;
+    tenantId: string;
+    workbookId: string | null;
+    depth: number;
+};
+
 export async function getRelatedEntries(
-    ctx: CTX,
-    {entryIds, direction = 'parent', extendedTimeout = false}: GetRelatedEntriesData,
+    {ctx, trx}: ServiceArgs,
+    {
+        entryIds,
+        direction = RelationDirection.Parent,
+        extendedTimeout = false,
+    }: GetRelatedEntriesData,
 ) {
     ctx.log('GET_RELATED_ENTRIES_RUN');
 
-    const endToStart = direction === 'parent';
+    const endToStart = direction === RelationDirection.Parent;
 
-    const relatedEntries = await Entry.query(Entry.replica)
+    const relatedEntries = (await Entry.query(getReplica(trx))
         .withRecursive('relatedEntries', (qb) => {
             qb.select(['fromId', 'toId', raw('1 depth')])
                 .from('links')
@@ -59,7 +83,9 @@ export async function getRelatedEntries(
                 .as('re');
         })
         .orderBy('depth')
-        .timeout(extendedTimeout ? EXTENDED_QUERY_TIMEOUT : DEFAULT_QUERY_TIMEOUT);
+        .timeout(
+            extendedTimeout ? EXTENDED_QUERY_TIMEOUT : DEFAULT_QUERY_TIMEOUT,
+        )) as unknown[] as GetRelatedEntriesResult[];
 
     ctx.log('GET_RELATED_ENTRIES_DONE', {
         amount: relatedEntries && relatedEntries.length,
