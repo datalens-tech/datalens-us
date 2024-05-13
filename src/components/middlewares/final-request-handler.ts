@@ -2,7 +2,7 @@ import {Request, Response} from '@gravity-ui/expresskit';
 import {AppError} from '@gravity-ui/nodekit';
 import prepareErrorResponse from '../error-response-presenter';
 
-function logError(error: AppError, req: Request) {
+export function logError(error: AppError, req: Request) {
     if (error instanceof AppError) {
         const {message} = error;
         req.ctx.log(message, {error});

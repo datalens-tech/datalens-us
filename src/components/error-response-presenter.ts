@@ -76,7 +76,6 @@ export default (error: AppError | DBError) => {
         case US_ERRORS.DECODE_ID_FAILED:
         case US_ERRORS.USER_SETTINGS_NOT_EXISTS:
         case US_ERRORS.TENANT_IS_BEING_DELETED:
-        case US_ERRORS.INCORRECT_ACTION:
         case US_ERRORS.VALIDATION_ERROR: {
             return {
                 code: 400,
@@ -221,22 +220,7 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.NOT_EXIST_INSTANCE_SERVICE: {
-            return {
-                code: 404,
-                response: {
-                    message: "The instance service doesn't exist",
-                },
-            };
-        }
-        case US_ERRORS.NOT_EXIST_INSTANCE_SERVICES: {
-            return {
-                code: 404,
-                response: {
-                    message,
-                },
-            };
-        }
+
         case US_ERRORS.NOT_EXIST_REVISION: {
             return {
                 code: 404,
@@ -314,14 +298,6 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.NOT_EXIST_BILLING_INSTANCE_SERVICE_ID_PREFIX_IN_CONFIG: {
-            return {
-                code: 500,
-                response: {
-                    message: 'Not found billingInstanceServiceIdPrefix in config',
-                },
-            };
-        }
         case US_ERRORS.DLS_ADD_ENTITY_ERROR:
         case US_ERRORS.DLS_CHECK_BULK_PERMISSION_ERROR:
         case US_ERRORS.DLS_CHECK_PERMISSION_ERROR: {
@@ -332,14 +308,7 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.ACCESS_SERVICE_CHECK_PERMISSION_ERROR: {
-            return {
-                code: 530,
-                response: {
-                    type: 'access_service_error',
-                },
-            };
-        }
+
         case US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED: {
             return {
                 code: 403,
@@ -350,15 +319,6 @@ export default (error: AppError | DBError) => {
             };
         }
         case US_ERRORS.ACCESS_SERVICE_UNAUTHENTICATED: {
-            return {
-                code: 401,
-                response: {
-                    message: 'Unauthenticated',
-                    code,
-                },
-            };
-        }
-        case US_ERRORS.BILLING_SERVICE_ACCOUNT_UNAUTHENTICATED: {
             return {
                 code: 401,
                 response: {
@@ -522,38 +482,7 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.ACCESS_SERVICE_ERROR: {
-            return {
-                code: 500,
-                response: {
-                    message: message ?? 'Access service error',
-                },
-            };
-        }
-        case US_ERRORS.ACCESS_BINDINGS_SERVICE_ERROR: {
-            return {
-                code: 500,
-                response: {
-                    message: message ?? 'Access bindings service error',
-                },
-            };
-        }
-        case US_ERRORS.NOT_ORG_INSTANCE_ERROR: {
-            return {
-                code: 500,
-                response: {
-                    message: message ?? 'The action is only available in an organization instance',
-                },
-            };
-        }
-        case US_ERRORS.INCORRECT_INSTALLATION_ERROR: {
-            return {
-                code: 500,
-                response: {
-                    message: message ?? 'Incorrect installation',
-                },
-            };
-        }
+
         case US_ERRORS.TOO_MANY_COLOR_PALETTES: {
             return {
                 code: 500,
@@ -572,16 +501,6 @@ export default (error: AppError | DBError) => {
             };
         }
 
-        case US_ERRORS.SWITCH_PUBLICATION_INCORRECT_WORKBOOK_ID:
-        case US_ERRORS.SWITCH_PUBLICATION_INCORRECT_MAIN_ENTRY: {
-            return {
-                code: 500,
-                response: {
-                    message,
-                    details,
-                },
-            };
-        }
         case US_ERRORS.MODIFY_USERS_FOLDER_DENIED: {
             return {
                 code: 403,
@@ -598,33 +517,7 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.EMBEDDING_SECRET_NOT_EXISTS: {
-            return {
-                code: 404,
-                response: {
-                    code,
-                    message: "The embedding secret doesn't exist",
-                },
-            };
-        }
-        case US_ERRORS.EMBED_NOT_EXISTS: {
-            return {
-                code: 404,
-                response: {
-                    code,
-                    message: "The embed doesn't exist",
-                },
-            };
-        }
-        case US_ERRORS.INCORRECT_DEPS_IDS_FOR_EMBED: {
-            return {
-                code: 409,
-                response: {
-                    code,
-                    message: 'Incorrect dependencies for embed',
-                },
-            };
-        }
+
         case US_ERRORS.INCORRECT_ENTRY_ID_FOR_EMBED: {
             return {
                 code: 409,
@@ -634,51 +527,7 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.EMBEDDING_INFO_IS_EMPTY: {
-            return {
-                code: 500,
-                response: {
-                    code,
-                    message: 'Embedding info is empty',
-                },
-            };
-        }
-        case US_ERRORS.UNKNOWN_OPERATION_TYPE: {
-            return {
-                code: 400,
-                response: {
-                    code,
-                    message: 'Unknown operation type',
-                },
-            };
-        }
-        case US_ERRORS.IAM_OPERATION_NOT_EXISTS: {
-            return {
-                code: 404,
-                response: {
-                    code,
-                    message: "IAM operation doesn't exist",
-                },
-            };
-        }
-        case US_ERRORS.MOVE_TENANT_CONTENT_DENIED: {
-            return {
-                code: 403,
-                response: {
-                    code,
-                    message: message ?? 'Move tenant content denied',
-                },
-            };
-        }
-        case US_ERRORS.MOVE_TENANT_CONTENT_ERROR: {
-            return {
-                code: 500,
-                response: {
-                    code,
-                    message: message ?? 'Move tenant content error',
-                },
-            };
-        }
+
         case US_ERRORS.INCORRECT_WORKBOOK_ID_HEADER: {
             return {
                 code: 400,
@@ -715,24 +564,7 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.WORKBOOK_ID_IS_NOT_SET_FOR_TEMPLATE: {
-            return {
-                code: 500,
-                response: {
-                    code,
-                    message: 'Workbook id is not set for template',
-                },
-            };
-        }
-        case US_ERRORS.EMBEDDING_IS_NOT_AVAILABLE: {
-            return {
-                code: 403,
-                response: {
-                    code,
-                    message: 'Embedding is not available',
-                },
-            };
-        }
+
         default:
             return {
                 code: 500,
