@@ -215,7 +215,7 @@ class Entry extends Model {
 
         if (!isValid) {
             throw new AppError('Validation error', {
-                code: 'VALIDATION_ERROR',
+                code: US_ERRORS.VALIDATION_ERROR,
                 details: {validationErrors},
             });
         }
@@ -241,8 +241,8 @@ class Entry extends Model {
                 const isTenantExistence = await Tenant.checkExistence(tenantId, ctx);
 
                 if (!isTenantExistence) {
-                    throw new AppError('NOT_EXIST_TENANT', {
-                        code: 'NOT_EXIST_TENANT',
+                    throw new AppError(US_ERRORS.NOT_EXIST_TENANT, {
+                        code: US_ERRORS.NOT_EXIST_TENANT,
                     });
                 }
             }
@@ -658,7 +658,7 @@ class Entry extends Model {
 
         if (!isValid) {
             throw new AppError('Validation error', {
-                code: 'VALIDATION_ERROR',
+                code: US_ERRORS.VALIDATION_ERROR,
                 details: {validationErrors},
             });
         }

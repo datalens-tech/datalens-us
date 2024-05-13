@@ -2,6 +2,7 @@ import {Model} from '../..';
 import {AppError} from '@gravity-ui/nodekit';
 import * as MT from '../../../types/models';
 import {validateGet, validateCreate, validateUpdate, validateDelete} from './scheme';
+import {US_ERRORS} from '../../../const';
 
 interface Template extends MT.TemplateColumns {}
 class Template extends Model {
@@ -32,7 +33,7 @@ class Template extends Model {
 
         if (!isValid) {
             throw new AppError('Validation error', {
-                code: 'VALIDATION_ERROR',
+                code: US_ERRORS.VALIDATION_ERROR,
                 details: {validationErrors},
             });
         }
@@ -64,7 +65,7 @@ class Template extends Model {
 
         if (!isValid) {
             throw new AppError('Validation error', {
-                code: 'VALIDATION_ERROR',
+                code: US_ERRORS.VALIDATION_ERROR,
                 details: {validationErrors},
             });
         }
@@ -89,7 +90,7 @@ class Template extends Model {
 
         if (!isValid) {
             throw new AppError('Validation error', {
-                code: 'VALIDATION_ERROR',
+                code: US_ERRORS.VALIDATION_ERROR,
                 details: {validationErrors},
             });
         }
@@ -123,7 +124,7 @@ class Template extends Model {
 
         if (!isValid) {
             throw new AppError('Validation error', {
-                code: 'VALIDATION_ERROR',
+                code: US_ERRORS.VALIDATION_ERROR,
                 details: {validationErrors},
             });
         }
