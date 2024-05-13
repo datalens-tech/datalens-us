@@ -1,6 +1,6 @@
 import {AppConfig} from '@gravity-ui/nodekit';
 import {AuthPolicy} from '@gravity-ui/expresskit';
-import {US_MASTER_TOKEN_HEADER, Zitadel} from '../const';
+import {US_MASTER_TOKEN_HEADER} from '../const';
 import Utils from '../utils';
 
 export default {
@@ -17,14 +17,13 @@ export default {
         extended: false,
     },
 
-    appAuthPolicy:
-        Utils.getEnvVariable('ZITADEL') === Zitadel.Enabled
-            ? AuthPolicy.required
-            : AuthPolicy.disabled,
+    appAuthPolicy: Utils.isTrueArg(Utils.getEnvVariable('ZITADEL'))
+        ? AuthPolicy.required
+        : AuthPolicy.disabled,
 
     appSensitiveKeys: [US_MASTER_TOKEN_HEADER],
 
-    zitadelEnabled: Utils.getEnvVariable('ZITADEL') === Zitadel.Enabled,
+    zitadelEnabled: Utils.isTrueArg(Utils.getEnvVariable('ZITADEL')),
     zitadelUri: Utils.getEnvVariable('ZITADEL_URI') || 'http://localhost:8080',
 
     clientId: Utils.getEnvVariable('CLIENT_ID') || '',

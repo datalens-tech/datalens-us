@@ -207,8 +207,3 @@ export enum AppEnv {
 
 export const COPY_START = '(COPY';
 export const COPY_END = ')';
-
-export enum Zitadel {
-    Enabled = 'enabled',
-    Disabled = 'disabled',
-}
