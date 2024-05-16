@@ -5,7 +5,7 @@ import Revision from '../revision';
 import Favorite from '../favorite';
 import {AppError} from '@gravity-ui/nodekit';
 import * as MT from '../../../types/models';
-import {RETURN_NAVIGATION_COLUMNS, COMPARISON_OPERATORS} from '../../../const';
+import {RETURN_NAVIGATION_COLUMNS, COMPARISON_OPERATORS, US_ERRORS} from '../../../const';
 import {validateGetEntries, validateInterTenantGetEntries} from './scheme';
 import {registry} from '../../../registry';
 
@@ -113,7 +113,7 @@ class Navigation extends Model {
 
         if (!isValid) {
             throw new AppError('Validation error', {
-                code: 'VALIDATION_ERROR',
+                code: US_ERRORS.VALIDATION_ERROR,
                 details: {validationErrors},
             });
         }
@@ -385,7 +385,7 @@ class Navigation extends Model {
 
         if (!isValid) {
             throw new AppError('Validation error', {
-                code: 'VALIDATION_ERROR',
+                code: US_ERRORS.VALIDATION_ERROR,
                 details: {validationErrors},
             });
         }

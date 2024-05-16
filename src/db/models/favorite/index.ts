@@ -12,7 +12,7 @@ import {
     validateDeleteFavorite,
     validateRenameFavorite,
 } from './scheme';
-import {RETURN_FAVORITES_COLUMNS} from '../../../const';
+import {RETURN_FAVORITES_COLUMNS, US_ERRORS} from '../../../const';
 import {registry} from '../../../registry';
 
 import {getWorkbook} from '../../../services/new/workbook';
@@ -92,7 +92,7 @@ class Favorite extends Model {
 
         if (!isValid) {
             throw new AppError('Validation error', {
-                code: 'VALIDATION_ERROR',
+                code: US_ERRORS.VALIDATION_ERROR,
                 details: {validationErrors},
             });
         }
@@ -299,7 +299,7 @@ class Favorite extends Model {
 
         if (!isValid) {
             throw new AppError('Validation error', {
-                code: 'VALIDATION_ERROR',
+                code: US_ERRORS.VALIDATION_ERROR,
                 details: {validationErrors},
             });
         }
@@ -356,7 +356,7 @@ class Favorite extends Model {
 
         if (!isValid) {
             throw new AppError('Validation error', {
-                code: 'VALIDATION_ERROR',
+                code: US_ERRORS.VALIDATION_ERROR,
                 details: {validationErrors},
             });
         }

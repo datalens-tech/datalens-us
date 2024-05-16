@@ -148,7 +148,7 @@ class Lock extends Model {
 
         if (!isValid) {
             throw new AppError('Validation error', {
-                code: 'VALIDATION_ERROR',
+                code: US_ERRORS.VALIDATION_ERROR,
                 details: {validationErrors},
             });
         }
@@ -203,7 +203,7 @@ class Lock extends Model {
 
         if (!isValid) {
             throw new AppError('Validation error', {
-                code: 'VALIDATION_ERROR',
+                code: US_ERRORS.VALIDATION_ERROR,
                 details: {validationErrors},
             });
         }
@@ -314,7 +314,7 @@ class Lock extends Model {
 
         if (!isValid) {
             throw new AppError('Validation error', {
-                code: 'VALIDATION_ERROR',
+                code: US_ERRORS.VALIDATION_ERROR,
                 details: {validationErrors},
             });
         }
@@ -401,7 +401,7 @@ class Lock extends Model {
 
         if (!isValid) {
             throw new AppError('Validation error', {
-                code: 'VALIDATION_ERROR',
+                code: US_ERRORS.VALIDATION_ERROR,
                 details: {validationErrors},
             });
         }

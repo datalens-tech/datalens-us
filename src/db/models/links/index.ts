@@ -3,6 +3,7 @@ import Utils from '../../../utils';
 import {AppError} from '@gravity-ui/nodekit';
 import * as MT from '../../../types/models';
 import {validateCreateLink} from './scheme';
+import {US_ERRORS} from '../../../const';
 
 interface Links extends MT.LinksColumns {}
 class Links extends Model {
@@ -22,7 +23,7 @@ class Links extends Model {
 
             if (!isValid) {
                 throw new AppError('Validation error', {
-                    code: 'VALIDATION_ERROR',
+                    code: US_ERRORS.VALIDATION_ERROR,
                     details: {validationErrors},
                 });
             }
