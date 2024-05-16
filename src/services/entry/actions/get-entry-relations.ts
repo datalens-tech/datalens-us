@@ -1,32 +1,32 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {EntryPermissions} from '../../new/entry/types';
-import Entry from '../../../db/models/entry';
-import {CTX, DlsActions} from '../../../types/models';
+import {Entry, EntryColumn} from '../../../db/models/new/entry';
+import {DlsActions} from '../../../types/models';
+import {ServiceArgs} from '../../new/types';
 import Utils, {logInfo} from '../../../utils';
 import {US_ERRORS} from '../../../const';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {getEntryPermissionsByWorkbook} from '../../new/workbook/utils';
-import {getRelatedEntries} from './get-related-entries';
-import {checkEntry} from './check-entry';
+import {getRelatedEntries, RelationDirection} from './get-related-entries';
 import {registry} from '../../../registry';
+import {getReplica} from '../../new/utils';
 
-export type GetEntryRelationsData = {
+export type GetEntryRelationsArgs = {
     entryId: string;
-    direction?: string;
-    includePermissionsInfo: boolean;
+    direction?: RelationDirection;
+    includePermissionsInfo?: boolean;
 };
 
-const validateParams = makeSchemaValidator({
+const validateArgs = makeSchemaValidator({
     type: 'object',
-    required: ['entryId', 'includePermissionsInfo'],
+    required: ['entryId'],
     properties: {
         entryId: {
             type: 'string',
         },
         direction: {
             type: 'string',
-            enum: ['parent', 'child'],
+            enum: [RelationDirection.Parent, RelationDirection.Child],
         },
         includePermissionsInfo: {
             type: 'boolean',
@@ -34,9 +34,15 @@ const validateParams = makeSchemaValidator({
     },
 });
 
-export async function getEntryRelations(ctx: CTX, params: GetEntryRelationsData) {
-    const {entryId, direction, includePermissionsInfo} = params;
+export async function getEntryRelations(
+    {ctx, trx, skipValidation = false}: ServiceArgs,
+    args: GetEntryRelationsArgs,
+) {
+    const {DLS} = registry.common.classes.get();
+
     const {tenantId, isPrivateRoute} = ctx.get('info');
+
+    const {entryId, direction = RelationDirection.Parent, includePermissionsInfo = false} = args;
 
     logInfo(ctx, 'GET_ENTRY_RELATIONS_REQUEST', {
         entryId: Utils.encodeId(entryId),
@@ -44,15 +50,15 @@ export async function getEntryRelations(ctx: CTX, params: GetEntryRelationsData)
         includePermissionsInfo,
     });
 
-    const {DLS} = registry.common.classes.get();
+    if (!skipValidation) {
+        validateArgs(args);
+    }
 
-    validateParams(params);
-
-    const validatedDirection = direction as Optional<'parent' | 'child'>;
-
-    const entry = await Entry.query(Entry.replica)
+    const entry = await Entry.query(getReplica(trx))
         .where({
-            entryId,
+            [EntryColumn.EntryId]: entryId,
+            [EntryColumn.IsDeleted]: false,
+            ...(isPrivateRoute ? {} : {[EntryColumn.TenantId]: tenantId}),
         })
         .first()
         .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
@@ -63,46 +69,70 @@ export async function getEntryRelations(ctx: CTX, params: GetEntryRelationsData)
         });
     }
 
-    if (!entry.workbookId && !isPrivateRoute) {
-        await checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
-    }
+    let relations = await getRelatedEntries(
+        {ctx, trx: getReplica(trx)},
+        {
+            entryIds: [entryId],
+            direction,
+        },
+    );
 
-    let relations = await getRelatedEntries(ctx, {
-        entryIds: [entryId],
-        direction: validatedDirection,
-    });
+    relations = relations.filter((item) => item.tenantId === entry.tenantId);
 
     if (entry.workbookId) {
         const workbook = await getWorkbook(
             {
                 ctx,
-                trx: Entry.replica,
+                trx: getReplica(trx),
             },
             {workbookId: entry.workbookId, includePermissionsInfo},
         );
 
-        relations = relations.filter(
-            (relationEntry) => relationEntry.workbookId === entry.workbookId,
-        );
+        relations = relations
+            .filter((item) => item.workbookId === entry.workbookId)
+            .map((item) => ({...item, isLocked: false}));
 
-        relations = relations.map((item) => {
-            let iamPermissions: Optional<EntryPermissions>;
-
-            if (includePermissionsInfo) {
-                iamPermissions = getEntryPermissionsByWorkbook({
-                    ctx,
-                    workbook,
-                    scope: entry.scope,
-                });
-            }
-
-            return {
-                ...item,
-                permissions: iamPermissions,
-            };
-        }) as Entry[];
+        if (includePermissionsInfo) {
+            relations = relations.map((item) => {
+                return {
+                    ...item,
+                    permissions: getEntryPermissionsByWorkbook({
+                        ctx,
+                        workbook,
+                        scope: item.scope,
+                    }),
+                };
+            });
+        }
     } else {
-        if (!isPrivateRoute && ctx.config.dlsEnabled) {
+        const skipDLS = isPrivateRoute || !ctx.config.dlsEnabled;
+
+        if (skipDLS) {
+            relations = relations.map((item) => {
+                return {
+                    ...item,
+                    isLocked: false,
+                    ...(includePermissionsInfo
+                        ? {
+                              permissions: {
+                                  execute: true,
+                                  read: true,
+                                  edit: true,
+                                  admin: true,
+                              },
+                          }
+                        : {}),
+                };
+            });
+        } else {
+            await DLS.checkPermission(
+                {ctx, trx: getReplica(trx)},
+                {
+                    entryId: entry.entryId,
+                    action: DlsActions.Read,
+                },
+            );
+
             relations = await DLS.checkBulkPermission(
                 {ctx},
                 {
@@ -112,23 +142,9 @@ export async function getEntryRelations(ctx: CTX, params: GetEntryRelationsData)
                 },
             );
         }
-
-        if (includePermissionsInfo && !ctx.config.dlsEnabled) {
-            relations = relations.map((item) => ({
-                ...item,
-                permissions: {
-                    execute: true,
-                    read: true,
-                    edit: true,
-                    admin: true,
-                },
-            })) as Entry[];
-        }
     }
 
-    ctx.log('GET_ENTRY_RELATIONS_SUCCESS');
+    ctx.log('GET_ENTRY_RELATIONS_SUCCESS', {count: relations.length});
 
-    return isPrivateRoute
-        ? relations.filter((item) => item.tenantId === entry.tenantId)
-        : relations.filter((item) => item.tenantId === tenantId);
+    return relations;
 }

@@ -3,6 +3,7 @@ import {RevisionModel} from '../revision';
 import {WorkbookModel} from '../workbook';
 import {Favorite} from '../favorite';
 import {EntryScope} from './types';
+import {EntryPermissions} from '../../../../services/new/entry/types';
 
 export const EntryColumn = {
     Scope: 'scope',
@@ -112,6 +113,9 @@ export class Entry extends Model {
     publishedRevision?: RevisionModel;
     workbook?: WorkbookModel;
     favorite?: Favorite;
+
+    permissions?: EntryPermissions;
+    isLocked?: boolean;
 
     get currentRevision() {
         return this.savedRevision ?? this.publishedRevision;
