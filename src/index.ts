@@ -16,7 +16,7 @@ import {
 import {AppEnv} from './const';
 import {registry} from './registry';
 import {getRoutes} from './routes';
-import authZitadel from './middlewares/auth-zitadel';
+import authZitadel from './components/middlewares/auth-zitadel';
 
 registerAppPlugins();
 

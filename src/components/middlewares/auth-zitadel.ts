@@ -1,8 +1,8 @@
 import {NextFunction, Request, Response} from '@gravity-ui/expresskit';
-import {introspect} from '../utils/zitadel';
+import {introspect} from '../../utils/zitadel';
 import {IncomingHttpHeaders} from 'http';
-import {DL_AUTH_HEADER_KEY, DL_SERVICE_USER_TOKEN} from '../const';
-import {ZitadelServiceUser} from '../types/zitadel';
+import {DL_AUTH_HEADER_KEY, DL_SERVICE_USER_TOKEN} from '../../const';
+import {ZitadelServiceUser} from '../../types/zitadel';
 
 export default async function (req: Request, res: Response, next: NextFunction) {
     const {ctx} = req;
@@ -23,6 +23,7 @@ export default async function (req: Request, res: Response, next: NextFunction) 
             r2.active &&
             (r2.name === ZitadelServiceUser.charts || r2.name === ZitadelServiceUser.bi)
         ) {
+            res.locals.serviceUser = r2.name;
             return next();
         }
     }

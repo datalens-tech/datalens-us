@@ -1,17 +1,12 @@
 import {AppContext} from '@gravity-ui/nodekit';
-import axios from 'axios';
 import {nodekit} from '../nodekit';
-import axiosRetry from 'axios-retry';
 import {Utils} from './utils';
+import {default as axiosInstance} from '../utils/axios';
 
 type IntrospectionResult = {
     active: boolean;
     name?: string;
 };
-
-axiosRetry(axios, {
-    retries: 3,
-});
 
 export const introspect = async (ctx: AppContext, token?: string): Promise<IntrospectionResult> => {
     ctx.log('Token introspection');
@@ -33,16 +28,20 @@ export const introspect = async (ctx: AppContext, token?: string): Promise<Intro
 
         const hrStart = process.hrtime();
 
-        const response = await axios.post(
-            `${nodekit.config.zitadelUri}/oauth/v2/introspect`,
-            new URLSearchParams({token}),
-            {
-                auth: {
-                    username: nodekit.config.clientId,
-                    password: nodekit.config.clientSecret,
-                },
+        const response = await axiosInstance({
+            method: 'post',
+            url: `${nodekit.config.zitadelUri}/oauth/v2/introspect`,
+            auth: {
+                username: nodekit.config.clientId,
+                password: nodekit.config.clientSecret,
             },
-        );
+            'axios-retry': {
+                retries: 3,
+            },
+            params: {
+                token,
+            },
+        });
 
         ctx.log(`Token introspected successfully within: ${Utils.getDuration(hrStart)} ms`);
 
