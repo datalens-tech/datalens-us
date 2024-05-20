@@ -125,14 +125,6 @@ export async function getEntryRelations(
                 };
             });
         } else {
-            await DLS.checkPermission(
-                {ctx, trx: getReplica(trx)},
-                {
-                    entryId: entry.entryId,
-                    action: DlsActions.Read,
-                },
-            );
-
             relations = await DLS.checkBulkPermission(
                 {ctx},
                 {
