@@ -1,19 +1,19 @@
 import {NextFunction, Request, Response} from '@gravity-ui/expresskit';
 import {introspect} from '../../utils/zitadel';
 import {IncomingHttpHeaders} from 'http';
-import {DL_AUTH_HEADER_KEY, DL_SERVICE_USER_TOKEN} from '../../const';
+import {DL_AUTH_HEADER_KEY, DL_SERVICE_USER_ACCESS_TOKEN} from '../../const';
 import {ZitadelServiceUser} from '../../types/zitadel';
 
 export default async function (req: Request, res: Response, next: NextFunction) {
     const {ctx} = req;
 
     const authToken = extractAuthTokenFromHeader(req.headers);
-    const serviceUserToken = req.headers[DL_SERVICE_USER_TOKEN] as Optional<string>;
+    const serviceUserAccessToken = req.headers[DL_SERVICE_USER_ACCESS_TOKEN] as Optional<string>;
 
-    if (authToken && serviceUserToken) {
+    if (authToken && serviceUserAccessToken) {
         const [r1, r2] = await Promise.all([
             introspect(ctx, authToken),
-            introspect(ctx, serviceUserToken),
+            introspect(ctx, serviceUserAccessToken),
         ]);
 
         ctx.log(`Tokens introspected successfully`);
