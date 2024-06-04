@@ -6,6 +6,7 @@ import {default as axiosInstance} from '../utils/axios';
 type IntrospectionResult = {
     active: boolean;
     name?: string;
+    userId?: string;
 };
 
 export const introspect = async (ctx: AppContext, token?: string): Promise<IntrospectionResult> => {
@@ -45,8 +46,8 @@ export const introspect = async (ctx: AppContext, token?: string): Promise<Intro
 
         ctx.log(`Token introspected successfully within: ${Utils.getDuration(hrStart)} ms`);
 
-        const {active, name} = response.data;
-        return {active: Boolean(active), name};
+        const {active, name, sub} = response.data;
+        return {active: Boolean(active), name, userId: sub};
     } catch (e) {
         ctx.logError('Failed to introspect token', e);
         return {active: false};
