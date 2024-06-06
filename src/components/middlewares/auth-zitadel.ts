@@ -21,11 +21,11 @@ export default async function (req: Request, res: Response, next: NextFunction) 
         if (
             r1.active &&
             r2.active &&
-            (r2.login === ZitadelServiceUser.charts || r2.login === ZitadelServiceUser.bi)
+            (r2.username === ZitadelServiceUser.charts || r2.username === ZitadelServiceUser.bi)
         ) {
             res.locals.userId = r1.userId;
-            res.locals.login = r1.login;
-            res.locals.serviceUser = r2.login;
+            res.locals.login = r1.username;
+            res.locals.serviceUser = r2.username;
             return next();
         }
     }

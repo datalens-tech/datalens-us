@@ -7,7 +7,7 @@ import axiosRetry from 'axios-retry';
 type IntrospectionResult = {
     active: boolean;
     userId?: string;
-    login?: string;
+    username?: string;
 };
 
 const axiosInstance = axios.create();
@@ -48,7 +48,7 @@ export const introspect = async (ctx: AppContext, token?: string): Promise<Intro
         ctx.log(`Token introspected successfully within: ${Utils.getDuration(hrStart)} ms`);
 
         const {active, username, sub} = response.data;
-        return {active: Boolean(active), userId: sub, login: username};
+        return {active: Boolean(active), userId: sub, username};
     } catch (e) {
         ctx.logError('Failed to introspect token', e);
         return {active: false};
