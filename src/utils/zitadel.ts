@@ -1,7 +1,8 @@
 import {AppContext} from '@gravity-ui/nodekit';
 import {nodekit} from '../nodekit';
 import {Utils} from './utils';
-import {default as axiosInstance} from '../utils/axios';
+import axios from 'axios';
+import axiosRetry from 'axios-retry';
 
 type IntrospectionResult = {
     active: boolean;
@@ -29,15 +30,15 @@ export const introspect = async (ctx: AppContext, token?: string): Promise<Intro
 
         const hrStart = process.hrtime();
 
+        const axiosInstance = axios.create();
+        axiosRetry(axiosInstance, {retries: 3});
+
         const response = await axiosInstance({
             method: 'post',
             url: `${nodekit.config.zitadelUri}/oauth/v2/introspect`,
             auth: {
                 username: nodekit.config.clientId,
                 password: nodekit.config.clientSecret,
-            },
-            'axios-retry': {
-                retries: 3,
             },
             params: {
                 token,
