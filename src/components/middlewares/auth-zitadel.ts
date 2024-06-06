@@ -24,6 +24,7 @@ export default async function (req: Request, res: Response, next: NextFunction) 
             (r2.name === ZitadelServiceUser.charts || r2.name === ZitadelServiceUser.bi)
         ) {
             res.locals.userId = r1.userId;
+            res.locals.login = r1.login;
             res.locals.serviceUser = r2.name;
             return next();
         }

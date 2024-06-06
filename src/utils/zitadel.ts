@@ -8,7 +8,11 @@ type IntrospectionResult = {
     active: boolean;
     name?: string;
     userId?: string;
+    login?: string;
 };
+
+const axiosInstance = axios.create();
+axiosRetry(axiosInstance, {retries: 3});
 
 export const introspect = async (ctx: AppContext, token?: string): Promise<IntrospectionResult> => {
     ctx.log('Token introspection');
@@ -30,9 +34,6 @@ export const introspect = async (ctx: AppContext, token?: string): Promise<Intro
 
         const hrStart = process.hrtime();
 
-        const axiosInstance = axios.create();
-        axiosRetry(axiosInstance, {retries: 3});
-
         const response = await axiosInstance({
             method: 'post',
             url: `${nodekit.config.zitadelUri}/oauth/v2/introspect`,
@@ -47,8 +48,8 @@ export const introspect = async (ctx: AppContext, token?: string): Promise<Intro
 
         ctx.log(`Token introspected successfully within: ${Utils.getDuration(hrStart)} ms`);
 
-        const {active, name, sub} = response.data;
-        return {active: Boolean(active), name, userId: sub};
+        const {active, name, email, sub} = response.data;
+        return {active: Boolean(active), name, userId: sub, login: email};
     } catch (e) {
         ctx.logError('Failed to introspect token', e);
         return {active: false};
