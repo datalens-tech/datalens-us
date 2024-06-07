@@ -1,5 +1,6 @@
 import {AppConfig} from '@gravity-ui/nodekit';
 import {Feature, FeaturesConfig} from '../../components/features/types';
+import {DL_SERVICE_USER_ACCESS_TOKEN} from '../../const';
 
 export const features: FeaturesConfig = {
     [Feature.ReadOnlyMode]: false,
@@ -12,5 +13,7 @@ export const features: FeaturesConfig = {
 };
 
 export default {
+    appSensitiveKeys: [DL_SERVICE_USER_ACCESS_TOKEN],
+    appSensitiveHeaders: [DL_SERVICE_USER_ACCESS_TOKEN],
     features,
 } as Partial<AppConfig>;
