@@ -400,6 +400,11 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
                 handler: collectionsController.delete,
                 write: true,
             }),
+            deleteCollections: makeRoute({
+                route: 'DELETE /v1/delete-collections',
+                handler: collectionsController.deleteList,
+                write: true,
+            }),
             moveCollection: makeRoute({
                 route: 'POST /v1/collections/:collectionId/move',
                 handler: collectionsController.move,

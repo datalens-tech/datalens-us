@@ -23,6 +23,7 @@ import {
     formatCollectionContent,
     formatCollectionWithOperation,
 } from '../services/new/collection/formatters';
+import {deleteCollectionsList} from '../services/new/collection/delete-collections-list';
 
 export default {
     create: async (req: Request, res: Response) => {
@@ -142,6 +143,23 @@ export default {
             {ctx: req.ctx},
             {
                 collectionId: params.collectionId,
+            },
+        );
+
+        const formattedResponse = formatCollectionModelsList(result);
+
+        const {code, response} = prepareResponse({data: formattedResponse});
+
+        res.status(code).send(response);
+    },
+
+    deleteList: async (req: Request, res: Response) => {
+        const {body} = req;
+
+        const result = await deleteCollectionsList(
+            {ctx: req.ctx},
+            {
+                collectionIds: body.collectionIds,
             },
         );
 
