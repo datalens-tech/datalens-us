@@ -1,6 +1,6 @@
 import {Request, Response} from '@gravity-ui/expresskit';
 import LockService from '../services/lock.service';
-import prepareResponse from '../components/response-presenter';
+import {prepareResponseAsync} from '../components/response-presenter';
 import * as ST from '../types/services.types';
 
 export default {
@@ -12,7 +12,7 @@ export default {
             ctx: req.ctx,
         });
 
-        const {code, response} = prepareResponse({data: result});
+        const {code, response} = await prepareResponseAsync({data: result});
 
         res.status(code).send(response);
     },
@@ -26,7 +26,7 @@ export default {
             ctx: req.ctx,
         });
 
-        const {code, response} = prepareResponse({data: result});
+        const {code, response} = await prepareResponseAsync({data: result});
 
         res.status(code).send(response);
     },
@@ -40,7 +40,7 @@ export default {
             ctx: req.ctx,
         });
 
-        const {code, response} = prepareResponse({data: result});
+        const {code, response} = await prepareResponseAsync({data: result});
 
         res.status(code).send(response);
     },
@@ -55,7 +55,7 @@ export default {
             ctx: req.ctx,
         });
 
-        const {code, response} = prepareResponse({data: result});
+        const {code, response} = await prepareResponseAsync({data: result});
 
         res.status(code).send(response);
     },

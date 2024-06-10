@@ -1,5 +1,5 @@
 import {Request, Response} from '@gravity-ui/expresskit';
-import prepareResponse from '../components/response-presenter';
+import {prepareResponseAsync} from '../components/response-presenter';
 import {
     deleteColorPalette,
     getColorPalettesList,
@@ -25,7 +25,7 @@ export default {
 
         const formattedResponse = formatColorPalette(result);
 
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
         res.status(code).send(response);
     },
@@ -48,7 +48,7 @@ export default {
 
         const formattedResponse = formatColorPalette(result);
 
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
         res.status(code).send(response);
     },
@@ -63,7 +63,7 @@ export default {
 
         const formattedResponse = formatColorPaletteList(result);
 
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
         res.status(code).send(response);
     },
@@ -78,7 +78,7 @@ export default {
 
         const formattedResponse = formatColorPaletteList(result);
 
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
         res.status(code).send(response);
     },

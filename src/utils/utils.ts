@@ -1,6 +1,8 @@
 const fs = require('fs');
 const PowerRadix = require('power-radix');
 
+import chunk from 'lodash/chunk';
+
 import {EntryScope, USAPIResponse} from '../types/models';
 
 import {ID_VARIABLES, CODING_BASE, TRUE_FLAGS, COPY_START, COPY_END} from '../const';
@@ -141,6 +143,33 @@ export class Utils {
         return rotatedArray;
     }
 
+    static async macrotasksMap<T, R extends (item: T) => unknown>(
+        arr: T[],
+        cb: R,
+        chunkSize = 1000,
+    ): Promise<ReturnType<R>[]> {
+        const chunks = chunk(arr, chunkSize);
+        const results: ReturnType<R>[] = [];
+        for (const chunkItem of chunks) {
+            const items = (await new Promise((resolve, reject) => {
+                function done() {
+                    try {
+                        resolve(chunkItem.map(cb));
+                    } catch (error) {
+                        reject(error);
+                    }
+                }
+                if (chunkItem === chunks[0]) {
+                    done();
+                } else {
+                    setImmediate(done);
+                }
+            })) as unknown as ReturnType<R>[];
+            results.push(...items);
+        }
+        return results;
+    }
+
     static encodeId(bigIntId: any) {
         let encodedId = '';
 
@@ -180,11 +209,23 @@ export class Utils {
         return decodedId;
     }
 
+    /** @deprecated use macrotasksEncodeMapIds */
     static encodeMapIds(object: {[key: string]: any}) {
         return Object.keys(object).reduce(function (result, bigInt) {
             const encodedId = Utils.encodeId(bigInt);
 
             return {...result, [encodedId]: object[bigInt]};
+        }, {});
+    }
+
+    static async macrotasksEncodeMapIds(object: Record<string, unknown>) {
+        const ids = await Utils.macrotasksMap(Object.keys(object), (bigInt: string) => ({
+            bigInt,
+            encodedId: Utils.encodeId(bigInt),
+        }));
+        return ids.reduce<Record<string, unknown>>((result, id) => {
+            result[id.encodedId] = object[id.bigInt];
+            return result;
         }, {});
     }
 
@@ -199,11 +240,26 @@ export class Utils {
         return object;
     }
 
+    /** @deprecated use macrotasksEncodeData */
     static encodeData(data: any) {
         let dataFormed;
 
         if (Array.isArray(data)) {
             dataFormed = data.map(Utils.encodeIds);
+        } else if (data !== null && typeof data === 'object') {
+            dataFormed = Utils.encodeIds(data);
+        } else {
+            dataFormed = data;
+        }
+
+        return dataFormed;
+    }
+
+    static async macrotasksEncodeData(data: any) {
+        let dataFormed;
+
+        if (Array.isArray(data)) {
+            dataFormed = await Utils.macrotasksMap(data, Utils.encodeIds);
         } else if (data !== null && typeof data === 'object') {
             dataFormed = Utils.encodeIds(data);
         } else {
