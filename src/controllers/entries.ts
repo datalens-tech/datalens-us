@@ -1,6 +1,6 @@
 import EntryService from '../services/entry.service';
 import {Request, Response} from '@gravity-ui/expresskit';
-import prepareResponse from '../components/response-presenter';
+import {prepareResponseAsync} from '../components/response-presenter';
 import Utils from '../utils';
 import {US_MASTER_TOKEN_HEADER} from '../const';
 import NavigationService from '../services/navigation.service';
@@ -48,7 +48,7 @@ export default {
         );
         const formattedResponse = formatGetEntryResponse(req.ctx, result);
 
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
         res.status(code).send(response);
     },
@@ -65,7 +65,7 @@ export default {
         );
         const formattedResponse = formatGetEntryMetaResponse(result);
 
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
         res.status(code).send(response);
     },
@@ -86,7 +86,7 @@ export default {
         );
         const formattedResponse = formatGetEntryMetaPrivateResponse(result);
 
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
         res.status(code).send(response);
     },
@@ -106,7 +106,7 @@ export default {
             },
         );
 
-        const {code, response} = prepareResponse({data: result});
+        const {code, response} = await prepareResponseAsync({data: result});
 
         res.status(code).send(response);
     },
@@ -134,7 +134,7 @@ export default {
             ctx: req.ctx,
         });
 
-        const {code, response} = prepareResponse({data: result});
+        const {code, response} = await prepareResponseAsync({data: result});
 
         res.status(code).send(response);
     },
@@ -161,7 +161,7 @@ export default {
             ctx: req.ctx,
         });
 
-        const {code, response} = prepareResponse({data: result});
+        const {code, response} = await prepareResponseAsync({data: result});
 
         res.status(code).send(response);
     },
@@ -184,7 +184,7 @@ export default {
             skipSyncLinks: body.skipSyncLinks,
         });
 
-        const {code, response} = prepareResponse({data: result});
+        const {code, response} = await prepareResponseAsync({data: result});
 
         res.status(code).send(response);
     },
@@ -200,7 +200,7 @@ export default {
             },
         );
 
-        const {code, response} = prepareResponse({data: result});
+        const {code, response} = await prepareResponseAsync({data: result});
 
         res.status(code).send(response);
     },
@@ -213,7 +213,7 @@ export default {
             name: body.name,
         });
 
-        const {code, response} = prepareResponse({data: result});
+        const {code, response} = await prepareResponseAsync({data: result});
 
         res.status(code).send(response);
     },
@@ -227,7 +227,7 @@ export default {
             },
         );
 
-        const {code, response} = prepareResponse({data: result});
+        const {code, response} = await prepareResponseAsync({data: result});
         res.status(code).send(response);
     },
 
@@ -243,7 +243,7 @@ export default {
             },
         );
 
-        const {code, response} = prepareResponse({data: result});
+        const {code, response} = await prepareResponseAsync({data: result});
 
         res.status(code).send(response);
     },
@@ -262,7 +262,7 @@ export default {
 
         const formattedResponse = formatEntryModel(result);
 
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
         res.status(code).send(response);
     },
 
@@ -277,7 +277,7 @@ export default {
             },
         );
 
-        const {code, response} = prepareResponse({data: result});
+        const {code, response} = await prepareResponseAsync({data: result});
         res.status(code).send(response);
     },
 
@@ -302,7 +302,7 @@ export default {
             ctx: req.ctx,
         });
 
-        const {code, response} = prepareResponse({data: result});
+        const {code, response} = await prepareResponseAsync({data: result});
 
         res.status(code).send(response);
     },

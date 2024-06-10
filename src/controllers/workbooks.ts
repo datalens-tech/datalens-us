@@ -1,5 +1,5 @@
 import {Request, Response} from '@gravity-ui/expresskit';
-import prepareResponse from '../components/response-presenter';
+import {prepareResponseAsync} from '../components/response-presenter';
 import Utils from '../utils';
 import {
     createWorkbook,
@@ -46,7 +46,7 @@ export default {
         );
 
         const formattedResponse = formatWorkbookWithOperation(result.workbook, result.operation);
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
         res.status(code).send(response);
     },
 
@@ -64,7 +64,7 @@ export default {
         );
 
         const formattedResponse = formatWorkbook(result);
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
         res.status(code).send(response);
     },
 
@@ -86,7 +86,7 @@ export default {
         );
 
         const formattedResponse = formatGetWorkbookContent(result);
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
         res.status(code).send(response);
     },
 
@@ -108,7 +108,7 @@ export default {
         );
 
         const formattedResponse = formatWorkbooksList(result);
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
         res.status(code).send(response);
     },
 
@@ -127,7 +127,7 @@ export default {
         );
 
         const formattedResponse = formatWorkbookModel(result);
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
         res.status(code).send(response);
     },
 
@@ -146,7 +146,7 @@ export default {
         );
 
         const formattedResponse = formatWorkbookModel(result);
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
         res.status(code).send(response);
     },
 
@@ -163,7 +163,7 @@ export default {
 
         const formattedResponse = formatWorkbookModelsList(result);
 
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
         res.status(code).send(response);
     },
@@ -180,7 +180,7 @@ export default {
             },
         );
 
-        const {code, response} = prepareResponse({data: {status: 'ok'}});
+        const {code, response} = await prepareResponseAsync({data: {status: 'ok'}});
 
         res.status(code).send(response);
     },
@@ -204,7 +204,7 @@ export default {
             result.workbook,
             result.operation,
         );
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
         res.status(code).send(response);
     },
 
@@ -222,7 +222,7 @@ export default {
         );
 
         const formattedResponse = formatSetWorkbookIsTemplate(result);
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
         res.status(code).send(response);
     },
 
@@ -245,7 +245,7 @@ export default {
             result.workbook,
             result.operation,
         );
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
         res.status(code).send(response);
     },
 
@@ -261,7 +261,7 @@ export default {
         );
 
         const formattedResponse = formatWorkbookModelsList(result);
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
         res.status(code).send(response);
     },
 
@@ -278,7 +278,7 @@ export default {
         );
 
         const formattedResponse = formatRestoreWorkbook(result);
-        const {code, response} = prepareResponse({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
         res.status(code).send(response);
     },
 };

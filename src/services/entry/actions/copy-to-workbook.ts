@@ -70,7 +70,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
     } = params;
 
     logInfo(ctx, 'COPY_ENTRY_TO_WORKBOOK_CALL', {
-        entryIds: entryIds.map((entryId) => Utils.encodeId(entryId)),
+        entryIds: await Utils.macrotasksMap(entryIds, (entryId) => Utils.encodeId(entryId)),
         destinationWorkbookId: Utils.encodeId(destinationWorkbookId),
         tenantIdOverride,
     });

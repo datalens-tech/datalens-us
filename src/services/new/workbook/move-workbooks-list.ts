@@ -45,10 +45,12 @@ export const moveWorkbooksList = async (
         collectionId: Utils.encodeId(collectionId),
     });
 
+    const ids = await Utils.macrotasksMap(workbookIds, (id) => Utils.decodeId(id));
+
     const result = await transaction(targetTrx, async (transactionTrx) => {
         return await Promise.all(
-            workbookIds.map(
-                async (id: string) =>
+            ids.map(
+                async (workbookId: string) =>
                     await moveWorkbook(
                         {
                             ctx,
@@ -57,7 +59,7 @@ export const moveWorkbooksList = async (
                             skipCheckPermissions,
                         },
                         {
-                            workbookId: Utils.decodeId(id),
+                            workbookId,
                             collectionId,
                         },
                     ),
@@ -66,7 +68,9 @@ export const moveWorkbooksList = async (
     });
 
     ctx.log('MOVE_LIST_WORKBOOKS_END', {
-        workbookIds: result.map((workbook) => Utils.encodeId(workbook.workbookId)),
+        workbookIds: await Utils.macrotasksMap(result, (workbook) =>
+            Utils.encodeId(workbook.workbookId),
+        ),
         collectionId: Utils.encodeId(collectionId),
     });
 

@@ -8,7 +8,10 @@ export {
 
 export {OrganizationPermission, ProjectPermission} from '../src/components/iam';
 
-export {default as prepareResponse} from '../src/components/response-presenter';
+export {
+    default as prepareResponse,
+    prepareResponseAsync,
+} from '../src/components/response-presenter';
 export {default as prepareErrorResponse} from '../src/components/error-response-presenter';
 
 export {isEnabledFeature, Feature} from '../src/components/features';
