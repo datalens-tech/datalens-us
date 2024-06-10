@@ -152,13 +152,18 @@ export class Utils {
         const results: ReturnType<R>[] = [];
         for (const chunkItem of chunks) {
             const items = (await new Promise((resolve, reject) => {
-                setImmediate(() => {
+                function done() {
                     try {
                         resolve(chunkItem.map(cb));
                     } catch (error) {
                         reject(error);
                     }
-                });
+                }
+                if (chunkItem === chunks[0]) {
+                    done();
+                } else {
+                    setImmediate(done);
+                }
             })) as unknown as ReturnType<R>[];
             results.push(...items);
         }
