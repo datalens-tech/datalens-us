@@ -14,10 +14,10 @@ declare module '@gravity-ui/nodekit' {
 
         masterToken: string[];
 
-        zitadelEnabled: boolean;
-        zitadelUri: string;
-        clientId: string;
-        clientSecret: string;
+        zitadelEnabled?: boolean;
+        zitadelUri?: string;
+        clientId?: string;
+        clientSecret?: string;
     }
 
     interface AppDynamicConfig {
