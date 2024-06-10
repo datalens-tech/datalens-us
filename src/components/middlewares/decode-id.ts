@@ -3,7 +3,7 @@ import {Request, Response, NextFunction} from '@gravity-ui/expresskit';
 import {AppError} from '@gravity-ui/nodekit';
 import US_ERRORS from '../../const/us-error-constants';
 
-export const decodeId = (req: Request, _res: Response, next: NextFunction) => {
+export const decodeId = async (req: Request, _res: Response, next: NextFunction) => {
     try {
         for (const idVariable of Utils.idVariables) {
             if (req.params && req.params[idVariable]) {
@@ -15,7 +15,9 @@ export const decodeId = (req: Request, _res: Response, next: NextFunction) => {
                 const entity = req.query[idVariable] as string | string[];
 
                 if (Array.isArray(entity)) {
-                    req.query[idVariable] = entity.map((encodedId) => Utils.decodeId(encodedId));
+                    req.query[idVariable] = await Utils.macrotasksMap(entity, (encodedId) =>
+                        Utils.decodeId(encodedId),
+                    );
                 } else {
                     const encodedId = entity;
                     req.query[idVariable] = Utils.decodeId(encodedId);
@@ -26,7 +28,9 @@ export const decodeId = (req: Request, _res: Response, next: NextFunction) => {
                 const entity = req.body[idVariable] as string | string[];
 
                 if (Array.isArray(entity)) {
-                    req.body[idVariable] = entity.map((encodedId) => Utils.decodeId(encodedId));
+                    req.body[idVariable] = await Utils.macrotasksMap(entity, (encodedId) =>
+                        Utils.decodeId(encodedId),
+                    );
                 } else {
                     const encodedId = req.body[idVariable];
                     req.body[idVariable] = Utils.decodeId(encodedId);

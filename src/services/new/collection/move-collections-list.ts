@@ -45,10 +45,12 @@ export const moveCollectionsList = async (
         parentId: Utils.encodeId(parentId),
     });
 
+    const ids = await Utils.macrotasksMap(collectionIds, (id) => Utils.decodeId(id));
+
     const result = await transaction(targetTrx, async (transactionTrx) => {
         return await Promise.all(
-            collectionIds.map(
-                async (id: string) =>
+            ids.map(
+                async (collectionId: string) =>
                     await moveCollection(
                         {
                             ctx,
@@ -57,7 +59,7 @@ export const moveCollectionsList = async (
                             skipCheckPermissions,
                         },
                         {
-                            collectionId: Utils.decodeId(id),
+                            collectionId,
                             parentId,
                         },
                     ),
@@ -66,7 +68,9 @@ export const moveCollectionsList = async (
     });
 
     ctx.log('MOVE_LIST_COLLECTIONS_END', {
-        collectionIds: result.map((collection) => Utils.encodeId(collection.collectionId)),
+        collectionIds: await Utils.macrotasksMap(result, (collection) =>
+            Utils.encodeId(collection.collectionId),
+        ),
         parentId: Utils.encodeId(parentId),
     });
 

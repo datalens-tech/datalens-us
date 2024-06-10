@@ -57,7 +57,7 @@ export const getWorkbooksListByIds = async (
     const {workbookIds, includePermissionsInfo = false} = args;
 
     logInfo(ctx, 'GET_WORKBOOKS_LIST_BY_IDS_STARTED', {
-        workbookIds: workbookIds.map((id) => Utils.encodeId(id)),
+        workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.encodeId(id)),
         includePermissionsInfo,
     });
 
@@ -168,7 +168,9 @@ export const getWorkbooksListByIds = async (
     const result = workbooks.filter((item) => Boolean(item)) as WorkbookInstance[];
 
     logInfo(ctx, 'GET_WORKBOOKS_LIST_BY_IDS_FINISHED', {
-        workbookIds: workbookList.map((workbook) => Utils.encodeId(workbook.workbookId)),
+        workbookIds: await Utils.macrotasksMap(workbookList, (workbook) =>
+            Utils.encodeId(workbook.workbookId),
+        ),
     });
 
     return result;

@@ -45,7 +45,7 @@ export const copyEntriesToWorkbook = async (
     const updatedBy = makeUserId(user.userId);
 
     logInfo(ctx, 'COPY_ENTRIES_TO_WORKBOOK_START', {
-        entryIds: entryIds.map((entryId) => Utils.encodeId(entryId)),
+        entryIds: await Utils.macrotasksMap(entryIds, (entryId) => Utils.encodeId(entryId)),
         workbookId: Utils.encodeId(targetWorkbookId),
         copiedBy: updatedBy,
     });

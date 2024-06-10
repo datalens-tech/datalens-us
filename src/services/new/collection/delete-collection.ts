@@ -153,7 +153,9 @@ export const deleteCollection = async (
     });
 
     logInfo(ctx, 'DELETE_COLLECTION_FINISH', {
-        deletedCollections: result.map((item) => Utils.encodeId(item.collectionId)),
+        deletedCollections: await Utils.macrotasksMap(result, (item) =>
+            Utils.encodeId(item.collectionId),
+        ),
     });
 
     // TODO: Return deleted workbooks and entries
