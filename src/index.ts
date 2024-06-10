@@ -16,6 +16,7 @@ import {
 import {AppEnv} from './const';
 import {registry} from './registry';
 import {getRoutes} from './routes';
+import authZitadel from './components/middlewares/auth-zitadel';
 
 registerAppPlugins();
 
@@ -44,6 +45,10 @@ afterAuth.push(
     ctx,
     checkReadOnlyMode,
 );
+
+if (nodekit.config.zitadelEnabled) {
+    nodekit.config.appAuthHandler = authZitadel;
+}
 
 nodekit.config.appFinalErrorHandler = finalRequestHandler;
 

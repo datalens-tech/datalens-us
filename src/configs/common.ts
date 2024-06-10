@@ -7,6 +7,7 @@ export default {
     appName: 'united-storage',
 
     appSocket: 'dist/run/server.sock',
+
     expressTrustProxyNumber: 3,
     expressBodyParserJSONConfig: {
         limit: '50mb',
@@ -16,9 +17,17 @@ export default {
         extended: false,
     },
 
-    appAuthPolicy: AuthPolicy.disabled,
+    appAuthPolicy: Utils.isTrueArg(Utils.getEnvVariable('ZITADEL'))
+        ? AuthPolicy.required
+        : AuthPolicy.disabled,
 
     appSensitiveKeys: [US_MASTER_TOKEN_HEADER],
+
+    zitadelEnabled: Utils.isTrueArg(Utils.getEnvVariable('ZITADEL')),
+    zitadelUri: Utils.getEnvVariable('ZITADEL_URI') || 'http://localhost:8080',
+
+    clientId: Utils.getEnvVariable('CLIENT_ID') || '',
+    clientSecret: Utils.getEnvVariable('CLIENT_SECRET') || '',
 
     multitenant: false,
     tenantIdOverride: 'common',

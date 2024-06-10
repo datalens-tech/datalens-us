@@ -272,6 +272,11 @@ export class Utils {
         }
     }
 
+    static getDuration(hrStart: [number, number]) {
+        const hrDuration = process.hrtime(hrStart);
+        return (hrDuration[0] * 1e9 + hrDuration[1]) / 1e6;
+    }
+
     static extractResponseBody(response: USAPIResponse) {
         return response && response.body;
     }
