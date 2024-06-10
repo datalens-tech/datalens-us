@@ -204,6 +204,7 @@ export class Utils {
         return decodedId;
     }
 
+    /** @deprecated use macrotasksEncodeMapIds */
     static encodeMapIds(object: {[key: string]: any}) {
         return Object.keys(object).reduce(function (result, bigInt) {
             const encodedId = Utils.encodeId(bigInt);
@@ -234,6 +235,7 @@ export class Utils {
         return object;
     }
 
+    /** @deprecated use macrotasksEncodeData */
     static encodeData(data: any) {
         let dataFormed;
 
