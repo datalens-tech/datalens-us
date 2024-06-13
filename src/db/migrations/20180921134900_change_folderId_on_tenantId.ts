@@ -6,4 +6,5 @@ exports.up = (knex: any) =>
     ALTER INDEX folder_id_key_idx RENAME TO tenant_id_key_idx;
 `);
 
-exports.down = (knex: any) => knex.raw('');
+// Stub for correct rollback
+exports.down = (knex: any) => knex.raw('SELECT 1 + 1;');

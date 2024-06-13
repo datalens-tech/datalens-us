@@ -7,4 +7,5 @@ exports.up = (knex: any) =>
     UPDATE entries SET folder_id = 'common';
 `);
 
-exports.down = (knex: any) => knex.raw('');
+// Stub for correct rollback
+exports.down = (knex: any) => knex.raw('SELECT 1 + 1;');

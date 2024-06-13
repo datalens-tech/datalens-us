@@ -69,14 +69,7 @@ export const getKnexOptions = () => ({
 export function initDB(nodekit: NodeKit) {
     let dsnList: string;
     if (nodekit.config.appEnv === AppEnv.IntTesting) {
-        const globals = global as unknown as {
-            __TESTCONTAINERS_POSTGRE_IP__: string;
-            __TESTCONTAINERS_POSTGRE_PORT_5432__: string;
-        };
-        dsnList = getTestDsnList({
-            host: globals.__TESTCONTAINERS_POSTGRE_IP__,
-            port: globals.__TESTCONTAINERS_POSTGRE_PORT_5432__,
-        });
+        dsnList = getTestDsnList();
     } else {
         dsnList = Utils.getDsnList();
     }

@@ -5,4 +5,5 @@ exports.up = (knex: any) =>
     ALTER TABLE entries ADD COLUMN hidden BOOLEAN DEFAULT false;
 `);
 
-exports.down = (knex: any) => knex.raw('');
+// Stub for correct rollback
+exports.down = (knex: any) => knex.raw('SELECT 1 + 1;');

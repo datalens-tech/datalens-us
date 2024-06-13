@@ -5,7 +5,8 @@ exports.up = (knex: any) =>
     ALTER TYPE scope ADD VALUE 'config';
 `);
 
-exports.down = (knex: any) => knex.raw('');
+// Stub for correct rollback
+exports.down = (knex: any) => knex.raw('SELECT 1 + 1;');
 
 exports.config = {
     transaction: false,

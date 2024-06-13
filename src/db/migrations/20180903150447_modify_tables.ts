@@ -21,4 +21,5 @@ exports.up = (knex: any) =>
     ALTER TABLE entries DROP CONSTRAINT IF EXISTS entries_key_key;
 `);
 
-exports.down = (knex: any) => knex.raw('');
+// Stub for correct rollback
+exports.down = (knex: any) => knex.raw('SELECT 1 + 1;');
