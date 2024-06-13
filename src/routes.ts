@@ -398,6 +398,7 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
             deleteCollection: makeRoute({
                 route: 'DELETE /v1/collections/:collectionId',
                 handler: collectionsController.delete,
+                authPolicy: AuthPolicy.disabled,
                 write: true,
             }),
             deleteCollections: makeRoute({

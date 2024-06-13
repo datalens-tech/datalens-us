@@ -9,7 +9,6 @@ import {
     updateWorkbook,
     moveWorkbook,
     moveWorkbooksList,
-    deleteWorkbook,
     setWorkbookIsTemplate,
     copyWorkbook,
     copyWorkbookTemplate,
@@ -17,6 +16,7 @@ import {
     OrderField,
     OrderDirection,
     restoreWorkbook,
+    deleteWorkbooks,
 } from '../services/new/workbook';
 import {
     formatWorkbookModel,
@@ -171,12 +171,12 @@ export default {
     delete: async (req: Request, res: Response) => {
         const {params} = req;
 
-        await deleteWorkbook(
+        await deleteWorkbooks(
             {
                 ctx: req.ctx,
             },
             {
-                workbookId: params.workbookId,
+                workbookIds: [params.workbookId],
             },
         );
 
