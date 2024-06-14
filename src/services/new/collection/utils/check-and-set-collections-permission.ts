@@ -65,6 +65,8 @@ export const checkAndSetCollectionPermission = async (
             permission: localPermission,
         });
 
+        console.log('includePermissionsInfoasd: ', includePermissionsInfo);
+
         if (includePermissionsInfo) {
             await collectionInstance.fetchAllPermissions({parentIds});
         }

@@ -74,7 +74,7 @@ export const getCollectionsListByIds = async (
 
         const collection = await checkAndSetCollectionPermission(
             {ctx, trx},
-            {collectionInstance, skipCheckPermissions, permission},
+            {collectionInstance, skipCheckPermissions, includePermissionsInfo, permission},
         );
 
         return collection;

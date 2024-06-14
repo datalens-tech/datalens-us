@@ -82,7 +82,7 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
 
     const collection = await checkAndSetCollectionPermission(
         {ctx, trx},
-        {collectionInstance, skipCheckPermissions, permission},
+        {collectionInstance, skipCheckPermissions, includePermissionsInfo, permission},
     );
 
     logInfo(ctx, 'GET_COLLECTION_FINISH', {
