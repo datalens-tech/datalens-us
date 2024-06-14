@@ -1,5 +1,5 @@
 import request from 'supertest';
-import {testUserId, testTenantId, testProjectId} from '../constants';
+import {systemId, testTenantId, testProjectId} from '../constants';
 import {US_MASTER_TOKEN_HEADER} from '../../../const';
 
 import {auth} from '../utils';
@@ -31,9 +31,9 @@ describe('Private Collections managment', () => {
         expect(body1).toStrictEqual({
             collectionId: expect.any(String),
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: collectionsData.description,
             meta: {},
             projectId: testProjectId,
@@ -55,9 +55,9 @@ describe('Private Collections managment', () => {
         expect(body2).toStrictEqual({
             collectionId: expect.any(String),
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: collectionsData.description,
             meta: {},
             projectId: testProjectId,

@@ -1,5 +1,5 @@
 import request from 'supertest';
-import {testUserId, testTenantId, testProjectId} from '../constants';
+import {systemId, testTenantId, testProjectId} from '../constants';
 import {US_MASTER_TOKEN_HEADER} from '../../../const';
 import usApp from '../../..';
 import {auth} from '../utils';
@@ -43,9 +43,9 @@ describe('Workbooks managment', () => {
         expect(body1).toStrictEqual({
             collectionId: null,
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: workbooksData[0].description,
             meta: {},
             projectId: testProjectId,
@@ -68,9 +68,9 @@ describe('Workbooks managment', () => {
         expect(body2).toStrictEqual({
             collectionId: null,
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: workbooksData[1].description,
             meta: {},
             projectId: testProjectId,
@@ -91,9 +91,9 @@ describe('Workbooks managment', () => {
 
         expect(body).toStrictEqual({
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: workbooksData[0].description,
             meta: {},
             projectId: testProjectId,
@@ -113,9 +113,9 @@ describe('Workbooks managment', () => {
             workbooks: expect.arrayContaining([
                 {
                     createdAt: expect.any(String),
-                    createdBy: testUserId,
+                    createdBy: systemId,
                     updatedAt: expect.any(String),
-                    updatedBy: testUserId,
+                    updatedBy: systemId,
                     description: workbooksData[1].description,
                     meta: {},
                     projectId: testProjectId,
@@ -126,9 +126,9 @@ describe('Workbooks managment', () => {
                 },
                 {
                     createdAt: expect.any(String),
-                    createdBy: testUserId,
+                    createdBy: systemId,
                     updatedAt: expect.any(String),
-                    updatedBy: testUserId,
+                    updatedBy: systemId,
                     description: workbooksData[0].description,
                     meta: {},
                     projectId: testProjectId,
@@ -156,9 +156,9 @@ describe('Workbooks managment', () => {
             workbooks: expect.arrayContaining([
                 {
                     createdAt: expect.any(String),
-                    createdBy: testUserId,
+                    createdBy: systemId,
                     updatedAt: expect.any(String),
-                    updatedBy: testUserId,
+                    updatedBy: systemId,
                     description: workbooksData[0].description,
                     meta: {},
                     projectId: testProjectId,
@@ -185,9 +185,9 @@ describe('Workbooks managment', () => {
             workbooks: expect.arrayContaining([
                 {
                     createdAt: expect.any(String),
-                    createdBy: testUserId,
+                    createdBy: systemId,
                     updatedAt: expect.any(String),
-                    updatedBy: testUserId,
+                    updatedBy: systemId,
                     description: workbooksData[1].description,
                     meta: {},
                     projectId: testProjectId,
@@ -217,9 +217,9 @@ describe('Workbooks managment', () => {
 
         expect(body).toStrictEqual({
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: workbooksData[0].description,
             meta: {},
             projectId: testProjectId,
@@ -266,9 +266,9 @@ describe('Entries in workboooks managment', () => {
 
         expect(bodyWorkbook).toStrictEqual({
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: testDescription,
             meta: {},
             projectId: testProjectId,
@@ -416,9 +416,9 @@ describe('Entries in workboooks managment', () => {
         expect(body).toStrictEqual({
             collectionId: null,
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: testDescription,
             meta: {},
             projectId: testProjectId,
@@ -504,9 +504,9 @@ describe('Workbook template', () => {
         expect(body).toStrictEqual({
             collectionId: null,
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: testTemplateWorkbookData.description,
             meta: {},
             projectId: testProjectId,

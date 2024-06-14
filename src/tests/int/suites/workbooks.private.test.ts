@@ -1,5 +1,5 @@
 import request from 'supertest';
-import {testUserId, testTenantId, testProjectId} from '../constants';
+import {systemId, testTenantId, testProjectId} from '../constants';
 import {US_MASTER_TOKEN_HEADER} from '../../../const';
 import usApp from '../../..';
 import {auth} from '../utils';
@@ -32,9 +32,9 @@ describe('Private Workbooks managment', () => {
         expect(body1).toStrictEqual({
             collectionId: null,
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: workbooksData.description,
             meta: {},
             projectId: testProjectId,
@@ -56,9 +56,9 @@ describe('Private Workbooks managment', () => {
         expect(body2).toStrictEqual({
             collectionId: null,
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: workbooksData.description,
             meta: {},
             projectId: testProjectId,
@@ -142,8 +142,8 @@ describe('Private Entries in workboooks managment', () => {
 
 describe('Private for one workboook managment', () => {
     test('Create workbook with entries – [POST /private/v2/workbooks]', async () => {
-        const testTitle = 'Test private workbook with entries title';
-        const testDescription = 'Test private workbook with entries description';
+        const testTitle = 'Test private workbook with entries title 2';
+        const testDescription = 'Test private workbook with entries description 2';
 
         const entry1Name = 'Entry in test workbook 1';
 

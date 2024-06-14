@@ -1,7 +1,7 @@
+export const systemId = 'systemId';
 export const systemLogin = 'system';
 
-export const testUserId = 'test-user-id';
-export const testUserLogin = 'test-user-login';
+export const testUserLogin = 'unknown';
 
-export const testTenantId = 'org_test-tenant-id';
+export const testTenantId = 'common';
 export const testProjectId = null;

@@ -41,10 +41,6 @@ export const getKnexOptions = () => ({
         extension: 'js',
         loadExtensions: ['.js'],
     },
-    seeds: {
-        directory: path.resolve(__dirname, 'seeds'),
-        loadExtensions: ['.js'],
-    },
     postProcessResponse: (result: any): any => {
         let dataFormed;
 

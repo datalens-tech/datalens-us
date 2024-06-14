@@ -4,7 +4,7 @@ const DSNParser = require('dsn-parser');
 const knexBuilder = require('knex');
 const _ = require('lodash');
 
-const {getKnexOptions: getKnexUsOptions} = require('../../dist/server/platform/api/init-db');
+const {getKnexOptions: getKnexUsOptions} = require('../../dist/server/db/init-db');
 const {getTestDsnList} = require('../../dist/server/tests/int/db');
 
 const prepareTestUsDb = async ({dsnList}) => {
@@ -26,7 +26,7 @@ const prepareTestUsDb = async ({dsnList}) => {
 
     await knexInstance.migrate.rollback(undefined, true);
     await knexInstance.migrate.latest();
-    await knexInstance.seed.run();
+    // await knexInstance.seed.run();
     await knexInstance.destroy();
 };
 
