@@ -1,6 +1,6 @@
 import request from 'supertest';
 import usApp from '../../..';
-import {withScopeHeaders} from '../utils';
+import {auth} from '../utils';
 
 const app = usApp.express;
 
@@ -15,7 +15,7 @@ let stateHash: string;
 
 describe('States', () => {
     test('Create entry – [POST /v1/entries]', async () => {
-        const response = await withScopeHeaders(request(app).post('/v1/entries'))
+        const response = await auth(request(app).post('/v1/entries'))
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -63,7 +63,7 @@ describe('States', () => {
     });
 
     test('Delete entry – [DELETE /v1/entries/:entryId]', async () => {
-        await withScopeHeaders(request(app).delete(`/v1/entries/${testEntryId}`))
+        await auth(request(app).delete(`/v1/entries/${testEntryId}`))
             .send({})
             .expect(200);
     });

@@ -2,7 +2,7 @@ import request from 'supertest';
 import {testTenantId} from '../../constants';
 import usApp from '../../../..';
 import {US_MASTER_TOKEN_HEADER} from '../../../../const';
-import {withScopeHeaders} from '../../utils';
+import {auth} from '../../utils';
 
 const app = usApp.express;
 const masterToken = usApp.config.masterToken[0];
@@ -13,7 +13,7 @@ let testEntryId: string;
 
 describe('Get entry by private route', () => {
     test('Create entry – [POST /v1/entries]', async () => {
-        const response = await withScopeHeaders(request(app).post('/v1/entries'))
+        const response = await auth(request(app).post('/v1/entries'))
             .send({
                 scope: 'dataset',
                 type: 'graph',

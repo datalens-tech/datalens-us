@@ -4,10 +4,15 @@
 require('events').EventEmitter.defaultMaxListeners = 1000;
 
 require('../../dist/server');
+
 const {db} = require('../../dist/server/db');
+
+const {prepareTestDb} = require('./prepare-test-db');
 
 global.beforeAll(async () => {
     await db.ready();
+
+    await prepareTestDb();
 });
 
 global.afterAll(async () => {

@@ -2,7 +2,7 @@ import request from 'supertest';
 import {testUserId, testTenantId, testProjectId} from '../constants';
 import {US_MASTER_TOKEN_HEADER} from '../../../const';
 
-import {withScopeHeaders} from '../utils';
+import {auth} from '../utils';
 
 import usApp from '../../..';
 
@@ -18,7 +18,7 @@ describe('Private Collections managment', () => {
     test('Create collection – [POST /private/v1/collections]', async () => {
         await request(app).post('/private/v1/collections').expect(403);
 
-        const response1 = await withScopeHeaders(request(app).post('/private/v1/collections'))
+        const response1 = await auth(request(app).post('/private/v1/collections'))
             .set({[US_MASTER_TOKEN_HEADER]: masterToken})
             .send({
                 parentId: null,
@@ -44,7 +44,7 @@ describe('Private Collections managment', () => {
 
         await request(app).get(`/private/v1/collections/${body1.collectionId}`).expect(403);
 
-        const response2 = await withScopeHeaders(
+        const response2 = await auth(
             request(app).get(`/private/v1/collections/${body1.collectionId}`),
         )
             .set({[US_MASTER_TOKEN_HEADER]: masterToken})

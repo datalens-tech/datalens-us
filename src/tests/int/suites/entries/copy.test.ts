@@ -1,6 +1,6 @@
 import request from 'supertest';
 import usApp from '../../../..';
-import {withScopeHeaders} from '../../utils';
+import {auth} from '../../utils';
 
 const app = usApp.express;
 
@@ -12,14 +12,14 @@ describe('Copy entries', () => {
     let workbookId1EntryId2: string;
 
     test('Create workbooks - [POST /v2/workbooks]', async () => {
-        const {body: workbook1Body} = await withScopeHeaders(request(app).post('/v2/workbooks'))
+        const {body: workbook1Body} = await auth(request(app).post('/v2/workbooks'))
             .send({
                 title: 'Workbook1',
                 description: 'Description1',
             })
             .expect(200);
 
-        const {body: workbook2Body} = await withScopeHeaders(request(app).post('/v2/workbooks'))
+        const {body: workbook2Body} = await auth(request(app).post('/v2/workbooks'))
             .send({
                 title: 'Workbook2',
                 description: 'Description2',
@@ -31,7 +31,7 @@ describe('Copy entries', () => {
     });
 
     test('Create entries - [POST /v1/entries]', async () => {
-        const {body: entry1Body} = await withScopeHeaders(request(app).post('/v1/entries'))
+        const {body: entry1Body} = await auth(request(app).post('/v1/entries'))
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -42,7 +42,7 @@ describe('Copy entries', () => {
             })
             .expect(200);
 
-        const {body: entry2Body} = await withScopeHeaders(request(app).post('/v1/entries'))
+        const {body: entry2Body} = await auth(request(app).post('/v1/entries'))
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -58,7 +58,7 @@ describe('Copy entries', () => {
     });
 
     test('Copy entries - [POST /v2/copy-entries]', async () => {
-        const {body} = await withScopeHeaders(request(app).post('/v2/copy-entries'))
+        const {body} = await auth(request(app).post('/v2/copy-entries'))
             .send({
                 entryIds: [workbookId1EntryId1, workbookId1EntryId2],
                 workbookId: workbookId2,
@@ -69,7 +69,7 @@ describe('Copy entries', () => {
 
         const {
             body: {entries},
-        } = await withScopeHeaders(request(app).get(`/v2/workbooks/${workbookId2}/entries`))
+        } = await auth(request(app).get(`/v2/workbooks/${workbookId2}/entries`))
             .send()
             .expect(200);
 
@@ -82,7 +82,7 @@ describe('Copy entries', () => {
     });
 
     test('Copy entries with duplicate names - [POST /v2/copy-entries]', async () => {
-        await withScopeHeaders(request(app).post('/v2/copy-entries'))
+        await auth(request(app).post('/v2/copy-entries'))
             .send({
                 entryIds: [workbookId1EntryId1, workbookId1EntryId2],
                 workbookId: workbookId2,
@@ -91,7 +91,7 @@ describe('Copy entries', () => {
 
         const {
             body: {entries},
-        } = await withScopeHeaders(request(app).get(`/v2/workbooks/${workbookId2}/entries`))
+        } = await auth(request(app).get(`/v2/workbooks/${workbookId2}/entries`))
             .send()
             .expect(200);
 
@@ -108,7 +108,7 @@ describe('Copy entries', () => {
     test('Copy entries with incremented duplicate names  - [POST /v2/copy-entries]', async () => {
         const {
             body: {entryId: workbookId1EntryId3},
-        } = await withScopeHeaders(request(app).post('/v1/entries'))
+        } = await auth(request(app).post('/v1/entries'))
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -119,7 +119,7 @@ describe('Copy entries', () => {
             })
             .expect(200);
 
-        await withScopeHeaders(request(app).post('/v2/copy-entries'))
+        await auth(request(app).post('/v2/copy-entries'))
             .send({
                 entryIds: [workbookId1EntryId3],
                 workbookId: workbookId2,
@@ -128,7 +128,7 @@ describe('Copy entries', () => {
 
         const {
             body: {entries},
-        } = await withScopeHeaders(request(app).get(`/v2/workbooks/${workbookId2}/entries`))
+        } = await auth(request(app).get(`/v2/workbooks/${workbookId2}/entries`))
             .send()
             .expect(200);
 
@@ -144,7 +144,7 @@ describe('Copy entries', () => {
     });
 
     test('Delete workbooks - [DELETE /v2/workbooks/:workbookId]', async () => {
-        await withScopeHeaders(request(app).delete(`/v2/workbooks/${workbookId1}`)).expect(200);
-        await withScopeHeaders(request(app).delete(`/v2/workbooks/${workbookId2}`)).expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${workbookId1}`)).expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${workbookId2}`)).expect(200);
     });
 });
