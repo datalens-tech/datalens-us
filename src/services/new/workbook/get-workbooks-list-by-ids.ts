@@ -70,7 +70,6 @@ export const getWorkbooksListByIds = async (
     const targetTrx = getReplica(trx);
 
     const workbookList = await WorkbookModel.query(targetTrx)
-        .select()
         .where({
             [WorkbookModelColumn.DeletedAt]: null,
             [WorkbookModelColumn.TenantId]: tenantId,
