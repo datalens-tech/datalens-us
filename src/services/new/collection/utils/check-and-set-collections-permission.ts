@@ -58,8 +58,6 @@ export const checkAndSetCollectionPermission = async (
             });
         }
 
-        console.log('parentasdIds: ', parentIds);
-
         logInfo(ctx, 'CHECK_PERMISSION', {permission: localPermission});
 
         await collectionInstance.checkPermission({

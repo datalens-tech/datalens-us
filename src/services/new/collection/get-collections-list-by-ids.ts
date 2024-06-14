@@ -50,7 +50,6 @@ export const getCollectionsListByIds = async (
     const {tenantId, projectId} = ctx.get('info');
 
     const models = await CollectionModel.query(getReplica(trx))
-        .select()
         .where({
             [CollectionModelColumn.DeletedAt]: null,
             [CollectionModelColumn.TenantId]: tenantId,
