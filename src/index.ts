@@ -1,17 +1,19 @@
 import {nodekit} from './nodekit';
 import {registerAppPlugins} from './registry/register-app-plugins';
-import {ExpressKit, AppMiddleware, AppRoutes} from '@gravity-ui/expresskit';
+import {ExpressKit, AppMiddleware, AuthPolicy, AppRoutes} from '@gravity-ui/expresskit';
 import {
     decodeId,
     resolveTenantId,
     resolveSpecialTokens,
     waitDatabase,
+    setCiEnv,
     dlContext,
     ctx,
     finalRequestHandler,
     checkReadOnlyMode,
     resolveWorkbookId,
 } from './components/middlewares';
+import {AppEnv} from './const';
 import {registry} from './registry';
 import {getRoutes} from './routes';
 import authZitadel from './components/middlewares/auth-zitadel';
@@ -23,6 +25,13 @@ const afterAuth: AppMiddleware[] = [];
 
 if (nodekit.config.appDevMode) {
     require('source-map-support').install();
+}
+
+if (
+    nodekit.config.appEnv === AppEnv.Development &&
+    nodekit.config.appAuthPolicy === AuthPolicy.disabled
+) {
+    beforeAuth.push(setCiEnv);
 }
 
 afterAuth.push(decodeId);

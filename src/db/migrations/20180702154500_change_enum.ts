@@ -6,8 +6,7 @@ exports.up = async (knex: any) => {
     return knex.raw("ALTER TYPE scope ADD VALUE 'widget';");
 };
 
-// Stub for correct rollback
-exports.down = (knex: any) => knex.raw('SELECT 1 + 1;');
+exports.down = (knex: any) => knex.raw('');
 
 exports.config = {
     transaction: false,

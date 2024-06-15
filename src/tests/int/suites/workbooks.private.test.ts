@@ -142,8 +142,8 @@ describe('Private Entries in workboooks managment', () => {
 
 describe('Private for one workboook managment', () => {
     test('Create workbook with entries – [POST /private/v2/workbooks]', async () => {
-        const testTitle = 'Test private workbook with entries title 2';
-        const testDescription = 'Test private workbook with entries description 2';
+        const testTitle = 'Test private workbook with entries title';
+        const testDescription = 'Test private workbook with entries description';
 
         const entry1Name = 'Entry in test workbook 1';
 
