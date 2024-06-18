@@ -1,5 +1,3 @@
-// const path = require('path');
-
 const DSNParser = require('dsn-parser');
 const knexBuilder = require('knex');
 const _ = require('lodash');
