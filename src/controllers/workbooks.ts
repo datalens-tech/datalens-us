@@ -185,6 +185,23 @@ export default {
         res.status(code).send(response);
     },
 
+    deleteList: async (req: Request, res: Response) => {
+        const {body} = req;
+
+        console.log('body.workbookIdsasd: ', body);
+
+        await deleteWorkbooks(
+            {ctx: req.ctx},
+            {
+                workbookIds: body.workbookIds,
+            },
+        );
+
+        const {code, response} = await prepareResponseAsync({data: {status: 'ok'}});
+
+        res.status(code).send(response);
+    },
+
     copy: async (req: Request, res: Response) => {
         const {body, params} = req;
 

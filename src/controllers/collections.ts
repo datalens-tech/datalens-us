@@ -3,7 +3,6 @@ import {prepareResponseAsync} from '../components/response-presenter';
 import Utils from '../utils';
 import {
     createCollection,
-    deleteCollection,
     getCollection,
     getCollectionContent,
     getRootCollectionPermissions,
@@ -14,6 +13,7 @@ import {
     OrderField,
     OrderDirection,
     Mode,
+    deleteCollections,
 } from '../services/new/collection';
 import {
     formatCollectionModel,
@@ -138,7 +138,7 @@ export default {
     delete: async (req: Request, res: Response) => {
         const {params} = req;
 
-        const result = await deleteCollection(
+        const result = await deleteCollections(
             {ctx: req.ctx},
             {
                 collectionIds: [params.collectionId],
@@ -155,7 +155,7 @@ export default {
     deleteList: async (req: Request, res: Response) => {
         const {body} = req;
 
-        const result = await deleteCollection(
+        const result = await deleteCollections(
             {ctx: req.ctx},
             {
                 collectionIds: body.collectionIds,

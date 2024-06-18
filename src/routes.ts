@@ -318,6 +318,11 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
                 handler: workbooksController.delete,
                 write: true,
             }),
+            deleteWorkbooks: makeRoute({
+                route: 'DELETE /v1/delete-workbooks',
+                handler: workbooksController.deleteList,
+                write: true,
+            }),
             moveWorkbook: makeRoute({
                 route: 'POST /v2/workbooks/:workbookId/move',
                 handler: workbooksController.move,

@@ -36,8 +36,10 @@ export const deleteWorkbooks = async (
 ) => {
     const {workbookIds} = args;
 
-    logInfo(ctx, 'DELETE_WORKBOOK_START', {
-        workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.encodeId(id)),
+    console.log('workbookIds2asd: ', workbookIds);
+
+    logInfo(ctx, 'DELETE_WORKBOOKS_START', {
+        workbookIds,
     });
 
     if (!skipValidation) {
@@ -52,14 +54,14 @@ export const deleteWorkbooks = async (
 
     const targetTrx = getPrimary(trx);
 
+    const ids = await Utils.macrotasksMap(workbookIds, (id) => Utils.decodeId(id));
+
     const workbooks = await getWorkbooksListByIds(
         {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions: true},
-        {workbookIds},
+        {workbookIds: ids},
     );
 
     workbooks.forEach(async (workbook) => {
-        workbookIds.push(workbook.model.workbookId);
-
         if (workbook.model.isTemplate) {
             throw new AppError("Workbook template can't be deleted", {
                 code: US_ERRORS.WORKBOOK_TEMPLATE_CANT_BE_DELETED,
@@ -90,14 +92,14 @@ export const deleteWorkbooks = async (
                 [WorkbookModelColumn.DeletedBy]: userId,
                 [WorkbookModelColumn.DeletedAt]: raw(CURRENT_TIMESTAMP),
             })
-            .whereIn([WorkbookModelColumn.WorkbookId], workbookIds)
+            .whereIn([WorkbookModelColumn.WorkbookId], ids)
             .returning('*')
             .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
         const entries = await Entry.query(transactionTrx)
             .select()
             .where({isDeleted: false})
-            .whereIn([EntryColumn.WorkbookId], workbookIds)
+            .whereIn([EntryColumn.WorkbookId], ids)
             .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
         const entryDeletedBy = makeUserId(userId);
@@ -133,8 +135,8 @@ export const deleteWorkbooks = async (
         });
     }
 
-    logInfo(ctx, 'DELETE_WORKBOOK_FINISH', {
-        workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.encodeId(id)),
+    logInfo(ctx, 'DELETE_WORKBOOKS_FINISH', {
+        workbookIds,
     });
 
     return result;

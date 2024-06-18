@@ -26,7 +26,7 @@ export interface DeleteCollectionArgs {
     collectionIds: string[];
 }
 
-export const deleteCollection = async (
+export const deleteCollections = async (
     {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
     args: DeleteCollectionArgs,
 ) => {
@@ -39,18 +39,20 @@ export const deleteCollection = async (
     } = ctx.get('info');
 
     logInfo(ctx, 'DELETE_COLLECTION_START', {
-        collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),
+        collectionIds,
     });
 
     if (!skipValidation) {
         validateArgs(args);
     }
 
+    const ids = await Utils.macrotasksMap(collectionIds, (id) => Utils.decodeId(id));
+
     const targetTrx = getPrimary(trx);
 
     await getCollectionsListByIds(
         {ctx, trx: targetTrx, skipValidation, skipCheckPermissions},
-        {collectionIds, permission: CollectionPermission.Delete},
+        {collectionIds: ids, permission: CollectionPermission.Delete},
     );
 
     const result = await transaction(targetTrx, async (transactionTrx) => {
@@ -65,7 +67,7 @@ export const deleteCollection = async (
                         [CollectionModelColumn.ProjectId]: projectId,
                         [CollectionModelColumn.DeletedAt]: null,
                     })
-                    .whereIn([CollectionModelColumn.CollectionId], collectionIds)
+                    .whereIn([CollectionModelColumn.CollectionId], ids)
                     .union((qb2) => {
                         qb2.select(`${CollectionModel.tableName}.*`)
                             .from(CollectionModel.tableName)
@@ -107,11 +109,14 @@ export const deleteCollection = async (
         }
 
         const workbookIds = workbooksForDelete.map((workbook) => workbook.workbookId);
+        const preparedWorkbookIds = await Utils.macrotasksMap(workbookIds, (id) =>
+            Utils.encodeId(id),
+        );
 
         await deleteWorkbooks(
             {ctx, trx: transactionTrx},
             {
-                workbookIds,
+                workbookIds: preparedWorkbookIds,
             },
         );
 
@@ -131,9 +136,7 @@ export const deleteCollection = async (
     });
 
     ctx.log('DELETE_COLLECTION_FINISH', {
-        deletedCollections: await Utils.macrotasksMap(result, (item) =>
-            Utils.encodeId(item.collectionId),
-        ),
+        deletedCollections: result.map((item) => item.collectionId),
     });
 
     // TODO: Return deleted workbooks and entries
