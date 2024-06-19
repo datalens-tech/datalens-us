@@ -38,7 +38,7 @@ export const deleteCollections = async (
         user: {userId},
     } = ctx.get('info');
 
-    logInfo(ctx, 'DELETE_COLLECTION_START', {
+    logInfo(ctx, 'DELETE_COLLECTIONS_START', {
         collectionIds,
     });
 
@@ -135,8 +135,8 @@ export const deleteCollections = async (
         return deletedCollections;
     });
 
-    ctx.log('DELETE_COLLECTION_FINISH', {
-        deletedCollections: result.map((item) => item.collectionId),
+    ctx.log('DELETE_COLLECTIONS_FINISH', {
+        collectionIds,
     });
 
     // TODO: Return deleted workbooks and entries

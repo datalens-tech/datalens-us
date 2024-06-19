@@ -36,8 +36,6 @@ export const deleteWorkbooks = async (
 ) => {
     const {workbookIds} = args;
 
-    console.log('workbookIds2asd: ', workbookIds);
-
     logInfo(ctx, 'DELETE_WORKBOOKS_START', {
         workbookIds,
     });

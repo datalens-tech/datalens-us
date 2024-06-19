@@ -45,11 +45,6 @@ export const checkAndSetCollectionPermission = async (
             localPermission = CollectionPermission.View;
         }
 
-        console.log(
-            'parentcollectasdionInstance.model.parentIdasdIds: ',
-            collectionInstance.model.parentId,
-        );
-
         if (collectionInstance.model.parentId !== null) {
             parentIds = await getParentIds({
                 ctx,
