@@ -1,10 +1,10 @@
 export {
     decodeId,
     waitDatabase,
-    setCiEnv,
     dlContext,
     finalRequestHandler,
     logError,
     checkReadOnlyMode,
     resolveWorkbookId,
+    setCiEnv,
 } from '../src/components/middlewares';

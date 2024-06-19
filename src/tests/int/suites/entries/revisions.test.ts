@@ -1,7 +1,7 @@
 import request from 'supertest';
 import {testTenantId} from '../../constants';
 import usApp from '../../../..';
-import {withScopeHeaders} from '../../utils';
+import {auth} from '../../utils';
 
 const app = usApp.express;
 
@@ -30,7 +30,7 @@ const testDataPublished = {
 
 describe('Creating entries', () => {
     test('Create folder – [POST /v1/entries]', async () => {
-        const response = await withScopeHeaders(request(app).post('/v1/entries'))
+        const response = await auth(request(app).post('/v1/entries'))
             .send({
                 key: testFolderName,
                 scope: 'folder',
@@ -68,7 +68,7 @@ describe('Creating entries', () => {
     });
 
     test('Create dataset – [POST /v1/entries]', async () => {
-        const response = await withScopeHeaders(request(app).post('/v1/entries'))
+        const response = await auth(request(app).post('/v1/entries'))
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -111,7 +111,7 @@ describe('Creating entries', () => {
 
 describe('Get all revisions', () => {
     test('Create new revision and publish – [POST /v1/entries/:entryId]', async () => {
-        const response = await withScopeHeaders(request(app).post(`/v1/entries/${testEntryId}`))
+        const response = await auth(request(app).post(`/v1/entries/${testEntryId}`))
             .send({
                 meta: testMetaPublished,
                 data: testDataPublished,
@@ -141,7 +141,7 @@ describe('Get all revisions', () => {
     test('Create new revision without publishing – [POST /v1/entries/:entryId]', async () => {
         timeBeforeCreateLastRev = new Date().toISOString();
 
-        const response = await withScopeHeaders(request(app).post(`/v1/entries/${testEntryId}`))
+        const response = await auth(request(app).post(`/v1/entries/${testEntryId}`))
             .send({
                 meta: testMetaSaved,
                 data: testDataSaved,
@@ -166,7 +166,7 @@ describe('Get all revisions', () => {
     });
 
     test('Get all revisions of entry – [GET /v1/entries/:entryId/revisions]', async () => {
-        const response = await withScopeHeaders(
+        const response = await auth(
             request(app).get(`/v1/entries/${testEntryId}/revisions`),
         ).expect(200);
 
@@ -227,7 +227,7 @@ describe('Get all revisions', () => {
     });
 
     test('Get entry revisions by revIds without another entry revisions – [GET /v1/entries/:entryId/revisions]', async () => {
-        const response = await withScopeHeaders(
+        const response = await auth(
             request(app)
                 .get(`/v1/entries/${testEntryId}/revisions`)
                 .query({
@@ -262,7 +262,7 @@ describe('Get all revisions', () => {
     });
 
     test('Get entry revisions by filter updatedAfter – [GET /v1/entries/:entryId/revisions]', async () => {
-        const response = await withScopeHeaders(
+        const response = await auth(
             request(app).get(`/v1/entries/${testEntryId}/revisions`).query({
                 updatedAfter: timeBeforeCreateLastRev,
             }),

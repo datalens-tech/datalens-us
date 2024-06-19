@@ -28,7 +28,7 @@ if (nodekit.config.appDevMode) {
 }
 
 if (
-    (nodekit.config.appEnv === AppEnv.IntTesting || nodekit.config.appEnv === AppEnv.Development) &&
+    nodekit.config.appEnv === AppEnv.Development &&
     nodekit.config.appAuthPolicy === AuthPolicy.disabled
 ) {
     beforeAuth.push(setCiEnv);
