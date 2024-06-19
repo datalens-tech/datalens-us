@@ -114,7 +114,7 @@ export default {
 
         const {response} = await prepareResponseAsync({data: result});
 
-        res.status(500).send(response);
+        res.status(201).send(response);
     },
 
     getBreadcrumbs: async (req: Request, res: Response) => {
