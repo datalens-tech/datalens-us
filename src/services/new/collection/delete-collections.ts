@@ -109,16 +109,19 @@ export const deleteCollections = async (
         }
 
         const workbookIds = workbooksForDelete.map((workbook) => workbook.workbookId);
-        const preparedWorkbookIds = await Utils.macrotasksMap(workbookIds, (id) =>
-            Utils.encodeId(id),
-        );
 
-        await deleteWorkbooks(
-            {ctx, trx: transactionTrx},
-            {
-                workbookIds: preparedWorkbookIds,
-            },
-        );
+        if (workbookIds.length) {
+            const preparedWorkbookIds = await Utils.macrotasksMap(workbookIds, (id) =>
+                Utils.encodeId(id),
+            );
+
+            await deleteWorkbooks(
+                {ctx, trx: transactionTrx},
+                {
+                    workbookIds: preparedWorkbookIds,
+                },
+            );
+        }
 
         const deletedCollections = await CollectionModel.query(transactionTrx)
             .patch({
