@@ -39,20 +39,18 @@ export const deleteCollections = async (
     } = ctx.get('info');
 
     logInfo(ctx, 'DELETE_COLLECTIONS_START', {
-        collectionIds,
+        collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),
     });
 
     if (!skipValidation) {
         validateArgs(args);
     }
 
-    const ids = await Utils.macrotasksMap(collectionIds, (id) => Utils.decodeId(id));
-
     const targetTrx = getPrimary(trx);
 
     await getCollectionsListByIds(
         {ctx, trx: targetTrx, skipValidation, skipCheckPermissions},
-        {collectionIds: ids, permission: CollectionPermission.Delete},
+        {collectionIds, permission: CollectionPermission.Delete},
     );
 
     const result = await transaction(targetTrx, async (transactionTrx) => {
@@ -67,7 +65,7 @@ export const deleteCollections = async (
                         [CollectionModelColumn.ProjectId]: projectId,
                         [CollectionModelColumn.DeletedAt]: null,
                     })
-                    .whereIn([CollectionModelColumn.CollectionId], ids)
+                    .whereIn([CollectionModelColumn.CollectionId], collectionIds)
                     .union((qb2) => {
                         qb2.select(`${CollectionModel.tableName}.*`)
                             .from(CollectionModel.tableName)
@@ -111,14 +109,14 @@ export const deleteCollections = async (
         const workbookIds = workbooksForDelete.map((workbook) => workbook.workbookId);
 
         if (workbookIds.length) {
-            const preparedWorkbookIds = await Utils.macrotasksMap(workbookIds, (id) =>
-                Utils.encodeId(id),
-            );
+            // const preparedWorkbookIds = await Utils.macrotasksMap(workbookIds, (id) =>
+            //     Utils.encodeId(id),
+            // );
 
             await deleteWorkbooks(
                 {ctx, trx: transactionTrx},
                 {
-                    workbookIds: preparedWorkbookIds,
+                    workbookIds,
                 },
             );
         }
@@ -139,9 +137,8 @@ export const deleteCollections = async (
     });
 
     ctx.log('DELETE_COLLECTIONS_FINISH', {
-        collectionIds,
+        collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.decodeId(id)),
     });
 
-    // TODO: Return deleted workbooks and entries
     return {collections: result};
 };

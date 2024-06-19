@@ -37,7 +37,7 @@ export const deleteWorkbooks = async (
     const {workbookIds} = args;
 
     logInfo(ctx, 'DELETE_WORKBOOKS_START', {
-        workbookIds,
+        workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.encodeId(id)),
     });
 
     if (!skipValidation) {
@@ -52,11 +52,9 @@ export const deleteWorkbooks = async (
 
     const targetTrx = getPrimary(trx);
 
-    const ids = await Utils.macrotasksMap(workbookIds, (id) => Utils.decodeId(id));
-
     const workbooks = await getWorkbooksListByIds(
         {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions: true},
-        {workbookIds: ids},
+        {workbookIds},
     );
 
     workbooks.forEach(async (workbook) => {
@@ -90,14 +88,14 @@ export const deleteWorkbooks = async (
                 [WorkbookModelColumn.DeletedBy]: userId,
                 [WorkbookModelColumn.DeletedAt]: raw(CURRENT_TIMESTAMP),
             })
-            .whereIn([WorkbookModelColumn.WorkbookId], ids)
+            .whereIn([WorkbookModelColumn.WorkbookId], workbookIds)
             .returning('*')
             .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
         const entries = await Entry.query(transactionTrx)
             .select()
             .where({isDeleted: false})
-            .whereIn([EntryColumn.WorkbookId], ids)
+            .whereIn([EntryColumn.WorkbookId], workbookIds)
             .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
         const entryDeletedBy = makeUserId(userId);
@@ -134,7 +132,7 @@ export const deleteWorkbooks = async (
     }
 
     logInfo(ctx, 'DELETE_WORKBOOKS_FINISH', {
-        workbookIds,
+        workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.decodeId(id)),
     });
 
     return result;
