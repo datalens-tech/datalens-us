@@ -41,15 +41,13 @@ export const moveCollectionsList = async (
     const targetTrx = getPrimary(trx);
 
     logInfo(ctx, 'MOVE_LIST_COLLECTIONS_START', {
-        collectionIds,
+        collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),
         parentId: Utils.encodeId(parentId),
     });
 
-    const ids = await Utils.macrotasksMap(collectionIds, (id) => Utils.decodeId(id));
-
     const result = await transaction(targetTrx, async (transactionTrx) => {
         return await Promise.all(
-            ids.map(
+            collectionIds.map(
                 async (collectionId: string) =>
                     await moveCollection(
                         {

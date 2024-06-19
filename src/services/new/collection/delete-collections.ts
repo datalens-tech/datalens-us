@@ -109,10 +109,6 @@ export const deleteCollections = async (
         const workbookIds = workbooksForDelete.map((workbook) => workbook.workbookId);
 
         if (workbookIds.length) {
-            // const preparedWorkbookIds = await Utils.macrotasksMap(workbookIds, (id) =>
-            //     Utils.encodeId(id),
-            // );
-
             await deleteWorkbooks(
                 {ctx, trx: transactionTrx},
                 {
@@ -137,7 +133,9 @@ export const deleteCollections = async (
     });
 
     ctx.log('DELETE_COLLECTIONS_FINISH', {
-        collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.decodeId(id)),
+        collectionIds: await Utils.macrotasksMap(result, (collection) =>
+            Utils.encodeId(collection.collectionId),
+        ),
     });
 
     return {collections: result};
