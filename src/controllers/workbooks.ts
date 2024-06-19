@@ -188,8 +188,6 @@ export default {
     deleteList: async (req: Request, res: Response) => {
         const {body} = req;
 
-        console.log('body.workbookIdsasd: ', body);
-
         await deleteWorkbooks(
             {ctx: req.ctx},
             {
