@@ -112,9 +112,9 @@ export default {
     getRootPermissions: async (req: Request, res: Response) => {
         const result = await getRootCollectionPermissions({ctx: req.ctx});
 
-        const {code, response} = await prepareResponseAsync({data: result});
+        const {response} = await prepareResponseAsync({data: result});
 
-        res.status(code).send(response);
+        res.status(201).send(response);
     },
 
     getBreadcrumbs: async (req: Request, res: Response) => {
