@@ -7,4 +7,5 @@ export {
     checkReadOnlyMode,
     resolveWorkbookId,
     setCiEnv,
+    authZitadel,
 } from '../src/components/middlewares';
