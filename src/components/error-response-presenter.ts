@@ -299,7 +299,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 400,
                 response: {
-                    message: 'The workbook is alredy restored',
+                    message: 'The workbook is already restored',
                 },
             };
         }
