@@ -1,5 +1,4 @@
 import {AppContext} from '@gravity-ui/nodekit';
-import {nodekit} from '../nodekit';
 import {Utils} from './utils';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
@@ -16,13 +15,13 @@ axiosRetry(axiosInstance, {retries: 3});
 export const introspect = async (ctx: AppContext, token?: string): Promise<IntrospectionResult> => {
     ctx.log('Token introspection');
 
-    if (!nodekit.config.zitadelUri) {
+    if (!ctx.config.zitadelUri) {
         throw new Error('Missing ZITADEL_URI in env');
     }
-    if (!nodekit.config.clientId) {
+    if (!ctx.config.clientId) {
         throw new Error('Missing CLIENT_ID in env');
     }
-    if (!nodekit.config.clientSecret) {
+    if (!ctx.config.clientSecret) {
         throw new Error('Missing CLIENT_SECRET in env');
     }
 
@@ -35,10 +34,10 @@ export const introspect = async (ctx: AppContext, token?: string): Promise<Intro
 
         const response = await axiosInstance({
             method: 'post',
-            url: `${nodekit.config.zitadelUri}/oauth/v2/introspect`,
+            url: `${ctx.config.zitadelUri}/oauth/v2/introspect`,
             auth: {
-                username: nodekit.config.clientId,
-                password: nodekit.config.clientSecret,
+                username: ctx.config.clientId,
+                password: ctx.config.clientSecret,
             },
             params: {
                 token,

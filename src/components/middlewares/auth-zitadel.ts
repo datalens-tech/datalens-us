@@ -4,7 +4,7 @@ import {IncomingHttpHeaders} from 'http';
 import {DL_AUTH_HEADER_KEY, DL_SERVICE_USER_ACCESS_TOKEN} from '../../const';
 import {ZitadelServiceUser} from '../../types/zitadel';
 
-export default async function (req: Request, res: Response, next: NextFunction) {
+export const authZitadel = async (req: Request, res: Response, next: NextFunction) => {
     const {ctx} = req;
 
     const authToken = extractAuthTokenFromHeader(req.headers);
@@ -31,7 +31,7 @@ export default async function (req: Request, res: Response, next: NextFunction) 
     }
 
     return res.status(401).send('Unauthorized access');
-}
+};
 
 export function extractAuthTokenFromHeader(headers: IncomingHttpHeaders) {
     const authHeaderParts = headers?.authorization?.split(' ');
