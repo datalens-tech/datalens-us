@@ -4,9 +4,9 @@ import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
 enum ZitadelUserRole {
-    Creator = 'Creator',
-    Admin = 'Admin',
-    Viewer = 'Viewer',
+    Creator = 'creator',
+    Admin = 'admin',
+    Viewer = 'viewer',
 }
 
 type IntrospectionResult = {
