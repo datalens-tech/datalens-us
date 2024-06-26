@@ -171,7 +171,7 @@ export default {
     delete: async (req: Request, res: Response) => {
         const {params} = req;
 
-        await deleteWorkbooks(
+        const result = await deleteWorkbooks(
             {
                 ctx: req.ctx,
             },
@@ -180,7 +180,9 @@ export default {
             },
         );
 
-        const {code, response} = await prepareResponseAsync({data: {status: 'ok'}});
+        const formattedResponse = formatWorkbookModelsList(result);
+
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
         res.status(code).send(response);
     },
@@ -188,14 +190,16 @@ export default {
     deleteList: async (req: Request, res: Response) => {
         const {body} = req;
 
-        await deleteWorkbooks(
+        const result = await deleteWorkbooks(
             {ctx: req.ctx},
             {
                 workbookIds: body.workbookIds,
             },
         );
 
-        const {code, response} = await prepareResponseAsync({data: {status: 'ok'}});
+        const formattedResponse = formatWorkbookModelsList(result);
+
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
         res.status(code).send(response);
     },

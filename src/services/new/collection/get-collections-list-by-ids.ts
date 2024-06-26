@@ -1,8 +1,6 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
 import Utils, {logInfo} from '../../../utils';
@@ -59,12 +57,6 @@ export const getCollectionsListByIds = async (
         .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
 
     const modelsWithPermissions = models.map(async (model) => {
-        if (!model) {
-            throw new AppError(US_ERRORS.COLLECTION_NOT_EXISTS, {
-                code: US_ERRORS.COLLECTION_NOT_EXISTS,
-            });
-        }
-
         const {Collection} = registry.common.classes.get();
 
         const collectionInstance = new Collection({

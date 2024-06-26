@@ -2,7 +2,6 @@ import {getParentIds} from './get-parents';
 import {ServiceArgs} from '../../types';
 import {getReplica} from '../../utils';
 import {CollectionPermission} from '../../../../entities/collection';
-import {logInfo} from '../../../../utils';
 
 import {Feature, isEnabledFeature} from '../../../../components/features';
 import {CollectionInstance} from '../../../../registry/common/entities/collection/types';
@@ -53,7 +52,7 @@ export const checkAndSetCollectionPermission = async (
             });
         }
 
-        logInfo(ctx, 'CHECK_PERMISSION', {permission: localPermission});
+        ctx.log('CHECK_PERMISSION', {permission: localPermission});
 
         await collectionInstance.checkPermission({
             parentIds,

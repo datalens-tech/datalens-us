@@ -57,7 +57,7 @@ export const deleteWorkbooks = async (
         {workbookIds},
     );
 
-    workbooks.forEach(async (workbook) => {
+    const checkDeletePermissionPromises = workbooks.map(async (workbook) => {
         if (workbook.model.isTemplate) {
             throw new AppError("Workbook template can't be deleted", {
                 code: US_ERRORS.WORKBOOK_TEMPLATE_CANT_BE_DELETED,
@@ -81,6 +81,8 @@ export const deleteWorkbooks = async (
             });
         }
     });
+
+    await Promise.all(checkDeletePermissionPromises);
 
     const result = await transaction(targetTrx, async (transactionTrx) => {
         const deletedWorkbooks = await WorkbookModel.query(transactionTrx)
@@ -137,5 +139,7 @@ export const deleteWorkbooks = async (
         ),
     });
 
-    return result;
+    return {
+        workbooks: result,
+    };
 };

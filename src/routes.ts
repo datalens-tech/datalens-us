@@ -319,7 +319,7 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
                 write: true,
             }),
             deleteWorkbooks: makeRoute({
-                route: 'DELETE /v1/delete-workbooks',
+                route: 'DELETE /v2/delete-workbooks',
                 handler: workbooksController.deleteList,
                 write: true,
             }),
