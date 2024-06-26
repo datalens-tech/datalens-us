@@ -2,7 +2,7 @@ import request from 'supertest';
 import {testTenantId} from '../../constants';
 import usApp from '../../../..';
 import Utils from '../../../../utils';
-import {withScopeHeaders} from '../../utils';
+import {auth} from '../../utils';
 
 const app = usApp.express;
 
@@ -29,7 +29,7 @@ const testDataPublished = {
 
 describe('Creating entries', () => {
     test('Create folder – [POST /v1/entries]', async () => {
-        const response = await withScopeHeaders(request(app).post('/v1/entries'))
+        const response = await auth(request(app).post('/v1/entries'))
             .send({
                 key: testFolderName,
                 scope: 'folder',
@@ -65,7 +65,7 @@ describe('Creating entries', () => {
     });
 
     test('Create dataset – [POST /v1/entries]', async () => {
-        const response = await withScopeHeaders(request(app).post('/v1/entries'))
+        const response = await auth(request(app).post('/v1/entries'))
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -108,7 +108,7 @@ describe('Creating entries', () => {
     test('Create widget recursively – [POST /v1/entries]', async () => {
         const key = `${testFolderName}/folder1/Folder2/folder3/Folder4/widget1`;
 
-        const response = await withScopeHeaders(request(app).post('/v1/entries'))
+        const response = await auth(request(app).post('/v1/entries'))
             .send({
                 scope: 'widget',
                 type: '',
@@ -126,7 +126,7 @@ describe('Creating entries', () => {
 
 describe('Managing revisions', () => {
     test('Create new revision and publish – [POST /v1/entries/:entryId]', async () => {
-        const response = await withScopeHeaders(request(app).post(`/v1/entries/${testEntryId}`))
+        const response = await auth(request(app).post(`/v1/entries/${testEntryId}`))
             .send({
                 meta: testMetaPublished,
                 data: testDataPublished,
@@ -154,7 +154,7 @@ describe('Managing revisions', () => {
     });
 
     test('Create new revision without publishing – [POST /v1/entries/:entryId]', async () => {
-        const response = await withScopeHeaders(request(app).post(`/v1/entries/${testEntryId}`))
+        const response = await auth(request(app).post(`/v1/entries/${testEntryId}`))
             .send({
                 meta: testMetaSaved,
                 data: testDataSaved,
@@ -181,9 +181,7 @@ describe('Managing revisions', () => {
 
 describe('Getting entries', () => {
     test('Get entry by entryId – [/v1/entries/:entryId]', async () => {
-        const response = await withScopeHeaders(
-            request(app).get(`/v1/entries/${testEntryId}`),
-        ).expect(200);
+        const response = await auth(request(app).get(`/v1/entries/${testEntryId}`)).expect(200);
 
         const {body} = response;
 
@@ -210,7 +208,7 @@ describe('Getting entries', () => {
     });
 
     test('Get saved entry by entryId – [/v1/entries/:entryId?branch=saved]', async () => {
-        const response = await withScopeHeaders(
+        const response = await auth(
             request(app).get(`/v1/entries/${testEntryId}?branch=saved`),
         ).expect(200);
 
@@ -239,7 +237,7 @@ describe('Getting entries', () => {
     });
 
     test('Get published entry by entryId – [/v1/entries/:entryId?branch=published]', async () => {
-        const response = await withScopeHeaders(
+        const response = await auth(
             request(app).get(`/v1/entries/${testEntryId}?branch=published`),
         ).expect(200);
 
@@ -268,7 +266,7 @@ describe('Getting entries', () => {
     });
 
     test('Get entry by entryId and revId – [/v1/entries/:entryId?revId=:revId]', async () => {
-        const response = await withScopeHeaders(
+        const response = await auth(
             request(app).get(`/v1/entries/${testEntryId}?revId=${testRevCreatedId}`),
         ).expect(200);
 
@@ -299,9 +297,9 @@ describe('Getting entries', () => {
 
 describe('Getting additional entries info', () => {
     test('Get meta by enrtyId – [GET /v1/entries/:entryId/meta]', async () => {
-        const response = await withScopeHeaders(
-            request(app).get(`/v1/entries/${testEntryId}/meta`),
-        ).expect(200);
+        const response = await auth(request(app).get(`/v1/entries/${testEntryId}/meta`)).expect(
+            200,
+        );
 
         const {body} = response;
 
@@ -321,7 +319,7 @@ describe('Getting additional entries info', () => {
 
 describe('Delete / Recover entry', () => {
     test('Delete entry – [DELETE /v1/entries/:entryId]', async () => {
-        const response = await withScopeHeaders(request(app).delete(`/v1/entries/${testEntryId}`))
+        const response = await auth(request(app).delete(`/v1/entries/${testEntryId}`))
             .send({})
             .expect(200);
 
@@ -351,11 +349,11 @@ describe('Delete / Recover entry', () => {
             deletedAt: expect.any(String),
         });
 
-        await withScopeHeaders(request(app).get(`/v1/entries/${testEntryId}`)).expect(404);
+        await auth(request(app).get(`/v1/entries/${testEntryId}`)).expect(404);
     });
 
     test('Recover deleted entry – [POST /v1/entries/:entryId]', async () => {
-        const response = await withScopeHeaders(request(app).post(`/v1/entries/${testEntryId}`))
+        const response = await auth(request(app).post(`/v1/entries/${testEntryId}`))
             .send({
                 mode: 'recover',
             })
@@ -385,15 +383,13 @@ describe('Delete / Recover entry', () => {
             workbookId: null,
         });
 
-        await withScopeHeaders(request(app).get(`/v1/entries/${testEntryId}`)).expect(200);
+        await auth(request(app).get(`/v1/entries/${testEntryId}`)).expect(200);
     });
 });
 
 describe('Rename entry', () => {
     test('Rename entry – [POST /v1/entries/:entryId/rename]', async () => {
-        const response = await withScopeHeaders(
-            request(app).post(`/v1/entries/${testEntryId}/rename`),
-        )
+        const response = await auth(request(app).post(`/v1/entries/${testEntryId}/rename`))
             .send({
                 name: 'test2',
             })

@@ -1,8 +1,8 @@
 import request from 'supertest';
-import {testUserId, testTenantId, testProjectId} from '../constants';
+import {systemId, testTenantId, testProjectId} from '../constants';
 import {US_MASTER_TOKEN_HEADER} from '../../../const';
 import usApp from '../../..';
-import {withScopeHeaders} from '../utils';
+import {auth} from '../utils';
 
 const app = usApp.express;
 const masterToken = usApp.config.masterToken[0];
@@ -19,7 +19,7 @@ describe('Private Workbooks managment', () => {
     test('Create workbooks – [POST /private/v2/workbooks]', async () => {
         await request(app).post('/private/v2/workbooks').expect(403);
 
-        const response1 = await withScopeHeaders(request(app).post('/private/v2/workbooks'))
+        const response1 = await auth(request(app).post('/private/v2/workbooks'))
             .set({[US_MASTER_TOKEN_HEADER]: masterToken})
             .send({
                 title: workbooksData.title,
@@ -32,9 +32,9 @@ describe('Private Workbooks managment', () => {
         expect(body1).toStrictEqual({
             collectionId: null,
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: workbooksData.description,
             meta: {},
             projectId: testProjectId,
@@ -47,9 +47,7 @@ describe('Private Workbooks managment', () => {
 
         await request(app).get(`/private/v2/workbooks/${body1.workbookId}`).expect(403);
 
-        const response2 = await withScopeHeaders(
-            request(app).get(`/private/v2/workbooks/${body1.workbookId}`),
-        )
+        const response2 = await auth(request(app).get(`/private/v2/workbooks/${body1.workbookId}`))
             .set({[US_MASTER_TOKEN_HEADER]: masterToken})
             .expect(200);
 
@@ -58,9 +56,9 @@ describe('Private Workbooks managment', () => {
         expect(body2).toStrictEqual({
             collectionId: null,
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: workbooksData.description,
             meta: {},
             projectId: testProjectId,
@@ -69,9 +67,7 @@ describe('Private Workbooks managment', () => {
             workbookId: expect.any(String),
         });
 
-        await withScopeHeaders(request(app).delete(`/v2/workbooks/${workbooksData.id}`)).expect(
-            200,
-        );
+        await auth(request(app).delete(`/v2/workbooks/${workbooksData.id}`)).expect(200);
     });
 });
 
@@ -82,7 +78,7 @@ describe('Private Entries in workboooks managment', () => {
 
         const entry1Name = 'Entry in test workbook 1';
 
-        const responseWorkbook = await withScopeHeaders(request(app).post('/private/v2/workbooks'))
+        const responseWorkbook = await auth(request(app).post('/private/v2/workbooks'))
             .set({[US_MASTER_TOKEN_HEADER]: masterToken})
             .send({
                 title: testTitle,
@@ -94,7 +90,7 @@ describe('Private Entries in workboooks managment', () => {
 
         testWorkbookId = bodyWorkbook.workbookId;
 
-        await withScopeHeaders(request(app).post('/v1/entries'))
+        await auth(request(app).post('/v1/entries'))
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -109,7 +105,7 @@ describe('Private Entries in workboooks managment', () => {
     test('Get workbook entries – [GET /private/v2/workbooks/entries]', async () => {
         await request(app).get('/private/v2/workbooks/entries').expect(403);
 
-        const response = await withScopeHeaders(
+        const response = await auth(
             request(app)
                 .get(`/private/v2/workbooks/${testWorkbookId}/entries`)
                 .set({[US_MASTER_TOKEN_HEADER]: masterToken}),
@@ -140,7 +136,7 @@ describe('Private Entries in workboooks managment', () => {
             ]),
         });
 
-        await withScopeHeaders(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
     });
 });
 
@@ -151,7 +147,7 @@ describe('Private for one workboook managment', () => {
 
         const entry1Name = 'Entry in test workbook 1';
 
-        const responseWorkbook = await withScopeHeaders(request(app).post('/private/v2/workbooks'))
+        const responseWorkbook = await auth(request(app).post('/private/v2/workbooks'))
             .set({[US_MASTER_TOKEN_HEADER]: masterToken})
             .send({
                 title: testTitle,
@@ -163,7 +159,7 @@ describe('Private for one workboook managment', () => {
 
         testWorkbookId = bodyWorkbook.workbookId;
 
-        await withScopeHeaders(request(app).post('/v1/entries'))
+        await auth(request(app).post('/v1/entries'))
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -176,11 +172,11 @@ describe('Private for one workboook managment', () => {
     });
 
     test('Restore workbook with entries – [POST /private/v2/workbooks/:workbookId/restore]', async () => {
-        await withScopeHeaders(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
 
         await request(app).post(`/private/v2/workbooks/${testWorkbookId}/restore`).expect(403);
 
-        const response = await withScopeHeaders(
+        const response = await auth(
             request(app)
                 .post(`/private/v2/workbooks/${testWorkbookId}/restore`)
                 .set({[US_MASTER_TOKEN_HEADER]: masterToken}),
@@ -192,7 +188,7 @@ describe('Private for one workboook managment', () => {
             workbookId: testWorkbookId,
         });
 
-        const responseEntries = await withScopeHeaders(
+        const responseEntries = await auth(
             request(app)
                 .get(`/private/v2/workbooks/${testWorkbookId}/entries`)
                 .set({[US_MASTER_TOKEN_HEADER]: masterToken}),
@@ -223,6 +219,6 @@ describe('Private for one workboook managment', () => {
             ]),
         });
 
-        await withScopeHeaders(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
     });
 });

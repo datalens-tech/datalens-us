@@ -2,7 +2,7 @@ import request from 'supertest';
 import {testUserLogin} from '../constants';
 import usApp from '../../..';
 import {US_ERRORS} from '../../../const';
-import {withScopeHeaders} from '../utils';
+import {auth} from '../utils';
 
 const app = usApp.express;
 
@@ -23,7 +23,7 @@ const entryLockedMessage = 'The entry is locked';
 
 describe('Locks', () => {
     test('Create entry – [POST /v1/entries]', async () => {
-        const response = await withScopeHeaders(request(app).post('/v1/entries'))
+        const response = await auth(request(app).post('/v1/entries'))
             .send({
                 scope: 'dash',
                 type: '',
@@ -41,7 +41,7 @@ describe('Locks', () => {
     });
 
     test('Create lock for entry – [POST /v1/locks/:entryId]', async () => {
-        const response = await withScopeHeaders(request(app).post(`/v1/locks/${testDashId}`))
+        const response = await auth(request(app).post(`/v1/locks/${testDashId}`))
             .send({
                 duration: 80000,
             })
@@ -55,9 +55,7 @@ describe('Locks', () => {
     });
 
     test('Get lock for entry – [GET /v1/locks/:entryId]', async () => {
-        const response = await withScopeHeaders(request(app).get(`/v1/locks/${testDashId}`)).expect(
-            200,
-        );
+        const response = await auth(request(app).get(`/v1/locks/${testDashId}`)).expect(200);
 
         const {body} = response;
 
@@ -74,7 +72,7 @@ describe('Locks', () => {
     });
 
     test('Try to modify locked entry – [POST /v1/entries/:entryId]', async () => {
-        await withScopeHeaders(request(app).post(`/v1/entries/${testDashId}`))
+        await auth(request(app).post(`/v1/entries/${testDashId}`))
             .send({
                 meta: {
                     test_meta: 'test_meta',
@@ -86,9 +84,7 @@ describe('Locks', () => {
             })
             .expect(423);
 
-        const response = await withScopeHeaders(
-            request(app).get(`/v1/entries/${testDashId}`),
-        ).expect(200);
+        const response = await auth(request(app).get(`/v1/entries/${testDashId}`)).expect(200);
 
         const {body} = response;
 
@@ -97,13 +93,11 @@ describe('Locks', () => {
     });
 
     test('Try to delete locked entry – [DELETE /v1/entries/:entryId]', async () => {
-        await withScopeHeaders(request(app).delete(`/v1/entries/${testDashId}`))
+        await auth(request(app).delete(`/v1/entries/${testDashId}`))
             .send({})
             .expect(423);
 
-        const response = await withScopeHeaders(
-            request(app).get(`/v1/entries/${testDashId}`),
-        ).expect(200);
+        const response = await auth(request(app).get(`/v1/entries/${testDashId}`)).expect(200);
 
         const {body} = response;
 
@@ -111,7 +105,7 @@ describe('Locks', () => {
     });
 
     test('Extend lock – [POST /v1/locks/:entryId/extend]', async () => {
-        const response = await withScopeHeaders(request(app).post(`/v1/locks/${testDashId}/extend`))
+        const response = await auth(request(app).post(`/v1/locks/${testDashId}/extend`))
             .send({
                 duration: 100000,
                 lockToken: testDashLockToken,
@@ -133,7 +127,7 @@ describe('Locks', () => {
     });
 
     test('Delete lock – [DELETE /v1/locks/:entryId]', async () => {
-        const response = await withScopeHeaders(
+        const response = await auth(
             request(app).delete(`/v1/locks/${testDashId}?force=true`),
         ).expect(200);
 
@@ -148,11 +142,11 @@ describe('Locks', () => {
             login: testUserLogin,
         });
 
-        await withScopeHeaders(request(app).get(`/v1/locks/${testDashId}`)).expect(404);
+        await auth(request(app).get(`/v1/locks/${testDashId}`)).expect(404);
     });
 
     test('Modify unlocked entry – [POST /v1/entries/:entryId]', async () => {
-        await withScopeHeaders(request(app).post(`/v1/entries/${testDashId}`))
+        await auth(request(app).post(`/v1/entries/${testDashId}`))
             .send({
                 meta: modifiedTestDashMeta,
                 data: modifiedTestDashData,
@@ -160,9 +154,7 @@ describe('Locks', () => {
             })
             .expect(200);
 
-        const response = await withScopeHeaders(
-            request(app).get(`/v1/entries/${testDashId}`),
-        ).expect(200);
+        const response = await auth(request(app).get(`/v1/entries/${testDashId}`)).expect(200);
 
         const {body} = response;
 
@@ -172,10 +164,10 @@ describe('Locks', () => {
 
     test('Sync create lock for entry – [POST /v1/locks/:entryId]', async () => {
         const [response1, response2] = await Promise.all([
-            withScopeHeaders(request(app).post(`/v1/locks/${testDashId}`)).send({
+            auth(request(app).post(`/v1/locks/${testDashId}`)).send({
                 duration: 80000,
             }),
-            withScopeHeaders(request(app).post(`/v1/locks/${testDashId}`)).send({
+            auth(request(app).post(`/v1/locks/${testDashId}`)).send({
                 duration: 80000,
             }),
         ]);
@@ -209,18 +201,16 @@ describe('Locks', () => {
             });
         }
 
-        await withScopeHeaders(request(app).delete(`/v1/locks/${testDashId}?force=true`)).expect(
-            200,
-        );
+        await auth(request(app).delete(`/v1/locks/${testDashId}?force=true`)).expect(200);
     });
 
     test('Sync create force lock for entry – [POST /v1/locks/:entryId]', async () => {
         const [response1, response2] = await Promise.all([
-            withScopeHeaders(request(app).post(`/v1/locks/${testDashId}`)).send({
+            auth(request(app).post(`/v1/locks/${testDashId}`)).send({
                 duration: 80000,
                 force: true,
             }),
-            withScopeHeaders(request(app).post(`/v1/locks/${testDashId}?force=true`)).send({
+            auth(request(app).post(`/v1/locks/${testDashId}?force=true`)).send({
                 duration: 80000,
                 force: true,
             }),
@@ -247,15 +237,13 @@ describe('Locks', () => {
             message: entryLockedMessage,
         });
 
-        await withScopeHeaders(request(app).delete(`/v1/locks/${testDashId}?force=true`)).expect(
-            200,
-        );
+        await auth(request(app).delete(`/v1/locks/${testDashId}?force=true`)).expect(200);
     });
 
     test('Delete unlocked entry – [DELETE /v1/entries/:entryId]', async () => {
-        await withScopeHeaders(request(app).delete(`/v1/entries/${testDashId}`))
+        await auth(request(app).delete(`/v1/entries/${testDashId}`))
             .send({})
             .expect(200);
-        await withScopeHeaders(request(app).get(`/v1/entries/${testDashId}`)).expect(404);
+        await auth(request(app).get(`/v1/entries/${testDashId}`)).expect(404);
     });
 });

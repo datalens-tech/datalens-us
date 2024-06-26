@@ -1,8 +1,8 @@
 import request from 'supertest';
-import {testUserId, testTenantId, testProjectId} from '../constants';
+import {systemId, testTenantId, testProjectId} from '../constants';
 import {US_MASTER_TOKEN_HEADER} from '../../../const';
 import usApp from '../../..';
-import {withScopeHeaders} from '../utils';
+import {auth} from '../utils';
 
 const app = usApp.express;
 const masterToken = usApp.config.masterToken[0];
@@ -31,7 +31,7 @@ const testTemplateWorkbookData = {
 
 describe('Workbooks managment', () => {
     test('Create workbooks – [POST /v2/workbooks]', async () => {
-        const response1 = await withScopeHeaders(request(app).post('/v2/workbooks'))
+        const response1 = await auth(request(app).post('/v2/workbooks'))
             .send({
                 title: workbooksData[0].title,
                 description: workbooksData[0].description,
@@ -43,9 +43,9 @@ describe('Workbooks managment', () => {
         expect(body1).toStrictEqual({
             collectionId: null,
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: workbooksData[0].description,
             meta: {},
             projectId: testProjectId,
@@ -56,7 +56,7 @@ describe('Workbooks managment', () => {
 
         workbooksData[0].id = body1.workbookId;
 
-        const response2 = await withScopeHeaders(request(app).post('/v2/workbooks'))
+        const response2 = await auth(request(app).post('/v2/workbooks'))
             .send({
                 title: workbooksData[1].title,
                 description: workbooksData[1].description,
@@ -68,9 +68,9 @@ describe('Workbooks managment', () => {
         expect(body2).toStrictEqual({
             collectionId: null,
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: workbooksData[1].description,
             meta: {},
             projectId: testProjectId,
@@ -83,7 +83,7 @@ describe('Workbooks managment', () => {
     });
 
     test('Get workbook by workbookId – [GET /v2/workbooks/:workbookId]', async () => {
-        const response = await withScopeHeaders(
+        const response = await auth(
             request(app).get(`/v2/workbooks/${workbooksData[0].id}`),
         ).expect(200);
 
@@ -91,9 +91,9 @@ describe('Workbooks managment', () => {
 
         expect(body).toStrictEqual({
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: workbooksData[0].description,
             meta: {},
             projectId: testProjectId,
@@ -105,7 +105,7 @@ describe('Workbooks managment', () => {
     });
 
     test('Get list of workbooks – [GET /v2/workbooks]', async () => {
-        const response = await withScopeHeaders(request(app).get(`/v2/workbooks`)).expect(200);
+        const response = await auth(request(app).get(`/v2/workbooks`)).expect(200);
 
         const {body} = response;
 
@@ -113,9 +113,9 @@ describe('Workbooks managment', () => {
             workbooks: expect.arrayContaining([
                 {
                     createdAt: expect.any(String),
-                    createdBy: testUserId,
+                    createdBy: systemId,
                     updatedAt: expect.any(String),
-                    updatedBy: testUserId,
+                    updatedBy: systemId,
                     description: workbooksData[1].description,
                     meta: {},
                     projectId: testProjectId,
@@ -126,9 +126,9 @@ describe('Workbooks managment', () => {
                 },
                 {
                     createdAt: expect.any(String),
-                    createdBy: testUserId,
+                    createdBy: systemId,
                     updatedAt: expect.any(String),
-                    updatedBy: testUserId,
+                    updatedBy: systemId,
                     description: workbooksData[0].description,
                     meta: {},
                     projectId: testProjectId,
@@ -142,7 +142,7 @@ describe('Workbooks managment', () => {
     });
 
     test('Get list of workbooks with pagination – [GET /v2/workbooks]', async () => {
-        const response1 = await withScopeHeaders(request(app).get(`/v2/workbooks`))
+        const response1 = await auth(request(app).get(`/v2/workbooks`))
             .query({
                 page: 0,
                 pageSize: 1,
@@ -156,9 +156,9 @@ describe('Workbooks managment', () => {
             workbooks: expect.arrayContaining([
                 {
                     createdAt: expect.any(String),
-                    createdBy: testUserId,
+                    createdBy: systemId,
                     updatedAt: expect.any(String),
-                    updatedBy: testUserId,
+                    updatedBy: systemId,
                     description: workbooksData[0].description,
                     meta: {},
                     projectId: testProjectId,
@@ -172,7 +172,7 @@ describe('Workbooks managment', () => {
 
         const nextPageToken = body1.nextPageToken;
 
-        const response2 = await withScopeHeaders(request(app).get(`/v2/workbooks`))
+        const response2 = await auth(request(app).get(`/v2/workbooks`))
             .query({
                 page: nextPageToken,
                 pageSize: 1,
@@ -185,9 +185,9 @@ describe('Workbooks managment', () => {
             workbooks: expect.arrayContaining([
                 {
                     createdAt: expect.any(String),
-                    createdBy: testUserId,
+                    createdBy: systemId,
                     updatedAt: expect.any(String),
-                    updatedBy: testUserId,
+                    updatedBy: systemId,
                     description: workbooksData[1].description,
                     meta: {},
                     projectId: testProjectId,
@@ -204,7 +204,7 @@ describe('Workbooks managment', () => {
         workbooksData[0].title = 'Renamed test workbook title 1';
         workbooksData[0].description = 'Renamed test workbook description 1';
 
-        const response = await withScopeHeaders(
+        const response = await auth(
             request(app).post(`/v2/workbooks/${workbooksData[0].id}/update`),
         )
             .send({
@@ -217,9 +217,9 @@ describe('Workbooks managment', () => {
 
         expect(body).toStrictEqual({
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: workbooksData[0].description,
             meta: {},
             projectId: testProjectId,
@@ -231,21 +231,13 @@ describe('Workbooks managment', () => {
     });
 
     test('Delete workbooks – [DELETE /v2/workbooks/:workbookId]', async () => {
-        await withScopeHeaders(request(app).delete(`/v2/workbooks/${workbooksData[0].id}`)).expect(
-            200,
-        );
-        await withScopeHeaders(request(app).delete(`/v2/workbooks/${workbooksData[1].id}`)).expect(
-            200,
-        );
+        await auth(request(app).delete(`/v2/workbooks/${workbooksData[0].id}`)).expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${workbooksData[1].id}`)).expect(200);
 
-        await withScopeHeaders(request(app).get(`/v2/workbooks/${workbooksData[0].id}`)).expect(
-            404,
-        );
-        await withScopeHeaders(request(app).get(`/v2/workbooks/${workbooksData[1].id}`)).expect(
-            404,
-        );
+        await auth(request(app).get(`/v2/workbooks/${workbooksData[0].id}`)).expect(404);
+        await auth(request(app).get(`/v2/workbooks/${workbooksData[1].id}`)).expect(404);
 
-        const response = await withScopeHeaders(request(app).get(`/v2/workbooks`)).expect(200);
+        const response = await auth(request(app).get(`/v2/workbooks`)).expect(200);
 
         const {body} = response;
 
@@ -263,7 +255,7 @@ describe('Entries in workboooks managment', () => {
         const entry1Name = 'Entry in test workbook 1';
         const entry2Name = 'Entry in test workbook 2';
 
-        const responseWorkbook = await withScopeHeaders(request(app).post('/v2/workbooks'))
+        const responseWorkbook = await auth(request(app).post('/v2/workbooks'))
             .send({
                 title: testTitle,
                 description: testDescription,
@@ -274,9 +266,9 @@ describe('Entries in workboooks managment', () => {
 
         expect(bodyWorkbook).toStrictEqual({
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: testDescription,
             meta: {},
             projectId: testProjectId,
@@ -288,7 +280,7 @@ describe('Entries in workboooks managment', () => {
 
         testWorkbookId = bodyWorkbook.workbookId;
 
-        const responseEntry1 = await withScopeHeaders(request(app).post('/v1/entries'))
+        const responseEntry1 = await auth(request(app).post('/v1/entries'))
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -324,7 +316,7 @@ describe('Entries in workboooks managment', () => {
             workbookId: testWorkbookId,
         });
 
-        const responseEntry2 = await withScopeHeaders(request(app).post('/v1/entries'))
+        const responseEntry2 = await auth(request(app).post('/v1/entries'))
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -362,7 +354,7 @@ describe('Entries in workboooks managment', () => {
     });
 
     test('Get workbook entries – [GET /v2/workbooks/entries]', async () => {
-        const response = await withScopeHeaders(
+        const response = await auth(
             request(app).get(`/v2/workbooks/${testWorkbookId}/entries`),
         ).expect(200);
 
@@ -413,20 +405,20 @@ describe('Entries in workboooks managment', () => {
     test('Copy workbook with entries – [POST /v2/workbooks/:workbookId/copy]', async () => {
         const testNewTitle = 'Copied test workbook with entries title';
 
-        const response = await withScopeHeaders(
-            request(app).post(`/v2/workbooks/${testWorkbookId}/copy`),
-        ).send({
-            newTitle: testNewTitle,
-        });
+        const response = await auth(request(app).post(`/v2/workbooks/${testWorkbookId}/copy`)).send(
+            {
+                newTitle: testNewTitle,
+            },
+        );
 
         const {body} = response;
 
         expect(body).toStrictEqual({
             collectionId: null,
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: testDescription,
             meta: {},
             projectId: testProjectId,
@@ -441,7 +433,7 @@ describe('Entries in workboooks managment', () => {
     });
 
     test('Check entries in copied workbook – [GET /v2/workbooks/entries]', async () => {
-        const response = await withScopeHeaders(
+        const response = await auth(
             request(app).get(`/v2/workbooks/${testCopiedWorkbookId}/entries`),
         ).expect(200);
 
@@ -490,21 +482,17 @@ describe('Entries in workboooks managment', () => {
     });
 
     test('Delete workbooks with entries – [DELETE /v2/workbooks/:workbookId]', async () => {
-        await withScopeHeaders(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
-        await withScopeHeaders(request(app).delete(`/v2/workbooks/${testCopiedWorkbookId}`)).expect(
-            200,
-        );
+        await auth(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${testCopiedWorkbookId}`)).expect(200);
 
-        await withScopeHeaders(request(app).get(`/v2/workbooks/${testWorkbookId}`)).expect(404);
-        await withScopeHeaders(request(app).get(`/v2/workbooks/${testCopiedWorkbookId}`)).expect(
-            404,
-        );
+        await auth(request(app).get(`/v2/workbooks/${testWorkbookId}`)).expect(404);
+        await auth(request(app).get(`/v2/workbooks/${testCopiedWorkbookId}`)).expect(404);
     });
 });
 
 describe('Workbook template', () => {
     test('Create workbook – [POST /v2/workbooks]', async () => {
-        const response = await withScopeHeaders(request(app).post('/v2/workbooks'))
+        const response = await auth(request(app).post('/v2/workbooks'))
             .send({
                 title: testTemplateWorkbookData.title,
                 description: testTemplateWorkbookData.description,
@@ -516,9 +504,9 @@ describe('Workbook template', () => {
         expect(body).toStrictEqual({
             collectionId: null,
             createdAt: expect.any(String),
-            createdBy: testUserId,
+            createdBy: systemId,
             updatedAt: expect.any(String),
-            updatedBy: testUserId,
+            updatedBy: systemId,
             description: testTemplateWorkbookData.description,
             meta: {},
             projectId: testProjectId,

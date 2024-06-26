@@ -12,11 +12,11 @@ import {
     finalRequestHandler,
     checkReadOnlyMode,
     resolveWorkbookId,
+    authZitadel,
 } from './components/middlewares';
 import {AppEnv} from './const';
 import {registry} from './registry';
 import {getRoutes} from './routes';
-import authZitadel from './components/middlewares/auth-zitadel';
 
 registerAppPlugins();
 
@@ -28,7 +28,7 @@ if (nodekit.config.appDevMode) {
 }
 
 if (
-    (nodekit.config.appEnv === AppEnv.IntTesting || nodekit.config.appEnv === AppEnv.Development) &&
+    nodekit.config.appEnv === AppEnv.Development &&
     nodekit.config.appAuthPolicy === AuthPolicy.disabled
 ) {
     beforeAuth.push(setCiEnv);
