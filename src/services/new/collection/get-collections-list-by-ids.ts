@@ -56,21 +56,23 @@ export const getCollectionsListByIds = async (
         .whereIn(CollectionModelColumn.CollectionId, collectionIds)
         .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
 
-    const modelsWithPermissions = models.map(async (model) => {
-        const {Collection} = registry.common.classes.get();
+    const modelsWithPermissions = await Promise.all(
+        models.map(async (model) => {
+            const {Collection} = registry.common.classes.get();
 
-        const collectionInstance = new Collection({
-            ctx,
-            model,
-        });
+            const collectionInstance = new Collection({
+                ctx,
+                model,
+            });
 
-        const collection = await checkAndSetCollectionPermission(
-            {ctx, trx},
-            {collectionInstance, skipCheckPermissions, includePermissionsInfo, permission},
-        );
+            const collection = await checkAndSetCollectionPermission(
+                {ctx, trx},
+                {collectionInstance, skipCheckPermissions, includePermissionsInfo, permission},
+            );
 
-        return collection;
-    });
+            return collection;
+        }),
+    );
 
     ctx.log('GET_COLLECTIONS_LIST_BY_IDS_FINISH', {
         collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),
