@@ -19,6 +19,7 @@ const selectedTenantColumns = [
     TenantColumn.BillingStartedAt,
     TenantColumn.BillingEndedAt,
     TenantColumn.Branding,
+    TenantColumn.Settings,
 ] as const;
 
 const selectedMigrationTenantColumns = [
@@ -48,6 +49,7 @@ export const JoinedMigrationTenantColumn = {
     Migrating: MigrationTenantColumn.Migrating,
     MigrationMeta: MigrationTenantColumn.MigrationMeta,
     Branding: TenantColumn.Branding,
+    Settings: TenantColumn.Settings,
 } as const;
 
 export const selectedJoinedMigrationTenantColumns = [
