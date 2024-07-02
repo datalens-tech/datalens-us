@@ -77,7 +77,7 @@ export const getEntry = async (
         }
 
         const {checkEmbeddingAvailability} = registry.common.functions.get();
-        await checkEmbeddingAvailability(embeddingInfo.chart[EntryColumn.TenantId] as string);
+        await checkEmbeddingAvailability(embeddingInfo.entry[EntryColumn.TenantId] as string);
     }
 
     const isEmbedding = Boolean(embeddingInfo);

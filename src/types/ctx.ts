@@ -12,7 +12,7 @@ export type UserCtxInfo = {
 export type EmbeddingInfo = {
     token: EmbeddingToken;
     embed: EmbedModel;
-    chart: JoinedEntryRevisionColumns;
+    entry: JoinedEntryRevisionColumns;
 };
 
 export type CtxInfo = {
