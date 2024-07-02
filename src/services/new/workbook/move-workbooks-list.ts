@@ -41,15 +41,13 @@ export const moveWorkbooksList = async (
     const targetTrx = getPrimary(trx);
 
     logInfo(ctx, 'MOVE_LIST_WORKBOOKS_START', {
-        workbookIds,
+        workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.encodeId(id)),
         collectionId: Utils.encodeId(collectionId),
     });
 
-    const ids = await Utils.macrotasksMap(workbookIds, (id) => Utils.decodeId(id));
-
     const result = await transaction(targetTrx, async (transactionTrx) => {
         return await Promise.all(
-            ids.map(
+            workbookIds.map(
                 async (workbookId: string) =>
                     await moveWorkbook(
                         {

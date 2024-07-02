@@ -1,5 +1,4 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {getParentIds} from './utils/get-parents';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
@@ -8,9 +7,9 @@ import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/col
 import {CollectionPermission} from '../../../entities/collection';
 import Utils, {logInfo} from '../../../utils';
 import {registry} from '../../../registry';
-import {Feature, isEnabledFeature} from '../../../components/features';
 
 import type {CollectionInstance} from '../../../registry/common/entities/collection/types';
+import {checkAndSetCollectionPermission} from './utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -22,19 +21,23 @@ const validateArgs = makeSchemaValidator({
         includePermissionsInfo: {
             type: 'boolean',
         },
+        permission: {
+            type: 'string',
+        },
     },
 });
 
 export interface GetCollectionArgs {
     collectionId: string;
     includePermissionsInfo?: boolean;
+    permission?: CollectionPermission;
 }
 
 export const getCollection = async <T extends CollectionInstance = CollectionInstance>(
     {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
     args: GetCollectionArgs,
 ): Promise<T> => {
-    const {collectionId, includePermissionsInfo = false} = args;
+    const {collectionId, includePermissionsInfo = false, permission} = args;
 
     logInfo(ctx, 'GET_COLLECTION_START', {
         collectionId: Utils.encodeId(collectionId),
@@ -46,8 +49,6 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
     }
 
     const {tenantId, projectId, isPrivateRoute} = ctx.get('info');
-
-    const {accessServiceEnabled} = ctx.config;
 
     const targetTrx = getReplica(trx);
 
@@ -74,40 +75,18 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
 
     const {Collection} = registry.common.classes.get();
 
-    const collection = new Collection({
+    const collectionInstance = new Collection({
         ctx,
         model,
     });
 
-    if (accessServiceEnabled && !skipCheckPermissions && !isPrivateRoute) {
-        let parentIds: string[] = [];
-
-        if (collection.model.parentId !== null) {
-            parentIds = await getParentIds({
-                ctx,
-                trx: targetTrx,
-                collectionId: collection.model.parentId,
-            });
-        }
-
-        logInfo(ctx, 'CHECK_VIEW_PERMISSION');
-
-        await collection.checkPermission({
-            parentIds,
-            permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                ? CollectionPermission.LimitedView
-                : CollectionPermission.View,
-        });
-
-        if (includePermissionsInfo) {
-            await collection.fetchAllPermissions({parentIds});
-        }
-    } else if (includePermissionsInfo) {
-        collection.enableAllPermissions();
-    }
+    const collection = await checkAndSetCollectionPermission(
+        {ctx, trx},
+        {collectionInstance, skipCheckPermissions, includePermissionsInfo, permission},
+    );
 
     logInfo(ctx, 'GET_COLLECTION_FINISH', {
-        collectionId: Utils.encodeId(collection.model.collectionId),
+        collectionId: Utils.encodeId(model.collectionId),
     });
 
     return collection as T;

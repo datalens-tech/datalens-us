@@ -1,8 +1,6 @@
-import {getCollection} from './get-collection';
-import {getParentIds} from './utils/get-parents';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
-import {deleteWorkbook} from '../workbook';
+import {deleteWorkbooks} from '../workbook';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {raw, transaction} from 'objection';
@@ -11,26 +9,28 @@ import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workboo
 import Utils, {logInfo} from '../../../utils';
 import {CollectionPermission} from '../../../entities/collection';
 import {AppError} from '@gravity-ui/nodekit';
+import {getCollectionsListByIds} from './get-collections-list-by-ids';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
-    required: ['collectionId'],
+    required: ['collectionIds'],
     properties: {
-        collectionId: {
-            type: 'string',
+        collectionIds: {
+            type: 'array',
+            items: {type: 'string'},
         },
     },
 });
 
 export interface DeleteCollectionArgs {
-    collectionId: string;
+    collectionIds: string[];
 }
 
-export const deleteCollection = async (
+export const deleteCollections = async (
     {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
     args: DeleteCollectionArgs,
 ) => {
-    const {collectionId} = args;
+    const {collectionIds} = args;
 
     const {
         tenantId,
@@ -38,10 +38,8 @@ export const deleteCollection = async (
         user: {userId},
     } = ctx.get('info');
 
-    const {accessServiceEnabled} = ctx.config;
-
-    logInfo(ctx, 'DELETE_COLLECTION_START', {
-        collectionId: Utils.encodeId(collectionId),
+    logInfo(ctx, 'DELETE_COLLECTIONS_START', {
+        collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),
     });
 
     if (!skipValidation) {
@@ -50,27 +48,10 @@ export const deleteCollection = async (
 
     const targetTrx = getPrimary(trx);
 
-    const collection = await getCollection(
-        {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions: true},
-        {collectionId},
+    await getCollectionsListByIds(
+        {ctx, trx: targetTrx, skipValidation, skipCheckPermissions},
+        {collectionIds, permission: CollectionPermission.Delete},
     );
-
-    if (accessServiceEnabled && !skipCheckPermissions) {
-        let parentIds: string[] = [];
-
-        if (collection.model.parentId !== null) {
-            parentIds = await getParentIds({
-                ctx,
-                trx: targetTrx,
-                collectionId: collection.model.parentId,
-            });
-        }
-
-        await collection.checkPermission({
-            parentIds,
-            permission: CollectionPermission.Delete,
-        });
-    }
 
     const result = await transaction(targetTrx, async (transactionTrx) => {
         const recursiveName = 'collectionChildren';
@@ -83,8 +64,8 @@ export const deleteCollection = async (
                         [CollectionModelColumn.TenantId]: tenantId,
                         [CollectionModelColumn.ProjectId]: projectId,
                         [CollectionModelColumn.DeletedAt]: null,
-                        [CollectionModelColumn.CollectionId]: collectionId,
                     })
+                    .whereIn([CollectionModelColumn.CollectionId], collectionIds)
                     .union((qb2) => {
                         qb2.select(`${CollectionModel.tableName}.*`)
                             .from(CollectionModel.tableName)
@@ -125,17 +106,16 @@ export const deleteCollection = async (
             }
         }
 
-        // TODO: Rewrite the deletion for the optimal number of requests
-        await Promise.all(
-            workbooksForDelete.map((workbook) => {
-                return deleteWorkbook(
-                    {ctx, trx: transactionTrx},
-                    {
-                        workbookId: workbook.workbookId,
-                    },
-                );
-            }),
-        );
+        const workbookIds = workbooksForDelete.map((workbook) => workbook.workbookId);
+
+        if (workbookIds.length) {
+            await deleteWorkbooks(
+                {ctx, trx: transactionTrx, skipCheckPermissions: true},
+                {
+                    workbookIds,
+                },
+            );
+        }
 
         const deletedCollections = await CollectionModel.query(transactionTrx)
             .patch({
@@ -143,7 +123,7 @@ export const deleteCollection = async (
                 [CollectionModelColumn.DeletedAt]: raw(CURRENT_TIMESTAMP),
             })
             .where(CollectionModelColumn.CollectionId, 'in', collectionsForDeleteIds)
-            .where({
+            .andWhere({
                 [CollectionModelColumn.DeletedAt]: null,
             })
             .returning('*')
@@ -152,12 +132,11 @@ export const deleteCollection = async (
         return deletedCollections;
     });
 
-    logInfo(ctx, 'DELETE_COLLECTION_FINISH', {
-        deletedCollections: await Utils.macrotasksMap(result, (item) =>
-            Utils.encodeId(item.collectionId),
+    ctx.log('DELETE_COLLECTIONS_FINISH', {
+        collectionIds: await Utils.macrotasksMap(result, (collection) =>
+            Utils.encodeId(collection.collectionId),
         ),
     });
 
-    // TODO: Return deleted workbooks and entries
     return {collections: result};
 };
