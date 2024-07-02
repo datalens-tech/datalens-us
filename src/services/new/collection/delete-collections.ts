@@ -110,7 +110,7 @@ export const deleteCollections = async (
 
         if (workbookIds.length) {
             await deleteWorkbooks(
-                {ctx, trx: transactionTrx},
+                {ctx, trx: transactionTrx, skipCheckPermissions: true},
                 {
                     workbookIds,
                 },
