@@ -101,8 +101,6 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
         if (includePermissionsInfo) {
             await workbook.fetchAllPermissions({parentIds});
         }
-    } else if (includePermissionsInfo) {
-        workbook.enableAllPermissions();
     }
 
     logInfo(ctx, 'GET_WORKBOOK_FINISH', {

@@ -217,16 +217,6 @@ export const getCollectionContent = async (
                         })),
                     );
                 }
-            } else {
-                collections = curCollectionsPage.results.map((model) => {
-                    const collection = new Collection({ctx, model});
-
-                    if (includePermissionsInfo) {
-                        collection.enableAllPermissions();
-                    }
-
-                    return collection;
-                });
             }
         }
     }

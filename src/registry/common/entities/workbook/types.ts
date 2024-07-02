@@ -9,17 +9,13 @@ export interface WorkbookConstructor<T = void> {
 export interface WorkbookInstance {
     ctx: AppContext;
     model: WorkbookModel;
-    permissions?: Permissions;
+    permissions: Permissions;
 
     register(args: {parentIds: string[]}): Promise<unknown>;
 
     checkPermission(args: {parentIds: string[]; permission: WorkbookPermission}): Promise<void>;
 
     fetchAllPermissions(args: {parentIds: string[]}): Promise<void>;
-
-    setPermissions(permissions: Permissions): void;
-
-    enableAllPermissions(): void;
 }
 
 export type BulkFetchWorkbooksAllPermissions = (

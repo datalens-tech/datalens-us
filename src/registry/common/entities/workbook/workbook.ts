@@ -1,42 +1,58 @@
 import type {AppContext} from '@gravity-ui/nodekit';
 import type {WorkbookModel} from '../../../../db/models/new/workbook';
+import {AppError} from '@gravity-ui/nodekit';
 import {WorkbookConstructor, WorkbookInstance} from './types';
-import {Permissions} from '../../../../entities/workbook/types';
+import {Permissions, WorkbookPermission} from '../../../../entities/workbook/types';
+import {ZitadelUserRole} from '../../../../utils/zitadel';
+import {US_ERRORS} from '../../../../const';
 
 export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
     implements WorkbookInstance
 {
     ctx: AppContext;
     model: WorkbookModel;
-    permissions?: Permissions;
+    permissions: Permissions;
 
     constructor({ctx, model}: {ctx: AppContext; model: WorkbookModel}) {
         this.ctx = ctx;
         this.model = model;
-    }
 
-    async register() {}
+        const {zitadelUserRole: role} = this.ctx.config;
 
-    async checkPermission() {}
+        const isEditorOrAdmin = role === ZitadelUserRole.Editor || role === ZitadelUserRole.Admin;
 
-    async fetchAllPermissions() {}
-
-    setPermissions(permissions: Permissions) {
-        this.permissions = permissions;
-    }
-
-    enableAllPermissions() {
         this.permissions = {
-            listAccessBindings: true,
-            updateAccessBindings: true,
+            listAccessBindings: isEditorOrAdmin,
+            updateAccessBindings: isEditorOrAdmin,
             limitedView: true,
             view: true,
-            update: true,
-            copy: true,
-            move: true,
-            publish: true,
-            embed: true,
-            delete: true,
+            update: isEditorOrAdmin,
+            copy: isEditorOrAdmin,
+            move: isEditorOrAdmin,
+            publish: isEditorOrAdmin,
+            embed: isEditorOrAdmin,
+            delete: isEditorOrAdmin,
         };
+    }
+
+    async register(_args: {parentIds: string[]}): Promise<unknown> {
+        return Promise.resolve();
+    }
+
+    async checkPermission(args: {
+        parentIds: string[];
+        permission: WorkbookPermission;
+    }): Promise<void> {
+        if (this.permissions[args.permission] === false) {
+            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
+                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
+            });
+        }
+
+        return Promise.resolve();
+    }
+
+    async fetchAllPermissions(_args: {parentIds: string[]}): Promise<void> {
+        return Promise.resolve();
     }
 };

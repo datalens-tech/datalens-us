@@ -3,10 +3,10 @@ import {Utils} from './utils';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
-enum ZitadelUserRole {
-    Creator = 'creator',
-    Admin = 'admin',
-    Viewer = 'viewer',
+export enum ZitadelUserRole {
+    Editor = 'datalens.editor',
+    Admin = 'datalens.admin',
+    Viewer = 'datalens.viewer',
 }
 
 type IntrospectionResult = {
@@ -28,12 +28,12 @@ const getRole = (data: any): ZitadelUserRole => {
         return ZitadelUserRole.Viewer;
     }
 
-    if (roles['admin']) {
+    if (roles['datalens.admin']) {
         return ZitadelUserRole.Admin;
     }
 
-    if (roles['creator']) {
-        return ZitadelUserRole.Creator;
+    if (roles['datalens.editor']) {
+        return ZitadelUserRole.Editor;
     }
 
     return ZitadelUserRole.Viewer;

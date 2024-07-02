@@ -33,7 +33,7 @@ export default {
     tenantIdOverride: 'common',
 
     dlsEnabled: false,
-    accessServiceEnabled: false,
+    accessServiceEnabled: true,
     accessBindingsServiceEnabled: false,
 
     masterToken: Utils.getEnvTokenVariable('MASTER_TOKEN'),
