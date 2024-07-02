@@ -15,6 +15,8 @@ export interface WorkbookInstance {
 
     checkPermission(args: {parentIds: string[]; permission: WorkbookPermission}): Promise<void>;
 
+    setPermissions(permissions: Permissions): void;
+
     fetchAllPermissions(args: {parentIds: string[]}): Promise<void>;
 }
 

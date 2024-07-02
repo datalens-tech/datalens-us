@@ -15,6 +15,8 @@ export interface CollectionInstance {
 
     checkPermission(args: {parentIds: string[]; permission: CollectionPermission}): Promise<void>;
 
+    setPermissions(permissions: Permissions): void;
+
     fetchAllPermissions(args: {parentIds: string[]}): Promise<void>;
 }
 

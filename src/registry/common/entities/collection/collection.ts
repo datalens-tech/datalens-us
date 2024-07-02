@@ -47,5 +47,7 @@ export const Collection: CollectionConstructor = class Collection implements Col
         return Promise.resolve();
     }
 
+    setPermissions() {}
+
     async fetchAllPermissions() {}
 };

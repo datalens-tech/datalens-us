@@ -52,6 +52,8 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
         return Promise.resolve();
     }
 
+    setPermissions() {}
+
     async fetchAllPermissions(_args: {parentIds: string[]}): Promise<void> {
         return Promise.resolve();
     }
