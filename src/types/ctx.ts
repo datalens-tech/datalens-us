@@ -28,5 +28,5 @@ export type CtxInfo = {
     projectId: string | null;
     embeddingInfo?: EmbeddingInfo;
     serviceUser?: ZitadelServiceUser;
-    zitadelUserRole: ZitadelUserRole;
+    zitadelUserRole?: ZitadelUserRole;
 };
