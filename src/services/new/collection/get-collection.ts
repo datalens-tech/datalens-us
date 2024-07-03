@@ -102,6 +102,8 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
         if (includePermissionsInfo) {
             await collection.fetchAllPermissions({parentIds});
         }
+    } else if (includePermissionsInfo) {
+        collection.enableAllPermissions();
     }
 
     logInfo(ctx, 'GET_COLLECTION_FINISH', {

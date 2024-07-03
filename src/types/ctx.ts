@@ -2,7 +2,7 @@ import {EmbedModel} from '../db/models/new/embed';
 import {JoinedEntryRevisionColumns} from '../db/presentations/joined-entry-revision';
 import {EmbeddingToken} from '../types/embedding';
 import {PrivatePermissions} from './models';
-import {ZitadelServiceUser} from './zitadel';
+import {ZitadelServiceUser, ZitadelUserRole} from './zitadel';
 
 export type UserCtxInfo = {
     userId: string;
@@ -28,4 +28,5 @@ export type CtxInfo = {
     projectId: string | null;
     embeddingInfo?: EmbeddingInfo;
     serviceUser?: ZitadelServiceUser;
+    zitadelUserRole: ZitadelUserRole;
 };

@@ -9,13 +9,15 @@ export interface CollectionConstructor<T extends CollectionInstance = Collection
 export interface CollectionInstance {
     ctx: AppContext;
     model: CollectionModel;
-    permissions: Permissions;
+    permissions?: Permissions;
 
     register(args: {parentIds: string[]}): Promise<unknown>;
 
     checkPermission(args: {parentIds: string[]; permission: CollectionPermission}): Promise<void>;
 
     setPermissions(permissions: Permissions): void;
+
+    enableAllPermissions(): void;
 
     fetchAllPermissions(args: {parentIds: string[]}): Promise<void>;
 }

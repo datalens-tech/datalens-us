@@ -4,17 +4,56 @@ import {AppError} from '@gravity-ui/nodekit';
 import {CollectionConstructor, CollectionInstance} from './types';
 import {CollectionPermission, Permissions} from '../../../../entities/collection/types';
 import {US_ERRORS} from '../../../../const';
-import {ZitadelUserRole} from '../../../../utils/zitadel';
+import {ZitadelUserRole} from '../../../../types/zitadel';
 
 export const Collection: CollectionConstructor = class Collection implements CollectionInstance {
     ctx: AppContext;
     model: CollectionModel;
-    permissions: Permissions;
+    permissions?: Permissions;
 
     constructor({ctx, model}: {ctx: AppContext; model: CollectionModel}) {
         this.ctx = ctx;
         this.model = model;
-        const {zitadelUserRole: role} = this.ctx.config;
+    }
+
+    async register() {}
+
+    async checkPermission(args: {
+        parentIds: string[];
+        permission: CollectionPermission;
+    }): Promise<void> {
+        this.fetchAllPermissions();
+
+        if (!this.permissions || this.permissions[args.permission] === false) {
+            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
+                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
+            });
+        }
+
+        return Promise.resolve();
+    }
+
+    enableAllPermissions() {
+        this.permissions = {
+            listAccessBindings: true,
+            updateAccessBindings: true,
+            createCollection: true,
+            createWorkbook: true,
+            limitedView: true,
+            view: true,
+            update: true,
+            copy: true,
+            move: true,
+            delete: true,
+        };
+    }
+
+    setPermissions(permissions: Permissions) {
+        this.permissions = permissions;
+    }
+
+    async fetchAllPermissions() {
+        const {zitadelUserRole: role} = this.ctx.get('info');
 
         const isEditorOrAdmin = role === ZitadelUserRole.Editor || role === ZitadelUserRole.Admin;
 
@@ -31,23 +70,4 @@ export const Collection: CollectionConstructor = class Collection implements Col
             delete: isEditorOrAdmin,
         };
     }
-
-    async register() {}
-
-    async checkPermission(args: {
-        parentIds: string[];
-        permission: CollectionPermission;
-    }): Promise<void> {
-        if (this.permissions[args.permission] === false) {
-            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
-            });
-        }
-
-        return Promise.resolve();
-    }
-
-    setPermissions() {}
-
-    async fetchAllPermissions() {}
 };

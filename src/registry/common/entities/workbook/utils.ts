@@ -7,6 +7,8 @@ export const bulkFetchWorkbooksAllPermissions: BulkFetchWorkbooksAllPermissions 
 ) => {
     return items.map(({model}) => {
         const workbook = new Workbook({ctx, model});
+        // workbook.enableAllPermissions();
+        workbook.fetchAllPermissions({parentIds: []});
         return workbook;
     });
 };

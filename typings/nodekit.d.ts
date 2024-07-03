@@ -18,8 +18,6 @@ export interface SharedAppConfig {
     zitadelUri?: string;
     clientId?: string;
     clientSecret?: string;
-
-    zitadelUserRole?: ZitadelUserRole;
 }
 declare module '@gravity-ui/nodekit' {
     export interface AppConfig extends SharedAppConfig {}

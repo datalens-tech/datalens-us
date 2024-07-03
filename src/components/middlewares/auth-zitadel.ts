@@ -26,7 +26,7 @@ export const authZitadel = async (req: Request, res: Response, next: NextFunctio
             res.locals.userId = r1.userId;
             res.locals.login = r1.username;
             res.locals.serviceUser = r2.username;
-            ctx.config.zitadelUserRole = r1.role;
+            res.locals.zitadelUserRole = r1.role;
             return next();
         }
     }

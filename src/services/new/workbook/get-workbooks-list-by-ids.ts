@@ -86,6 +86,7 @@ export const getWorkbooksListByIds = async (
         if (includePermissionsInfo) {
             return workbookList.map((model) => {
                 const workbook = new Workbook({ctx, model});
+                workbook.enableAllPermissions();
                 return workbook;
             });
         }

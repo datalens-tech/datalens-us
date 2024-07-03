@@ -2,12 +2,7 @@ import {AppContext} from '@gravity-ui/nodekit';
 import {Utils} from './utils';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
-
-export enum ZitadelUserRole {
-    Editor = 'datalens.editor',
-    Admin = 'datalens.admin',
-    Viewer = 'datalens.viewer',
-}
+import {ZitadelUserRole} from '../types/zitadel';
 
 type IntrospectionResult = {
     active: boolean;

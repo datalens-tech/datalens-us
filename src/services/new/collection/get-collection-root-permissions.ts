@@ -12,8 +12,8 @@ export const getRootCollectionPermissions = async ({ctx}: ServiceArgs) => {
     const {accessServiceEnabled} = ctx.config;
 
     const result = {
-        createCollectionInRoot: false,
-        createWorkbookInRoot: false,
+        createCollectionInRoot: true,
+        createWorkbookInRoot: true,
     };
 
     if (accessServiceEnabled) {
