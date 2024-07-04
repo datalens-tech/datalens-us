@@ -7,7 +7,11 @@ export const bulkFetchCollectionsAllPermissions: BulkFetchCollectionsAllPermissi
 ) => {
     return items.map(({model}) => {
         const collection = new Collection({ctx, model});
-        collection.fetchAllPermissions({parentIds: []});
+        if (ctx.config.zitadelEnabled) {
+            collection.fetchAllPermissions({parentIds: []});
+        } else {
+            collection.enableAllPermissions();
+        }
         return collection;
     });
 };

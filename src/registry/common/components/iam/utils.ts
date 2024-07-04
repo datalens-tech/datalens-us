@@ -15,27 +15,29 @@ export const checkOrganizationPermission: CheckOrganizationPermission = async (a
     permission: OrganizationPermission;
 }) => {
     const {ctx, permission} = args;
-    const {zitadelUserRole: role} = ctx.get('info');
+    if (ctx.config.zitadelEnabled) {
+        const {zitadelUserRole: role} = ctx.get('info');
 
-    switch (permission) {
-        case OrganizationPermission.UseInstance:
-            break;
+        switch (permission) {
+            case OrganizationPermission.UseInstance:
+                break;
 
-        case OrganizationPermission.ManageInstance:
-            if (role !== ZitadelUserRole.Admin) {
+            case OrganizationPermission.ManageInstance:
+                if (role !== ZitadelUserRole.Admin) {
+                    throwAccessServicePermissionDenied();
+                }
+                break;
+
+            case OrganizationPermission.CreateCollectionInRoot:
+            case OrganizationPermission.CreateWorkbookInRoot:
+                if (role !== ZitadelUserRole.Editor && role !== ZitadelUserRole.Admin) {
+                    throwAccessServicePermissionDenied();
+                }
+                break;
+
+            default:
                 throwAccessServicePermissionDenied();
-            }
-            break;
-
-        case OrganizationPermission.CreateCollectionInRoot:
-        case OrganizationPermission.CreateWorkbookInRoot:
-            if (role !== ZitadelUserRole.Editor && role !== ZitadelUserRole.Admin) {
-                throwAccessServicePermissionDenied();
-            }
-            break;
-
-        default:
-            throwAccessServicePermissionDenied();
+        }
     }
 };
 
@@ -44,17 +46,20 @@ export const checkProjectPermission: CheckProjectPermission = async (args: {
     permission: ProjectPermission;
 }) => {
     const {ctx, permission} = args;
-    const {zitadelUserRole: role} = ctx.get('info');
 
-    switch (permission) {
-        case ProjectPermission.CreateCollectionInRoot:
-        case ProjectPermission.CreateWorkbookInRoot:
-            if (role !== ZitadelUserRole.Editor && role !== ZitadelUserRole.Admin) {
+    if (ctx.config.zitadelEnabled) {
+        const {zitadelUserRole: role} = ctx.get('info');
+
+        switch (permission) {
+            case ProjectPermission.CreateCollectionInRoot:
+            case ProjectPermission.CreateWorkbookInRoot:
+                if (role !== ZitadelUserRole.Editor && role !== ZitadelUserRole.Admin) {
+                    throwAccessServicePermissionDenied();
+                }
+                break;
+
+            default:
                 throwAccessServicePermissionDenied();
-            }
-            break;
-
-        default:
-            throwAccessServicePermissionDenied();
+        }
     }
 };

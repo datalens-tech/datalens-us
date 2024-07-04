@@ -23,11 +23,11 @@ const getRole = (data: any): ZitadelUserRole => {
         return ZitadelUserRole.Viewer;
     }
 
-    if (roles['datalens.admin']) {
+    if (roles[ZitadelUserRole.Admin]) {
         return ZitadelUserRole.Admin;
     }
 
-    if (roles['datalens.editor']) {
+    if (roles[ZitadelUserRole.Editor]) {
         return ZitadelUserRole.Editor;
     }
 
