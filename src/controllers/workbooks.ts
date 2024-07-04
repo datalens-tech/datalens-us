@@ -180,9 +180,7 @@ export default {
             },
         );
 
-        const formattedResponse = formatWorkbookModelsList(result);
-
-        const {code, response} = await prepareResponseAsync({data: formattedResponse});
+        const {code, response} = await prepareResponseAsync({data: result.workbooks[0]});
 
         res.status(code).send(response);
     },

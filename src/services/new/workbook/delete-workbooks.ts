@@ -134,8 +134,8 @@ export const deleteWorkbooks = async (
     }
 
     logInfo(ctx, 'DELETE_WORKBOOKS_FINISH', {
-        workbookIds: await Utils.macrotasksMap(result, (collection) =>
-            Utils.encodeId(collection.collectionId),
+        workbookIds: await Utils.macrotasksMap(result, (workbook) =>
+            Utils.encodeId(workbook.workbookId),
         ),
     });
 

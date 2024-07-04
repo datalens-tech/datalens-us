@@ -75,7 +75,10 @@ export const getCollectionsListByIds = async (
     );
 
     ctx.log('GET_COLLECTIONS_LIST_BY_IDS_FINISH', {
-        collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),
+        collectionIds: await Utils.macrotasksMap(
+            models.map((item) => item.collectionId),
+            (id) => Utils.encodeId(id),
+        ),
     });
 
     return modelsWithPermissions;
