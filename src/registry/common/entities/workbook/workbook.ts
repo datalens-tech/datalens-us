@@ -18,31 +18,12 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
         this.model = model;
     }
 
-    async register(_args: {parentIds: string[]}): Promise<unknown> {
-        return Promise.resolve();
-    }
-
-    async checkPermission(args: {
-        parentIds: string[];
-        permission: WorkbookPermission;
-    }): Promise<void> {
-        this.fetchAllPermissions();
-
-        if (!this.permissions || this.permissions[args.permission] === false) {
-            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
-            });
-        }
-
-        return Promise.resolve();
-    }
-
-    async fetchAllPermissions(): Promise<void> {
+    private getAllPermissions() {
         const {zitadelUserRole: role} = this.ctx.get('info');
 
         const isEditorOrAdmin = role === ZitadelUserRole.Editor || role === ZitadelUserRole.Admin;
 
-        this.permissions = {
+        const permissions = {
             listAccessBindings: true,
             updateAccessBindings: isEditorOrAdmin,
             limitedView: true,
@@ -55,6 +36,30 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
             delete: isEditorOrAdmin,
         };
 
+        return permissions;
+    }
+
+    async register(_args: {parentIds: string[]}): Promise<unknown> {
+        return Promise.resolve();
+    }
+
+    async checkPermission(args: {
+        parentIds: string[];
+        permission: WorkbookPermission;
+    }): Promise<void> {
+        const permissions = this.getAllPermissions();
+
+        if (permissions[args.permission] === false) {
+            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
+                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
+            });
+        }
+
+        return Promise.resolve();
+    }
+
+    async fetchAllPermissions(): Promise<void> {
+        this.permissions = this.getAllPermissions();
         return Promise.resolve();
     }
 

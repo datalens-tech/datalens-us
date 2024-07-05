@@ -16,15 +16,36 @@ export const Collection: CollectionConstructor = class Collection implements Col
         this.model = model;
     }
 
+    private getAllPermissions() {
+        const {zitadelUserRole: role} = this.ctx.get('info');
+
+        const isEditorOrAdmin = role === ZitadelUserRole.Editor || role === ZitadelUserRole.Admin;
+
+        const permissions = {
+            listAccessBindings: true,
+            updateAccessBindings: isEditorOrAdmin,
+            createCollection: isEditorOrAdmin,
+            createWorkbook: isEditorOrAdmin,
+            limitedView: true,
+            view: true,
+            update: isEditorOrAdmin,
+            copy: isEditorOrAdmin,
+            move: isEditorOrAdmin,
+            delete: isEditorOrAdmin,
+        };
+
+        return permissions;
+    }
+
     async register() {}
 
     async checkPermission(args: {
         parentIds: string[];
         permission: CollectionPermission;
     }): Promise<void> {
-        this.fetchAllPermissions();
+        const permissions = this.getAllPermissions();
 
-        if (!this.permissions || this.permissions[args.permission] === false) {
+        if (permissions[args.permission] === false) {
             throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
                 code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
             });
@@ -53,21 +74,7 @@ export const Collection: CollectionConstructor = class Collection implements Col
     }
 
     async fetchAllPermissions() {
-        const {zitadelUserRole: role} = this.ctx.get('info');
-
-        const isEditorOrAdmin = role === ZitadelUserRole.Editor || role === ZitadelUserRole.Admin;
-
-        this.permissions = {
-            listAccessBindings: true,
-            updateAccessBindings: isEditorOrAdmin,
-            createCollection: isEditorOrAdmin,
-            createWorkbook: isEditorOrAdmin,
-            limitedView: true,
-            view: true,
-            update: isEditorOrAdmin,
-            copy: isEditorOrAdmin,
-            move: isEditorOrAdmin,
-            delete: isEditorOrAdmin,
-        };
+        this.permissions = this.getAllPermissions();
+        return Promise.resolve();
     }
 };
