@@ -7,7 +7,7 @@ export const bulkFetchCollectionsAllPermissions: BulkFetchCollectionsAllPermissi
 ) => {
     return items.map(({model}) => {
         const collection = new Collection({ctx, model});
-        if (ctx.config.zitadelEnabled) {
+        if (ctx.config.accessServiceEnabled) {
             collection.fetchAllPermissions({parentIds: []});
         } else {
             collection.enableAllPermissions();

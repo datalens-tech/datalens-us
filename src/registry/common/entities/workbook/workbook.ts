@@ -26,38 +26,35 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
         parentIds: string[];
         permission: WorkbookPermission;
     }): Promise<void> {
-        if (this.ctx.config.zitadelEnabled) {
-            this.fetchAllPermissions();
+        this.fetchAllPermissions();
 
-            if (!this.permissions || this.permissions[args.permission] === false) {
-                throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-                    code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
-                });
-            }
+        if (!this.permissions || this.permissions[args.permission] === false) {
+            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
+                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
+            });
         }
+
         return Promise.resolve();
     }
 
     async fetchAllPermissions(): Promise<void> {
-        if (this.ctx.config.zitadelEnabled) {
-            const {zitadelUserRole: role} = this.ctx.get('info');
+        const {zitadelUserRole: role} = this.ctx.get('info');
 
-            const isEditorOrAdmin =
-                role === ZitadelUserRole.Editor || role === ZitadelUserRole.Admin;
+        const isEditorOrAdmin = role === ZitadelUserRole.Editor || role === ZitadelUserRole.Admin;
 
-            this.permissions = {
-                listAccessBindings: true,
-                updateAccessBindings: isEditorOrAdmin,
-                limitedView: true,
-                view: true,
-                update: isEditorOrAdmin,
-                copy: isEditorOrAdmin,
-                move: isEditorOrAdmin,
-                publish: isEditorOrAdmin,
-                embed: isEditorOrAdmin,
-                delete: isEditorOrAdmin,
-            };
-        }
+        this.permissions = {
+            listAccessBindings: true,
+            updateAccessBindings: isEditorOrAdmin,
+            limitedView: true,
+            view: true,
+            update: isEditorOrAdmin,
+            copy: isEditorOrAdmin,
+            move: isEditorOrAdmin,
+            publish: isEditorOrAdmin,
+            embed: isEditorOrAdmin,
+            delete: isEditorOrAdmin,
+        };
+
         return Promise.resolve();
     }
 

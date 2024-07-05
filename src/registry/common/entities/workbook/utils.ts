@@ -7,7 +7,7 @@ export const bulkFetchWorkbooksAllPermissions: BulkFetchWorkbooksAllPermissions 
 ) => {
     return items.map(({model}) => {
         const workbook = new Workbook({ctx, model});
-        if (ctx.config.zitadelEnabled) {
+        if (ctx.config.accessServiceEnabled) {
             workbook.fetchAllPermissions({parentIds: []});
         } else {
             workbook.enableAllPermissions();

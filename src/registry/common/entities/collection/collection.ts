@@ -22,14 +22,12 @@ export const Collection: CollectionConstructor = class Collection implements Col
         parentIds: string[];
         permission: CollectionPermission;
     }): Promise<void> {
-        if (this.ctx.config.zitadelEnabled) {
-            this.fetchAllPermissions();
+        this.fetchAllPermissions();
 
-            if (!this.permissions || this.permissions[args.permission] === false) {
-                throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-                    code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
-                });
-            }
+        if (!this.permissions || this.permissions[args.permission] === false) {
+            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
+                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
+            });
         }
 
         return Promise.resolve();
@@ -55,24 +53,21 @@ export const Collection: CollectionConstructor = class Collection implements Col
     }
 
     async fetchAllPermissions() {
-        if (this.ctx.config.zitadelEnabled) {
-            const {zitadelUserRole: role} = this.ctx.get('info');
+        const {zitadelUserRole: role} = this.ctx.get('info');
 
-            const isEditorOrAdmin =
-                role === ZitadelUserRole.Editor || role === ZitadelUserRole.Admin;
+        const isEditorOrAdmin = role === ZitadelUserRole.Editor || role === ZitadelUserRole.Admin;
 
-            this.permissions = {
-                listAccessBindings: true,
-                updateAccessBindings: isEditorOrAdmin,
-                createCollection: isEditorOrAdmin,
-                createWorkbook: isEditorOrAdmin,
-                limitedView: true,
-                view: true,
-                update: isEditorOrAdmin,
-                copy: isEditorOrAdmin,
-                move: isEditorOrAdmin,
-                delete: isEditorOrAdmin,
-            };
-        }
+        this.permissions = {
+            listAccessBindings: true,
+            updateAccessBindings: isEditorOrAdmin,
+            createCollection: isEditorOrAdmin,
+            createWorkbook: isEditorOrAdmin,
+            limitedView: true,
+            view: true,
+            update: isEditorOrAdmin,
+            copy: isEditorOrAdmin,
+            move: isEditorOrAdmin,
+            delete: isEditorOrAdmin,
+        };
     }
 };
