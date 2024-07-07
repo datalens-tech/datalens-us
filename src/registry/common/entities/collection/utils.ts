@@ -7,7 +7,11 @@ export const bulkFetchCollectionsAllPermissions: BulkFetchCollectionsAllPermissi
 ) => {
     return items.map(({model}) => {
         const collection = new Collection({ctx, model});
-        collection.enableAllPermissions();
+        if (ctx.config.accessServiceEnabled) {
+            collection.fetchAllPermissions({parentIds: []});
+        } else {
+            collection.enableAllPermissions();
+        }
         return collection;
     });
 };

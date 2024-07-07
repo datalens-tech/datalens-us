@@ -15,11 +15,11 @@ export interface CollectionInstance {
 
     checkPermission(args: {parentIds: string[]; permission: CollectionPermission}): Promise<void>;
 
-    fetchAllPermissions(args: {parentIds: string[]}): Promise<void>;
-
     setPermissions(permissions: Permissions): void;
 
     enableAllPermissions(): void;
+
+    fetchAllPermissions(args: {parentIds: string[]}): Promise<void>;
 }
 
 export type BulkFetchCollectionsAllPermissions = (

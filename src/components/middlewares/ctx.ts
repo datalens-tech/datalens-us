@@ -13,6 +13,7 @@ export const ctx = async (req: Request, res: Response, next: NextFunction) => {
         onlyPublic,
         projectId,
         serviceUser,
+        zitadelUserRole,
     } = res.locals;
 
     const privatePermissions = resolvePrivatePermissions(
@@ -30,6 +31,7 @@ export const ctx = async (req: Request, res: Response, next: NextFunction) => {
         privatePermissions,
         projectId: projectId || null,
         serviceUser,
+        zitadelUserRole,
     });
 
     next();

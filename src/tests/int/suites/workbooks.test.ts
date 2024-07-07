@@ -1,8 +1,9 @@
 import request from 'supertest';
-import {systemId, testTenantId, testProjectId} from '../constants';
+import {systemId, testTenantId, testProjectId, ZITADEL_USER_ROLE_HEADER} from '../constants';
 import {US_MASTER_TOKEN_HEADER} from '../../../const';
 import usApp from '../../..';
 import {auth} from '../utils';
+import {ZitadelUserRole} from '../../../types/zitadel';
 
 const app = usApp.express;
 const masterToken = usApp.config.masterToken[0];
@@ -102,6 +103,24 @@ describe('Workbooks managment', () => {
             workbookId: workbooksData[0].id,
             collectionId: null,
         });
+
+        const response1 = await auth(request(app).get(`/v2/workbooks/${workbooksData[0].id}`))
+            .set({[ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor})
+            .expect(200);
+
+        expect(response1.body).toStrictEqual({
+            createdAt: expect.any(String),
+            createdBy: systemId,
+            updatedAt: expect.any(String),
+            updatedBy: systemId,
+            description: workbooksData[0].description,
+            meta: {},
+            projectId: testProjectId,
+            tenantId: testTenantId,
+            title: workbooksData[0].title,
+            workbookId: workbooksData[0].id,
+            collectionId: null,
+        });
     });
 
     test('Get list of workbooks – [GET /v2/workbooks]', async () => {
@@ -110,6 +129,41 @@ describe('Workbooks managment', () => {
         const {body} = response;
 
         expect(body).toStrictEqual({
+            workbooks: expect.arrayContaining([
+                {
+                    createdAt: expect.any(String),
+                    createdBy: systemId,
+                    updatedAt: expect.any(String),
+                    updatedBy: systemId,
+                    description: workbooksData[1].description,
+                    meta: {},
+                    projectId: testProjectId,
+                    tenantId: testTenantId,
+                    title: workbooksData[1].title,
+                    workbookId: workbooksData[1].id,
+                    collectionId: null,
+                },
+                {
+                    createdAt: expect.any(String),
+                    createdBy: systemId,
+                    updatedAt: expect.any(String),
+                    updatedBy: systemId,
+                    description: workbooksData[0].description,
+                    meta: {},
+                    projectId: testProjectId,
+                    tenantId: testTenantId,
+                    title: workbooksData[0].title,
+                    workbookId: workbooksData[0].id,
+                    collectionId: null,
+                },
+            ]),
+        });
+
+        const response2 = await auth(request(app).get(`/v2/workbooks`))
+            .set({[ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor})
+            .expect(200);
+
+        expect(response2.body).toStrictEqual({
             workbooks: expect.arrayContaining([
                 {
                     createdAt: expect.any(String),
@@ -204,9 +258,17 @@ describe('Workbooks managment', () => {
         workbooksData[0].title = 'Renamed test workbook title 1';
         workbooksData[0].description = 'Renamed test workbook description 1';
 
+        await auth(request(app).post(`/v2/workbooks/${workbooksData[0].id}/update`))
+            .send({
+                title: workbooksData[0].title,
+                description: workbooksData[0].description,
+            })
+            .expect(403);
+
         const response = await auth(
             request(app).post(`/v2/workbooks/${workbooksData[0].id}/update`),
         )
+            .set({[ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor})
             .send({
                 title: workbooksData[0].title,
                 description: workbooksData[0].description,
@@ -231,8 +293,12 @@ describe('Workbooks managment', () => {
     });
 
     test('Delete workbooks – [DELETE /v2/workbooks/:workbookId]', async () => {
-        await auth(request(app).delete(`/v2/workbooks/${workbooksData[0].id}`)).expect(200);
-        await auth(request(app).delete(`/v2/workbooks/${workbooksData[1].id}`)).expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${workbooksData[0].id}`))
+            .set({[ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor})
+            .expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${workbooksData[1].id}`))
+            .set({[ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor})
+            .expect(200);
 
         await auth(request(app).get(`/v2/workbooks/${workbooksData[0].id}`)).expect(404);
         await auth(request(app).get(`/v2/workbooks/${workbooksData[1].id}`)).expect(404);
@@ -281,6 +347,7 @@ describe('Entries in workboooks managment', () => {
         testWorkbookId = bodyWorkbook.workbookId;
 
         const responseEntry1 = await auth(request(app).post('/v1/entries'))
+            .set({[ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor})
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -317,6 +384,7 @@ describe('Entries in workboooks managment', () => {
         });
 
         const responseEntry2 = await auth(request(app).post('/v1/entries'))
+            .set({[ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor})
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -405,11 +473,18 @@ describe('Entries in workboooks managment', () => {
     test('Copy workbook with entries – [POST /v2/workbooks/:workbookId/copy]', async () => {
         const testNewTitle = 'Copied test workbook with entries title';
 
-        const response = await auth(request(app).post(`/v2/workbooks/${testWorkbookId}/copy`)).send(
-            {
+        await auth(request(app).post(`/v2/workbooks/${testWorkbookId}/copy`))
+            .send({
                 newTitle: testNewTitle,
-            },
-        );
+            })
+            .expect(403);
+
+        const response = await auth(request(app).post(`/v2/workbooks/${testWorkbookId}/copy`))
+            .set({[ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor})
+            .send({
+                newTitle: testNewTitle,
+            })
+            .expect(200);
 
         const {body} = response;
 
@@ -482,8 +557,15 @@ describe('Entries in workboooks managment', () => {
     });
 
     test('Delete workbooks with entries – [DELETE /v2/workbooks/:workbookId]', async () => {
-        await auth(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
-        await auth(request(app).delete(`/v2/workbooks/${testCopiedWorkbookId}`)).expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(403);
+        await auth(request(app).delete(`/v2/workbooks/${testCopiedWorkbookId}`)).expect(403);
+
+        await auth(request(app).delete(`/v2/workbooks/${testWorkbookId}`))
+            .set({[ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor})
+            .expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${testCopiedWorkbookId}`))
+            .set({[ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor})
+            .expect(200);
 
         await auth(request(app).get(`/v2/workbooks/${testWorkbookId}`)).expect(404);
         await auth(request(app).get(`/v2/workbooks/${testCopiedWorkbookId}`)).expect(404);

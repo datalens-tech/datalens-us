@@ -1,8 +1,9 @@
 import request from 'supertest';
-import {systemId, testTenantId, testProjectId} from '../constants';
+import {systemId, testTenantId, testProjectId, ZITADEL_USER_ROLE_HEADER} from '../constants';
 import {US_MASTER_TOKEN_HEADER} from '../../../const';
 import usApp from '../../..';
 import {auth} from '../utils';
+import {ZitadelUserRole} from '../../../types/zitadel';
 
 const app = usApp.express;
 const masterToken = usApp.config.masterToken[0];
@@ -67,7 +68,13 @@ describe('Private Workbooks managment', () => {
             workbookId: expect.any(String),
         });
 
-        await auth(request(app).delete(`/v2/workbooks/${workbooksData.id}`)).expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${workbooksData.id}`)).expect(403);
+
+        await auth(request(app).delete(`/v2/workbooks/${workbooksData.id}`))
+            .set({
+                [ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor,
+            })
+            .expect(200);
     });
 });
 
@@ -91,6 +98,20 @@ describe('Private Entries in workboooks managment', () => {
         testWorkbookId = bodyWorkbook.workbookId;
 
         await auth(request(app).post('/v1/entries'))
+            .send({
+                scope: 'dataset',
+                type: 'graph',
+                meta: {},
+                data: {},
+                name: entry1Name,
+                workbookId: testWorkbookId,
+            })
+            .expect(403);
+
+        await auth(request(app).post('/v1/entries'))
+            .set({
+                [ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor,
+            })
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -136,7 +157,13 @@ describe('Private Entries in workboooks managment', () => {
             ]),
         });
 
-        await auth(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(403);
+
+        await auth(request(app).delete(`/v2/workbooks/${testWorkbookId}`))
+            .set({
+                [ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor,
+            })
+            .expect(200);
     });
 });
 
@@ -168,11 +195,29 @@ describe('Private for one workboook managment', () => {
                 name: entry1Name,
                 workbookId: testWorkbookId,
             })
+            .expect(403);
+
+        await auth(request(app).post('/v1/entries'))
+            .set({
+                [ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor,
+            })
+            .send({
+                scope: 'dataset',
+                type: 'graph',
+                meta: {},
+                data: {},
+                name: entry1Name,
+                workbookId: testWorkbookId,
+            })
             .expect(200);
     });
 
     test('Restore workbook with entries – [POST /private/v2/workbooks/:workbookId/restore]', async () => {
-        await auth(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${testWorkbookId}`))
+            .set({
+                [ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor,
+            })
+            .expect(200);
 
         await request(app).post(`/private/v2/workbooks/${testWorkbookId}/restore`).expect(403);
 
@@ -219,6 +264,12 @@ describe('Private for one workboook managment', () => {
             ]),
         });
 
-        await auth(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${testWorkbookId}`)).expect(403);
+
+        await auth(request(app).delete(`/v2/workbooks/${testWorkbookId}`))
+            .set({
+                [ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor,
+            })
+            .expect(200);
     });
 });

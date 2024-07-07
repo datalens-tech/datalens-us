@@ -2,12 +2,7 @@ import {AppContext} from '@gravity-ui/nodekit';
 import {Utils} from './utils';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
-
-enum ZitadelUserRole {
-    Creator = 'creator',
-    Admin = 'admin',
-    Viewer = 'viewer',
-}
+import {ZitadelUserRole} from '../types/zitadel';
 
 type IntrospectionResult = {
     active: boolean;
@@ -28,12 +23,12 @@ const getRole = (data: any): ZitadelUserRole => {
         return ZitadelUserRole.Viewer;
     }
 
-    if (roles['admin']) {
+    if (roles[ZitadelUserRole.Admin]) {
         return ZitadelUserRole.Admin;
     }
 
-    if (roles['creator']) {
-        return ZitadelUserRole.Creator;
+    if (roles[ZitadelUserRole.Editor]) {
+        return ZitadelUserRole.Editor;
     }
 
     return ZitadelUserRole.Viewer;

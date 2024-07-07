@@ -1,6 +1,8 @@
 import request from 'supertest';
 import usApp from '../../../..';
 import {auth} from '../../utils';
+import {ZITADEL_USER_ROLE_HEADER} from '../../constants';
+import {ZitadelUserRole} from '../../../../types/zitadel';
 
 const app = usApp.express;
 
@@ -31,7 +33,19 @@ describe('Copy entries', () => {
     });
 
     test('Create entries - [POST /v1/entries]', async () => {
+        await auth(request(app).post('/v1/entries'))
+            .send({
+                scope: 'dataset',
+                type: 'graph',
+                meta: {},
+                data: {},
+                name: 'EntryName1',
+                workbookId: workbookId1,
+            })
+            .expect(403);
+
         const {body: entry1Body} = await auth(request(app).post('/v1/entries'))
+            .set({[ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor})
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -43,6 +57,7 @@ describe('Copy entries', () => {
             .expect(200);
 
         const {body: entry2Body} = await auth(request(app).post('/v1/entries'))
+            .set({[ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor})
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -58,7 +73,15 @@ describe('Copy entries', () => {
     });
 
     test('Copy entries - [POST /v2/copy-entries]', async () => {
+        await auth(request(app).post('/v2/copy-entries'))
+            .send({
+                entryIds: [workbookId1EntryId1, workbookId1EntryId2],
+                workbookId: workbookId2,
+            })
+            .expect(403);
+
         const {body} = await auth(request(app).post('/v2/copy-entries'))
+            .set({[ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor})
             .send({
                 entryIds: [workbookId1EntryId1, workbookId1EntryId2],
                 workbookId: workbookId2,
@@ -87,6 +110,16 @@ describe('Copy entries', () => {
                 entryIds: [workbookId1EntryId1, workbookId1EntryId2],
                 workbookId: workbookId2,
             })
+            .expect(403);
+
+        await auth(request(app).post('/v2/copy-entries'))
+            .set({
+                [ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor,
+            })
+            .send({
+                entryIds: [workbookId1EntryId1, workbookId1EntryId2],
+                workbookId: workbookId2,
+            })
             .expect(200);
 
         const {
@@ -106,9 +139,23 @@ describe('Copy entries', () => {
     });
 
     test('Copy entries with incremented duplicate names  - [POST /v2/copy-entries]', async () => {
+        await auth(request(app).post('/v1/entries'))
+            .send({
+                scope: 'dataset',
+                type: 'graph',
+                meta: {},
+                data: {},
+                name: 'EntryName1 (COPY 1)',
+                workbookId: workbookId1,
+            })
+            .expect(403);
+
         const {
             body: {entryId: workbookId1EntryId3},
         } = await auth(request(app).post('/v1/entries'))
+            .set({
+                [ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor,
+            })
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -120,6 +167,9 @@ describe('Copy entries', () => {
             .expect(200);
 
         await auth(request(app).post('/v2/copy-entries'))
+            .set({
+                [ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor,
+            })
             .send({
                 entryIds: [workbookId1EntryId3],
                 workbookId: workbookId2,
@@ -144,7 +194,18 @@ describe('Copy entries', () => {
     });
 
     test('Delete workbooks - [DELETE /v2/workbooks/:workbookId]', async () => {
-        await auth(request(app).delete(`/v2/workbooks/${workbookId1}`)).expect(200);
-        await auth(request(app).delete(`/v2/workbooks/${workbookId2}`)).expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${workbookId1}`)).expect(403);
+        await auth(request(app).delete(`/v2/workbooks/${workbookId2}`)).expect(403);
+
+        await auth(request(app).delete(`/v2/workbooks/${workbookId1}`))
+            .set({
+                [ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor,
+            })
+            .expect(200);
+        await auth(request(app).delete(`/v2/workbooks/${workbookId2}`))
+            .set({
+                [ZITADEL_USER_ROLE_HEADER]: ZitadelUserRole.Editor,
+            })
+            .expect(200);
     });
 });

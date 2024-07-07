@@ -1,7 +1,10 @@
 import type {AppContext} from '@gravity-ui/nodekit';
 import type {WorkbookModel} from '../../../../db/models/new/workbook';
+import {AppError} from '@gravity-ui/nodekit';
 import {WorkbookConstructor, WorkbookInstance} from './types';
-import {Permissions} from '../../../../entities/workbook/types';
+import {Permissions, WorkbookPermission} from '../../../../entities/workbook/types';
+import {US_ERRORS} from '../../../../const';
+import {ZitadelUserRole} from '../../../../types/zitadel';
 
 export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
     implements WorkbookInstance
@@ -15,11 +18,50 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
         this.model = model;
     }
 
-    async register() {}
+    private getAllPermissions() {
+        const {zitadelUserRole: role} = this.ctx.get('info');
 
-    async checkPermission() {}
+        const isEditorOrAdmin = role === ZitadelUserRole.Editor || role === ZitadelUserRole.Admin;
 
-    async fetchAllPermissions() {}
+        const permissions = {
+            listAccessBindings: true,
+            updateAccessBindings: isEditorOrAdmin,
+            limitedView: true,
+            view: true,
+            update: isEditorOrAdmin,
+            copy: isEditorOrAdmin,
+            move: isEditorOrAdmin,
+            publish: isEditorOrAdmin,
+            embed: isEditorOrAdmin,
+            delete: isEditorOrAdmin,
+        };
+
+        return permissions;
+    }
+
+    async register(_args: {parentIds: string[]}): Promise<unknown> {
+        return Promise.resolve();
+    }
+
+    async checkPermission(args: {
+        parentIds: string[];
+        permission: WorkbookPermission;
+    }): Promise<void> {
+        const permissions = this.getAllPermissions();
+
+        if (permissions[args.permission] === false) {
+            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
+                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
+            });
+        }
+
+        return Promise.resolve();
+    }
+
+    async fetchAllPermissions(): Promise<void> {
+        this.permissions = this.getAllPermissions();
+        return Promise.resolve();
+    }
 
     setPermissions(permissions: Permissions) {
         this.permissions = permissions;

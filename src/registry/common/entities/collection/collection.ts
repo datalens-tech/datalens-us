@@ -1,7 +1,10 @@
 import type {AppContext} from '@gravity-ui/nodekit';
 import type {CollectionModel} from '../../../../db/models/new/collection';
+import {AppError} from '@gravity-ui/nodekit';
 import {CollectionConstructor, CollectionInstance} from './types';
-import {Permissions} from '../../../../entities/collection/types';
+import {CollectionPermission, Permissions} from '../../../../entities/collection/types';
+import {US_ERRORS} from '../../../../const';
+import {ZitadelUserRole} from '../../../../types/zitadel';
 
 export const Collection: CollectionConstructor = class Collection implements CollectionInstance {
     ctx: AppContext;
@@ -13,14 +16,42 @@ export const Collection: CollectionConstructor = class Collection implements Col
         this.model = model;
     }
 
+    private getAllPermissions() {
+        const {zitadelUserRole: role} = this.ctx.get('info');
+
+        const isEditorOrAdmin = role === ZitadelUserRole.Editor || role === ZitadelUserRole.Admin;
+
+        const permissions = {
+            listAccessBindings: true,
+            updateAccessBindings: isEditorOrAdmin,
+            createCollection: isEditorOrAdmin,
+            createWorkbook: isEditorOrAdmin,
+            limitedView: true,
+            view: true,
+            update: isEditorOrAdmin,
+            copy: isEditorOrAdmin,
+            move: isEditorOrAdmin,
+            delete: isEditorOrAdmin,
+        };
+
+        return permissions;
+    }
+
     async register() {}
 
-    async checkPermission() {}
+    async checkPermission(args: {
+        parentIds: string[];
+        permission: CollectionPermission;
+    }): Promise<void> {
+        const permissions = this.getAllPermissions();
 
-    async fetchAllPermissions() {}
+        if (permissions[args.permission] === false) {
+            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
+                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
+            });
+        }
 
-    setPermissions(permissions: Permissions) {
-        this.permissions = permissions;
+        return Promise.resolve();
     }
 
     enableAllPermissions() {
@@ -36,5 +67,14 @@ export const Collection: CollectionConstructor = class Collection implements Col
             move: true,
             delete: true,
         };
+    }
+
+    setPermissions(permissions: Permissions) {
+        this.permissions = permissions;
+    }
+
+    async fetchAllPermissions() {
+        this.permissions = this.getAllPermissions();
+        return Promise.resolve();
     }
 };

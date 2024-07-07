@@ -3,6 +3,7 @@
 // test environment the max listeners limitation is lifted.
 require('events').EventEmitter.defaultMaxListeners = 1000;
 
+require('../../dist/server/tests/int/mocks');
 require('../../dist/server');
 
 const {db} = require('../../dist/server/db');
