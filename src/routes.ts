@@ -318,6 +318,11 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
                 handler: workbooksController.delete,
                 write: true,
             }),
+            deleteWorkbooks: makeRoute({
+                route: 'DELETE /v2/delete-workbooks',
+                handler: workbooksController.deleteList,
+                write: true,
+            }),
             moveWorkbook: makeRoute({
                 route: 'POST /v2/workbooks/:workbookId/move',
                 handler: workbooksController.move,
@@ -398,6 +403,11 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
             deleteCollection: makeRoute({
                 route: 'DELETE /v1/collections/:collectionId',
                 handler: collectionsController.delete,
+                write: true,
+            }),
+            deleteCollections: makeRoute({
+                route: 'DELETE /v1/delete-collections',
+                handler: collectionsController.deleteList,
                 write: true,
             }),
             moveCollection: makeRoute({

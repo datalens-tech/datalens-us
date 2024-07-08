@@ -1,5 +1,4 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {getWorkbook} from './get-workbook';
 import {getParentIds} from '../collection/utils/get-parents';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
@@ -8,33 +7,37 @@ import {US_ERRORS, CURRENT_TIMESTAMP} from '../../../const';
 import {raw, transaction} from 'objection';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import Lock from '../../../db/models/lock';
-import {Entry} from '../../../db/models/new/entry';
+import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import Utils, {logInfo, makeUserId} from '../../../utils';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {markEntryAsDeleted} from '../../entry/crud';
+import {getWorkbooksListByIds} from './get-workbooks-list-by-ids';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
-    required: ['workbookId'],
+    required: ['workbookIds'],
     properties: {
-        workbookId: {
-            type: 'string',
+        workbookIds: {
+            type: 'array',
+            items: {
+                type: 'string',
+            },
         },
     },
 });
 
-export interface DeleteWorkbookArgs {
-    workbookId: string;
+export interface DeleteWorkbooksArgs {
+    workbookIds: string[];
 }
 
-export const deleteWorkbook = async (
+export const deleteWorkbooks = async (
     {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
-    args: DeleteWorkbookArgs,
+    args: DeleteWorkbooksArgs,
 ) => {
-    const {workbookId} = args;
+    const {workbookIds} = args;
 
-    logInfo(ctx, 'DELETE_WORKBOOK_START', {
-        workbookId: Utils.encodeId(workbookId),
+    logInfo(ctx, 'DELETE_WORKBOOKS_START', {
+        workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.encodeId(id)),
     });
 
     if (!skipValidation) {
@@ -49,50 +52,52 @@ export const deleteWorkbook = async (
 
     const targetTrx = getPrimary(trx);
 
-    const workbook = await getWorkbook(
+    const workbooks = await getWorkbooksListByIds(
         {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions: true},
-        {workbookId},
+        {workbookIds},
     );
 
-    if (workbook.model.isTemplate) {
-        throw new AppError("Workbook template can't be deleted", {
-            code: US_ERRORS.WORKBOOK_TEMPLATE_CANT_BE_DELETED,
-        });
-    }
-
-    if (accessServiceEnabled && !skipCheckPermissions) {
-        let parentIds: string[] = [];
-
-        if (workbook.model.collectionId !== null) {
-            parentIds = await getParentIds({
-                ctx,
-                trx: targetTrx,
-                collectionId: workbook.model.collectionId,
+    const checkDeletePermissionPromises = workbooks.map(async (workbook) => {
+        if (workbook.model.isTemplate) {
+            throw new AppError("Workbook template can't be deleted", {
+                code: US_ERRORS.WORKBOOK_TEMPLATE_CANT_BE_DELETED,
             });
         }
 
-        await workbook.checkPermission({
-            parentIds,
-            permission: WorkbookPermission.Delete,
-        });
-    }
+        if (accessServiceEnabled && !skipCheckPermissions) {
+            let parentIds: string[] = [];
+
+            if (workbook.model.collectionId !== null) {
+                parentIds = await getParentIds({
+                    ctx,
+                    trx: targetTrx,
+                    collectionId: workbook.model.collectionId,
+                });
+            }
+
+            await workbook.checkPermission({
+                parentIds,
+                permission: WorkbookPermission.Delete,
+            });
+        }
+    });
+
+    await Promise.all(checkDeletePermissionPromises);
 
     const result = await transaction(targetTrx, async (transactionTrx) => {
-        const deletedWorkbook = await WorkbookModel.query(transactionTrx)
+        const deletedWorkbooks = await WorkbookModel.query(transactionTrx)
             .patch({
                 [WorkbookModelColumn.DeletedBy]: userId,
                 [WorkbookModelColumn.DeletedAt]: raw(CURRENT_TIMESTAMP),
             })
-            .where({
-                [WorkbookModelColumn.WorkbookId]: workbook.model.workbookId,
-            })
+            .whereIn([WorkbookModelColumn.WorkbookId], workbookIds)
             .returning('*')
-            .first()
             .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
         const entries = await Entry.query(transactionTrx)
             .select()
-            .where({workbookId, isDeleted: false})
+            .where({isDeleted: false})
+            .whereIn([EntryColumn.WorkbookId], workbookIds)
             .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
         const entryDeletedBy = makeUserId(userId);
@@ -119,7 +124,7 @@ export const deleteWorkbook = async (
             }),
         );
 
-        return deletedWorkbook;
+        return deletedWorkbooks;
     });
 
     if (!result) {
@@ -128,9 +133,13 @@ export const deleteWorkbook = async (
         });
     }
 
-    logInfo(ctx, 'DELETE_WORKBOOK_FINISH', {
-        workbookId: Utils.encodeId(result.workbookId),
+    logInfo(ctx, 'DELETE_WORKBOOKS_FINISH', {
+        workbookIds: await Utils.macrotasksMap(result, (workbook) =>
+            Utils.encodeId(workbook.workbookId),
+        ),
     });
 
-    return result;
+    return {
+        workbooks: result,
+    };
 };

@@ -9,7 +9,6 @@ import {
     updateWorkbook,
     moveWorkbook,
     moveWorkbooksList,
-    deleteWorkbook,
     setWorkbookIsTemplate,
     copyWorkbook,
     copyWorkbookTemplate,
@@ -17,6 +16,7 @@ import {
     OrderField,
     OrderDirection,
     restoreWorkbook,
+    deleteWorkbooks,
 } from '../services/new/workbook';
 import {
     formatWorkbookModel,
@@ -171,16 +171,33 @@ export default {
     delete: async (req: Request, res: Response) => {
         const {params} = req;
 
-        await deleteWorkbook(
+        const result = await deleteWorkbooks(
             {
                 ctx: req.ctx,
             },
             {
-                workbookId: params.workbookId,
+                workbookIds: [params.workbookId],
             },
         );
 
-        const {code, response} = await prepareResponseAsync({data: {status: 'ok'}});
+        const {code, response} = await prepareResponseAsync({data: result.workbooks[0]});
+
+        res.status(code).send(response);
+    },
+
+    deleteList: async (req: Request, res: Response) => {
+        const {body} = req;
+
+        const result = await deleteWorkbooks(
+            {ctx: req.ctx},
+            {
+                workbookIds: body.workbookIds,
+            },
+        );
+
+        const formattedResponse = formatWorkbookModelsList(result);
+
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
         res.status(code).send(response);
     },

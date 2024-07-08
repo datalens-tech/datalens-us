@@ -6,7 +6,7 @@ export * from './get-workbooks-list';
 export * from './update-workbook';
 export * from './move-workbook';
 export * from './move-workbooks-list';
-export * from './delete-workbook';
+export * from './delete-workbooks';
 export * from './set-workbook-is-template';
 export * from './copy-workbook';
 export * from './copy-workbook-template';
