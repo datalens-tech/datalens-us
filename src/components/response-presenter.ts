@@ -51,6 +51,9 @@ export async function prepareResponseAsync({data}: {data: any}): Promise<ST.Serv
     if (response.chart) {
         response.chart = await Utils.macrotasksEncodeData(response.chart);
     }
+    if (response.entry) {
+        response.entry = await Utils.macrotasksEncodeData(response.entry);
+    }
 
     return {
         code: 200,
