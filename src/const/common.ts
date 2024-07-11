@@ -234,13 +234,6 @@ export const INTER_TENANT_GET_ENTRIES_SCHEMA = {
         type: 'object',
         patternProperties: AJV_PATTERN_KEYS_NOT_OBJECT,
     },
-    creationTimeFilters: {
-        type: 'object',
-        patternProperties: AJV_PATTERN_KEYS_NOT_OBJECT,
-        propertyNames: {
-            enum: [...Object.keys(COMPARISON_OPERATORS)],
-        },
-    },
 };
 
 export const MAX_PAGE_LIMIT = 10000;
