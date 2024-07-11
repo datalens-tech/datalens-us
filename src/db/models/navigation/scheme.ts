@@ -1,5 +1,5 @@
 import compileSchema from '../../../components/validation-schema-compiler';
-import {AJV_PATTERN_KEYS_NOT_OBJECT, COMPARISON_OPERATORS} from '../../../const';
+import {AJV_PATTERN_KEYS_NOT_OBJECT, INTER_TENANT_GET_ENTRIES_SCHEMA} from '../../../const';
 
 export const validateGetEntries = compileSchema({
     type: 'object',
@@ -76,36 +76,7 @@ export const validateInterTenantGetEntries = compileSchema({
     type: 'object',
     required: ['scope'],
     properties: {
-        scope: {
-            type: 'string',
-            enum: ['dataset', 'connection', 'config', 'widget', 'dash'],
-        },
-        ids: {
-            type: ['string', 'array'],
-        },
-        type: {
-            type: 'string',
-        },
-        createdBy: {
-            oneOf: [
-                {type: 'string'},
-                {
-                    type: 'array',
-                    items: {type: 'string'},
-                },
-            ],
-        },
-        metaFilters: {
-            type: 'object',
-            patternProperties: AJV_PATTERN_KEYS_NOT_OBJECT,
-        },
-        creationTimeFilters: {
-            type: 'object',
-            patternProperties: AJV_PATTERN_KEYS_NOT_OBJECT,
-            propertyNames: {
-                enum: [...Object.keys(COMPARISON_OPERATORS)],
-            },
-        },
+        ...INTER_TENANT_GET_ENTRIES_SCHEMA,
         orderBy: {
             type: 'string',
             enum: ['asc', 'desc'],

@@ -32,7 +32,7 @@ export interface InterTenantGetEntriesConfig {
     type?: string;
     orderBy?: OrderByDirection;
     createdBy?: string | string[];
-    metaFilters?: object;
+    meta?: object;
     creationTimeFilters?: object;
     page?: number;
     pageSize?: number;
