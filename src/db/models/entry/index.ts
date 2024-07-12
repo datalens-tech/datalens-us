@@ -6,7 +6,7 @@ import Tenant from '../tenant';
 import Link from '../links';
 import {AppError} from '@gravity-ui/nodekit';
 import * as MT from '../../../types/models';
-import {validateCreateEntry, validateResolveTenantIdByEntryId} from './scheme';
+import {validateResolveTenantIdByEntryId} from './scheme';
 import {RETURN_COLUMNS, BiTrackingLogs, US_ERRORS} from '../../../const';
 import {registry} from '../../../registry';
 
@@ -196,6 +196,8 @@ class Entry extends Model {
         if (isLastLetterSlash) {
             key = key.slice(0, key.length - 1);
         }
+
+        const {validateCreateEntry} = registry.common.functions.get();
 
         const {isValid, validationErrors} = validateCreateEntry({
             tenantId,

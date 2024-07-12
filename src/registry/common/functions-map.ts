@@ -14,4 +14,12 @@ export const commonFunctionsMap = {
     isNeedBypassEntryByKey: makeFunctionTemplate<IsNeedBypassEntryByKey>(),
     colorPalettesAdminValidator: makeFunctionTemplate<ColorPalettesAdminValidator>(),
     checkEmbeddingAvailability: makeFunctionTemplate<CheckEmbeddingAvailability>(),
+
+    validateCreateEntry: makeFunctionTemplate<
+        (data: object) => {
+            isValid: boolean | PromiseLike<any>;
+            validationErrors: string;
+        }
+    >(),
+    validateCreateEntryInWorkbook: makeFunctionTemplate<<T extends object>(data: T) => T>(),
 } as const;

@@ -9,6 +9,8 @@ import {colorPalettesAdminValidator} from './utils/color-palettes/utils';
 import {checkEmbeddingAvailability} from './utils/embedding/utils';
 
 import {registry} from '../index';
+import {validateCreateEntry} from '../../db/models/entry/scheme';
+import {validateCreateEntryInWorkbook} from '../../services/entry';
 
 export const registerCommonPlugins = () => {
     registry.common.classes.register({
@@ -25,5 +27,7 @@ export const registerCommonPlugins = () => {
         isNeedBypassEntryByKey,
         colorPalettesAdminValidator,
         checkEmbeddingAvailability,
+        validateCreateEntry,
+        validateCreateEntryInWorkbook,
     });
 };
