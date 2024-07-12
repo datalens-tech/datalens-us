@@ -1,5 +1,5 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {raw, transaction} from 'objection';
+import {raw, transaction, TransactionOrKnex} from 'objection';
 import Entry from '../../../db/models/entry';
 import Lock from '../../../db/models/lock';
 import Revision from '../../../db/models/revision';
@@ -93,6 +93,7 @@ type UpdateEntryData = {
     lockToken?: string;
     skipSyncLinks?: boolean;
     useLegacyLogin?: boolean;
+    updateRevision?: boolean;
 };
 
 export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
@@ -112,6 +113,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         lockToken,
         skipSyncLinks,
         useLegacyLogin = false,
+        updateRevision = false,
     } = updateData;
 
     logInfo(ctx, 'UPDATE_ENTRY_REQUEST', {
@@ -125,6 +127,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         revId,
         lockToken,
         skipSyncLinks,
+        updateRevision,
     });
 
     const {DLS} = registry.common.classes.get();
@@ -189,6 +192,56 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         }
     }
 
+    const createOrUpdateRevision = async ({
+        trx,
+        syncedLinks,
+    }: {
+        trx: TransactionOrKnex;
+        syncedLinks: SyncLinksConf['links'];
+    }) => {
+        let revision: Revision;
+
+        if (isPrivateRoute && updateRevision) {
+            const updatedRevision = await Revision.query(trx)
+                .patch({
+                    data,
+                    meta,
+                    links: syncedLinks,
+                    updatedBy,
+                    updatedAt: raw(CURRENT_TIMESTAMP),
+                })
+                .where({
+                    revId: mode === 'publish' ? entry.publishedId ?? entry.savedId : entry.savedId,
+                    entryId: entry.entryId,
+                })
+                .returning('*')
+                .first()
+                .timeout(DEFAULT_QUERY_TIMEOUT);
+
+            if (!updatedRevision) {
+                throw new AppError(US_ERRORS.NOT_EXIST_REVISION, {
+                    code: US_ERRORS.NOT_EXIST_REVISION,
+                });
+            }
+
+            revision = updatedRevision;
+        } else {
+            revision = await Revision.query(trx)
+                .insert({
+                    entryId,
+                    data,
+                    meta,
+                    links: syncedLinks,
+                    createdBy: updatedBy,
+                    updatedBy: updatedBy,
+                })
+                .returning('*')
+                .timeout(DEFAULT_QUERY_TIMEOUT);
+        }
+
+        return revision;
+    };
+
     const result = await (async () => {
         switch (mode) {
             case 'save': {
@@ -203,17 +256,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                         });
                     }
 
-                    const revision = await Revision.query(trx)
-                        .insert({
-                            entryId,
-                            data,
-                            meta,
-                            links: syncedLinks,
-                            createdBy: updatedBy,
-                            updatedBy: updatedBy,
-                        })
-                        .returning('*')
-                        .timeout(DEFAULT_QUERY_TIMEOUT);
+                    const revision = await createOrUpdateRevision({trx, syncedLinks});
 
                     const revId = revision.revId;
 
@@ -308,17 +351,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                             trxOverride: trx,
                         });
 
-                        const revision = await Revision.query(trx)
-                            .insert({
-                                entryId,
-                                data,
-                                meta,
-                                links: syncedLinks,
-                                createdBy: updatedBy,
-                                updatedBy: updatedBy,
-                            })
-                            .returning('*')
-                            .timeout(DEFAULT_QUERY_TIMEOUT);
+                        const revision = await createOrUpdateRevision({trx, syncedLinks});
 
                         const revId = revision.revId;
 
