@@ -1,8 +1,7 @@
 import Entry from '../db/models/entry';
 import * as ST from '../types/services.types';
-import {createEntryInWorkbook} from './entry';
+import {createEntryInWorkbook, validateCreateEntryInWorkbook} from './entry';
 import {SYSTEM_USER} from '../const';
-import {registry} from '../registry';
 
 export default class EntryService {
     static async _getEntriesByKey({key, branch, ctx}: ST.PrivateGetEntriesByKey) {
@@ -41,8 +40,6 @@ export default class EntryService {
         ctx,
     }: ST.CreateEntry) {
         if (workbookId) {
-            const {validateCreateEntryInWorkbook} = registry.common.functions.get();
-
             const validatedData = validateCreateEntryInWorkbook({
                 workbookId,
                 name: name as string,
@@ -107,8 +104,6 @@ export default class EntryService {
         ctx,
     }: ST.CreateEntry) {
         if (workbookId) {
-            const {validateCreateEntryInWorkbook} = registry.common.functions.get();
-
             const validatedData = validateCreateEntryInWorkbook({
                 workbookId,
                 name: name as string,
