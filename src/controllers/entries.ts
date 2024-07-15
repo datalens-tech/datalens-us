@@ -182,6 +182,7 @@ export default {
             revId: body.revId,
             lockToken: body.lockToken,
             skipSyncLinks: body.skipSyncLinks,
+            updateRevision: body.updateRevision,
         });
 
         const {code, response} = await prepareResponseAsync({data: result});
