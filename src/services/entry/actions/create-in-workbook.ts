@@ -23,6 +23,8 @@ import {WorkbookPermission} from '../../../entities/workbook';
 import Utils, {logInfo, makeUserId} from '../../../utils';
 import {getId} from '../../../db';
 
+export type ValidateCreateEntryInWorkbook = <T extends object>(data: T) => T;
+
 export const validateCreateEntryInWorkbook = makeSchemaValidator({
     type: 'object',
     required: ['workbookId', 'name', 'scope'],

@@ -5,6 +5,8 @@ import type {CheckOrganizationPermission, CheckProjectPermission} from './compon
 import type {IsNeedBypassEntryByKey} from './utils/entry/types';
 import type {ColorPalettesAdminValidator} from './utils/color-palettes/types';
 import type {CheckEmbeddingAvailability} from './utils/embedding/types';
+import {ValidateCreateEntry} from '../../db/models/entry/scheme';
+import {ValidateCreateEntryInWorkbook} from '../../services/entry';
 
 export const commonFunctionsMap = {
     bulkFetchWorkbooksAllPermissions: makeFunctionTemplate<BulkFetchWorkbooksAllPermissions>(),
@@ -15,11 +17,6 @@ export const commonFunctionsMap = {
     colorPalettesAdminValidator: makeFunctionTemplate<ColorPalettesAdminValidator>(),
     checkEmbeddingAvailability: makeFunctionTemplate<CheckEmbeddingAvailability>(),
 
-    validateCreateEntry: makeFunctionTemplate<
-        (data: object) => {
-            isValid: boolean | PromiseLike<any>;
-            validationErrors: string;
-        }
-    >(),
-    validateCreateEntryInWorkbook: makeFunctionTemplate<<T extends object>(data: T) => T>(),
+    validateCreateEntry: makeFunctionTemplate<ValidateCreateEntry>(),
+    validateCreateEntryInWorkbook: makeFunctionTemplate<ValidateCreateEntryInWorkbook>(),
 } as const;

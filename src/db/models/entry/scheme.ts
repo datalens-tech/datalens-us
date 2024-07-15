@@ -1,6 +1,11 @@
 import compileSchema from '../../../components/validation-schema-compiler';
 import {ALLOWED_SCOPE_VALUES, AJV_PATTERN_KEYS_NOT_OBJECT} from '../../../const';
 
+export type ValidateCreateEntry = (data: object) => {
+    isValid: boolean | PromiseLike<any>;
+    validationErrors: string;
+};
+
 export const validateCreateEntry = compileSchema({
     type: 'object',
     required: ['key', 'tenantId', 'scope', 'createdBy'],
