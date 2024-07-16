@@ -14,11 +14,6 @@ export const formatEntryModel = (entryModel: Entry) => {
         publishedId: entryModel.publishedId,
         tenantId: entryModel.tenantId,
         workbookId: entryModel.workbookId,
-        innerMeta: entryModel.innerMeta,
-        hidden: entryModel.hidden,
-        displayKey: entryModel.displayKey,
-        name: entryModel.name,
-        sortName: entryModel.sortName,
         public: entryModel.public,
     };
 };
