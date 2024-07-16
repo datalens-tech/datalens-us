@@ -23,3 +23,5 @@ export {
 export * as ST from '../src/types/services.types';
 
 export {EmbeddingToken} from '../src/types/embedding';
+
+export {ZitadelUserRole} from '../src/types/zitadel';
