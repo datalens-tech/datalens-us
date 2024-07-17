@@ -29,6 +29,6 @@ export {default as NavigationService} from '../src/services/navigation.service';
 
 export {getEntryByKey, GetEntryByKeyArgs} from '../src/services/new/entry';
 export {getEntriesByKeyPattern} from '../src/services/entry';
-export {formatGetEntryByKeyResponse} from '../src/services/new/entry/formatters';
+export {formatGetEntryByKeyResponse, formatEntryModel} from '../src/services/new/entry/formatters';
 
 export {crossSyncCopiedJoinedEntryRevisions} from '../src/services/new/workbook';
