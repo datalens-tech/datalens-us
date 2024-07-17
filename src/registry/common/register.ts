@@ -7,6 +7,7 @@ import {checkOrganizationPermission, checkProjectPermission} from './components/
 import {isNeedBypassEntryByKey} from './utils/entry/utils';
 import {colorPalettesAdminValidator} from './utils/color-palettes/utils';
 import {checkEmbeddingAvailability} from './utils/embedding/utils';
+import {getZitadelUserRole} from '../zitadel/utils';
 
 import {registry} from '../index';
 
@@ -25,5 +26,6 @@ export const registerCommonPlugins = () => {
         isNeedBypassEntryByKey,
         colorPalettesAdminValidator,
         checkEmbeddingAvailability,
+        getZitadelUserRole,
     });
 };

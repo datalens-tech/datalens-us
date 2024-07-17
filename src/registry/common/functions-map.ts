@@ -5,6 +5,7 @@ import type {CheckOrganizationPermission, CheckProjectPermission} from './compon
 import type {IsNeedBypassEntryByKey} from './utils/entry/types';
 import type {ColorPalettesAdminValidator} from './utils/color-palettes/types';
 import type {CheckEmbeddingAvailability} from './utils/embedding/types';
+import type {GetZitadelUserRole} from '../zitadel/types';
 
 export const commonFunctionsMap = {
     bulkFetchWorkbooksAllPermissions: makeFunctionTemplate<BulkFetchWorkbooksAllPermissions>(),
@@ -14,4 +15,5 @@ export const commonFunctionsMap = {
     isNeedBypassEntryByKey: makeFunctionTemplate<IsNeedBypassEntryByKey>(),
     colorPalettesAdminValidator: makeFunctionTemplate<ColorPalettesAdminValidator>(),
     checkEmbeddingAvailability: makeFunctionTemplate<CheckEmbeddingAvailability>(),
+    getZitadelUserRole: makeFunctionTemplate<GetZitadelUserRole>(),
 } as const;

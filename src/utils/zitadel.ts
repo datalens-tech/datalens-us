@@ -3,6 +3,7 @@ import {Utils} from './utils';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import {ZitadelUserRole} from '../types/zitadel';
+import {registry} from '../registry';
 
 type IntrospectionResult = {
     active: boolean;
@@ -13,26 +14,6 @@ type IntrospectionResult = {
 
 const axiosInstance = axios.create();
 axiosRetry(axiosInstance, {retries: 3});
-
-const getRole = (data: any): ZitadelUserRole => {
-    const scope = 'urn:zitadel:iam:org:project:roles';
-
-    const roles = data[scope];
-
-    if (!roles) {
-        return ZitadelUserRole.Viewer;
-    }
-
-    if (roles[ZitadelUserRole.Admin]) {
-        return ZitadelUserRole.Admin;
-    }
-
-    if (roles[ZitadelUserRole.Editor]) {
-        return ZitadelUserRole.Editor;
-    }
-
-    return ZitadelUserRole.Viewer;
-};
 
 export const introspect = async (ctx: AppContext, token?: string): Promise<IntrospectionResult> => {
     ctx.log('Token introspection');
@@ -70,7 +51,9 @@ export const introspect = async (ctx: AppContext, token?: string): Promise<Intro
 
         const {active, username, sub} = response.data;
 
-        const role = getRole(response.data);
+        const {getZitadelUserRole} = registry.common.functions.get();
+
+        const role = getZitadelUserRole(response.data);
 
         return {active: Boolean(active), userId: sub, username, role};
     } catch (e) {
