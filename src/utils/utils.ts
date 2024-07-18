@@ -5,16 +5,11 @@ import chunk from 'lodash/chunk';
 
 import {EntryScope, USAPIResponse} from '../types/models';
 
-import {
-    ID_VARIABLES,
-    CODING_BASE,
-    TRUE_FLAGS,
-    COPY_START,
-    COPY_END,
-    MAX_PAGE_LIMIT,
-} from '../const';
+import {ID_VARIABLES, CODING_BASE, TRUE_FLAGS, COPY_START, COPY_END} from '../const';
 
 import {EntryScope as EntryScopeEnum, EntryType} from '../db/models/new/entry/types';
+
+const MAX_PAGE_LIMIT = 10000;
 
 const PROFILES: {
     [key: string]: any;
@@ -462,7 +457,7 @@ export class Utils {
         return Math.floor(new Date().getTime() / 1000);
     };
 
-    static getCorrectedPageLimit = (limit?: number) => {
-        return limit ? Math.min(Math.abs(limit), MAX_PAGE_LIMIT) : MAX_PAGE_LIMIT;
+    static getCorrectedPageLimit = (limit?: number, maxPageLimit = MAX_PAGE_LIMIT) => {
+        return limit ? Math.min(Math.abs(limit), maxPageLimit) : maxPageLimit;
     };
 }

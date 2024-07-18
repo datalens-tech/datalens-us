@@ -1,6 +1,5 @@
-import {QueryBuilder, raw} from 'objection';
-
-import Navigation from '.';
+import {raw} from 'objection';
+import type {Knex} from 'knex';
 import {COMPARISON_OPERATORS} from '../../../const';
 import {InterTenantGetEntriesConfig} from '../../../types/models';
 
@@ -16,8 +15,9 @@ export const whereBuilderInterTenantGetEntries = ({
     meta,
     creationTimeFilters,
     scope,
-}: InterTenantGetEntriesArgs) => {
-    return (builder: QueryBuilder<Navigation, Navigation[]>) => {
+    createdAtFrom,
+}: InterTenantGetEntriesArgs & {createdAtFrom?: number}) => {
+    return (builder: Knex.QueryBuilder) => {
         builder.where({
             isDeleted: false,
             scope,
@@ -57,6 +57,8 @@ export const whereBuilderInterTenantGetEntries = ({
 
                 return;
             });
+        } else if (createdAtFrom) {
+            builder.andWhere('entries.created_at', '>', raw('to_timestamp(?)', [createdAtFrom]));
         }
     };
 };

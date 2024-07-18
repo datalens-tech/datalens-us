@@ -236,5 +236,3 @@ export const INTER_TENANT_GET_ENTRIES_SCHEMA = {
         patternProperties: AJV_PATTERN_KEYS_NOT_OBJECT,
     },
 };
-
-export const MAX_PAGE_LIMIT = 10000;

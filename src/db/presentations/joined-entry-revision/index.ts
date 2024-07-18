@@ -60,18 +60,25 @@ export class JoinedEntryRevision extends Model {
         where,
         joinRevisionArgs = {},
         trx,
+        limit,
     }: {
         where: Record<string, unknown> | ((builder: Knex.QueryBuilder) => void);
         joinRevisionArgs?: JoinRevisionArgs;
         trx: TransactionOrKnex;
+        limit?: number;
     }) {
-        return JoinedEntryRevision.query(trx)
+        const joinedEntryRevision = JoinedEntryRevision.query(trx)
             .select(selectedColumns)
             .join(RevisionModel.tableName, joinRevision(joinRevisionArgs))
-            .where(where)
-            .timeout(JoinedEntryRevision.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<
-            JoinedEntryRevisionColumns[]
-        >;
+            .where(where);
+
+        if (limit) {
+            joinedEntryRevision.limit(limit);
+        }
+
+        return joinedEntryRevision.timeout(
+            JoinedEntryRevision.DEFAULT_QUERY_TIMEOUT,
+        ) as unknown as Promise<JoinedEntryRevisionColumns[]>;
     }
 
     static findOne({
