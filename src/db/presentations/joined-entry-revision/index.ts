@@ -75,12 +75,12 @@ export class JoinedEntryRevision extends Model {
             .join(RevisionModel.tableName, joinRevision(joinRevisionArgs))
             .where(where);
 
-        if (limit) {
-            joinedEntryRevision.limit(limit);
-        }
-
         if (orderBy) {
             joinedEntryRevision.orderBy(orderBy.field, orderBy.direction);
+        }
+
+        if (limit) {
+            joinedEntryRevision.limit(limit);
         }
 
         return joinedEntryRevision.timeout(
