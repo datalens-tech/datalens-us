@@ -106,7 +106,7 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
     }
 
     logInfo(ctx, 'GET_WORKBOOK_FINISH', {
-        workbookId: Utils.encodeId(workbook.model.collectionId),
+        workbookId: Utils.encodeId(workbook.model.workbookId),
     });
 
     return workbook as T;
