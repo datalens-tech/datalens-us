@@ -5,6 +5,7 @@ import {Entry} from '../../models/new/entry';
 import {RevisionModel} from '../../models/new/revision';
 
 import {selectedEntryColumns} from '../constants';
+import {EntriesOrderByFilter} from '../../../types/models';
 
 const selectedRevisionColumns = [
     'data',
@@ -61,11 +62,13 @@ export class JoinedEntryRevision extends Model {
         joinRevisionArgs = {},
         trx,
         limit,
+        orderBy,
     }: {
         where: Record<string, unknown> | ((builder: Knex.QueryBuilder) => void);
         joinRevisionArgs?: JoinRevisionArgs;
         trx: TransactionOrKnex;
         limit?: number;
+        orderBy?: EntriesOrderByFilter;
     }) {
         const joinedEntryRevision = JoinedEntryRevision.query(trx)
             .select(selectedColumns)
@@ -74,6 +77,10 @@ export class JoinedEntryRevision extends Model {
 
         if (limit) {
             joinedEntryRevision.limit(limit);
+        }
+
+        if (orderBy) {
+            joinedEntryRevision.orderBy(orderBy.field, orderBy.direction);
         }
 
         return joinedEntryRevision.timeout(
