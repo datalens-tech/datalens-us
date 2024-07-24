@@ -68,7 +68,7 @@ export default class NavigationService {
                 type,
                 createdBy,
                 orderBy,
-                metaFilters: meta,
+                meta,
                 creationTimeFilters: creationTime,
                 page,
                 pageSize,

@@ -5,7 +5,7 @@ import Revision from '../revision';
 import Favorite from '../favorite';
 import {AppError} from '@gravity-ui/nodekit';
 import * as MT from '../../../types/models';
-import {RETURN_NAVIGATION_COLUMNS, COMPARISON_OPERATORS, US_ERRORS} from '../../../const';
+import {RETURN_NAVIGATION_COLUMNS, US_ERRORS} from '../../../const';
 import {validateGetEntries, validateInterTenantGetEntries} from './scheme';
 import {registry} from '../../../registry';
 
@@ -14,6 +14,7 @@ import {getEntryPermissionsByWorkbook} from '../../../services/new/workbook/util
 
 import {getWorkbooksListByIds} from '../../../services/new/workbook/get-workbooks-list-by-ids';
 import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+import {whereBuilderInterTenantGetEntries} from './utils';
 
 interface Navigation extends MT.EntryColumns {
     isLocked?: boolean;
@@ -348,7 +349,7 @@ class Navigation extends Model {
             ids,
             scope,
             type,
-            metaFilters,
+            meta,
             creationTimeFilters,
             createdBy,
             orderBy = 'desc',
@@ -363,7 +364,7 @@ class Navigation extends Model {
             scope,
             type,
             createdBy,
-            metaFilters,
+            meta,
             creationTimeFilters,
             orderBy,
             page,
@@ -376,7 +377,7 @@ class Navigation extends Model {
             scope,
             type,
             createdBy,
-            metaFilters,
+            meta,
             creationTimeFilters,
             orderBy,
             page,
@@ -393,47 +394,16 @@ class Navigation extends Model {
         const entries = await Navigation.query(this.replica)
             .select([...RETURN_NAVIGATION_COLUMNS, 'tenantId'])
             .join('revisions', 'entries.savedId', 'revisions.revId')
-            .where({
-                isDeleted: false,
-                scope,
-            })
-            .where((builder) => {
-                if (ids) {
-                    if (Array.isArray(ids)) {
-                        builder.where('entries.entryId', 'in', ids);
-                    } else {
-                        builder.where('entries.entryId', ids);
-                    }
-                }
-                if (type) {
-                    builder.where('type', type);
-                }
-                if (createdBy) {
-                    builder.whereIn(
-                        'entries.createdBy',
-                        Array.isArray(createdBy) ? createdBy : [createdBy],
-                    );
-                }
-                if (metaFilters) {
-                    Object.entries(metaFilters).map(([metaField, value]) => {
-                        return builder.whereRaw('meta->>?::text = ?::text', [metaField, value]);
-                    });
-                }
-                if (creationTimeFilters) {
-                    Object.entries(creationTimeFilters).forEach(([comparisonOperator, date]) => {
-                        const sqlComparisonOperator = COMPARISON_OPERATORS[comparisonOperator];
-
-                        if (sqlComparisonOperator) {
-                            return builder.whereRaw('entries.created_at ? ?', [
-                                raw(sqlComparisonOperator),
-                                date,
-                            ]);
-                        }
-
-                        return;
-                    });
-                }
-            })
+            .where(
+                whereBuilderInterTenantGetEntries({
+                    ids,
+                    type,
+                    createdBy,
+                    meta,
+                    creationTimeFilters,
+                    scope,
+                }),
+            )
             .page(page, pageSize)
             .orderBy('revisions.updatedAt', orderBy)
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);

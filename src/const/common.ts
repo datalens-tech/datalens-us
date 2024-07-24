@@ -210,3 +210,29 @@ export enum AppEnv {
 
 export const COPY_START = '(COPY';
 export const COPY_END = ')';
+
+export const INTER_TENANT_GET_ENTRIES_SCHEMA = {
+    scope: {
+        type: 'string',
+        enum: ['dataset', 'connection', 'config', 'widget', 'dash'],
+    },
+    ids: {
+        type: ['string', 'array'],
+    },
+    type: {
+        type: 'string',
+    },
+    createdBy: {
+        oneOf: [
+            {type: 'string'},
+            {
+                type: 'array',
+                items: {type: 'string'},
+            },
+        ],
+    },
+    meta: {
+        type: 'object',
+        patternProperties: AJV_PATTERN_KEYS_NOT_OBJECT,
+    },
+};
