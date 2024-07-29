@@ -295,7 +295,7 @@ class Navigation extends Model {
             } else {
                 result = [
                     ...result,
-                    workbookEntries.map((entry) => ({
+                    ...workbookEntries.map((entry) => ({
                         ...entry,
                         isLocked: false,
                         ...(includePermissionsInfo && {
