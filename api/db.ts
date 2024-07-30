@@ -36,6 +36,8 @@ export {
     EmbeddingSecretModelColumn,
 } from '../src/db/models/new/embedding-secret';
 
+export {JobOperationModel, JobOperationColumn} from '../src/db/models/new/job-operation';
+
 export {ColorPaletteModel, ColorPaletteModelColumn} from '../src/db/models/new/color-palette';
 
 export {
