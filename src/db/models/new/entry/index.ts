@@ -28,7 +28,31 @@ export const EntryColumn = {
     UnversionedData: 'unversionedData',
     WorkbookId: 'workbookId',
     Mirrored: 'mirrored',
-    Branding: 'branding',
+} as const;
+
+export const EntryColumnRaw = {
+    Scope: 'scope',
+    Type: 'type',
+    Key: 'key',
+    InnerMeta: 'inner_meta',
+    CreatedBy: 'created_by',
+    CreatedAt: 'created_at',
+    UpdatedBy: 'updated_by',
+    UpdatedAt: 'updated_at',
+    IsDeleted: 'is_deleted',
+    DeletedAt: 'deleted_at',
+    Hidden: 'hidden',
+    DisplayKey: 'display_key',
+    EntryId: 'entry_id',
+    SavedId: 'saved_id',
+    PublishedId: 'published_id',
+    TenantId: 'tenant_id',
+    Name: 'name',
+    SortName: 'sort_name',
+    Public: 'public',
+    UnversionedData: 'unversioned_data',
+    WorkbookId: 'workbook_id',
+    Mirrored: 'mirrored',
 } as const;
 
 export class Entry extends Model {
