@@ -7,7 +7,7 @@ export {default as LegacyNavigation} from '../src/db/models/navigation';
 export {default as LegacyTemplate} from '../src/db/models/template';
 export {default as LegacyTenant} from '../src/db/models/tenant';
 
-export {Entry, EntryColumn} from '../src/db/models/new/entry';
+export {Entry, EntryColumn, EntryColumnRaw} from '../src/db/models/new/entry';
 export {EntryScope, EntryType} from '../src/db/models/new/entry/types';
 export {
     RevisionModel,
