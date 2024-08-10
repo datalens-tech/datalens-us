@@ -46,7 +46,7 @@ export default {
                 includeLinks: Utils.isTrueArg(query.includeLinks),
             },
         );
-        const formattedResponse = formatGetEntryResponse(req.ctx, result);
+        const formattedResponse = await formatGetEntryResponse(req.ctx, result);
 
         const {code, response} = await prepareResponseAsync({data: formattedResponse});
 

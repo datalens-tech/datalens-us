@@ -1,1 +1,3 @@
-export type CheckEmbeddingAvailability = (tenantId: string) => Promise<void>;
+import type {AppContext} from '@gravity-ui/nodekit';
+
+export type CheckEmbedding = (args: {ctx: AppContext}) => boolean;
