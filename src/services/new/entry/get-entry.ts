@@ -60,7 +60,7 @@ export type GetEntryResult = {
 export const getEntry = async (
     {ctx, trx, skipValidation = false}: ServiceArgs,
     args: GetEntryArgs,
-) => {
+): Promise<GetEntryResult> => {
     const {entryId, revId, branch = 'saved', includePermissionsInfo, includeLinks} = args;
 
     logInfo(ctx, 'GET_ENTRY_REQUEST', {
