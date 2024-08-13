@@ -1,23 +1,10 @@
-import {EntryPermissions} from '../types';
-import {JoinedEntryRevisionFavoriteColumns} from '../../../../db/presentations/joined-entry-revision-favorite';
 import {CTX} from '../../../../types/models';
+import {registry} from '../../../../registry';
+import {GetEntryResult} from '../../../../services/new/entry/get-entry';
 
-interface GetEntryResult {
-    joinedEntryRevisionFavorite: JoinedEntryRevisionFavoriteColumns;
-    permissions: EntryPermissions;
-    includePermissionsInfo: boolean;
-    includeLinks: boolean;
-}
+export const formatGetEntryResponse = async (ctx: CTX, result: GetEntryResult) => {
+    const {joinedEntryRevisionFavorite, permissions, includePermissionsInfo, includeLinks} = result;
 
-export const formatGetEntryResponse = (
-    ctx: CTX,
-    {
-        joinedEntryRevisionFavorite,
-        permissions,
-        includePermissionsInfo,
-        includeLinks,
-    }: GetEntryResult,
-) => {
     const {privatePermissions, onlyPublic} = ctx.get('info');
 
     let isHiddenUnversionedData = false;
@@ -29,6 +16,10 @@ export const formatGetEntryResponse = (
     if (onlyPublic) {
         isHiddenIsFavorite = true;
     }
+
+    const {getEntryAddFormattedFieldsHook} = registry.common.functions.get();
+
+    const additionalFields = await getEntryAddFormattedFieldsHook({ctx, result});
 
     return {
         entryId: joinedEntryRevisionFavorite.entryId,
@@ -54,5 +45,6 @@ export const formatGetEntryResponse = (
         links: includeLinks ? joinedEntryRevisionFavorite.links : undefined,
         isFavorite: isHiddenIsFavorite ? undefined : joinedEntryRevisionFavorite.isFavorite,
         permissions: includePermissionsInfo ? permissions : undefined,
+        ...additionalFields,
     };
 };

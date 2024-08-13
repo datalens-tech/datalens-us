@@ -348,16 +348,6 @@ export default (error: AppError | DBError) => {
             };
         }
 
-        case US_ERRORS.INCORRECT_ENTRY_ID_FOR_EMBED: {
-            return {
-                code: 409,
-                response: {
-                    code,
-                    message: 'Incorrect entryId for embed',
-                },
-            };
-        }
-
         case US_ERRORS.INCORRECT_WORKBOOK_ID_HEADER: {
             return {
                 code: 400,
