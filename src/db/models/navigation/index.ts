@@ -7,14 +7,8 @@ import {AppError} from '@gravity-ui/nodekit';
 import * as MT from '../../../types/models';
 import {RETURN_NAVIGATION_COLUMNS, US_ERRORS} from '../../../const';
 import {validateGetEntries, validateInterTenantGetEntries} from './scheme';
-import {registry} from '../../../registry';
-
-import {EntryPermissions} from '../../../services/new/entry/types';
-import {getEntryPermissionsByWorkbook} from '../../../services/new/workbook/utils';
-
-import {getWorkbooksListByIds} from '../../../services/new/workbook/get-workbooks-list-by-ids';
-import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
 import {whereBuilderInterTenantGetEntries} from './utils';
+import {getEntriesWithPermissionsOnly} from '../../../utils/entry';
 
 interface Navigation extends MT.EntryColumns {
     isLocked?: boolean;
@@ -92,8 +86,6 @@ class Navigation extends Model {
             dlContext,
         });
 
-        const {DLS} = registry.common.classes.get();
-
         const {user} = ctx.get('info');
 
         const {isValid, validationErrors} = validateGetEntries({
@@ -118,8 +110,6 @@ class Navigation extends Model {
                 details: {validationErrors},
             });
         }
-
-        let result: any[] = [];
 
         const returnColumnNames = includeLinks
             ? RETURN_NAVIGATION_COLUMNS.concat('links')
@@ -205,143 +195,52 @@ class Navigation extends Model {
             .page(page, pageSize)
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);
 
-        const workbookEntries: Navigation[] = [];
-        const entryWithoutWorkbook: Navigation[] = [];
-
-        entries.results.forEach((entry: Navigation) => {
-            if (entry.workbookId) {
-                workbookEntries.push(entry);
-            } else {
-                entryWithoutWorkbook.push(entry);
-            }
-        });
-
         const nextPageToken = Utils.getNextPageToken(page, pageSize, entries.total);
 
-        if (entryWithoutWorkbook.length > 0) {
-            if (!isPrivateRoute && ctx.config.dlsEnabled) {
-                result = await DLS.checkBulkPermission(
-                    {ctx},
-                    {
-                        entities: entryWithoutWorkbook,
-                        action: MT.DlsActions.Read,
-                        includePermissionsInfo,
-                    },
-                );
-            } else {
-                result = entryWithoutWorkbook.map((entry) => ({
-                    ...entry,
-                    isLocked: false,
-                    ...(includePermissionsInfo && {
-                        permissions: {
-                            execute: true,
-                            read: true,
-                            edit: true,
-                            admin: true,
-                        },
-                    }),
-                }));
-            }
-        }
-
-        if (workbookEntries.length > 0) {
-            if (!isPrivateRoute && ctx.config.accessServiceEnabled) {
-                const workbookList = await getWorkbooksListByIds(
-                    {ctx},
-                    {
-                        workbookIds: workbookEntries.map((entry) => entry.workbookId) as string[],
-                        includePermissionsInfo,
-                    },
-                );
-
-                const entryPermissionsMap = new Map<string, EntryPermissions>();
-                const workbooksMap = new Map<string, WorkbookInstance>();
-
-                workbookList.forEach((workbook) => {
-                    workbooksMap.set(workbook.model.workbookId, workbook);
-                });
-
-                workbookEntries.forEach((entry) => {
-                    if (entry?.workbookId && workbooksMap.has(entry.workbookId)) {
-                        const workbook = workbooksMap.get(entry.workbookId);
-
-                        if (workbook && includePermissionsInfo) {
-                            const permissions = getEntryPermissionsByWorkbook({
-                                ctx,
-                                workbook,
-                                scope: entry.scope,
-                            });
-                            entryPermissionsMap.set(entry.entryId, permissions);
-                        }
-
-                        let isLocked = false;
-
-                        if (entryPermissionsMap.has(entry.entryId)) {
-                            const isReadPermission = entryPermissionsMap.get(entry.entryId)?.read;
-
-                            if (!isReadPermission) {
-                                isLocked = true;
-                            }
-                        }
-
-                        result.push({
-                            ...entry,
-                            permissions: includePermissionsInfo
-                                ? entryPermissionsMap.get(entry.entryId)
-                                : undefined,
-                            isLocked,
-                        });
-                    }
-                });
-            } else {
-                result = [
-                    ...result,
-                    ...workbookEntries.map((entry) => ({
-                        ...entry,
-                        isLocked: false,
-                        ...(includePermissionsInfo && {
-                            permissions: {
-                                execute: true,
-                                read: true,
-                                edit: true,
-                                admin: true,
-                            },
-                        }),
-                    })),
-                ];
-            }
-        }
-
-        const mapResult = new Map<string, Navigation>();
-
-        result.forEach((entry) => {
-            mapResult.set(entry.entryId, entry);
+        let entriesWithPermissionsOnly: Navigation[] = await getEntriesWithPermissionsOnly(ctx, {
+            entries: entries.results,
+            includePermissionsInfo,
+            isPrivateRoute,
         });
-
-        const orderedResult: Navigation[] = [];
-
-        entries.results.forEach((entry) => {
-            const model = mapResult.get(entry.entryId);
-
-            if (model) {
-                orderedResult.push(model);
-            }
-        });
-
-        result = Navigation.processEntries(orderedResult);
 
         if (excludeLocked) {
-            result = Navigation.filterEntriesByIsLocked(result);
+            entriesWithPermissionsOnly = Navigation.filterEntriesByIsLocked(
+                entriesWithPermissionsOnly,
+            );
+
+            ctx.log('GET_ENTRIES_REQUEST_SUCCESS');
+
+            const data: MT.PaginationEntriesResponse = {
+                nextPageToken,
+                entries: entriesWithPermissionsOnly,
+            };
+
+            return data;
+        } else {
+            const result = entriesWithPermissionsOnly.map((entry) => {
+                const {isLocked, entryId, scope, type} = entry;
+
+                if (isLocked) {
+                    return {
+                        isLocked,
+                        entryId,
+                        scope,
+                        type,
+                    };
+                } else {
+                    return entry;
+                }
+            });
+
+            ctx.log('GET_ENTRIES_REQUEST_SUCCESS');
+
+            const data: MT.PaginationEntriesResponse = {
+                nextPageToken,
+                entries: result,
+            };
+
+            return data;
         }
-
-        ctx.log('GET_ENTRIES_REQUEST_SUCCESS');
-
-        const data: MT.PaginationEntriesResponse = {
-            nextPageToken,
-            entries: result,
-        };
-
-        return data;
     }
 
     static async interTenantGetEntries(
@@ -416,23 +315,6 @@ class Navigation extends Model {
         };
 
         return data;
-    }
-
-    private static processEntries(entries: MT.EntryType[] = []): MT.EntryType[] {
-        return entries.map((entry) => {
-            const {isLocked, entryId, scope, type} = entry;
-
-            if (isLocked) {
-                return {
-                    isLocked,
-                    entryId,
-                    scope,
-                    type,
-                };
-            } else {
-                return entry;
-            }
-        });
     }
 
     private static filterEntriesByIsLocked(entries: Navigation[] = []): Navigation[] {
