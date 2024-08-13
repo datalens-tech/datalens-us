@@ -4,9 +4,13 @@ import {Collection} from './entities/collection/collection';
 import {bulkFetchWorkbooksAllPermissions} from './entities/workbook/utils';
 import {bulkFetchCollectionsAllPermissions} from './entities/collection/utils';
 import {checkOrganizationPermission, checkProjectPermission} from './components/iam/utils';
-import {isNeedBypassEntryByKey} from './utils/entry/utils';
+import {
+    isNeedBypassEntryByKey,
+    getEntryBeforeDbRequestHook,
+    getEntryAddFormattedFieldsHook,
+} from './utils/entry/utils';
 import {colorPalettesAdminValidator} from './utils/color-palettes/utils';
-import {checkEmbeddingAvailability} from './utils/embedding/utils';
+import {checkEmbedding} from './utils/embedding/utils';
 import {getZitadelUserRole} from '../zitadel/utils';
 
 import {registry} from '../index';
@@ -25,7 +29,9 @@ export const registerCommonPlugins = () => {
         checkProjectPermission,
         isNeedBypassEntryByKey,
         colorPalettesAdminValidator,
-        checkEmbeddingAvailability,
         getZitadelUserRole,
+        getEntryBeforeDbRequestHook,
+        getEntryAddFormattedFieldsHook,
+        checkEmbedding,
     });
 };

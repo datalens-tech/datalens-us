@@ -1,10 +1,13 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {EntryPermissions} from './types';
 import {checkFetchedEntry, checkWorkbookIsolation} from './utils';
-import {getReplica, checkEntryIdInEmbed} from '../utils';
+import {getReplica} from '../utils';
 import {ServiceArgs} from '../types';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
-import {JoinedEntryRevisionFavorite} from '../../../db/presentations/joined-entry-revision-favorite';
+import {
+    JoinedEntryRevisionFavorite,
+    JoinedEntryRevisionFavoriteColumns,
+} from '../../../db/presentations/joined-entry-revision-favorite';
 import {DlsActions} from '../../../types/models';
 import Utils, {logInfo} from '../../../utils';
 import {US_ERRORS} from '../../../const';
@@ -46,11 +49,18 @@ export interface GetEntryArgs {
     includeLinks: boolean;
 }
 
+export type GetEntryResult = {
+    joinedEntryRevisionFavorite: JoinedEntryRevisionFavoriteColumns;
+    permissions: EntryPermissions;
+    includePermissionsInfo: boolean;
+    includeLinks: boolean;
+};
+
 // eslint-disable-next-line complexity
 export const getEntry = async (
     {ctx, trx, skipValidation = false}: ServiceArgs,
     args: GetEntryArgs,
-) => {
+): Promise<GetEntryResult> => {
     const {entryId, revId, branch = 'saved', includePermissionsInfo, includeLinks} = args;
 
     logInfo(ctx, 'GET_ENTRY_REQUEST', {
@@ -63,24 +73,17 @@ export const getEntry = async (
 
     const {DLS} = registry.common.classes.get();
 
-    const {isPrivateRoute, user, onlyPublic, onlyMirrored, embeddingInfo} = ctx.get('info');
+    const {isPrivateRoute, user, onlyPublic, onlyMirrored} = ctx.get('info');
 
     if (!skipValidation) {
         validateArgs(args);
     }
 
-    if (embeddingInfo) {
-        if (!checkEntryIdInEmbed({embed: embeddingInfo.embed, entryId})) {
-            throw new AppError(US_ERRORS.INCORRECT_ENTRY_ID_FOR_EMBED, {
-                code: US_ERRORS.INCORRECT_ENTRY_ID_FOR_EMBED,
-            });
-        }
+    const {getEntryBeforeDbRequestHook, checkEmbedding} = registry.common.functions.get();
 
-        const {checkEmbeddingAvailability} = registry.common.functions.get();
-        await checkEmbeddingAvailability(embeddingInfo.entry[EntryColumn.TenantId] as string);
-    }
+    await getEntryBeforeDbRequestHook({ctx, entryId});
 
-    const isEmbedding = Boolean(embeddingInfo);
+    const isEmbedding = checkEmbedding({ctx});
 
     const joinedEntryRevisionFavorite = await JoinedEntryRevisionFavorite.findOne({
         where: (builder) => {
