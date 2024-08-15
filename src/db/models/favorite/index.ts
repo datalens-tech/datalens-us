@@ -157,7 +157,11 @@ class Favorite extends Model {
                 orderedResult.push({
                     ...entry,
                     isLocked: model.isLocked,
-                    permissions: model.permissions,
+                    ...(model.permissions
+                        ? {
+                              permissions: model.permissions,
+                          }
+                        : {}),
                 });
             }
         });
