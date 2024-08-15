@@ -1,9 +1,9 @@
 import {TransactionOrKnex} from 'objection';
-import {EntryType} from './entry';
+import {EntryScope, EntryType} from './entry';
 import {BasicRequestParams, RequestedBy} from './common';
 import {CTX} from './core';
 import {UsPermissions} from './permission';
-import {DlsPermission} from './dls';
+import {DlsEntity, DlsPermission} from './dls';
 import {SyncLinks} from './link';
 import {EntryPermissions} from '../../services/new/entry/types';
 
@@ -70,3 +70,9 @@ export interface CopyEntityBetweenTenantConfig {
     entryId: string;
     destinationTenantId: string;
 }
+
+export type EntryWithPermissionOnly = {
+    entryId: string;
+    scope: EntryScope;
+    workbookId: string | null;
+} & DlsEntity;

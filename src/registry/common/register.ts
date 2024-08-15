@@ -8,6 +8,7 @@ import {
     isNeedBypassEntryByKey,
     getEntryBeforeDbRequestHook,
     getEntryAddFormattedFieldsHook,
+    getEntriesWithPermissionsOnly,
 } from './utils/entry/utils';
 import {colorPalettesAdminValidator} from './utils/color-palettes/utils';
 import {checkEmbedding} from './utils/embedding/utils';
@@ -33,5 +34,6 @@ export const registerCommonPlugins = () => {
         getEntryBeforeDbRequestHook,
         getEntryAddFormattedFieldsHook,
         checkEmbedding,
+        getEntriesWithPermissionsOnly,
     });
 };

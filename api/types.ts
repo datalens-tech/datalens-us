@@ -18,6 +18,7 @@ export {
     CountAggregation,
     DlsPermissionSubject,
     EntryScope,
+    EntryWithPermissionOnly,
 } from '../src/types/models';
 
 export * as ST from '../src/types/services.types';

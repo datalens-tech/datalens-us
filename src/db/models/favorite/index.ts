@@ -17,8 +17,6 @@ import {registry} from '../../../registry';
 
 import {getWorkbook} from '../../../services/new/workbook';
 
-import {getEntriesWithPermissionsOnly} from '../../../utils/entry';
-
 interface Favorite extends MT.FavoriteColumns {}
 class Favorite extends Model {
     static get tableName() {
@@ -142,16 +140,33 @@ class Favorite extends Model {
 
         const nextPageToken = Utils.getNextPageToken(page, pageSize, entries.total);
 
-        const entriesWithPermissionsOnly = await getEntriesWithPermissionsOnly(ctx, {
-            entries: entries.results,
-            includePermissionsInfo,
+        const {getEntriesWithPermissionsOnly} = registry.common.functions.get();
+
+        const entriesWithPermissionsOnly: Map<string, MT.EntryWithPermissionOnly> =
+            await getEntriesWithPermissionsOnly(ctx, {
+                entries: entries.results,
+                includePermissionsInfo,
+            });
+
+        const orderedResult: any[] = [];
+
+        entries.results.forEach((entry) => {
+            const model = entriesWithPermissionsOnly.get(entry.entryId);
+
+            if (model) {
+                orderedResult.push({
+                    ...entry,
+                    isLocked: model.isLocked,
+                    permissions: model.permissions,
+                });
+            }
         });
 
         ctx.log('GET_FAVORITES_SUCCESS');
 
         const data: MT.PaginationEntriesResponse = {
             nextPageToken,
-            entries: entriesWithPermissionsOnly,
+            entries: orderedResult,
         };
 
         return data;

@@ -8,7 +8,7 @@ import * as MT from '../../../types/models';
 import {RETURN_NAVIGATION_COLUMNS, US_ERRORS} from '../../../const';
 import {validateGetEntries, validateInterTenantGetEntries} from './scheme';
 import {whereBuilderInterTenantGetEntries} from './utils';
-import {getEntriesWithPermissionsOnly} from '../../../utils/entry';
+import {registry} from '../../../registry';
 
 interface Navigation extends MT.EntryColumns {
     isLocked?: boolean;
@@ -197,27 +197,47 @@ class Navigation extends Model {
 
         const nextPageToken = Utils.getNextPageToken(page, pageSize, entries.total);
 
-        let entriesWithPermissionsOnly: Navigation[] = await getEntriesWithPermissionsOnly(ctx, {
-            entries: entries.results,
-            includePermissionsInfo,
-            isPrivateRoute,
+        const {getEntriesWithPermissionsOnly} = registry.common.functions.get();
+
+        const entriesWithPermissionsOnly: Map<string, MT.EntryWithPermissionOnly> =
+            await getEntriesWithPermissionsOnly(ctx, {
+                entries: entries.results.map((entry) => ({
+                    entryId: entry.entryId,
+                    workbookId: entry.workbookId,
+                    scope: entry.scope,
+                    type: entry.type,
+                })),
+                includePermissionsInfo,
+                isPrivateRoute,
+            });
+
+        let orderedResult: any[] = [];
+
+        entries.results.forEach((entry) => {
+            const model = entriesWithPermissionsOnly.get(entry.entryId);
+
+            if (model) {
+                orderedResult.push({
+                    ...entry,
+                    isLocked: model.isLocked,
+                    permissions: model.permissions,
+                });
+            }
         });
 
         if (excludeLocked) {
-            entriesWithPermissionsOnly = Navigation.filterEntriesByIsLocked(
-                entriesWithPermissionsOnly,
-            );
+            orderedResult = Navigation.filterEntriesByIsLocked(orderedResult);
 
             ctx.log('GET_ENTRIES_REQUEST_SUCCESS');
 
             const data: MT.PaginationEntriesResponse = {
                 nextPageToken,
-                entries: entriesWithPermissionsOnly,
+                entries: orderedResult,
             };
 
             return data;
         } else {
-            const result = entriesWithPermissionsOnly.map((entry) => {
+            const result = orderedResult.map((entry) => {
                 const {isLocked, entryId, scope, type} = entry;
 
                 if (isLocked) {
