@@ -10,6 +10,8 @@ const selectedEmbedColumns = [
     EmbedModelColumn.EntryId,
     EmbedModelColumn.DepsIds,
     EmbedModelColumn.UnsignedParams,
+    EmbedModelColumn.PrivateParams,
+    EmbedModelColumn.PublicParamsMode,
     EmbedModelColumn.CreatedBy,
     EmbedModelColumn.CreatedAt,
 ] as const;
