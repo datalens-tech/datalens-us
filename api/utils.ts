@@ -5,7 +5,6 @@ export {
     isTenantIdWithOrgId,
     getOrgIdFromTenantId,
     makeTenantIdFromOrgId,
-    getEntriesWithPermissionsOnly,
 } from '../src/utils';
 
 export {normalizedEnv} from '../src/utils/normalized-env';

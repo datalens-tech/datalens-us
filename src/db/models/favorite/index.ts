@@ -5,7 +5,7 @@ import {Entry as EntryModel} from '../new/entry';
 import {AppError} from '@gravity-ui/nodekit';
 import * as MT from '../../../types/models';
 import {DlsActions} from '../../../types/models';
-import Utils, {getEntriesWithPermissionsOnly} from '../../../utils';
+import Utils from '../../../utils';
 import {
     validateGetFavorites,
     validateAddFavorite,
@@ -16,6 +16,7 @@ import {RETURN_FAVORITES_COLUMNS, US_ERRORS} from '../../../const';
 import {registry} from '../../../registry';
 
 import {getWorkbook} from '../../../services/new/workbook';
+import {getEntriesWithPermissionsOnly} from '../../../utils/entry';
 
 interface Favorite extends MT.FavoriteColumns {}
 class Favorite extends Model {
