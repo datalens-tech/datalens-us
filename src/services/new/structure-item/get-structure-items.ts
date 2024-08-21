@@ -8,14 +8,15 @@ import {CollectionModel} from '../../../db/models/new/collection';
 import Utils, {logInfo} from '../../../utils';
 import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
-import {getCollection, getParentIds} from '../../../../api/services';
 import {WorkbookModel} from '../../../db/models/new/workbook';
 import {getWorkbooksQuery} from './get-workbooks-query';
 import {getCollectionsQuery} from './get-collections-query';
 import {isWorkbookInstance} from '../../../registry/common/entities/structure-item/types';
-import {WorkbookPermission} from '../../../../api/entities';
 import {CollectionInstance} from '../../../registry/common/entities/collection/types';
 import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+import {getCollection} from '../collection';
+import {getParentIds} from '../collection/utils';
+import {WorkbookPermission} from '../../../entities/workbook';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
