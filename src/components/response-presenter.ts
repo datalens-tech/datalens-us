@@ -45,6 +45,9 @@ export async function prepareResponseAsync({data}: {data: any}): Promise<ST.Serv
     if (response.collections) {
         response.collections = await Utils.macrotasksEncodeData(response.collections);
     }
+    if (response.items) {
+        response.items = await Utils.macrotasksEncodeData(response.items);
+    }
     if (response.embed) {
         response.embed = await Utils.macrotasksEncodeData(response.embed);
     }

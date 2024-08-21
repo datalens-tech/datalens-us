@@ -12,6 +12,7 @@ import favoritesController from './controllers/favorites';
 import workbooksController from './controllers/workbooks';
 import collectionsController from './controllers/collections';
 import colorPalettesController from './controllers/color-palettes';
+import structureItemsController from './controllers/structure-items';
 
 export type GetRoutesOptions = {
     beforeAuth: AppMiddleware[];
@@ -391,6 +392,10 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
             getCollectionContent: makeRoute({
                 route: 'GET /v1/collection-content',
                 handler: collectionsController.getContent,
+            }),
+            getStructureItems: makeRoute({
+                route: 'GET /v1/structure-items',
+                handler: structureItemsController.getStructureItems,
             }),
             getRootCollectionPermissions: makeRoute({
                 route: 'GET /v1/root-collection-permissions',
