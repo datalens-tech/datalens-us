@@ -261,6 +261,9 @@ const processPermissions = async ({
     return result;
 };
 
+const isWorkbookModel = (model: CollectionModel | WorkbookModel): model is WorkbookModel => {
+    return 'workbookId' in model && Boolean(model.workbookId);
+};
 const isWorkbookItem = (item: {
     model: CollectionModel | WorkbookModel;
     parentIds: string[];
@@ -303,16 +306,16 @@ const bulkFetchStructureItemsAllPermissions = async (
     const collectionsById: {[k: string]: CollectionInstance} = {};
     const workbooksById: {[k: string]: WorkbookInstance} = {};
 
-    collectionsWithPermissions.forEach((item) => (collectionsById[item.model.collectionId] = item));
-    workbooksWithPermissions.forEach((item) => (workbooksById[item.model.workbookId] = item));
+    collectionsWithPermissions.forEach((item) => {
+        collectionsById[item.model.collectionId] = item;
+    });
+    workbooksWithPermissions.forEach((item) => {
+        workbooksById[item.model.workbookId] = item;
+    });
 
     return items.map((item) => {
         return isWorkbookModel(item.model)
             ? workbooksById[item.model.workbookId]
             : collectionsById[item.model.collectionId];
     });
-};
-
-const isWorkbookModel = (model: CollectionModel | WorkbookModel): model is WorkbookModel => {
-    return 'workbookId' in model && Boolean(model.workbookId);
 };
