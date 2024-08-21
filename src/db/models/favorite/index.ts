@@ -5,7 +5,7 @@ import {Entry as EntryModel} from '../new/entry';
 import {AppError} from '@gravity-ui/nodekit';
 import * as MT from '../../../types/models';
 import {DlsActions} from '../../../types/models';
-import Utils from '../../../utils';
+import Utils, {getEntriesWithPermissionsOnly} from '../../../utils';
 import {
     validateGetFavorites,
     validateAddFavorite,
@@ -139,8 +139,6 @@ class Favorite extends Model {
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);
 
         const nextPageToken = Utils.getNextPageToken(page, pageSize, entries.total);
-
-        const {getEntriesWithPermissionsOnly} = registry.common.functions.get();
 
         const entriesWithPermissionsOnly: Map<string, MT.EntryWithPermissionOnly> =
             await getEntriesWithPermissionsOnly(ctx, {

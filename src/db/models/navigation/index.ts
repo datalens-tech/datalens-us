@@ -1,6 +1,6 @@
 import {raw} from 'objection';
 import {Model} from '../..';
-import Utils from '../../../utils';
+import Utils, {getEntriesWithPermissionsOnly} from '../../../utils';
 import Revision from '../revision';
 import Favorite from '../favorite';
 import {AppError} from '@gravity-ui/nodekit';
@@ -8,7 +8,6 @@ import * as MT from '../../../types/models';
 import {RETURN_NAVIGATION_COLUMNS, US_ERRORS} from '../../../const';
 import {validateGetEntries, validateInterTenantGetEntries} from './scheme';
 import {whereBuilderInterTenantGetEntries} from './utils';
-import {registry} from '../../../registry';
 
 interface Navigation extends MT.EntryColumns {
     isLocked?: boolean;
@@ -196,8 +195,6 @@ class Navigation extends Model {
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);
 
         const nextPageToken = Utils.getNextPageToken(page, pageSize, entries.total);
-
-        const {getEntriesWithPermissionsOnly} = registry.common.functions.get();
 
         const entriesWithPermissionsOnly: Map<string, MT.EntryWithPermissionOnly> =
             await getEntriesWithPermissionsOnly(ctx, {

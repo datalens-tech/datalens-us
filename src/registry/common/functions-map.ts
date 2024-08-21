@@ -6,7 +6,6 @@ import type {
     IsNeedBypassEntryByKey,
     GetEntryBeforeDbRequestHook,
     GetEntryAddFormattedFieldsHook,
-    GetEntriesWithPermissionsOnly,
 } from './utils/entry/types';
 import type {ColorPalettesAdminValidator} from './utils/color-palettes/types';
 import type {CheckEmbedding} from './utils/embedding/types';
@@ -23,5 +22,4 @@ export const commonFunctionsMap = {
     getEntryBeforeDbRequestHook: makeFunctionTemplate<GetEntryBeforeDbRequestHook>(),
     getEntryAddFormattedFieldsHook: makeFunctionTemplate<GetEntryAddFormattedFieldsHook>(),
     checkEmbedding: makeFunctionTemplate<CheckEmbedding>(),
-    getEntriesWithPermissionsOnly: makeFunctionTemplate<GetEntriesWithPermissionsOnly>(),
 } as const;
