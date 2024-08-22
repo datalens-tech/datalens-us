@@ -5,7 +5,6 @@ export async function up(knex: Knex): Promise<void> {
         ALTER TABLE embeds
             ADD COLUMN updated_by TEXT,
             ADD COLUMN updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
-        UPDATE embeds SET updated_by = created_by, updated_at = created_at;
         CREATE INDEX embeds_updated_at_idx ON embeds USING BTREE (updated_at);
     `);
 }
