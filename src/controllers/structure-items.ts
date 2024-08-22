@@ -8,12 +8,7 @@ export default {
     getStructureItems: async (req: Request, res: Response) => {
         const {query} = req;
 
-        let itemsPage: Optional<Nullable<number>>;
-        if (query.itemsPage === 'null') {
-            itemsPage = null;
-        } else {
-            itemsPage = query.itemsPage ? parseInt(query.itemsPage as string, 10) : undefined;
-        }
+        const page = query.page ? parseInt(query.page as string, 10) : undefined;
 
         const result = await getStructureItems(
             {ctx: req.ctx},
@@ -21,7 +16,7 @@ export default {
                 collectionId: (query.collectionId as Optional<string>) ?? null,
                 includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
                 filterString: query.filterString as Optional<string>,
-                itemsPage,
+                page: page,
                 pageSize: query.pageSize ? parseInt(query.pageSize as string, 10) : undefined,
                 orderField: query.orderField as Optional<OrderField>,
                 orderDirection: query.orderDirection as Optional<OrderDirection>,

@@ -1,22 +1,14 @@
-import {AppContext, AppError} from '@gravity-ui/nodekit';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {US_ERRORS} from '../../../const';
 import {CollectionPermission} from '../../../entities/collection';
 import {CollectionModel} from '../../../db/models/new/collection';
 import Utils, {logInfo} from '../../../utils';
 import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
-import {WorkbookModel} from '../../../db/models/new/workbook';
-import {getWorkbooksQuery} from './get-workbooks-query';
-import {getCollectionsQuery} from './get-collections-query';
-import {isWorkbookInstance} from '../../../registry/common/entities/structure-item/types';
-import {CollectionInstance} from '../../../registry/common/entities/collection/types';
-import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
 import {getCollection} from '../collection';
 import {getParentIds} from '../collection/utils';
-import {WorkbookPermission} from '../../../entities/workbook';
+import {getCollectionsQuery, getWorkbooksQuery, processPermissions} from './utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -31,7 +23,7 @@ const validateArgs = makeSchemaValidator({
         filterString: {
             type: 'string',
         },
-        itemsPage: {
+        page: {
             type: ['number', 'null'],
         },
         pageSize: {
@@ -58,7 +50,7 @@ export interface GetStructureItemsContentArgs {
     collectionId: Nullable<string>;
     includePermissionsInfo?: boolean;
     filterString?: string;
-    itemsPage?: Nullable<number>;
+    page?: Nullable<number>;
     pageSize?: number;
     orderField?: OrderField;
     orderDirection?: OrderDirection;
@@ -75,7 +67,7 @@ export const getStructureItems = async (
         collectionId,
         includePermissionsInfo = false,
         filterString,
-        itemsPage = 0,
+        page = 0,
         pageSize = 100,
         orderField = 'title',
         orderDirection = 'asc',
@@ -87,7 +79,7 @@ export const getStructureItems = async (
         collectionId: collectionId ? Utils.encodeId(collectionId) : null,
         includePermissionsInfo,
         filterString,
-        itemsPage,
+        page: page,
         pageSize,
         orderField,
         orderDirection,
@@ -132,7 +124,7 @@ export const getStructureItems = async (
     let items: InstanceType<typeof Collection | typeof Workbook>[] = [];
     let nextPageToken: Optional<string>;
 
-    if (itemsPage !== null) {
+    if (page !== null) {
         let query;
 
         const queryArgs = {collectionId, filterString, onlyMy};
@@ -147,18 +139,18 @@ export const getStructureItems = async (
                 .orderBy('type', 'asc');
         }
 
-        const curItemsPage = await query
+        const curPage = await query
             .orderBy(orderField === 'title' ? 'sortTitle' : orderField, orderDirection)
-            .page(itemsPage, pageSize)
+            .page(page, pageSize)
             .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
 
-        nextPageToken = Utils.getNextPageToken(itemsPage, pageSize, curItemsPage.total);
+        nextPageToken = Utils.getNextPageToken(page, pageSize, curPage.total);
 
-        if (curItemsPage.results.length > 0) {
+        if (curPage.results.length > 0) {
             const allParentIds = collectionId ? [collectionId, ...parentIds] : [];
             items = await processPermissions({
                 ctx,
-                models: curItemsPage.results,
+                models: curPage.results,
                 parentIds: allParentIds,
                 skipCheckPermissions,
                 includePermissionsInfo,
@@ -174,149 +166,4 @@ export const getStructureItems = async (
         items,
         nextPageToken: nextPageToken ?? null,
     };
-};
-
-interface ProcessPermissionsArgs {
-    ctx: AppContext;
-    models: (CollectionModel | WorkbookModel)[];
-    parentIds: string[];
-    skipCheckPermissions: boolean;
-    includePermissionsInfo: boolean;
-}
-
-const processPermissions = async ({
-    ctx,
-    models,
-    parentIds,
-    skipCheckPermissions,
-    includePermissionsInfo,
-}: ProcessPermissionsArgs) => {
-    let result;
-
-    const {accessServiceEnabled} = ctx.config;
-    const {Workbook, Collection} = registry.common.classes.get();
-
-    if (accessServiceEnabled && !skipCheckPermissions) {
-        const checkedItems = await Promise.all(
-            models.map(async (model: WorkbookModel | CollectionModel) => {
-                const item = isWorkbookModel(model)
-                    ? new Workbook({ctx, model})
-                    : new Collection({ctx, model});
-
-                try {
-                    if (isWorkbookInstance(item)) {
-                        await item.checkPermission({
-                            parentIds,
-                            permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                                ? WorkbookPermission.LimitedView
-                                : WorkbookPermission.View,
-                        });
-                    } else {
-                        await item.checkPermission({
-                            parentIds,
-                            permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                                ? CollectionPermission.LimitedView
-                                : CollectionPermission.View,
-                        });
-                    }
-
-                    return item;
-                } catch (error) {
-                    const err = error as AppError;
-
-                    if (err.code === US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED) {
-                        return null;
-                    }
-
-                    throw error;
-                }
-            }),
-        );
-
-        result = checkedItems.filter((item) => item !== null) as InstanceType<
-            typeof Collection | typeof Workbook
-        >[];
-
-        if (includePermissionsInfo) {
-            result = await bulkFetchStructureItemsAllPermissions(
-                ctx,
-                result.map((item) => ({
-                    model: item.model,
-                    parentIds,
-                })),
-            );
-        }
-    } else {
-        result = models.map((model: WorkbookModel | CollectionModel) => {
-            const item = isWorkbookModel(model)
-                ? new Workbook({ctx, model})
-                : new Collection({ctx, model});
-
-            if (includePermissionsInfo) {
-                item.enableAllPermissions();
-            }
-
-            return item;
-        });
-    }
-    return result;
-};
-
-const isWorkbookModel = (model: CollectionModel | WorkbookModel): model is WorkbookModel => {
-    return 'workbookId' in model && Boolean(model.workbookId);
-};
-const isWorkbookItem = (item: {
-    model: CollectionModel | WorkbookModel;
-    parentIds: string[];
-}): item is {model: WorkbookModel; parentIds: string[]} => {
-    return isWorkbookModel(item.model);
-};
-const isCollectionItem = (item: {
-    model: CollectionModel | WorkbookModel;
-    parentIds: string[];
-}): item is {model: CollectionModel; parentIds: string[]} => {
-    return !isWorkbookItem(item);
-};
-
-const bulkFetchStructureItemsAllPermissions = async (
-    ctx: AppContext,
-    items: {model: CollectionModel | WorkbookModel; parentIds: string[]}[],
-) => {
-    if (items.length === 0) {
-        return [];
-    }
-
-    const {bulkFetchCollectionsAllPermissions, bulkFetchWorkbooksAllPermissions} =
-        registry.common.functions.get();
-
-    const collectionItems: {model: CollectionModel; parentIds: string[]}[] = [];
-    const workbookItems: {model: WorkbookModel; parentIds: string[]}[] = [];
-    items.forEach((item) => {
-        if (isWorkbookItem(item)) {
-            workbookItems.push(item);
-        } else if (isCollectionItem(item)) {
-            collectionItems.push(item);
-        }
-    });
-
-    const [collectionsWithPermissions, workbooksWithPermissions] = await Promise.all([
-        bulkFetchCollectionsAllPermissions(ctx, collectionItems),
-        bulkFetchWorkbooksAllPermissions(ctx, workbookItems),
-    ]);
-
-    const collectionsById: {[k: string]: CollectionInstance} = {};
-    const workbooksById: {[k: string]: WorkbookInstance} = {};
-
-    collectionsWithPermissions.forEach((item) => {
-        collectionsById[item.model.collectionId] = item;
-    });
-    workbooksWithPermissions.forEach((item) => {
-        workbooksById[item.model.workbookId] = item;
-    });
-
-    return items.map((item) => {
-        return isWorkbookModel(item.model)
-            ? workbooksById[item.model.workbookId]
-            : collectionsById[item.model.collectionId];
-    });
 };
