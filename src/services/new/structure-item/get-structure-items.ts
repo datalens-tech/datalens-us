@@ -158,7 +158,7 @@ export const getStructureItems = async (
         }
     }
 
-    logInfo(ctx, 'GET_STRUCTURE_ITEMS_FINISH', {
+    ctx.log('GET_STRUCTURE_ITEMS_FINISH', {
         itemsLength: items.length,
     });
 

@@ -29,22 +29,22 @@ export const getWorkbooksQuery = ({ctx, trx}: ServiceArgs, args: GetWorkbooksQue
 
     const targetTrx = getReplica(trx);
     return WorkbookModel.query(targetTrx)
-        .select({
-            type: raw("'workbook'"),
-            workbookId: WorkbookModelColumn.WorkbookId,
-            collectionId: WorkbookModelColumn.CollectionId,
-            title: WorkbookModelColumn.Title,
-            sortTitle: WorkbookModelColumn.SortTitle,
-            description: WorkbookModelColumn.Description,
-            parentId: raw('null'),
-            projectId: WorkbookModelColumn.ProjectId,
-            tenantId: WorkbookModelColumn.TenantId,
-            createdBy: WorkbookModelColumn.CreatedBy,
-            createdAt: WorkbookModelColumn.CreatedAt,
-            updatedBy: WorkbookModelColumn.UpdatedBy,
-            updatedAt: WorkbookModelColumn.UpdatedAt,
-            meta: WorkbookModelColumn.Meta,
-        })
+        .select([
+            raw("'workbook' as ??", 'type'),
+            WorkbookModelColumn.WorkbookId,
+            WorkbookModelColumn.CollectionId,
+            WorkbookModelColumn.Title,
+            WorkbookModelColumn.SortTitle,
+            WorkbookModelColumn.Description,
+            raw('null as ??', 'parentId'),
+            WorkbookModelColumn.ProjectId,
+            WorkbookModelColumn.TenantId,
+            WorkbookModelColumn.CreatedBy,
+            WorkbookModelColumn.CreatedAt,
+            WorkbookModelColumn.UpdatedBy,
+            WorkbookModelColumn.UpdatedAt,
+            WorkbookModelColumn.Meta,
+        ])
         .where({
             [WorkbookModelColumn.TenantId]: tenantId,
             [WorkbookModelColumn.ProjectId]: projectId,
@@ -80,22 +80,22 @@ export const getCollectionsQuery = ({ctx, trx}: ServiceArgs, args: GetCollection
     const targetTrx = getReplica(trx);
 
     return CollectionModel.query(targetTrx)
-        .select({
-            type: raw("'collection'"),
-            workbookId: raw('null'),
-            collectionId: CollectionModelColumn.CollectionId,
-            title: CollectionModelColumn.Title,
-            sortTitle: CollectionModelColumn.SortTitle,
-            description: CollectionModelColumn.Description,
-            parentId: CollectionModelColumn.ParentId,
-            projectId: CollectionModelColumn.ProjectId,
-            tenantId: CollectionModelColumn.TenantId,
-            createdBy: CollectionModelColumn.CreatedBy,
-            createdAt: CollectionModelColumn.CreatedAt,
-            updatedBy: CollectionModelColumn.UpdatedBy,
-            updatedAt: CollectionModelColumn.UpdatedAt,
-            meta: CollectionModelColumn.Meta,
-        })
+        .select([
+            raw("'collection' as ??", 'type'),
+            raw('null as ??', 'workbookId'),
+            CollectionModelColumn.CollectionId,
+            CollectionModelColumn.Title,
+            CollectionModelColumn.SortTitle,
+            CollectionModelColumn.Description,
+            CollectionModelColumn.ParentId,
+            CollectionModelColumn.ProjectId,
+            CollectionModelColumn.TenantId,
+            CollectionModelColumn.CreatedBy,
+            CollectionModelColumn.CreatedAt,
+            CollectionModelColumn.UpdatedBy,
+            CollectionModelColumn.UpdatedAt,
+            CollectionModelColumn.Meta,
+        ])
         .where({
             [CollectionModelColumn.TenantId]: tenantId,
             [CollectionModelColumn.ProjectId]: projectId,
@@ -242,8 +242,8 @@ const bulkFetchStructureItemsAllPermissions = async (
         bulkFetchWorkbooksAllPermissions(ctx, workbookItems),
     ]);
 
-    const collectionsById: {[k: string]: CollectionInstance} = {};
-    const workbooksById: {[k: string]: WorkbookInstance} = {};
+    const collectionsById: {[collectionId: string]: CollectionInstance} = {};
+    const workbooksById: {[workbookId: string]: WorkbookInstance} = {};
 
     collectionsWithPermissions.forEach((item) => {
         collectionsById[item.model.collectionId] = item;
