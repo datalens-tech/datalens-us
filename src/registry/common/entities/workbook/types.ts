@@ -1,25 +1,19 @@
 import type {AppContext} from '@gravity-ui/nodekit';
 import type {WorkbookModel} from '../../../../db/models/new/workbook';
 import type {WorkbookPermission, Permissions} from '../../../../entities/workbook/types';
+import {StructureItemInstance} from '../structure-item/types';
 
 export interface WorkbookConstructor<T = void> {
     new (args: {ctx: AppContext; model: WorkbookModel}): T extends void ? WorkbookInstance : T;
 }
 
-export interface WorkbookInstance {
-    ctx: AppContext;
+export interface WorkbookInstance extends StructureItemInstance {
     model: WorkbookModel;
     permissions?: Permissions;
 
-    register(args: {parentIds: string[]}): Promise<unknown>;
-
     checkPermission(args: {parentIds: string[]; permission: WorkbookPermission}): Promise<void>;
 
-    fetchAllPermissions(args: {parentIds: string[]}): Promise<void>;
-
     setPermissions(permissions: Permissions): void;
-
-    enableAllPermissions(): void;
 }
 
 export type BulkFetchWorkbooksAllPermissions = (

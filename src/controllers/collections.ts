@@ -65,6 +65,11 @@ export default {
         res.status(code).send(response);
     },
 
+    /**
+     * @deprecated for structureItemsController.getStructureItems,
+     * @todo remove, after successful deploy with UI.
+     * Exists for reverse compatibility.
+     */
     getContent: async (req: Request, res: Response) => {
         const {query} = req;
 
