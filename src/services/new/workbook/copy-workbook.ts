@@ -351,13 +351,18 @@ export async function crossSyncCopiedJoinedEntryRevisions({
         newByOldEntryIdMap.set(encodedTargetConnectionId, encodedTemplateConnectionId);
     }
 
+    await Utils.waitNextMacrotask();
     let strCopiedJoinedEntryRevisions = JSON.stringify(arCopiedJoinedEntryRevisions);
-    newByOldEntryIdMap.forEach((value, key) => {
+
+    for (const [key, value] of newByOldEntryIdMap) {
+        await Utils.waitNextMacrotask();
         strCopiedJoinedEntryRevisions = strCopiedJoinedEntryRevisions.replace(
             new RegExp(value, 'g'),
             key,
         );
-    });
+    }
+
+    await Utils.waitNextMacrotask();
     const arCopiedJoinedEntryRevisionsWithReplacedIds = JSON.parse(
         strCopiedJoinedEntryRevisions,
     ) as JoinedEntryRevisionColumns[];
