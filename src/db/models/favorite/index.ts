@@ -18,7 +18,11 @@ import {registry} from '../../../registry';
 import {getWorkbook} from '../../../services/new/workbook';
 import {getEntriesWithPermissionsOnly} from '../../../utils/entry';
 
-interface Favorite extends MT.FavoriteColumns {}
+interface FavoriteFields extends MT.FavoriteColumns {
+    isLocked?: boolean;
+    permissions?: MT.UsPermission;
+}
+interface Favorite extends FavoriteFields {}
 class Favorite extends Model {
     static get tableName() {
         return 'favorites';
@@ -147,7 +151,7 @@ class Favorite extends Model {
                 includePermissionsInfo,
             });
 
-        const orderedResult: any[] = [];
+        const orderedResult: FavoriteFields[] = [];
 
         entries.results.forEach((entry) => {
             const model = entriesWithPermissionsOnly.get(entry.entryId);

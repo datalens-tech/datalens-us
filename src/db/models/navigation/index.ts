@@ -10,10 +10,11 @@ import {validateGetEntries, validateInterTenantGetEntries} from './scheme';
 import {whereBuilderInterTenantGetEntries} from './utils';
 import {getEntriesWithPermissionsOnly} from '../../../utils/entry';
 
-interface Navigation extends MT.EntryColumns {
+interface NavigationFields extends MT.EntryColumns {
     isLocked?: boolean;
     permissions?: MT.UsPermission;
 }
+interface Navigation extends NavigationFields {}
 class Navigation extends Model {
     static get tableName() {
         return 'entries';
@@ -209,7 +210,7 @@ class Navigation extends Model {
                 isPrivateRoute,
             });
 
-        let orderedResult: any[] = [];
+        let orderedResult: NavigationFields[] = [];
 
         entries.results.forEach((entry) => {
             const model = entriesWithPermissionsOnly.get(entry.entryId);
@@ -339,7 +340,7 @@ class Navigation extends Model {
         return data;
     }
 
-    private static filterEntriesByIsLocked(entries: Navigation[] = []): Navigation[] {
+    private static filterEntriesByIsLocked(entries: NavigationFields[] = []): NavigationFields[] {
         return entries.filter(({isLocked}) => !isLocked);
     }
 }
