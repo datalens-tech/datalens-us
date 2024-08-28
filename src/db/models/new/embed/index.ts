@@ -11,6 +11,8 @@ export const EmbedModelColumn = {
     PublicParamsMode: 'publicParamsMode',
     CreatedBy: 'createdBy',
     CreatedAt: 'createdAt',
+    UpdatedBy: 'updatedBy',
+    UpdatedAt: 'updatedAt',
 } as const;
 
 export class EmbedModel extends Model {
@@ -32,4 +34,6 @@ export class EmbedModel extends Model {
     [EmbedModelColumn.PublicParamsMode]!: boolean;
     [EmbedModelColumn.CreatedBy]!: string;
     [EmbedModelColumn.CreatedAt]!: string;
+    [EmbedModelColumn.UpdatedBy]!: string;
+    [EmbedModelColumn.UpdatedAt]!: string;
 }
