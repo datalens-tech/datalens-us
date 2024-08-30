@@ -9,6 +9,7 @@ import {
     EntryColumns,
     RevisionColumns,
     UsPermission,
+    Mode,
 } from '../../../types/models';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {
@@ -16,15 +17,13 @@ import {
     DEFAULT_QUERY_TIMEOUT,
     RETURN_COLUMNS,
     BiTrackingLogs,
+    ModeValues,
 } from '../../../const';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission, getEntryPermissionsByWorkbook} from '../../new/workbook/utils';
 import {WorkbookPermission} from '../../../entities/workbook';
 import Utils, {logInfo, makeUserId} from '../../../utils';
 import {getId} from '../../../db';
-
-type Mode = 'save' | 'publish';
-const ModeValues: Mode[] = ['save', 'publish'];
 
 export const validateCreateEntryInWorkbook = makeSchemaValidator({
     type: 'object',
@@ -112,7 +111,7 @@ export async function createEntryInWorkbook(
 
     validateCreateEntryInWorkbook({
         workbookId,
-        name: name as string,
+        name,
         scope,
         type,
         links,

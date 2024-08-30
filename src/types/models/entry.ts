@@ -33,3 +33,5 @@ export interface EntryType {
     // eslint-disable-next-line camelcase
     is_release?: any;
 }
+
+export type Mode = 'save' | 'publish';
