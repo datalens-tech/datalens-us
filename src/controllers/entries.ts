@@ -124,6 +124,7 @@ export default {
             recursion: body.recursion,
             hidden: body.hidden,
             mirrored: body.mirrored,
+            mode: body.mode,
             data: body.data,
             unversionedData: body.unversionedData,
             links: body.links,

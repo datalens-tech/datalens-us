@@ -147,6 +147,7 @@ class Entry extends Model {
             unversionedData,
             hidden = false,
             mirrored = false,
+            mode = 'save',
             recursion,
             requestedBy,
             data,
@@ -175,6 +176,7 @@ class Entry extends Model {
             links,
             hidden,
             mirrored,
+            mode,
             recursion,
             createdBy,
             requestedBy,
@@ -211,6 +213,7 @@ class Entry extends Model {
             permissionsMode,
             initialPermissions,
             mirrored,
+            mode,
         });
 
         if (!isValid) {
@@ -440,25 +443,26 @@ class Entry extends Model {
 
             const syncedLinks = await Entry.syncLinks({entryId, links, ctx, trxOverride: TRX});
 
-            const targetCreatedEntry = await Entry.query(TRX)
-                .insert({
-                    entryId,
-                    savedId: revId,
-                    key: keyFormatted,
-                    displayKey,
-                    tenantId,
-                    scope,
-                    type,
-                    innerMeta,
-                    unversionedData,
-                    createdBy: createdBy,
-                    updatedBy: createdBy,
-                    isDeleted,
-                    deletedAt,
-                    hidden,
-                    mirrored,
-                })
-                .returning('*');
+            const patchData = {
+                entryId,
+                savedId: revId,
+                key: keyFormatted,
+                displayKey,
+                tenantId,
+                scope,
+                type,
+                innerMeta,
+                unversionedData,
+                createdBy: createdBy,
+                updatedBy: createdBy,
+                isDeleted,
+                deletedAt,
+                hidden,
+                mirrored,
+                ...(mode === 'publish' ? {publishedId: revId} : {}),
+            };
+
+            const targetCreatedEntry = await Entry.query(TRX).insert(patchData).returning('*');
 
             await Revision.query(TRX).insert({
                 revId: revId,
