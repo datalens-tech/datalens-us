@@ -165,8 +165,6 @@ export default {
 
         const {code, response} = await prepareResponseAsync({data: result});
 
-        console.log('responseasd: ', response);
-
         res.status(code).send(response);
     },
 
