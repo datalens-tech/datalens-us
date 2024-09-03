@@ -153,7 +153,7 @@ export async function createEntryInWorkbook(
 
         const syncedLinks = await Entry.syncLinks({entryId, links, ctx, trxOverride: trx});
 
-        const patchData = {
+        const newData = {
             workbookId,
             entryId,
             savedId: revId,
@@ -172,7 +172,7 @@ export async function createEntryInWorkbook(
             ...(mode === 'publish' ? {publishedId: revId} : {}),
         };
 
-        await Entry.query(trx).insert(patchData);
+        await Entry.query(trx).insert(newData);
 
         await Revision.query(trx).insert({
             revId,

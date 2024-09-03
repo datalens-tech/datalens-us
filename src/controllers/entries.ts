@@ -153,6 +153,7 @@ export default {
             recursion: body.recursion,
             hidden: body.hidden,
             mirrored: body.mirrored,
+            mode: body.mode,
             data: body.data,
             unversionedData: body.unversionedData,
             links: body.links,
@@ -163,6 +164,8 @@ export default {
         });
 
         const {code, response} = await prepareResponseAsync({data: result});
+
+        console.log('responseasd: ', response);
 
         res.status(code).send(response);
     },

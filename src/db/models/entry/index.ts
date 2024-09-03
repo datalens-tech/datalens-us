@@ -443,7 +443,7 @@ class Entry extends Model {
 
             const syncedLinks = await Entry.syncLinks({entryId, links, ctx, trxOverride: TRX});
 
-            const patchData = {
+            const newData = {
                 entryId,
                 savedId: revId,
                 key: keyFormatted,
@@ -462,7 +462,7 @@ class Entry extends Model {
                 ...(mode === 'publish' ? {publishedId: revId} : {}),
             };
 
-            const targetCreatedEntry = await Entry.query(TRX).insert(patchData).returning('*');
+            const targetCreatedEntry = await Entry.query(TRX).insert(newData).returning('*');
 
             await Revision.query(TRX).insert({
                 revId: revId,
@@ -549,6 +549,7 @@ class Entry extends Model {
             meta,
             hidden = false,
             mirrored = false,
+            mode,
             recursion,
             requestedBy,
             data,
@@ -572,6 +573,7 @@ class Entry extends Model {
             links,
             hidden,
             mirrored,
+            mode,
             recursion,
             permissionsMode,
             initialPermissions,
@@ -593,6 +595,7 @@ class Entry extends Model {
                     meta,
                     hidden,
                     mirrored,
+                    mode,
                     recursion,
                     data,
                     unversionedData,
