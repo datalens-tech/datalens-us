@@ -224,7 +224,7 @@ describe('Workbooks managment', () => {
             ]),
         });
 
-        const nextPageToken = body1.nextPageToken;
+        let nextPageToken = body1.nextPageToken;
 
         const response2 = await auth(request(app).get(`/v2/workbooks`))
             .query({
@@ -236,6 +236,7 @@ describe('Workbooks managment', () => {
         const {body: body2} = response2;
 
         expect(body2).toStrictEqual({
+            nextPageToken: expect.any(String),
             workbooks: expect.arrayContaining([
                 {
                     createdAt: expect.any(String),
@@ -251,6 +252,21 @@ describe('Workbooks managment', () => {
                     collectionId: null,
                 },
             ]),
+        });
+
+        nextPageToken = body2.nextPageToken;
+
+        const response3 = await auth(request(app).get(`/v2/workbooks`))
+            .query({
+                page: nextPageToken,
+                pageSize: 1,
+            })
+            .expect(200);
+
+        const {body: body3} = response3;
+
+        expect(body3).toStrictEqual({
+            workbooks: [],
         });
     });
 
