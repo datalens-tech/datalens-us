@@ -192,9 +192,11 @@ class Navigation extends Model {
                     switch (orderBy.field) {
                         case 'updatedAt':
                             builder.orderBy('revisions.updatedAt', orderBy.direction);
+                            builder.orderBy('entries.entryId');
                             break;
                         case 'createdAt':
                             builder.orderBy('entries.createdAt', orderBy.direction);
+                            builder.orderBy('entries.entryId');
                             break;
                         case 'name':
                             builder.orderBy('sortName', orderBy.direction);
@@ -202,13 +204,14 @@ class Navigation extends Model {
                     }
                 }
             })
-            .page(page, pageSize)
+            .limit(pageSize)
+            .offset(pageSize * page)
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);
 
         const workbookEntries: Navigation[] = [];
         const entryWithoutWorkbook: Navigation[] = [];
 
-        entries.results.forEach((entry: Navigation) => {
+        entries.forEach((entry: Navigation) => {
             if (entry.workbookId) {
                 workbookEntries.push(entry);
             } else {
@@ -216,7 +219,11 @@ class Navigation extends Model {
             }
         });
 
-        const nextPageToken = Utils.getNextPageToken(page, pageSize, entries.total);
+        const nextPageToken = Utils.getOptimisticNextPageToken({
+            page,
+            pageSize,
+            curPage: entries,
+        });
 
         if (entryWithoutWorkbook.length > 0) {
             if (!isPrivateRoute && ctx.config.dlsEnabled) {
@@ -320,7 +327,7 @@ class Navigation extends Model {
 
         const orderedResult: Navigation[] = [];
 
-        entries.results.forEach((entry) => {
+        entries.forEach((entry) => {
             const model = mapResult.get(entry.entryId);
 
             if (model) {
@@ -404,15 +411,20 @@ class Navigation extends Model {
                     scope,
                 }),
             )
-            .page(page, pageSize)
+            .limit(pageSize)
+            .offset(pageSize * page)
             .orderBy('revisions.updatedAt', orderBy)
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);
 
         ctx.log('GET_ENTRIES_IN_TENANTS_SUCCESS');
 
         const data: MT.PaginationEntriesResponse = {
-            nextPageToken: Utils.getNextPageToken(page, pageSize, entries.total),
-            entries: entries.results,
+            nextPageToken: Utils.getOptimisticNextPageToken({
+                page,
+                pageSize,
+                curPage: entries,
+            }),
+            entries: entries,
         };
 
         return data;

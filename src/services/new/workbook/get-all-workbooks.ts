@@ -45,18 +45,23 @@ export const getAllWorkbooks = async (
         .where({
             [WorkbookModelColumn.DeletedAt]: null,
         })
-        .page(page, pageSize)
+        .limit(pageSize)
+        .offset(pageSize * page)
         .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
-    const nextPageToken = Utils.getNextPageToken(page, pageSize, workbooksPage.total);
+    const nextPageToken = Utils.getOptimisticNextPageToken({
+        page,
+        pageSize,
+        curPage: workbooksPage,
+    });
 
     ctx.log('GET_ALL_WORKBOOKS_FINISH', {
-        workbooksCount: workbooksPage.results.length,
+        workbooksCount: workbooksPage.length,
         nextPageToken,
     });
 
     return {
-        workbooks: workbooksPage.results,
+        workbooks: workbooksPage,
         nextPageToken,
     };
 };

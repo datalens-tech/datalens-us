@@ -126,14 +126,19 @@ export async function getEntryRevisions(
             }
         })
         .orderBy('revisions.updatedAt', 'desc')
-        .page(page, pageSize)
+        .limit(pageSize)
+        .offset(pageSize * page)
         .timeout(DEFAULT_QUERY_TIMEOUT);
 
     ctx.log('GET_REVISIONS_SUCCESS');
 
     return {
-        nextPageToken: Utils.getNextPageToken(page, pageSize, entryRevisions.total),
-        entries: entryRevisions.results,
+        nextPageToken: Utils.getOptimisticNextPageToken({
+            page,
+            pageSize,
+            curPage: entryRevisions,
+        }),
+        entries: entryRevisions,
     };
 }
 
