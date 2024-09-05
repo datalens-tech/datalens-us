@@ -24,10 +24,13 @@ const validateArgs = makeSchemaValidator({
             type: 'string',
         },
         page: {
-            type: ['number', 'null'],
+            type: 'number',
+            minimum: 0,
         },
         pageSize: {
             type: 'number',
+            minimum: 1,
+            maximum: 200,
         },
         orderField: {
             type: 'string',
@@ -50,7 +53,7 @@ export interface GetStructureItemsContentArgs {
     collectionId: Nullable<string>;
     includePermissionsInfo?: boolean;
     filterString?: string;
-    page?: Nullable<number>;
+    page?: number;
     pageSize?: number;
     orderField?: OrderField;
     orderDirection?: OrderDirection;
