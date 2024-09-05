@@ -153,9 +153,11 @@ export const getWorkbookContent = async (
                 switch (orderBy.field) {
                     case 'updatedAt':
                         builder.orderBy('revisions.updatedAt', orderBy.direction);
+                        builder.orderBy('entries.entryId');
                         break;
                     case 'createdAt':
                         builder.orderBy('entries.createdAt', orderBy.direction);
+                        builder.orderBy('entries.entryId');
                         break;
                     case 'name':
                         builder.orderBy('sortName', orderBy.direction);
@@ -169,9 +171,13 @@ export const getWorkbookContent = async (
         pageSize,
     });
 
-    const nextPageToken = Utils.getNextPageToken(page, pageSize, entriesPage.total);
+    const nextPageToken = Utils.getOptimisticNextPageToken({
+        page,
+        pageSize,
+        curPage: entriesPage,
+    });
 
-    const entries = entriesPage.results.map((entry) => {
+    const entries = entriesPage.map((entry) => {
         let permissions: Optional<UsPermission>;
 
         if (includePermissionsInfo) {
