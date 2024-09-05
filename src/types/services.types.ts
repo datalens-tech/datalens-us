@@ -6,6 +6,10 @@ import {
     TemplateData,
     EntryScope,
     WorkbookColumns,
+    EntryColumns,
+    RevisionColumns,
+    SyncLinks,
+    DlsPermissionsMode,
 } from './models';
 
 export interface ServiceResponse {
@@ -20,24 +24,26 @@ export interface PrivateGetEntriesByKey extends StdServiceParams {
     key: string;
     branch?: string;
 }
+
 export interface CreateEntry extends StdServiceParams {
     name?: string;
     workbookId?: WorkbookColumns['workbookId'];
-    scope?: any;
-    type?: any;
-    key?: any;
-    meta?: any;
-    hidden?: any;
-    mirrored?: boolean;
-    recursion?: any;
-    createdBy?: any;
-    data?: any;
-    unversionedData?: any;
-    links?: {};
-    permissionsMode?: any;
+    scope: EntryScope;
+    type?: EntryColumns['type'];
+    key?: EntryColumns['key'];
+    meta?: RevisionColumns['meta'];
+    hidden?: EntryColumns['hidden'];
+    mirrored?: EntryColumns['mirrored'];
+    mode?: 'save' | 'publish';
+    recursion?: boolean;
+    createdBy?: EntryColumns['createdBy'];
+    data?: RevisionColumns['data'];
+    unversionedData?: EntryColumns['unversionedData'];
+    links?: SyncLinks;
+    permissionsMode?: DlsPermissionsMode;
     includePermissionsInfo?: boolean;
     initialPermissions?: any;
-    initialParentId?: any;
+    initialParentId?: string;
 }
 
 export interface ResolveTenantIdByEntryId extends StdServiceParams {

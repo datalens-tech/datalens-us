@@ -1,6 +1,6 @@
 import Entry from '../db/models/entry';
 import * as ST from '../types/services.types';
-import {createEntryInWorkbook, validateCreateEntryInWorkbook} from './entry';
+import {createEntryInWorkbook} from './entry';
 import {SYSTEM_USER} from '../const';
 
 export default class EntryService {
@@ -30,6 +30,7 @@ export default class EntryService {
         recursion,
         hidden,
         mirrored,
+        mode,
         data,
         unversionedData,
         links,
@@ -40,7 +41,7 @@ export default class EntryService {
         ctx,
     }: ST.CreateEntry) {
         if (workbookId) {
-            const validatedData = validateCreateEntryInWorkbook({
+            return await createEntryInWorkbook(ctx, {
                 workbookId,
                 name: name as string,
                 scope,
@@ -48,13 +49,12 @@ export default class EntryService {
                 links,
                 hidden,
                 mirrored,
+                mode,
                 unversionedData,
                 meta,
                 data,
                 includePermissionsInfo,
             });
-
-            return await createEntryInWorkbook(ctx, validatedData);
         }
 
         const {requestId, tenantId, user, dlContext, isPrivateRoute} = ctx.get('info');
@@ -70,6 +70,7 @@ export default class EntryService {
                 recursion,
                 hidden,
                 mirrored,
+                mode,
                 requestedBy: user,
                 data,
                 unversionedData,
@@ -95,6 +96,7 @@ export default class EntryService {
         recursion,
         hidden,
         mirrored,
+        mode,
         data,
         unversionedData,
         links,
@@ -104,7 +106,7 @@ export default class EntryService {
         ctx,
     }: ST.CreateEntry) {
         if (workbookId) {
-            const validatedData = validateCreateEntryInWorkbook({
+            return await createEntryInWorkbook(ctx, {
                 workbookId,
                 name: name as string,
                 scope,
@@ -112,13 +114,12 @@ export default class EntryService {
                 links,
                 hidden,
                 mirrored,
+                mode,
                 unversionedData,
                 meta,
                 data,
                 includePermissionsInfo: false,
             });
-
-            return await createEntryInWorkbook(ctx, validatedData);
         }
 
         const {
@@ -143,6 +144,7 @@ export default class EntryService {
                 recursion,
                 hidden,
                 mirrored,
+                mode,
                 requestedBy,
                 data,
                 unversionedData: unversionedData,

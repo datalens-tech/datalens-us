@@ -1,5 +1,5 @@
 import compileSchema from '../../../components/validation-schema-compiler';
-import {ALLOWED_SCOPE_VALUES, AJV_PATTERN_KEYS_NOT_OBJECT} from '../../../const';
+import {ALLOWED_SCOPE_VALUES, AJV_PATTERN_KEYS_NOT_OBJECT, ModeValues} from '../../../const';
 
 export const validateCreateEntry = compileSchema({
     type: 'object',
@@ -50,6 +50,10 @@ export const validateCreateEntry = compileSchema({
         },
         mirrored: {
             type: 'boolean',
+        },
+        mode: {
+            type: 'string',
+            enum: ModeValues,
         },
     },
 });

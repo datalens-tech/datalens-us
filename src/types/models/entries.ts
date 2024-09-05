@@ -1,5 +1,5 @@
 import {TransactionOrKnex} from 'objection';
-import {EntryType} from './entry';
+import {EntryType, Mode} from './entry';
 import {BasicRequestParams, RequestedBy} from './common';
 import {CTX} from './core';
 import {UsPermissions} from './permission';
@@ -50,6 +50,7 @@ export interface CreationEntryConfig extends BasicRequestParams {
     trxOverride?: any;
     useLegacyLogin?: boolean;
     mirrored?: boolean;
+    mode?: Mode;
 }
 export interface PrivateCreationEntryConfig extends CreationEntryConfig {
     masterToken?: any;
