@@ -1,5 +1,5 @@
 import type {Knex} from 'knex';
-import {TransactionOrKnex, raw, Modifier, Page} from 'objection';
+import {TransactionOrKnex, raw, Modifier} from 'objection';
 import {Model} from '../..';
 import {Entry} from '../../models/new/entry';
 import {Favorite} from '../../models/new/favorite';
@@ -83,7 +83,8 @@ export class JoinedEntryFavorite extends Model {
             .leftJoin(Favorite.tableName, leftJoinFavorite(userLogin))
             .where(where)
             .modify(modify)
-            .page(page, pageSize)
-            .timeout(JoinedEntryFavorite.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<Page<Entry>>;
+            .limit(pageSize)
+            .offset(pageSize * page)
+            .timeout(JoinedEntryFavorite.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<Entry[]>;
     }
 }

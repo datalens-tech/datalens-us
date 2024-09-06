@@ -153,18 +153,23 @@ export const getWorkbooksList = async (
             orderField === 'title' ? WorkbookModelColumn.SortTitle : orderField,
             orderDirection,
         )
-        .page(page, pageSize)
+        .limit(pageSize)
+        .offset(pageSize * page)
         .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
-    const nextPageToken = Utils.getNextPageToken(page, pageSize, workbooksPage.total);
+    const nextPageToken = Utils.getOptimisticNextPageToken({
+        page,
+        pageSize,
+        curPage: workbooksPage,
+    });
 
     let workbooks: InstanceType<typeof Workbook>[] = [];
 
-    if (workbooksPage.results.length > 0) {
+    if (workbooksPage.length > 0) {
         if (accessServiceEnabled && !skipCheckPermissions) {
             const parentIds = parents.map((model) => model.collectionId);
 
-            workbooks = workbooksPage.results.map((model) => {
+            workbooks = workbooksPage.map((model) => {
                 return new Workbook({ctx, model});
             });
 
@@ -205,7 +210,7 @@ export const getWorkbooksList = async (
                 );
             }
         } else {
-            workbooks = workbooksPage.results.map((model) => {
+            workbooks = workbooksPage.map((model) => {
                 const workbook = new Workbook({ctx, model});
                 if (includePermissionsInfo) {
                     workbook.enableAllPermissions();

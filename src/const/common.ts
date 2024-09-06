@@ -1,3 +1,5 @@
+import {Mode} from '../types/models';
+
 export const TRUE_FLAGS = ['1', 'true', true];
 
 export const ALL_COLUMNS = [
@@ -236,3 +238,5 @@ export const INTER_TENANT_GET_ENTRIES_SCHEMA = {
         patternProperties: AJV_PATTERN_KEYS_NOT_OBJECT,
     },
 };
+
+export const ModeValues: Mode[] = ['save', 'publish'];

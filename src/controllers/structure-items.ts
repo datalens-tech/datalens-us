@@ -8,15 +8,13 @@ export default {
     getStructureItems: async (req: Request, res: Response) => {
         const {query} = req;
 
-        const page = query.page ? parseInt(query.page as string, 10) : undefined;
-
         const result = await getStructureItems(
             {ctx: req.ctx},
             {
                 collectionId: (query.collectionId as Optional<string>) ?? null,
                 includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
                 filterString: query.filterString as Optional<string>,
-                page: page,
+                page: query.page ? parseInt(query.page as string, 10) : undefined,
                 pageSize: query.pageSize ? parseInt(query.pageSize as string, 10) : undefined,
                 orderField: query.orderField as Optional<OrderField>,
                 orderDirection: query.orderDirection as Optional<OrderDirection>,

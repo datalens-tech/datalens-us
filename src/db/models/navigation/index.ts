@@ -183,9 +183,11 @@ class Navigation extends Model {
                     switch (orderBy.field) {
                         case 'updatedAt':
                             builder.orderBy('revisions.updatedAt', orderBy.direction);
+                            builder.orderBy('entries.entryId');
                             break;
                         case 'createdAt':
                             builder.orderBy('entries.createdAt', orderBy.direction);
+                            builder.orderBy('entries.entryId');
                             break;
                         case 'name':
                             builder.orderBy('sortName', orderBy.direction);
@@ -193,14 +195,19 @@ class Navigation extends Model {
                     }
                 }
             })
-            .page(page, pageSize)
+            .limit(pageSize)
+            .offset(pageSize * page)
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);
 
-        const nextPageToken = Utils.getNextPageToken(page, pageSize, entries.total);
+        const nextPageToken = Utils.getOptimisticNextPageToken({
+            page,
+            pageSize,
+            curPage: entries,
+        });
 
         const entriesWithPermissionsOnly: Map<string, MT.EntryWithPermissionOnly> =
             await getEntriesWithPermissionsOnly(ctx, {
-                entries: entries.results.map((entry) => ({
+                entries: entries.map((entry) => ({
                     entryId: entry.entryId,
                     workbookId: entry.workbookId,
                     scope: entry.scope,
@@ -212,7 +219,7 @@ class Navigation extends Model {
 
         let orderedResult: NavigationFields[] = [];
 
-        entries.results.forEach((entry) => {
+        entries.forEach((entry) => {
             const model = entriesWithPermissionsOnly.get(entry.entryId);
 
             if (model) {
@@ -326,15 +333,20 @@ class Navigation extends Model {
                     scope,
                 }),
             )
-            .page(page, pageSize)
+            .limit(pageSize)
+            .offset(pageSize * page)
             .orderBy('revisions.updatedAt', orderBy)
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);
 
         ctx.log('GET_ENTRIES_IN_TENANTS_SUCCESS');
 
         const data: MT.PaginationEntriesResponse = {
-            nextPageToken: Utils.getNextPageToken(page, pageSize, entries.total),
-            entries: entries.results,
+            nextPageToken: Utils.getOptimisticNextPageToken({
+                page,
+                pageSize,
+                curPage: entries,
+            }),
+            entries: entries,
         };
 
         return data;
