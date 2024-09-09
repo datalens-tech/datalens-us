@@ -1,20 +1,35 @@
 import {AppContext} from '@gravity-ui/nodekit';
-import {DlsActions, EntryWithPermissionOnly} from '../types/models';
-import {registry} from '../registry';
-import {getWorkbooksListByIds} from '../services/new/workbook/get-workbooks-list-by-ids';
-import {EntryPermissions} from '../services/new/entry/types';
-import {WorkbookInstance} from '../registry/common/entities/workbook/types';
-import {getEntryPermissionsByWorkbook} from '../services/new/workbook/utils';
+import {DlsActions, EntryWithPermissionOnly} from '../../../../types/models';
+import {registry} from '../../../../registry';
+import {getWorkbooksListByIds} from '../../workbook/get-workbooks-list-by-ids';
+import {EntryPermissions} from '../types';
+import {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
+import {getEntryPermissionsByWorkbook} from '../../workbook/utils';
 
-export type GetEntriesWithPermissionsOnlyArgs = {
+type Permission = 'execute' | 'read' | 'edit' | 'admin';
+
+const DLSPermissionsMap: Record<Permission, DlsActions> = {
+    execute: DlsActions.Execute,
+    read: DlsActions.Read,
+    edit: DlsActions.Edit,
+    admin: DlsActions.SetPermissions,
+};
+
+export type FilterEntriesByPermissionArgs = {
     entries: EntryWithPermissionOnly[];
     includePermissionsInfo?: boolean;
+    permission?: Permission;
     isPrivateRoute?: boolean;
 };
 
-export const getEntriesWithPermissionsOnly = async (
+export const filterEntriesByPermission = async (
     ctx: AppContext,
-    {entries, includePermissionsInfo, isPrivateRoute}: GetEntriesWithPermissionsOnlyArgs,
+    {
+        entries,
+        includePermissionsInfo,
+        permission = 'read',
+        isPrivateRoute,
+    }: FilterEntriesByPermissionArgs,
 ) => {
     const workbookEntries: EntryWithPermissionOnly[] = [];
     const entryWithoutWorkbook: EntryWithPermissionOnly[] = [];
@@ -37,7 +52,7 @@ export const getEntriesWithPermissionsOnly = async (
                 {ctx},
                 {
                     entities: entryWithoutWorkbook,
-                    action: DlsActions.Read,
+                    action: DLSPermissionsMap[permission],
                     includePermissionsInfo,
                 },
             );
@@ -90,9 +105,9 @@ export const getEntriesWithPermissionsOnly = async (
                     let isLocked = false;
 
                     if (entryPermissionsMap.has(entry.entryId)) {
-                        const isReadPermission = entryPermissionsMap.get(entry.entryId)?.read;
+                        const permissions = entryPermissionsMap.get(entry.entryId);
 
-                        if (!isReadPermission) {
+                        if (permissions && !permissions[permission]) {
                             isLocked = true;
                         }
                     }

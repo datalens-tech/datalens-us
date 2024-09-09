@@ -8,7 +8,7 @@ import * as MT from '../../../types/models';
 import {RETURN_NAVIGATION_COLUMNS, US_ERRORS} from '../../../const';
 import {validateGetEntries, validateInterTenantGetEntries} from './scheme';
 import {whereBuilderInterTenantGetEntries} from './utils';
-import {getEntriesWithPermissionsOnly} from '../../../utils/entry';
+import {filterEntriesByPermission} from '../../../services/new/entry/utils';
 
 interface NavigationFields extends MT.EntryColumns {
     isLocked?: boolean;
@@ -206,12 +206,11 @@ class Navigation extends Model {
         });
 
         const entriesWithPermissionsOnly: Map<string, MT.EntryWithPermissionOnly> =
-            await getEntriesWithPermissionsOnly(ctx, {
+            await filterEntriesByPermission(ctx, {
                 entries: entries.map((entry) => ({
                     entryId: entry.entryId,
                     workbookId: entry.workbookId,
                     scope: entry.scope,
-                    type: entry.type,
                 })),
                 includePermissionsInfo,
                 isPrivateRoute,

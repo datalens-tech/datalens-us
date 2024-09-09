@@ -16,7 +16,7 @@ import {RETURN_FAVORITES_COLUMNS, US_ERRORS} from '../../../const';
 import {registry} from '../../../registry';
 
 import {getWorkbook} from '../../../services/new/workbook';
-import {getEntriesWithPermissionsOnly} from '../../../utils/entry';
+import {filterEntriesByPermission} from '../../../services/new/entry/utils';
 
 interface FavoriteFields extends MT.FavoriteColumns {
     isLocked?: boolean;
@@ -153,8 +153,12 @@ class Favorite extends Model {
         });
 
         const entriesWithPermissionsOnly: Map<string, MT.EntryWithPermissionOnly> =
-            await getEntriesWithPermissionsOnly(ctx, {
-                entries: entries,
+            await filterEntriesByPermission(ctx, {
+                entries: entries.map((entry) => ({
+                    entryId: entry.entryId,
+                    workbookId: entry.workbookId,
+                    scope: entry.scope,
+                })),
                 includePermissionsInfo,
             });
 
