@@ -102,23 +102,17 @@ export const filterEntriesByPermission = async (
                         entryPermissionsMap.set(entry.entryId, permissions);
                     }
 
-                    let isLocked = false;
-
                     if (entryPermissionsMap.has(entry.entryId)) {
                         const permissions = entryPermissionsMap.get(entry.entryId);
 
-                        if (permissions && !permissions[permission]) {
-                            isLocked = true;
+                        if (permissions && permissions[permission]) {
+                            result.push({
+                                ...entry,
+                                isLocked: false,
+                                permissions,
+                            });
                         }
                     }
-
-                    result.push({
-                        ...entry,
-                        permissions: includePermissionsInfo
-                            ? entryPermissionsMap.get(entry.entryId)
-                            : undefined,
-                        isLocked,
-                    });
                 }
             });
         } else {
