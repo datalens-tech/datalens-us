@@ -11,7 +11,3 @@ export async function down(knex: Knex): Promise<void> {
         ALTER TYPE scope RENAME VALUE 'report' TO 'presentation';
     `);
 }
-
-export const config = {
-    transaction: false,
-};
