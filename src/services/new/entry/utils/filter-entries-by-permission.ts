@@ -1,10 +1,11 @@
-import {AppContext} from '@gravity-ui/nodekit';
-import {DlsActions, EntryWithPermissionOnly} from '../../../../types/models';
+import {DlsActions, EntryScope} from '../../../../types/models';
 import {registry} from '../../../../registry';
 import {getWorkbooksListByIds} from '../../workbook/get-workbooks-list-by-ids';
 import {EntryPermissions} from '../types';
 import {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
 import {getEntryPermissionsByWorkbook} from '../../workbook/utils';
+import {getReplica} from '../../utils';
+import {ServiceArgs} from '../../types';
 
 type Permission = 'execute' | 'read' | 'edit' | 'admin';
 
@@ -15,23 +16,34 @@ const DLSPermissionsMap: Record<Permission, DlsActions> = {
     admin: DlsActions.SetPermissions,
 };
 
-export type FilterEntriesByPermissionArgs = {
-    entries: EntryWithPermissionOnly[];
-    includePermissionsInfo?: boolean;
-    permission?: Permission;
+type PartialEntry = {
+    entryId: string;
+    scope: EntryScope;
+    workbookId: string | null;
 };
 
-export const filterEntriesByPermission = async (
-    ctx: AppContext,
-    {entries, includePermissionsInfo, permission = 'read'}: FilterEntriesByPermissionArgs,
-) => {
+type FilterEntriesByPermissionArgs<T> = {
+    entries: T[];
+    permission?: Permission;
+    includePermissionsInfo?: boolean;
+};
+
+type EntryWithPermissions<T> = T & {isLocked?: boolean; permsisions?: EntryPermissions};
+
+type FilterEntriesByPermissionResult<T> = Promise<EntryWithPermissions<T>[]>;
+
+export const filterEntriesByPermission = async <T extends PartialEntry>(
+    {ctx, trx}: ServiceArgs,
+    args: FilterEntriesByPermissionArgs<T>,
+): FilterEntriesByPermissionResult<T> => {
+    const {entries, permission = 'read', includePermissionsInfo} = args;
+
     const {isPrivateRoute} = ctx.get('info');
 
-    const workbookEntries: EntryWithPermissionOnly[] = [];
-    const folderEntries: EntryWithPermissionOnly[] = [];
-    let result: EntryWithPermissionOnly[] = [];
+    let result: EntryWithPermissions<T>[] = [];
 
-    const {DLS} = registry.common.classes.get();
+    const workbookEntries: T[] = [];
+    const folderEntries: T[] = [];
 
     entries.forEach((entry) => {
         if (entry.workbookId) {
@@ -44,8 +56,10 @@ export const filterEntriesByPermission = async (
     // TODO: use originatePermissions
     if (folderEntries.length > 0) {
         if (!isPrivateRoute && ctx.config.dlsEnabled) {
+            const {DLS} = registry.common.classes.get();
+
             result = await DLS.checkBulkPermission(
-                {ctx},
+                {ctx, trx: getReplica(trx)},
                 {
                     entities: folderEntries,
                     action: DLSPermissionsMap[permission],
@@ -71,7 +85,7 @@ export const filterEntriesByPermission = async (
     if (workbookEntries.length > 0) {
         if (!isPrivateRoute && ctx.config.accessServiceEnabled) {
             const workbookList = await getWorkbooksListByIds(
-                {ctx},
+                {ctx, trx: getReplica(trx)},
                 {
                     workbookIds: workbookEntries.map((entry) => entry.workbookId) as string[],
                     includePermissionsInfo: true,
@@ -132,11 +146,21 @@ export const filterEntriesByPermission = async (
         }
     }
 
-    const mapResult = new Map<string, EntryWithPermissionOnly>();
+    const mapResult = new Map<string, T>();
 
     result.forEach((entry) => {
         mapResult.set(entry.entryId, entry);
     });
 
-    return mapResult;
+    const orderedResult: T[] = [];
+
+    entries.forEach((entry) => {
+        const model = mapResult.get(entry.entryId);
+
+        if (model) {
+            orderedResult.push(model);
+        }
+    });
+
+    return orderedResult;
 };

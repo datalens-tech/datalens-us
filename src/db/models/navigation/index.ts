@@ -204,47 +204,29 @@ class Navigation extends Model {
             curPage: entries,
         });
 
-        const entriesWithPermissionsOnly: Map<string, MT.EntryWithPermissionOnly> =
-            await filterEntriesByPermission(ctx, {
-                entries: entries.map((entry) => ({
-                    entryId: entry.entryId,
-                    workbookId: entry.workbookId,
-                    scope: entry.scope,
-                })),
+        let entriesWithPermissionsOnly = await filterEntriesByPermission<NavigationFields>(
+            {ctx},
+            {
+                entries,
                 includePermissionsInfo,
-            });
-
-        let orderedResult: NavigationFields[] = [];
-
-        entries.forEach((entry) => {
-            const model = entriesWithPermissionsOnly.get(entry.entryId);
-
-            if (model) {
-                orderedResult.push({
-                    ...entry,
-                    isLocked: model.isLocked,
-                    ...(model.permissions
-                        ? {
-                              permissions: model.permissions,
-                          }
-                        : {}),
-                });
-            }
-        });
+            },
+        );
 
         if (excludeLocked) {
-            orderedResult = Navigation.filterEntriesByIsLocked(orderedResult);
+            entriesWithPermissionsOnly = Navigation.filterEntriesByIsLocked(
+                entriesWithPermissionsOnly,
+            );
 
             ctx.log('GET_ENTRIES_REQUEST_SUCCESS');
 
             const data: MT.PaginationEntriesResponse = {
                 nextPageToken,
-                entries: orderedResult,
+                entries: entriesWithPermissionsOnly,
             };
 
             return data;
         } else {
-            const result = orderedResult.map((entry) => {
+            const result = entriesWithPermissionsOnly.map((entry) => {
                 const {isLocked, entryId, scope, type} = entry;
 
                 if (isLocked) {

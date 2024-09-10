@@ -152,39 +152,19 @@ class Favorite extends Model {
             curPage: entries,
         });
 
-        const entriesWithPermissionsOnly: Map<string, MT.EntryWithPermissionOnly> =
-            await filterEntriesByPermission(ctx, {
-                entries: entries.map((entry) => ({
-                    entryId: entry.entryId,
-                    workbookId: entry.workbookId,
-                    scope: entry.scope,
-                })),
+        const entriesWithPermissionsOnly = await filterEntriesByPermission<FavoriteFields>(
+            {ctx},
+            {
+                entries: entries,
                 includePermissionsInfo,
-            });
-
-        const orderedResult: FavoriteFields[] = [];
-
-        entries.forEach((entry) => {
-            const model = entriesWithPermissionsOnly.get(entry.entryId);
-
-            if (model) {
-                orderedResult.push({
-                    ...entry,
-                    isLocked: model.isLocked,
-                    ...(model.permissions
-                        ? {
-                              permissions: model.permissions,
-                          }
-                        : {}),
-                });
-            }
-        });
+            },
+        );
 
         ctx.log('GET_FAVORITES_SUCCESS');
 
         const data: MT.PaginationEntriesResponse = {
             nextPageToken,
-            entries: orderedResult,
+            entries: entriesWithPermissionsOnly,
         };
 
         return data;
