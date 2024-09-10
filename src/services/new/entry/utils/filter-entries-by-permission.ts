@@ -19,20 +19,16 @@ export type FilterEntriesByPermissionArgs = {
     entries: EntryWithPermissionOnly[];
     includePermissionsInfo?: boolean;
     permission?: Permission;
-    isPrivateRoute?: boolean;
 };
 
 export const filterEntriesByPermission = async (
     ctx: AppContext,
-    {
-        entries,
-        includePermissionsInfo,
-        permission = 'read',
-        isPrivateRoute,
-    }: FilterEntriesByPermissionArgs,
+    {entries, includePermissionsInfo, permission = 'read'}: FilterEntriesByPermissionArgs,
 ) => {
+    const {isPrivateRoute} = ctx.get('info');
+
     const workbookEntries: EntryWithPermissionOnly[] = [];
-    const entryWithoutWorkbook: EntryWithPermissionOnly[] = [];
+    const folderEntries: EntryWithPermissionOnly[] = [];
     let result: EntryWithPermissionOnly[] = [];
 
     const {DLS} = registry.common.classes.get();
@@ -41,23 +37,23 @@ export const filterEntriesByPermission = async (
         if (entry.workbookId) {
             workbookEntries.push(entry);
         } else {
-            entryWithoutWorkbook.push(entry);
+            folderEntries.push(entry);
         }
     });
 
     // TODO: use originatePermissions
-    if (entryWithoutWorkbook.length > 0) {
+    if (folderEntries.length > 0) {
         if (!isPrivateRoute && ctx.config.dlsEnabled) {
             result = await DLS.checkBulkPermission(
                 {ctx},
                 {
-                    entities: entryWithoutWorkbook,
+                    entities: folderEntries,
                     action: DLSPermissionsMap[permission],
                     includePermissionsInfo,
                 },
             );
         } else {
-            result = entryWithoutWorkbook.map((entry) => ({
+            result = folderEntries.map((entry) => ({
                 ...entry,
                 isLocked: false,
                 ...(includePermissionsInfo && {

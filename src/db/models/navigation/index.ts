@@ -64,7 +64,6 @@ class Navigation extends Model {
             includeLinks,
             excludeLocked,
             dlContext,
-            isPrivateRoute,
         }: MT.GetEntriesConfig,
         ctx: MT.CTX,
     ) {
@@ -213,7 +212,6 @@ class Navigation extends Model {
                     scope: entry.scope,
                 })),
                 includePermissionsInfo,
-                isPrivateRoute,
             });
 
         let orderedResult: NavigationFields[] = [];
