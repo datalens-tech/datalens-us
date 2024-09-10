@@ -152,7 +152,7 @@ class Favorite extends Model {
             curPage: entries,
         });
 
-        const entriesWithPermissionsOnly = await filterEntriesByPermission<FavoriteFields>(
+        const entriesWithPermissionsOnly = await filterEntriesByPermission(
             {ctx},
             {
                 entries: entries,
