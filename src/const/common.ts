@@ -123,6 +123,7 @@ export const ALLOWED_SCOPE_VALUES = [
     'widget',
     'config',
     'presentation',
+    'report',
 ];
 
 export const ID_VARIABLES = [
