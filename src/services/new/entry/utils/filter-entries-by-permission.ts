@@ -78,7 +78,7 @@ export const filterEntriesByPermission = async (
                 {ctx},
                 {
                     workbookIds: workbookEntries.map((entry) => entry.workbookId) as string[],
-                    includePermissionsInfo,
+                    includePermissionsInfo: true,
                 },
             );
 
@@ -93,7 +93,7 @@ export const filterEntriesByPermission = async (
                 if (entry?.workbookId && workbooksMap.has(entry.workbookId)) {
                     const workbook = workbooksMap.get(entry.workbookId);
 
-                    if (workbook && includePermissionsInfo) {
+                    if (workbook) {
                         const permissions = getEntryPermissionsByWorkbook({
                             ctx,
                             workbook,
@@ -109,7 +109,9 @@ export const filterEntriesByPermission = async (
                             result.push({
                                 ...entry,
                                 isLocked: false,
-                                permissions,
+                                permissions: includePermissionsInfo
+                                    ? entryPermissionsMap.get(entry.entryId)
+                                    : undefined,
                             });
                         }
                     }
