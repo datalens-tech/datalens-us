@@ -92,7 +92,6 @@ export const filterEntriesByPermission = async <T extends PartialEntry>(
                 },
             );
 
-            const entryPermissionsMap = new Map<string, EntryPermissions>();
             const workbooksMap = new Map<string, WorkbookInstance>();
 
             workbookList.forEach((workbook) => {
@@ -109,19 +108,12 @@ export const filterEntriesByPermission = async <T extends PartialEntry>(
                             workbook,
                             scope: entry.scope,
                         });
-                        entryPermissionsMap.set(entry.entryId, permissions);
-                    }
-
-                    if (entryPermissionsMap.has(entry.entryId)) {
-                        const permissions = entryPermissionsMap.get(entry.entryId);
 
                         if (permissions && permissions[permission]) {
                             result.push({
                                 ...entry,
                                 isLocked: false,
-                                permissions: includePermissionsInfo
-                                    ? entryPermissionsMap.get(entry.entryId)
-                                    : undefined,
+                                permissions: includePermissionsInfo ? permissions : undefined,
                             });
                         }
                     }
