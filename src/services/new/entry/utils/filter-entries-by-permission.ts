@@ -28,7 +28,7 @@ type FilterEntriesByPermissionArgs<T> = {
     includePermissionsInfo?: boolean;
 };
 
-type EntryWithPermissions<T> = T & {isLocked?: boolean; permsisions?: EntryPermissions};
+type EntryWithPermissions<T> = T & {isLocked?: boolean; permissions?: EntryPermissions};
 
 type FilterEntriesByPermissionResult<T> = Promise<EntryWithPermissions<T>[]>;
 
