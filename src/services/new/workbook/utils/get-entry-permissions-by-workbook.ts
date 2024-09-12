@@ -27,7 +27,7 @@ export const getEntryPermissionsByWorkbook = ({
         admin: permissions.updateAccessBindings,
     };
 
-    if (scope === EntryScope.Dash || scope === EntryScope.Widget) {
+    if (scope === EntryScope.Dash || scope === EntryScope.Widget || scope === EntryScope.Report) {
         mappedPermission.read = view;
     }
 

@@ -6,6 +6,7 @@ export enum EntryScope {
     Folder = 'folder',
     Config = 'config',
     Pdf = 'pdf',
+    Report = 'report',
 }
 
 // "type" is a string field and value can be any string, this enum is only used for checks in code

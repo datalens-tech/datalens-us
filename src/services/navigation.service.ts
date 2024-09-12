@@ -19,7 +19,7 @@ export default class NavigationService {
         excludeLocked,
         ctx,
     }: ST.GetEntries) {
-        const {requestId, tenantId, user, isPrivateRoute, dlContext} = ctx.get('info');
+        const {requestId, tenantId, user, dlContext} = ctx.get('info');
 
         return await Navigation.getEntries(
             {
@@ -40,7 +40,6 @@ export default class NavigationService {
                 includeLinks,
                 excludeLocked,
                 requestedBy: user,
-                isPrivateRoute,
                 dlContext,
             },
             ctx,
