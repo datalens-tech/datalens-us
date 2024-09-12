@@ -1,4 +1,12 @@
-export type EntryScope = 'dataset' | 'pdf' | 'folder' | 'dash' | 'connection' | 'widget' | 'config';
+export type EntryScope =
+    | 'dataset'
+    | 'pdf'
+    | 'folder'
+    | 'dash'
+    | 'connection'
+    | 'widget'
+    | 'config'
+    | 'report';
 
 export type EntryInnerMeta = {
     oldKey: string;
