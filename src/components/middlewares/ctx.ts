@@ -36,7 +36,7 @@ export const ctx = async (req: Request, res: Response, next: NextFunction) => {
         zitadelUserRole,
     });
 
-    req.originalContext.log('REQUEST_START_CUSTOM', {
+    req.originalContext.log('REQUEST_START', {
         ctxTenantId: tenantId,
         ctxProjectId: projectId,
         requestedBy: user,
