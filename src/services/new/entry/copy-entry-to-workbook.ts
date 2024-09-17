@@ -8,7 +8,7 @@ import {RevisionModel, RevisionModelColumn} from '../../../db/models/new/revisio
 import {SyncLinks} from '../../../types/models/link';
 import {US_ERRORS, BiTrackingLogs} from '../../../const';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import Utils, {logInfo, makeUserId} from '../../../utils';
+import Utils, {makeUserId} from '../../../utils';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {ServiceArgs} from '../../new/types';
 import {checkWorkbookPermission} from '../../new/workbook/utils/check-workbook-permission';
@@ -52,7 +52,7 @@ export const copyEntryToWorkbook = async (
     const checkPermissionsEnabled =
         accessServiceEnabled && !isPrivateRoute && !skipCheckPermissions;
 
-    logInfo(ctx, 'COPY_ENTRY_TO_WORKBOOK_START', {
+    ctx.log('COPY_ENTRY_TO_WORKBOOK_START', {
         entryId: Utils.encodeId(entryId),
         workbookId: Utils.encodeId(workbookId),
         name,
@@ -218,7 +218,7 @@ export const copyEntryToWorkbook = async (
 
     ctx.log('COPY_ENTRY_TO_WORKBOOK_FINISH');
 
-    logInfo(ctx, BiTrackingLogs.CopyEntry, {
+    ctx.log(BiTrackingLogs.CopyEntry, {
         entryId: Utils.encodeId(entryId),
     });
 

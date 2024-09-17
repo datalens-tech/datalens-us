@@ -7,7 +7,7 @@ import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revisi
 import {WorkbookModel} from '../../../db/models/new/workbook';
 import {CTX} from '../../../types/models';
 import {US_ERRORS, BiTrackingLogs} from '../../../const';
-import Utils, {logInfo, makeUserId} from '../../../utils';
+import Utils, {makeUserId} from '../../../utils';
 import {registry} from '../../../registry';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {getParentIds} from '../../new/collection/utils/get-parents';
@@ -69,7 +69,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
         isMigrateCopiedEntries,
     } = params;
 
-    logInfo(ctx, 'COPY_ENTRY_TO_WORKBOOK_CALL', {
+    ctx.log('COPY_ENTRY_TO_WORKBOOK_CALL', {
         entryIds: await Utils.macrotasksMap(entryIds, (entryId) => Utils.encodeId(entryId)),
         destinationWorkbookId: Utils.encodeId(destinationWorkbookId),
         tenantIdOverride,
@@ -333,7 +333,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
     });
 
     result.forEach(({newJoinedEntryRevision}) => {
-        logInfo(ctx, BiTrackingLogs.CopyEntry, {
+        ctx.log(BiTrackingLogs.CopyEntry, {
             entryId: Utils.encodeId(newJoinedEntryRevision.entryId),
         });
     });

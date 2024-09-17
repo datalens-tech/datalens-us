@@ -1,6 +1,6 @@
 import {ServiceArgs} from '../../services/new/types';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
-import Utils, {logInfo} from '../../utils';
+import Utils from '../../utils';
 
 const PAGE = 0;
 
@@ -18,7 +18,7 @@ export const getColorPalettesList = async (
 ) => {
     const {tenantId} = ctx.get('info');
 
-    logInfo(ctx, 'GET_COLOR_PALETTES_LIST_START', {
+    ctx.log('GET_COLOR_PALETTES_LIST_START', {
         tenantId,
         filters,
     });
@@ -30,7 +30,7 @@ export const getColorPalettesList = async (
     try {
         decodedPaletteId = Utils.decodeId(colorPaletteId);
     } catch {
-        logInfo(ctx, 'GET_COLOR_PALETTES_LIST_FAILED_DECODING');
+        ctx.log('GET_COLOR_PALETTES_LIST_FAILED_DECODING');
 
         return [];
     }

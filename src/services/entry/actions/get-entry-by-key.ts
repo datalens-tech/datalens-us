@@ -3,7 +3,7 @@ import Entry from '../../../db/models/entry';
 import {Optional as OptionalFields} from 'utility-types';
 import {CTX, DlsActions, RevisionColumns} from '../../../types/models';
 import {RETURN_COLUMNS, DEFAULT_QUERY_TIMEOUT, US_ERRORS} from '../../../const';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {checkEntry} from './check-entry';
 import {registry} from '../../../registry';
@@ -56,7 +56,7 @@ export async function getEntryByKey(
     const {tenantId, isPrivateRoute: infoIsPrivateRoute} = ctx.get('info');
     const isPrivateRoute = customIsPrivateRoute || infoIsPrivateRoute;
 
-    logInfo(ctx, 'GET_ENTRY_BY_KEY_REQUEST', {
+    ctx.log('GET_ENTRY_BY_KEY_REQUEST', {
         key,
         revId,
         branch,

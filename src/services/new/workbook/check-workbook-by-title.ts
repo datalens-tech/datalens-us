@@ -3,7 +3,7 @@ import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -29,7 +29,7 @@ export const checkWorkbookByTitle = async (
 ) => {
     const {collectionId, title} = args;
 
-    logInfo(ctx, 'CHECK_WORKBOOK_BY_TITLE_START', {
+    ctx.log('CHECK_WORKBOOK_BY_TITLE_START', {
         collectionId: collectionId ? Utils.encodeId(collectionId) : null,
         title,
     });
@@ -63,7 +63,7 @@ export const checkWorkbookByTitle = async (
 
     const result = Boolean(workbook);
 
-    logInfo(ctx, 'CHECK_WORKBOOK_BY_TITLE_FINISH', {result});
+    ctx.log('CHECK_WORKBOOK_BY_TITLE_FINISH', {result});
 
     return result;
 };

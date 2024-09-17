@@ -7,7 +7,7 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {transaction} from 'objection';
 import {US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {registry} from '../../../registry';
 
 const validateArgs = makeSchemaValidator({
@@ -38,7 +38,7 @@ export const createCollection = async (
 ) => {
     const {title, description, parentId} = args;
 
-    logInfo(ctx, 'CREATE_COLLECTION_START', {
+    ctx.log('CREATE_COLLECTION_START', {
         title,
         description,
         parentId: parentId ? Utils.encodeId(parentId) : null,
@@ -96,7 +96,7 @@ export const createCollection = async (
     let operation: any;
 
     const result = await transaction(targetTrx, async (transactionTrx) => {
-        logInfo(ctx, 'CREATE_COLLECTION_IN_DB_START');
+        ctx.log('CREATE_COLLECTION_IN_DB_START');
 
         const model = await CollectionModel.query(transactionTrx)
             .insert({
@@ -112,7 +112,7 @@ export const createCollection = async (
             .returning('*')
             .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
 
-        logInfo(ctx, 'CREATE_COLLECTION_IN_DB_FINISH', {
+        ctx.log('CREATE_COLLECTION_IN_DB_FINISH', {
             collectionId: Utils.encodeId(model.collectionId),
         });
 
@@ -132,7 +132,7 @@ export const createCollection = async (
         return collection;
     });
 
-    logInfo(ctx, 'CREATE_COLLECTION_FINISH', {
+    ctx.log('CREATE_COLLECTION_FINISH', {
         collectionId: Utils.encodeId(result.model.collectionId),
     });
 

@@ -20,7 +20,7 @@ import {
     AJV_PATTERN_KEYS_NOT_OBJECT,
     CURRENT_TIMESTAMP,
 } from '../../../const';
-import Utils, {logInfo, makeUserId} from '../../../utils';
+import Utils, {makeUserId} from '../../../utils';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission} from '../../new/workbook/utils';
 import {WorkbookPermission} from '../../../entities/workbook';
@@ -116,7 +116,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         updateRevision = false,
     } = updateData;
 
-    logInfo(ctx, 'UPDATE_ENTRY_REQUEST', {
+    ctx.log('UPDATE_ENTRY_REQUEST', {
         entryId: Utils.encodeId(entryId),
         meta,
         links,
@@ -494,7 +494,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         }
     })();
 
-    logInfo(ctx, BiTrackingLogs.UpdateEntry, {
+    ctx.log(BiTrackingLogs.UpdateEntry, {
         entryId: Utils.encodeId(entryId),
     });
 

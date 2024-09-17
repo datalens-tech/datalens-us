@@ -22,7 +22,7 @@ import {
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission, getEntryPermissionsByWorkbook} from '../../new/workbook/utils';
 import {WorkbookPermission} from '../../../entities/workbook';
-import Utils, {logInfo, makeUserId} from '../../../utils';
+import Utils, {makeUserId} from '../../../utils';
 import {getId} from '../../../db';
 
 export const validateCreateEntryInWorkbook = makeSchemaValidator({
@@ -107,7 +107,7 @@ export async function createEntryInWorkbook(
         includePermissionsInfo,
     }: CreateEntryInWorkbookData,
 ) {
-    logInfo(ctx, 'CREATE_ENTRY_IN_WORKBOOK_CALL');
+    ctx.log('CREATE_ENTRY_IN_WORKBOOK_CALL');
 
     validateCreateEntryInWorkbook({
         workbookId,
@@ -208,7 +208,7 @@ export async function createEntryInWorkbook(
         resultEntry.permissions = permissions;
     }
 
-    logInfo(ctx, BiTrackingLogs.CreateEntry, {
+    ctx.log(BiTrackingLogs.CreateEntry, {
         entryId: Utils.encodeId(resultEntry.entryId),
     });
 

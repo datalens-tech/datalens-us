@@ -1,5 +1,4 @@
 import {ServiceArgs} from '../types';
-import {logInfo} from '../../../utils';
 import hashGenerator from '../../../components/hash-generator';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {State} from '../../../db/models/new/state';
@@ -33,7 +32,7 @@ export const createState = async (
 
     const {tenantId} = ctx.get('info');
 
-    logInfo(ctx, 'CREATE_STATE_REQUEST', {tenantId, entryId});
+    ctx.log('CREATE_STATE_REQUEST', {tenantId, entryId});
 
     if (!skipValidation) {
         validateArgs(args);
@@ -59,7 +58,7 @@ export const createState = async (
         .returning('*')
         .timeout(State.DEFAULT_QUERY_TIMEOUT);
 
-    logInfo(ctx, 'CREATE_STATE_SUCCESS');
+    ctx.log('CREATE_STATE_SUCCESS');
 
     return state;
 };

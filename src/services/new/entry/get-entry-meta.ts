@@ -5,7 +5,7 @@ import {getReplica} from '../utils';
 import {Entry} from '../../../db/models/new/entry';
 import {DlsActions} from '../../../types/models';
 import {US_ERRORS} from '../../../const';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
 import {getWorkbook} from '../workbook';
@@ -36,7 +36,7 @@ export const getEntryMeta = async (
 ) => {
     const {entryId, branch = 'saved'} = args;
 
-    logInfo(ctx, 'GET_ENTRY_META_REQUEST', {
+    ctx.log('GET_ENTRY_META_REQUEST', {
         entryId: Utils.encodeId(entryId),
     });
 

@@ -3,7 +3,7 @@ import {raw} from 'objection';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import Entry from '../../../db/models/entry';
 import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, SYSTEM_USER, US_ERRORS} from '../../../const';
-import Utils, {logInfo, makeUserId} from '../../../utils';
+import Utils, {makeUserId} from '../../../utils';
 import {ServiceArgs} from '../../new/types';
 import Revision from '../../../db/models/revision';
 import {RevisionModelColumn} from '../../../db/models/new/revision';
@@ -34,7 +34,7 @@ export async function switchRevisionEntry(
 ) {
     const {entryId, revId} = args;
 
-    logInfo(ctx, 'SWITCH_REVISION_ENTRY_REQUEST', {
+    ctx.log('SWITCH_REVISION_ENTRY_REQUEST', {
         entryId: Utils.encodeId(entryId),
         revId: Utils.encodeId(revId),
     });

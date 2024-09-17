@@ -1,6 +1,6 @@
 import {transaction} from 'objection';
 import {Model, getId} from '../..';
-import Utils, {logInfo, makeUserId} from '../../../utils';
+import Utils, {makeUserId} from '../../../utils';
 import Revision from '../revision';
 import Tenant from '../tenant';
 import Link from '../links';
@@ -519,7 +519,7 @@ class Entry extends Model {
             return allCreatedEntries;
         });
 
-        logInfo(ctx, BiTrackingLogs.CreateEntry, {
+        ctx.log(BiTrackingLogs.CreateEntry, {
             entryId: result && !Array.isArray(result) ? Utils.encodeId(result.entryId) : null,
         });
 
@@ -643,7 +643,7 @@ class Entry extends Model {
             return entries;
         });
 
-        logInfo(ctx, BiTrackingLogs.PrivateCreateEntry, {
+        ctx.log(BiTrackingLogs.PrivateCreateEntry, {
             entryId: result && !Array.isArray(result) ? Utils.encodeId(result.entryId) : null,
         });
 

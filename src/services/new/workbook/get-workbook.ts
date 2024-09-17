@@ -6,7 +6,7 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../entities/workbook';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
 import type {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
@@ -35,7 +35,7 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
 ): Promise<T> => {
     const {workbookId, includePermissionsInfo = false} = args;
 
-    logInfo(ctx, 'GET_WORKBOOK_START', {
+    ctx.log('GET_WORKBOOK_START', {
         workbookId: Utils.encodeId(workbookId),
         includePermissionsInfo,
     });
@@ -89,7 +89,7 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
             });
         }
 
-        logInfo(ctx, 'CHECK_VIEW_PERMISSION');
+        ctx.log('CHECK_VIEW_PERMISSION');
 
         await workbook.checkPermission({
             parentIds,
@@ -105,7 +105,7 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
         workbook.enableAllPermissions();
     }
 
-    logInfo(ctx, 'GET_WORKBOOK_FINISH', {
+    ctx.log('GET_WORKBOOK_FINISH', {
         workbookId: Utils.encodeId(workbook.model.workbookId),
     });
 

@@ -3,7 +3,7 @@ import {getReplica} from '../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {registry} from '../../../registry';
 import {checkAndSetCollectionPermission} from './utils';
 
@@ -36,7 +36,7 @@ export const getCollectionsListByIds = async (
 ) => {
     const {collectionIds, includePermissionsInfo = false, permission} = args;
 
-    logInfo(ctx, 'GET_COLLECTIONS_LIST_BY_IDS_START', {
+    ctx.log('GET_COLLECTIONS_LIST_BY_IDS_START', {
         collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),
         includePermissionsInfo,
     });

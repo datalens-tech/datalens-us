@@ -4,7 +4,7 @@ import {ServiceArgs} from '../types';
 import {getReplica, getPrimary} from '../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 
 import {US_ERRORS, CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, TRASH_FOLDER} from '../../../const';
@@ -29,7 +29,7 @@ export const restoreWorkbook = async (
 ) => {
     const {workbookId} = args;
 
-    logInfo(ctx, 'RESTORE_WORKBOOK_START', {
+    ctx.log('RESTORE_WORKBOOK_START', {
         workbookId: Utils.encodeId(workbookId),
     });
 

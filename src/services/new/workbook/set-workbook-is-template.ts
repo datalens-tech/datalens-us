@@ -2,7 +2,7 @@ import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {WorkbookModel} from '../../../db/models/new/workbook';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -28,7 +28,7 @@ export const setWorkbookIsTemplate = async (
 ) => {
     const {workbookId, isTemplate} = args;
 
-    logInfo(ctx, 'SET_WORKBOOK_IS_TEMPLATE_START', {
+    ctx.log('SET_WORKBOOK_IS_TEMPLATE_START', {
         workbookId: Utils.encodeId(workbookId),
         isTemplate,
     });
@@ -41,7 +41,7 @@ export const setWorkbookIsTemplate = async (
         isTemplate,
     });
 
-    logInfo(ctx, 'SET_WORKBOOK_IS_TEMPLATE_FINISH', {
+    ctx.log('SET_WORKBOOK_IS_TEMPLATE_FINISH', {
         workbookId: Utils.encodeId(workbookId),
         isTemplate: workbook.isTemplate,
     });

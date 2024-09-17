@@ -3,7 +3,7 @@ import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -31,7 +31,7 @@ export const checkCollectionByTitle = async (
 
     const {tenantId, projectId} = ctx.get('info');
 
-    logInfo(ctx, 'CHECK_COLLECTION_BY_TITLE_START', {
+    ctx.log('CHECK_COLLECTION_BY_TITLE_START', {
         parentId: Utils.encodeId(parentId),
         title,
     });
@@ -63,7 +63,7 @@ export const checkCollectionByTitle = async (
 
     const result = Boolean(collection);
 
-    logInfo(ctx, 'CHECK_COLLECTION_BY_TITLE_FINISH', {result});
+    ctx.log('CHECK_COLLECTION_BY_TITLE_FINISH', {result});
 
     return result;
 };

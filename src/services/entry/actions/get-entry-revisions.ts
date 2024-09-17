@@ -10,7 +10,7 @@ import {
     DEFAULT_PAGE,
     DEFAULT_PAGE_SIZE,
 } from '../../../const';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {checkEntry} from './check-entry';
 import {getWorkbook} from '../../new/workbook';
 import {ServiceArgs} from '../../new/types';
@@ -61,7 +61,7 @@ export async function getEntryRevisions(
 ) {
     const {entryId, page = DEFAULT_PAGE, pageSize = DEFAULT_PAGE_SIZE, revIds, updatedAfter} = args;
 
-    logInfo(ctx, 'GET_REVISIONS_REQUEST', {
+    ctx.log('GET_REVISIONS_REQUEST', {
         entryId: Utils.encodeId(entryId),
         page,
         pageSize,
@@ -157,7 +157,7 @@ type GetLegacyEntryRevisionsData = {
 };
 
 export async function getLegacyEntryRevisions(ctx: CTX, {entryId}: GetLegacyEntryRevisionsData) {
-    logInfo(ctx, 'GET_LEGACY_REVISIONS_REQUEST', {
+    ctx.log('GET_LEGACY_REVISIONS_REQUEST', {
         entryId: Utils.encodeId(entryId),
     });
 

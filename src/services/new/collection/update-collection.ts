@@ -8,7 +8,7 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {raw} from 'objection';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {CollectionPermission} from '../../../entities/collection';
 
 const validateArgs = makeSchemaValidator({
@@ -45,7 +45,7 @@ export const updateCollection = async (
 
     const {accessServiceEnabled} = ctx.config;
 
-    logInfo(ctx, 'UPDATE_COLLECTION_START', {
+    ctx.log('UPDATE_COLLECTION_START', {
         collectionId: Utils.encodeId(collectionId),
         newTitle,
         newDescription,
@@ -121,7 +121,7 @@ export const updateCollection = async (
         });
     }
 
-    logInfo(ctx, 'UPDATE_COLLECTION_FINISH', {
+    ctx.log('UPDATE_COLLECTION_FINISH', {
         collectionId: Utils.encodeId(patchedCollection.collectionId),
     });
 

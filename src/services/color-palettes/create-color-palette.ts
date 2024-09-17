@@ -3,7 +3,7 @@ import {transaction} from 'objection';
 import {ServiceArgs} from '../../services/new/types';
 import {makeSchemaValidator} from '../../components/validation-schema-compiler';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
-import Utils, {logInfo} from '../../utils';
+import Utils from '../../utils';
 import {registry} from '../../registry';
 import {getColorPalettesCount} from './get-color-palettes-count';
 import {US_ERRORS} from '../../const';
@@ -46,7 +46,7 @@ export const createColorPalette = async (
 ) => {
     const {displayName, colors, isGradient, isDefault} = args;
 
-    logInfo(ctx, 'CREATE_COLOR_PALETTE_START', {
+    ctx.log('CREATE_COLOR_PALETTE_START', {
         displayName,
         colors,
         isGradient,
@@ -84,7 +84,7 @@ export const createColorPalette = async (
 
     const {tenantId} = ctx.get('info');
 
-    logInfo(ctx, 'CREATE_COLOR_PALETTE_IN_DB_START');
+    ctx.log('CREATE_COLOR_PALETTE_IN_DB_START');
 
     const result = await transaction(ColorPaletteModel.primary, async (transactionTrx) => {
         if (isDefault) {
@@ -112,7 +112,7 @@ export const createColorPalette = async (
             .returning('*')
             .timeout(ColorPaletteModel.DEFAULT_QUERY_TIMEOUT);
 
-        logInfo(ctx, 'CREATE_COLOR_PALETTE_IN_DB_FINISH', {
+        ctx.log('CREATE_COLOR_PALETTE_IN_DB_FINISH', {
             colorPaletteId: Utils.encodeId(model[ColorPaletteModelColumn.ColorPaletteId]),
         });
 

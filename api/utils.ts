@@ -1,6 +1,5 @@
 export {
     default as Utils,
-    logInfo,
     makeUserId,
     isTenantIdWithOrgId,
     getOrgIdFromTenantId,

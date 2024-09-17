@@ -6,7 +6,7 @@ import {getReplica} from '../utils';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {DlsActions} from '../../../types/models';
 import {US_ERRORS} from '../../../const';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
 import {RevisionModel} from '../../../db/models/new/revision';
@@ -61,7 +61,7 @@ export const getEntryByKey = async (
         customErrorBypassEnabled = false,
     }: GetEntryByKeyArgs,
 ) => {
-    logInfo(ctx, 'GET_ENTRY_BY_KEY_REQUEST', {
+    ctx.log('GET_ENTRY_BY_KEY_REQUEST', {
         key,
         revId,
         branch,

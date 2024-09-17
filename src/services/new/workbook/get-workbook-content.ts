@@ -1,7 +1,7 @@
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE} from '../../../const';
 import {EntryScope} from '../../../db/models/new/entry/types';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {UsPermission} from '../../../types/models';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
@@ -92,7 +92,7 @@ export const getWorkbookContent = async (
         scope,
     } = args;
 
-    logInfo(ctx, 'GET_WORKBOOK_CONTENT_START', {
+    ctx.log('GET_WORKBOOK_CONTENT_START', {
         workbookId: Utils.encodeId(workbookId),
         includePermissionsInfo,
         page,

@@ -5,7 +5,7 @@ import Lock from '../../../db/models/lock';
 import {EntryColumns, DlsActions, UsPermissions} from '../../../types/models';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {RETURN_COLUMNS, BiTrackingLogs, DEFAULT_QUERY_TIMEOUT, US_ERRORS} from '../../../const';
-import Utils, {logInfo, makeUserId} from '../../../utils';
+import Utils, {makeUserId} from '../../../utils';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {checkWorkbookPermission} from '../../new/workbook/utils';
@@ -42,7 +42,7 @@ export async function deleteEntry(
 ) {
     const {entryId, lockToken, useLegacyLogin = false} = args;
 
-    logInfo(ctx, 'DELETE_ENTRY_REQUEST', {
+    ctx.log('DELETE_ENTRY_REQUEST', {
         entryId: Utils.encodeId(entryId),
         lockToken,
     });
@@ -198,7 +198,7 @@ export async function deleteEntry(
             .timeout(DEFAULT_QUERY_TIMEOUT);
     });
 
-    logInfo(ctx, BiTrackingLogs.DeleteEntry, {
+    ctx.log(BiTrackingLogs.DeleteEntry, {
         entryId: Utils.encodeId(entryId),
     });
 

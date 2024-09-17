@@ -1,6 +1,5 @@
 import {ServiceArgs} from '../types';
 import {AppError} from '@gravity-ui/nodekit';
-import {logInfo} from '../../../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {State} from '../../../db/models/new/state';
 
@@ -33,7 +32,7 @@ export const getState = async (
 
     const {tenantId} = ctx.get('info');
 
-    logInfo(ctx, 'GET_STATE_REQUEST', {tenantId, entryId, hash});
+    ctx.log('GET_STATE_REQUEST', {tenantId, entryId, hash});
 
     if (!skipValidation) {
         validateArgs(args);
@@ -49,7 +48,7 @@ export const getState = async (
         });
     }
 
-    logInfo(ctx, 'GET_STATE_SUCCESS');
+    ctx.log('GET_STATE_SUCCESS');
 
     return state;
 };

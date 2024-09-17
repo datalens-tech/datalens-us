@@ -6,7 +6,7 @@ import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {raw, transaction} from 'objection';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {CollectionPermission} from '../../../entities/collection';
 import {AppError} from '@gravity-ui/nodekit';
 import {getCollectionsListByIds} from './get-collections-list-by-ids';
@@ -38,7 +38,7 @@ export const deleteCollections = async (
         user: {userId},
     } = ctx.get('info');
 
-    logInfo(ctx, 'DELETE_COLLECTIONS_START', {
+    ctx.log('DELETE_COLLECTIONS_START', {
         collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),
     });
 

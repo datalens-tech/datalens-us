@@ -1,6 +1,6 @@
 import {ServiceArgs} from '../types';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import Utils, {logInfo, makeUserId} from '../../../utils';
+import Utils, {makeUserId} from '../../../utils';
 import {crossSyncCopiedJoinedEntryRevisions} from '../workbook';
 import {transaction} from 'objection';
 import {getPrimary} from '../utils';
@@ -44,7 +44,7 @@ export const copyEntriesToWorkbook = async (
     const {user} = ctx.get('info');
     const updatedBy = makeUserId(user.userId);
 
-    logInfo(ctx, 'COPY_ENTRIES_TO_WORKBOOK_START', {
+    ctx.log('COPY_ENTRIES_TO_WORKBOOK_START', {
         entryIds: await Utils.macrotasksMap(entryIds, (entryId) => Utils.encodeId(entryId)),
         workbookId: Utils.encodeId(targetWorkbookId),
         copiedBy: updatedBy,
@@ -75,7 +75,7 @@ export const copyEntriesToWorkbook = async (
         });
     });
 
-    logInfo(ctx, 'COPY_ENTRIES_TO_WORKBOOK_FINISH');
+    ctx.log('COPY_ENTRIES_TO_WORKBOOK_FINISH');
 
     return {
         workbookId: targetWorkbookId,

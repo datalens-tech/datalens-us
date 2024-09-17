@@ -3,7 +3,7 @@ import {getReplica} from '../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CollectionPermission} from '../../../entities/collection';
 import {CollectionModel} from '../../../db/models/new/collection';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
 import {getCollection} from '../collection';
@@ -78,7 +78,7 @@ export const getStructureItems = async (
         mode = 'all',
     } = args;
 
-    logInfo(ctx, 'GET_STRUCTURE_ITEMS_START', {
+    ctx.log('GET_STRUCTURE_ITEMS_START', {
         collectionId: collectionId ? Utils.encodeId(collectionId) : null,
         includePermissionsInfo,
         filterString,

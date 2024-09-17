@@ -5,7 +5,7 @@ import {ServiceArgs} from '../types';
 
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 
 import {moveWorkbook} from './move-workbook';
 
@@ -40,7 +40,7 @@ export const moveWorkbooksList = async (
 
     const targetTrx = getPrimary(trx);
 
-    logInfo(ctx, 'MOVE_LIST_WORKBOOKS_START', {
+    ctx.log('MOVE_LIST_WORKBOOKS_START', {
         workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.encodeId(id)),
         collectionId: Utils.encodeId(collectionId),
     });
