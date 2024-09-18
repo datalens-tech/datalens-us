@@ -5,7 +5,7 @@ import {ServiceArgs} from '../types';
 
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 
 import {moveCollection} from './move-collection';
 
@@ -40,7 +40,7 @@ export const moveCollectionsList = async (
 
     const targetTrx = getPrimary(trx);
 
-    logInfo(ctx, 'MOVE_LIST_COLLECTIONS_START', {
+    ctx.log('MOVE_LIST_COLLECTIONS_START', {
         collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),
         parentId: Utils.encodeId(parentId),
     });

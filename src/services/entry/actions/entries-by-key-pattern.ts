@@ -1,5 +1,4 @@
 import Entry from '../../../db/models/entry';
-import {logInfo} from '../../../utils';
 import {DEFAULT_QUERY_TIMEOUT} from '../../../const';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {ServiceArgs} from '../../new/types';
@@ -26,7 +25,7 @@ export async function getEntriesByKeyPattern(
 ) {
     const {keyPattern} = args;
 
-    logInfo(ctx, 'ENTRIES_BY_KEY_PATTERN_CALL', {keyPattern});
+    ctx.log('ENTRIES_BY_KEY_PATTERN_CALL', {keyPattern});
 
     if (!skipValidation) {
         validateArgs(args);

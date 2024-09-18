@@ -5,7 +5,7 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {US_ERRORS, DEFAULT_PAGE, DEFAULT_PAGE_SIZE} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {CollectionModel} from '../../../db/models/new/collection';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {CollectionPermission} from '../../../entities/collection';
 import {getParents} from '../collection/utils';
@@ -75,7 +75,7 @@ export const getWorkbooksList = async (
         onlyMy = false,
     } = args;
 
-    logInfo(ctx, 'GET_WORKBOOKS_LIST_START', {
+    ctx.log('GET_WORKBOOKS_LIST_START', {
         collectionId: collectionId ? Utils.encodeId(collectionId) : null,
         filterString,
         page,

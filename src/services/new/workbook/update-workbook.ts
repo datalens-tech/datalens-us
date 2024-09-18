@@ -8,7 +8,7 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {raw} from 'objection';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {WorkbookPermission} from '../../../entities/workbook';
 
 const validateArgs = makeSchemaValidator({
@@ -39,7 +39,7 @@ export const updateWorkbook = async (
 ) => {
     const {workbookId, title: newTitle, description: newDescription} = args;
 
-    logInfo(ctx, 'UPDATE_WORKBOOK_START', {
+    ctx.log('UPDATE_WORKBOOK_START', {
         workbookId: Utils.encodeId(workbookId),
         newTitle,
         newDescription,
@@ -121,7 +121,7 @@ export const updateWorkbook = async (
         });
     }
 
-    logInfo(ctx, 'UPDATE_WORKBOOK_FINISH', {
+    ctx.log('UPDATE_WORKBOOK_FINISH', {
         workbookId: Utils.encodeId(patchedWorkbook.workbookId),
     });
 

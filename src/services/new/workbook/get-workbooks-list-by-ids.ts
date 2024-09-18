@@ -2,7 +2,7 @@ import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workboo
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {registry} from '../../../registry';
 
 import {getParents} from '../collection/utils';
@@ -56,7 +56,7 @@ export const getWorkbooksListByIds = async (
 ) => {
     const {workbookIds, includePermissionsInfo = false} = args;
 
-    logInfo(ctx, 'GET_WORKBOOKS_LIST_BY_IDS_STARTED', {
+    ctx.log('GET_WORKBOOKS_LIST_BY_IDS_STARTED', {
         workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.encodeId(id)),
         includePermissionsInfo,
     });
@@ -165,7 +165,7 @@ export const getWorkbooksListByIds = async (
 
     const result = workbooks.filter((item) => Boolean(item)) as WorkbookInstance[];
 
-    logInfo(ctx, 'GET_WORKBOOKS_LIST_BY_IDS_FINISHED', {
+    ctx.log('GET_WORKBOOKS_LIST_BY_IDS_FINISHED', {
         workbookIds: await Utils.macrotasksMap(workbookList, (workbook) =>
             Utils.encodeId(workbook.workbookId),
         ),

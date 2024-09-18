@@ -9,7 +9,7 @@ import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {OrganizationPermission, ProjectPermission} from '../../../components/iam';
 import {raw} from 'objection';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {CollectionPermission} from '../../../entities/collection';
 import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
@@ -48,7 +48,7 @@ export const moveCollection = async (
         user: {userId},
     } = ctx.get('info');
 
-    logInfo(ctx, 'MOVE_COLLECTION_START', {
+    ctx.log('MOVE_COLLECTION_START', {
         collectionId: Utils.encodeId(collectionId),
         newParentId: Utils.encodeId(newParentId),
         newTitle,
@@ -178,7 +178,7 @@ export const moveCollection = async (
         });
     }
 
-    logInfo(ctx, 'MOVE_COLLECTION_FINISH', {
+    ctx.log('MOVE_COLLECTION_FINISH', {
         collectionId: Utils.encodeId(patchedCollection.collectionId),
     });
 

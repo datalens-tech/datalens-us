@@ -2,7 +2,7 @@ import {AppError} from '@gravity-ui/nodekit';
 import {WorkbookModel} from '../../../db/models/new/workbook';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {copyWorkbook} from './copy-workbook';
 import {US_ERRORS} from '../../../const';
@@ -35,7 +35,7 @@ export const copyWorkbookTemplate = async (
 ) => {
     const {workbookId, collectionId: newCollectionId, title: newTitle} = args;
 
-    logInfo(ctx, 'COPY_WORKBOOK_TEMPLATE_START', {
+    ctx.log('COPY_WORKBOOK_TEMPLATE_START', {
         workbookId: Utils.encodeId(workbookId),
         newCollectionId,
         newTitle,
@@ -74,7 +74,7 @@ export const copyWorkbookTemplate = async (
         },
     );
 
-    logInfo(ctx, 'COPY_WORKBOOK_TEMPLATE_SUCCESS', {
+    ctx.log('COPY_WORKBOOK_TEMPLATE_SUCCESS', {
         workbookId: Utils.encodeId(newWorkbook.workbookId),
     });
 

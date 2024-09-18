@@ -1,7 +1,6 @@
 import {ServiceArgs} from '../../services/new/types';
 import {makeSchemaValidator} from '../../components/validation-schema-compiler';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
-import {logInfo} from '../../utils';
 import {registry} from '../../registry';
 
 const validateArgs = makeSchemaValidator({
@@ -24,7 +23,7 @@ export const deleteColorPalette = async (
 ) => {
     const {colorPaletteId} = args;
 
-    logInfo(ctx, 'DELETE_COLOR_PALETTE_START', {
+    ctx.log('DELETE_COLOR_PALETTE_START', {
         colorPaletteId,
     });
 
@@ -45,7 +44,7 @@ export const deleteColorPalette = async (
         .delete()
         .timeout(ColorPaletteModel.DEFAULT_QUERY_TIMEOUT);
 
-    logInfo(ctx, 'DELETE_COLOR_PALETTE_FINISH', {
+    ctx.log('DELETE_COLOR_PALETTE_FINISH', {
         colorPaletteId,
     });
 };

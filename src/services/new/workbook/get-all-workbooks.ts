@@ -3,7 +3,7 @@ import {getReplica} from '../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -31,7 +31,7 @@ export const getAllWorkbooks = async (
 ) => {
     const {page = DEFAULT_PAGE, pageSize = DEFAULT_PAGE_SIZE} = args;
 
-    logInfo(ctx, 'GET_ALL_WORKBOOKS_START', {
+    ctx.log('GET_ALL_WORKBOOKS_START', {
         page,
         pageSize,
     });

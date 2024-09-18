@@ -3,7 +3,7 @@ import {raw, transaction} from 'objection';
 import Entry from '../../../db/models/entry';
 import {CTX, DlsActions} from '../../../types/models';
 import {RETURN_COLUMNS, BiTrackingLogs, US_ERRORS, CURRENT_TIMESTAMP} from '../../../const';
-import Utils, {logInfo, makeUserId} from '../../../utils';
+import Utils, {makeUserId} from '../../../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission} from '../../new/workbook/utils';
@@ -35,7 +35,7 @@ export const renameEntry = async (ctx: CTX, renameEntryData: RenameEntryData) =>
 
     const {entryId, name} = renameEntryData;
 
-    logInfo(ctx, 'RENAME_ENTRY_REQUEST', {
+    ctx.log('RENAME_ENTRY_REQUEST', {
         entryId: Utils.encodeId(entryId),
         name,
     });
@@ -150,7 +150,7 @@ export const renameEntry = async (ctx: CTX, renameEntryData: RenameEntryData) =>
             .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
     });
 
-    logInfo(ctx, BiTrackingLogs.RenameEntry, {
+    ctx.log(BiTrackingLogs.RenameEntry, {
         entryId: Utils.encodeId(entryId),
     });
     return result;

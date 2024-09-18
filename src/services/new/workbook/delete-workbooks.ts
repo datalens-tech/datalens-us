@@ -8,7 +8,7 @@ import {raw, transaction} from 'objection';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import Lock from '../../../db/models/lock';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
-import Utils, {logInfo, makeUserId} from '../../../utils';
+import Utils, {makeUserId} from '../../../utils';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {markEntryAsDeleted} from '../../entry/crud';
 import {getWorkbooksListByIds} from './get-workbooks-list-by-ids';
@@ -36,7 +36,7 @@ export const deleteWorkbooks = async (
 ) => {
     const {workbookIds} = args;
 
-    logInfo(ctx, 'DELETE_WORKBOOKS_START', {
+    ctx.log('DELETE_WORKBOOKS_START', {
         workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.encodeId(id)),
     });
 
@@ -133,7 +133,7 @@ export const deleteWorkbooks = async (
         });
     }
 
-    logInfo(ctx, 'DELETE_WORKBOOKS_FINISH', {
+    ctx.log('DELETE_WORKBOOKS_FINISH', {
         workbookIds: await Utils.macrotasksMap(result, (workbook) =>
             Utils.encodeId(workbook.workbookId),
         ),

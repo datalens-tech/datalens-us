@@ -4,7 +4,7 @@ import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 import {US_ERRORS} from '../../../const';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {CollectionPermission} from '../../../entities/collection';
 import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
@@ -32,7 +32,7 @@ export const getCollectionBreadcrumbs = async (
 
     const {accessServiceEnabled} = ctx.config;
 
-    logInfo(ctx, 'GET_COLLECTION_BREADCRUMBS_START', {
+    ctx.log('GET_COLLECTION_BREADCRUMBS_START', {
         collectionId: Utils.encodeId(collectionId),
         includePermissionsInfo,
     });
@@ -87,7 +87,7 @@ export const getCollectionBreadcrumbs = async (
         await Promise.all(checkPermissionPromises);
     }
 
-    logInfo(ctx, 'GET_COLLECTION_BREADCRUMBS_FINISH', {
+    ctx.log('GET_COLLECTION_BREADCRUMBS_FINISH', {
         collectionId: Utils.encodeId(collectionId),
         collectionsLength: collectionInstances.length,
     });

@@ -5,7 +5,7 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {registry} from '../../../registry';
 
 import type {CollectionInstance} from '../../../registry/common/entities/collection/types';
@@ -39,7 +39,7 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
 ): Promise<T> => {
     const {collectionId, includePermissionsInfo = false, permission} = args;
 
-    logInfo(ctx, 'GET_COLLECTION_START', {
+    ctx.log('GET_COLLECTION_START', {
         collectionId: Utils.encodeId(collectionId),
         includePermissionsInfo,
     });
@@ -85,7 +85,7 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
         {collectionInstance, skipCheckPermissions, includePermissionsInfo, permission},
     );
 
-    logInfo(ctx, 'GET_COLLECTION_FINISH', {
+    ctx.log('GET_COLLECTION_FINISH', {
         collectionId: Utils.encodeId(model.collectionId),
     });
 

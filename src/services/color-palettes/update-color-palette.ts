@@ -3,7 +3,7 @@ import {ServiceArgs} from '../../services/new/types';
 import {getPrimary} from '../../services/new/utils';
 import {makeSchemaValidator} from '../../components/validation-schema-compiler';
 import {WorkbookModel} from '../../db/models/new/workbook';
-import Utils, {logInfo} from '../../utils';
+import Utils from '../../utils';
 import {US_ERRORS} from '../../const';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
 import {transaction} from 'objection';
@@ -48,7 +48,7 @@ export const updateColorPalette = async (
 ) => {
     const {colorPaletteId, displayName, colors, isGradient, isDefault} = args;
 
-    logInfo(ctx, 'UPDATE_COLOR_PALETTE_START', {
+    ctx.log('UPDATE_COLOR_PALETTE_START', {
         colorPaletteId: Utils.encodeId(colorPaletteId),
         displayName,
         colors,
@@ -104,7 +104,7 @@ export const updateColorPalette = async (
         });
     }
 
-    logInfo(ctx, 'UPDATE_COLOR_PALETTE_FINISH', {
+    ctx.log('UPDATE_COLOR_PALETTE_FINISH', {
         colorPaletteId: Utils.encodeId(result.colorPaletteId),
     });
 

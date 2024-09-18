@@ -9,7 +9,7 @@ import {
     JoinedEntryRevisionFavoriteColumns,
 } from '../../../db/presentations/joined-entry-revision-favorite';
 import {DlsActions} from '../../../types/models';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {US_ERRORS} from '../../../const';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import OldEntry from '../../../db/models/entry';
@@ -63,7 +63,7 @@ export const getEntry = async (
 ): Promise<GetEntryResult> => {
     const {entryId, revId, branch = 'saved', includePermissionsInfo, includeLinks} = args;
 
-    logInfo(ctx, 'GET_ENTRY_REQUEST', {
+    ctx.log('GET_ENTRY_REQUEST', {
         entryId: Utils.encodeId(entryId),
         revId,
         branch,

@@ -11,7 +11,7 @@ import {RevisionModel} from '../../../db/models/new/revision';
 import Link from '../../../db/models/links';
 import {Entry} from '../../../db/models/new/entry';
 import {WorkbookPermission} from '../../../entities/workbook';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {copyToWorkbook} from '../../entry/actions';
 import {getCollection} from '../collection';
 import {registry} from '../../../registry';
@@ -62,7 +62,7 @@ export const copyWorkbook = async (
         tenantIdOverride,
     } = args;
 
-    logInfo(ctx, 'COPY_WORKBOOK_START', {
+    ctx.log('COPY_WORKBOOK_START', {
         workbookId: Utils.encodeId(workbookId),
         newCollectionId,
         newTitle,
@@ -241,7 +241,7 @@ export const copyWorkbook = async (
         return copiedWorkbook;
     });
 
-    logInfo(ctx, 'COPY_WORKBOOK_FINISH', {
+    ctx.log('COPY_WORKBOOK_FINISH', {
         workbookId: Utils.encodeId(newWorkbook.collectionId),
     });
 

@@ -2,7 +2,7 @@ import {AppError} from '@gravity-ui/nodekit';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {DlsActions} from '../../../types/models';
 import {ServiceArgs} from '../../new/types';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {US_ERRORS} from '../../../const';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {getWorkbook} from '../../new/workbook/get-workbook';
@@ -44,7 +44,7 @@ export async function getEntryRelations(
 
     const {entryId, direction = RelationDirection.Parent, includePermissionsInfo = false} = args;
 
-    logInfo(ctx, 'GET_ENTRY_RELATIONS_REQUEST', {
+    ctx.log('GET_ENTRY_RELATIONS_REQUEST', {
         entryId: Utils.encodeId(entryId),
         direction,
         includePermissionsInfo,

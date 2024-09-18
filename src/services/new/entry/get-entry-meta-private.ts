@@ -4,7 +4,7 @@ import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 import {DlsActions} from '../../../types/models';
 import {US_ERRORS} from '../../../const';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {getWorkbook} from '../workbook';
 import {registry} from '../../../registry';
 
@@ -18,7 +18,7 @@ export const getEntryMetaPrivate = async (
     {ctx, trx}: ServiceArgs,
     {entryId, masterToken, branch}: GetEntryMetaPrivateArgs,
 ) => {
-    logInfo(ctx, 'PRIVATE_GET_ENTRY_META_REQUEST', {
+    ctx.log('PRIVATE_GET_ENTRY_META_REQUEST', {
         entryId: Utils.encodeId(entryId),
     });
 

@@ -9,7 +9,7 @@ import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {OrganizationPermission, ProjectPermission} from '../../../components/iam';
 import {raw} from 'objection';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
-import Utils, {logInfo} from '../../../utils';
+import Utils from '../../../utils';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {CollectionPermission} from '../../../entities/collection';
 import {getCollection} from '../collection';
@@ -44,7 +44,7 @@ export const moveWorkbook = async (
 ) => {
     const {workbookId, collectionId: newCollectionId, title: newTitle} = args;
 
-    logInfo(ctx, 'MOVE_WORKBOOK_START', {
+    ctx.log('MOVE_WORKBOOK_START', {
         workbookId: Utils.encodeId(workbookId),
         newCollectionId: newCollectionId ? Utils.encodeId(newCollectionId) : null,
         newTitle,
@@ -160,7 +160,7 @@ export const moveWorkbook = async (
         });
     }
 
-    logInfo(ctx, 'MOVE_WORKBOOK_FINISH', {
+    ctx.log('MOVE_WORKBOOK_FINISH', {
         workbookId: Utils.encodeId(patchedWorkbook.workbookId),
     });
 
