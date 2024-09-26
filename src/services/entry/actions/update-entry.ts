@@ -27,6 +27,8 @@ import {WorkbookPermission} from '../../../entities/workbook';
 import {Optional} from 'utility-types';
 import {checkEntry} from './check-entry';
 import {registry} from '../../../registry';
+import {EntryScope} from '../../../db/models/new/entry/types';
+import {EntryColumn} from '../../../db/models/new/entry';
 
 type Mode = 'save' | 'publish' | 'recover';
 const ModeValues: Mode[] = ['save', 'publish', 'recover'];
@@ -405,9 +407,37 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                     const entryObj: EntryColumns | undefined = entry ? entry.toJSON() : undefined;
 
                     if (entryObj) {
+                        const entryTenantId = entryObj.tenantId;
+
+                        const entryObjInnerMeta = entryObj.innerMeta as NonNullable<
+                            EntryColumns['innerMeta']
+                        >;
+                        const newKey = entryObjInnerMeta.oldKey;
+
+                        const parentFolderKey = Utils.getParentFolderKey({
+                            keyFormatted: newKey,
+                        });
+
+                        if (parentFolderKey !== '/' && !entryObj.workbookId) {
+                            const parentFolderEntry = await Entry.query(trx)
+                                .where({
+                                    [EntryColumn.TenantId]: entryTenantId,
+                                    [EntryColumn.Scope]: EntryScope.Folder,
+                                })
+                                .andWhere(EntryColumn.Key, 'like', `${parentFolderKey}%`)
+                                .andWhereNot(EntryColumn.IsDeleted, null)
+                                .first()
+                                .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
+
+                            if (!parentFolderEntry) {
+                                throw new AppError(US_ERRORS.PARENT_FOLDER_NOT_EXIST, {
+                                    code: US_ERRORS.PARENT_FOLDER_NOT_EXIST,
+                                });
+                            }
+                        }
+
                         if (entryObj.scope === 'folder') {
                             const entryObjKey = entryObj.key;
-                            const entryTenantId = entryObj.tenantId;
 
                             const children = await Entry.query(trx)
                                 .select()
@@ -445,10 +475,6 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                                 }),
                             );
                         } else {
-                            const entryObjInnerMeta = entryObj.innerMeta as NonNullable<
-                                EntryColumns['innerMeta']
-                            >;
-                            const newKey = entryObjInnerMeta.oldKey;
                             const newDisplayKey = entryObjInnerMeta.oldDisplayKey;
                             const newInnerMeta: Optional<typeof entryObjInnerMeta> =
                                 entryObjInnerMeta;
