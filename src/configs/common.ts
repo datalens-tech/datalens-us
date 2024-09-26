@@ -34,7 +34,7 @@ export default {
 
     dlsEnabled: false,
     accessServiceEnabled: Utils.isTrueArg(Utils.getEnvVariable('ZITADEL')),
-    accessBindingsServiceEnabled: false,
+    accessBindingsServiceEnabled: Utils.isTrueArg(Utils.getEnvVariable('ZITADEL')),
 
     masterToken: Utils.getEnvTokenVariable('MASTER_TOKEN'),
 
