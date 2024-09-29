@@ -1,10 +1,8 @@
 import request from 'supertest';
-import usApp from '../../..';
-
-const app = usApp.express;
+import {app} from '../auth';
 
 describe('Check ping endpoints', () => {
-    test('Ping – [GET /ping]', async () => {
+    test('Ping', async () => {
         const response = await request(app).get('/ping').expect(200);
 
         const {body} = response;
@@ -12,8 +10,8 @@ describe('Check ping endpoints', () => {
         expect(body).toStrictEqual({result: 'pong'});
     });
 
-    test('Ping db – [GET /ping-db]', async () => {
-        // Waiting for Core-db to initialize, should take around 10ms
+    test('Ping db', async () => {
+        // db initialization timeout
         await new Promise((resolve) => {
             setTimeout(resolve, 10);
         });
@@ -25,7 +23,7 @@ describe('Check ping endpoints', () => {
         expect(body).toStrictEqual({result: 'pong-db'});
     });
 
-    test('Ping db primary – [GET /ping-db-primary]', async () => {
+    test('Ping db primary', async () => {
         const response = await request(app).get('/ping-db-primary').expect(200);
 
         const {body} = response;

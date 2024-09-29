@@ -5,6 +5,7 @@ import {CollectionConstructor, CollectionInstance} from './types';
 import {CollectionPermission, Permissions} from '../../../../entities/collection/types';
 import {US_ERRORS} from '../../../../const';
 import {ZitadelUserRole} from '../../../../types/zitadel';
+import {getMockedOperation} from '../utils';
 
 export const Collection: CollectionConstructor = class Collection implements CollectionInstance {
     ctx: AppContext;
@@ -49,7 +50,7 @@ export const Collection: CollectionConstructor = class Collection implements Col
             });
         }
 
-        return Promise.resolve();
+        return Promise.resolve(getMockedOperation(this.model.collectionId));
     }
 
     async checkPermission(args: {

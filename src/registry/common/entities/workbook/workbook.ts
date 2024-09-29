@@ -5,6 +5,7 @@ import {WorkbookConstructor, WorkbookInstance} from './types';
 import {Permissions, WorkbookPermission} from '../../../../entities/workbook/types';
 import {US_ERRORS} from '../../../../const';
 import {ZitadelUserRole} from '../../../../types/zitadel';
+import {getMockedOperation} from '../utils';
 
 export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
     implements WorkbookInstance
@@ -51,7 +52,7 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
             });
         }
 
-        return Promise.resolve();
+        return Promise.resolve(getMockedOperation(this.model.workbookId));
     }
 
     async checkPermission(args: {
