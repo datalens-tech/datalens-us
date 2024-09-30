@@ -46,4 +46,48 @@ describe('Utils', () => {
             expect(nameWithoutCopy).toBe('DASH');
         });
     });
+
+    describe('Utils.getFullParentFolderKeys', () => {
+        test('Shoud return all full parent folder keys', () => {
+            const parentFolderKeys = Utils.getFullParentFolderKeys(
+                'foldername/nestedfolder/nestedfolder2/nestedfolder3',
+            );
+
+            expect(parentFolderKeys).toEqual([
+                'foldername/nestedfolder/nestedfolder2/',
+                'foldername/nestedfolder/',
+                'foldername/',
+            ]);
+        });
+
+        test('Shoud return parent folder, if the entity does not have / at the end ', () => {
+            const parentFolderKeys = Utils.getFullParentFolderKeys('entries-basic-tests/dataset');
+
+            expect(parentFolderKeys).toEqual(['entries-basic-tests/']);
+        });
+
+        test('Shoud return /, if no parent folder', () => {
+            const parentFolderKeys = Utils.getFullParentFolderKeys('foldername');
+
+            expect(parentFolderKeys).toEqual(['/']);
+        });
+
+        test('Shoud return root folder, when only / in input', () => {
+            const parentFolderKeys = Utils.getFullParentFolderKeys('/');
+
+            expect(parentFolderKeys).toEqual(['/']);
+        });
+
+        test('Shoud return root folder, when only 1 entity in string', () => {
+            const parentFolderKeys = Utils.getFullParentFolderKeys('foldername/');
+
+            expect(parentFolderKeys).toEqual(['/']);
+        });
+
+        test('Shoud return empty array, when input empty string', () => {
+            const parentFolderKeys = Utils.getFullParentFolderKeys('');
+
+            expect(parentFolderKeys).toEqual([]);
+        });
+    });
 });
