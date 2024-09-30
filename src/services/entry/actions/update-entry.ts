@@ -414,13 +414,13 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                         >;
                         const newKey = entryObjInnerMeta.oldKey;
 
-                        const keyLowerCase = newKey.toLowerCase();
-                        const isFolder = Utils.isFolder({scope: entryObj.scope});
-                        const keyFormatted = Utils.formatKey(keyLowerCase, isFolder);
-                        console.log('keyFormattedasd: ', keyFormatted, 'newKeyasds: ', newKey);
                         if (!entryObj.workbookId) {
+                            const keyLowerCase = newKey.toLowerCase();
+                            const isFolder = Utils.isFolder({scope: entryObj.scope});
+                            const keyFormatted = Utils.formatKey(keyLowerCase, isFolder);
+
                             const parentFolderKeys = Utils.getFullParentFolderKeys(keyFormatted);
-                            console.log('parentFolderKeyss: ', parentFolderKeys);
+
                             const promisesParentFolders = parentFolderKeys.map((folderKey) => {
                                 return Entry.query(trx)
                                     .where({
@@ -435,8 +435,6 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
 
                             const parentFolders = await Promise.all(promisesParentFolders);
 
-                            console.log('parentFoldersasd: ', parentFolders);
-
                             const deletedParentFolderNames: string[] = [];
 
                             parentFolders.forEach((folder) => {
@@ -444,8 +442,6 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                                     deletedParentFolderNames.push(folder.innerMeta.oldDisplayKey);
                                 }
                             });
-
-                            console.log('deletedParentFoldersasd: ', deletedParentFolderNames);
 
                             if (deletedParentFolderNames.length) {
                                 throw new AppError(
