@@ -66,7 +66,7 @@ describe('Utils', () => {
             expect(parentFolderKeys).toEqual(['entries-basic-tests/']);
         });
 
-        test('Shoud return /, if no parent folder', () => {
+        test('Shoud return root folder, if no parent folder', () => {
             const parentFolderKeys = Utils.getFullParentFolderKeys('foldername');
 
             expect(parentFolderKeys).toEqual(['/']);
