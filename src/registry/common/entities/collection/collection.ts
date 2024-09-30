@@ -5,6 +5,8 @@ import {CollectionConstructor, CollectionInstance} from './types';
 import {CollectionPermission, Permissions} from '../../../../entities/collection/types';
 import {US_ERRORS} from '../../../../const';
 import {ZitadelUserRole} from '../../../../types/zitadel';
+import {getMockedOperation} from '../utils';
+import Utils from '../../../../utils';
 
 export const Collection: CollectionConstructor = class Collection implements CollectionInstance {
     ctx: AppContext;
@@ -16,10 +18,13 @@ export const Collection: CollectionConstructor = class Collection implements Col
         this.model = model;
     }
 
-    private getAllPermissions() {
+    private isEditorOrAdmin() {
         const {zitadelUserRole: role} = this.ctx.get('info');
+        return role === ZitadelUserRole.Editor || role === ZitadelUserRole.Admin;
+    }
 
-        const isEditorOrAdmin = role === ZitadelUserRole.Editor || role === ZitadelUserRole.Admin;
+    private getAllPermissions() {
+        const isEditorOrAdmin = this.isEditorOrAdmin();
 
         const permissions = {
             listAccessBindings: true,
@@ -37,7 +42,17 @@ export const Collection: CollectionConstructor = class Collection implements Col
         return permissions;
     }
 
-    async register() {}
+    async register() {
+        const isEditorOrAdmin = this.isEditorOrAdmin();
+
+        if (!isEditorOrAdmin) {
+            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
+                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
+            });
+        }
+
+        return Promise.resolve(getMockedOperation(Utils.encodeId(this.model.collectionId)));
+    }
 
     async checkPermission(args: {
         parentIds: string[];
