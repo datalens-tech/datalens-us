@@ -1,3 +1,4 @@
+export {ResourceType} from '../src/entities/types';
 export {
     CollectionPermission,
     CollectionRole,

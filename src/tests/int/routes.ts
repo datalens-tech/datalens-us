@@ -1,0 +1,18 @@
+export const routes = {
+    entries: '/v1/entries',
+    privateEntries: '/private/entries',
+    privateCreateEntry: '/private/createEntry',
+    favorites: '/v1/favorites',
+    states: '/v1/states',
+    locks: '/v1/locks',
+    collections: '/v1/collections',
+    deleteCollections: '/v1/delete-collections',
+    deleteWorkbooks: '/v2/delete-workbooks',
+    moveCollections: '/v1/move-collections',
+    moveWorkbooks: '/v2/move-workbooks',
+    privateCollections: '/private/v1/collections',
+    collectionContent: '/v1/collection-content',
+    structureItems: '/v1/structure-items',
+    rootCollectionPermissions: '/v1/root-collection-permissions',
+    workbooks: '/v2/workbooks',
+};
