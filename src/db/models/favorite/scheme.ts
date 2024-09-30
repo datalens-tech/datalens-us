@@ -27,7 +27,7 @@ export const validateGetFavorites = compileSchema({
             properties: {
                 field: {
                     type: 'string',
-                    enum: ['updatedAt', 'createdAt', 'name'],
+                    enum: ['createdAt', 'name'],
                 },
                 direction: {
                     type: 'string',

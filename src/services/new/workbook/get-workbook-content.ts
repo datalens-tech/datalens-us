@@ -47,7 +47,7 @@ const validateArgs = makeSchemaValidator({
             properties: {
                 field: {
                     type: 'string',
-                    enum: ['name', 'updatedAt', 'createdAt'],
+                    enum: ['name', 'createdAt'],
                 },
                 direction: {
                     type: 'string',
@@ -71,7 +71,7 @@ export interface GetWorkbookContentArgs {
         name?: string;
     };
     orderBy?: {
-        field: 'name' | 'updatedAt' | 'createdAt';
+        field: 'name' | 'createdAt';
         direction: 'asc' | 'desc';
     };
     scope?: EntryScope | EntryScope[];
@@ -151,10 +151,6 @@ export const getWorkbookContent = async (
         modify: (builder) => {
             if (orderBy) {
                 switch (orderBy.field) {
-                    case 'updatedAt':
-                        builder.orderBy('revisions.updatedAt', orderBy.direction);
-                        builder.orderBy('entries.entryId');
-                        break;
                     case 'createdAt':
                         builder.orderBy('entries.createdAt', orderBy.direction);
                         builder.orderBy('entries.entryId');
