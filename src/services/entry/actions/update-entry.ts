@@ -435,7 +435,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
 
                                 const existingKeysParentFolders = new Set<string>();
 
-                                const notFoundParentFolder: string[] = [];
+                                const notFoundParentFolders: string[] = [];
 
                                 parentFolders.forEach((folder) => {
                                     existingKeysParentFolders.add(folder.key);
@@ -443,13 +443,13 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
 
                                 parentFolderKeys.forEach((key) => {
                                     if (!existingKeysParentFolders.has(key)) {
-                                        notFoundParentFolder.push(key);
+                                        notFoundParentFolders.push(key);
                                     }
                                 });
 
-                                if (notFoundParentFolder.length) {
+                                if (notFoundParentFolders.length) {
                                     throw new AppError(
-                                        `Couldn't found these parent folders - '${notFoundParentFolder.join(
+                                        `Couldn't found these parent folders - '${notFoundParentFolders.join(
                                             ', ',
                                         )}'`,
                                         {
