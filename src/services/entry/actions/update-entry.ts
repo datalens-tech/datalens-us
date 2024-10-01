@@ -428,29 +428,28 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                                     .where({
                                         [EntryColumn.TenantId]: entryTenantId,
                                         [EntryColumn.Scope]: EntryScope.Folder,
-                                        [EntryColumn.IsDeleted]: true,
+                                        [EntryColumn.IsDeleted]: false,
                                     })
-                                    .andWhereRaw(
-                                        `inner_meta ->> 'oldKey' IN (${parentFolderKeys
-                                            .map(() => '?')
-                                            .join(',')})`,
-                                        parentFolderKeys,
-                                    )
+                                    .andWhere('key', 'in', parentFolderKeys)
                                     .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
-                                const deletedParentFolderNames: string[] = [];
+                                const existingKeysParentFolders = new Set<string>();
+
+                                const notFoundParentFolder: string[] = [];
 
                                 parentFolders.forEach((folder) => {
-                                    if (folder?.innerMeta?.oldDisplayKey) {
-                                        deletedParentFolderNames.push(
-                                            folder.innerMeta.oldDisplayKey,
-                                        );
+                                    existingKeysParentFolders.add(folder.key);
+                                });
+
+                                parentFolderKeys.forEach((key) => {
+                                    if (!existingKeysParentFolders.has(key)) {
+                                        notFoundParentFolder.push(key);
                                     }
                                 });
 
-                                if (deletedParentFolderNames.length) {
+                                if (notFoundParentFolder.length) {
                                     throw new AppError(
-                                        `Before restoring entity, you need to restore these parent folders - '${deletedParentFolderNames.join(
+                                        `Couldn't found these parent folders - '${notFoundParentFolder.join(
                                             ', ',
                                         )}'`,
                                         {
