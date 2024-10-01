@@ -430,7 +430,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                                         [EntryColumn.Scope]: EntryScope.Folder,
                                         [EntryColumn.IsDeleted]: false,
                                     })
-                                    .andWhere('key', 'in', parentFolderKeys)
+                                    .whereIn(EntryColumn.Key, parentFolderKeys)
                                     .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
                                 const existingKeysParentFolders = new Set<string>();
