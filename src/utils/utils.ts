@@ -72,6 +72,32 @@ export class Utils {
         return parentFolderKey ? parentFolderKey : '/';
     }
 
+    static getFullParentFolderKeys(keyFormatted = '') {
+        let parentFolderKey = keyFormatted;
+
+        const parentFolderKeys = [];
+
+        while (parentFolderKey.length) {
+            const newParentFolderKey = Utils.getParentFolderKey({
+                keyFormatted: parentFolderKey,
+            });
+
+            if (newParentFolderKey) {
+                parentFolderKey = newParentFolderKey;
+
+                parentFolderKeys.push(newParentFolderKey);
+
+                if (newParentFolderKey.split('/').length <= 2) {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
+        return parentFolderKeys;
+    }
+
     static isRoot(key: string | undefined) {
         return key === '/';
     }
