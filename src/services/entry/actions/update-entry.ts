@@ -419,39 +419,45 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                             const isFolder = Utils.isFolder({scope: entryObj.scope});
                             const keyFormatted = Utils.formatKey(keyLowerCase, isFolder);
 
-                            const parentFolderKeys = Utils.getFullParentFolderKeys(keyFormatted);
+                            const parentFolderKeys = Utils.getFullParentFolderKeys(
+                                keyFormatted,
+                            ).filter((key) => !Utils.isRoot(key));
 
-                            const promisesParentFolders = parentFolderKeys.map((folderKey) => {
-                                return Entry.query(trx)
+                            if (parentFolderKeys.length) {
+                                const parentFolders = await Entry.query(trx)
                                     .where({
                                         [EntryColumn.TenantId]: entryTenantId,
                                         [EntryColumn.Scope]: EntryScope.Folder,
                                         [EntryColumn.IsDeleted]: true,
                                     })
-                                    .andWhereRaw("inner_meta ->> 'oldKey' = ?", [folderKey])
-                                    .first()
+                                    .andWhereRaw(
+                                        `inner_meta ->> 'oldKey' IN (${parentFolderKeys
+                                            .map(() => '?')
+                                            .join(',')})`,
+                                        parentFolderKeys,
+                                    )
                                     .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
-                            });
 
-                            const parentFolders = await Promise.all(promisesParentFolders);
+                                const deletedParentFolderNames: string[] = [];
 
-                            const deletedParentFolderNames: string[] = [];
+                                parentFolders.forEach((folder) => {
+                                    if (folder?.innerMeta?.oldDisplayKey) {
+                                        deletedParentFolderNames.push(
+                                            folder.innerMeta.oldDisplayKey,
+                                        );
+                                    }
+                                });
 
-                            parentFolders.forEach((folder) => {
-                                if (folder?.innerMeta?.oldDisplayKey) {
-                                    deletedParentFolderNames.push(folder.innerMeta.oldDisplayKey);
+                                if (deletedParentFolderNames.length) {
+                                    throw new AppError(
+                                        `Before restoring entity, you need to restore these parent folders - '${deletedParentFolderNames.join(
+                                            ', ',
+                                        )}'`,
+                                        {
+                                            code: US_ERRORS.PARENT_FOLDER_NOT_EXIST,
+                                        },
+                                    );
                                 }
-                            });
-
-                            if (deletedParentFolderNames.length) {
-                                throw new AppError(
-                                    `Before restoring entity, you need to restore these parent folders - '${deletedParentFolderNames.join(
-                                        ', ',
-                                    )}'`,
-                                    {
-                                        code: US_ERRORS.PARENT_FOLDER_NOT_EXIST,
-                                    },
-                                );
                             }
                         }
 
