@@ -405,6 +405,10 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                     const entryObj: EntryColumns | undefined = entry ? entry.toJSON() : undefined;
 
                     if (entryObj) {
+                        if (entryObj.workbookId) {
+                            await getWorkbook({ctx}, {workbookId: entryObj.workbookId});
+                        }
+
                         if (entryObj.scope === 'folder') {
                             const entryObjKey = entryObj.key;
                             const entryTenantId = entryObj.tenantId;
