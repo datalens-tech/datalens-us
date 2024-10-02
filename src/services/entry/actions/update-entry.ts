@@ -414,7 +414,9 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                         >;
                         const newKey = entryObjInnerMeta.oldKey;
 
-                        if (!entryObj.workbookId) {
+                        if (entryObj.workbookId) {
+                            await getWorkbook({ctx}, {workbookId: entryObj.workbookId});
+                        } else {
                             const keyLowerCase = newKey.toLowerCase();
                             const isFolder = Utils.isFolder({scope: entryObj.scope});
                             const keyFormatted = Utils.formatKey(keyLowerCase, isFolder);

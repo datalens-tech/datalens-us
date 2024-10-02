@@ -291,6 +291,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 404,
                 response: {
+                    code,
                     message: "The workbook doesn't exist",
                 },
             };
