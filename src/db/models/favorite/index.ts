@@ -125,10 +125,6 @@ class Favorite extends Model {
             .modify((builder) => {
                 if (orderBy) {
                     switch (orderBy.field) {
-                        case 'updatedAt':
-                            builder.orderBy('entries.updatedAt', orderBy.direction);
-                            builder.orderBy('entries.entryId');
-                            break;
                         case 'createdAt':
                             builder.orderBy('entries.createdAt', orderBy.direction);
                             builder.orderBy('entries.entryId');

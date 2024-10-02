@@ -27,6 +27,8 @@ import {WorkbookPermission} from '../../../entities/workbook';
 import {Optional} from 'utility-types';
 import {checkEntry} from './check-entry';
 import {registry} from '../../../registry';
+import {EntryScope} from '../../../db/models/new/entry/types';
+import {EntryColumn} from '../../../db/models/new/entry';
 
 type Mode = 'save' | 'publish' | 'recover';
 const ModeValues: Mode[] = ['save', 'publish', 'recover'];
@@ -405,13 +407,63 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                     const entryObj: EntryColumns | undefined = entry ? entry.toJSON() : undefined;
 
                     if (entryObj) {
+                        const entryTenantId = entryObj.tenantId;
+
+                        const entryObjInnerMeta = entryObj.innerMeta as NonNullable<
+                            EntryColumns['innerMeta']
+                        >;
+                        const newKey = entryObjInnerMeta.oldKey;
+
                         if (entryObj.workbookId) {
                             await getWorkbook({ctx}, {workbookId: entryObj.workbookId});
+                        } else {
+                            const keyLowerCase = newKey.toLowerCase();
+                            const isFolder = Utils.isFolder({scope: entryObj.scope});
+                            const keyFormatted = Utils.formatKey(keyLowerCase, isFolder);
+
+                            const parentFolderKeys = Utils.getFullParentFolderKeys(
+                                keyFormatted,
+                            ).filter((key) => !Utils.isRoot(key));
+
+                            if (parentFolderKeys.length) {
+                                const parentFolders = await Entry.query(trx)
+                                    .where({
+                                        [EntryColumn.TenantId]: entryTenantId,
+                                        [EntryColumn.Scope]: EntryScope.Folder,
+                                        [EntryColumn.IsDeleted]: false,
+                                    })
+                                    .whereIn(EntryColumn.Key, parentFolderKeys)
+                                    .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
+
+                                const existingKeysParentFolders = new Set<string>();
+
+                                const notFoundParentFolders: string[] = [];
+
+                                parentFolders.forEach((folder) => {
+                                    existingKeysParentFolders.add(folder.key);
+                                });
+
+                                parentFolderKeys.forEach((key) => {
+                                    if (!existingKeysParentFolders.has(key)) {
+                                        notFoundParentFolders.push(key);
+                                    }
+                                });
+
+                                if (notFoundParentFolders.length) {
+                                    throw new AppError(
+                                        `Couldn't found these parent folders - '${notFoundParentFolders.join(
+                                            ', ',
+                                        )}'`,
+                                        {
+                                            code: US_ERRORS.PARENT_FOLDER_NOT_EXIST,
+                                        },
+                                    );
+                                }
+                            }
                         }
 
                         if (entryObj.scope === 'folder') {
                             const entryObjKey = entryObj.key;
-                            const entryTenantId = entryObj.tenantId;
 
                             const children = await Entry.query(trx)
                                 .select()
@@ -449,10 +501,6 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                                 }),
                             );
                         } else {
-                            const entryObjInnerMeta = entryObj.innerMeta as NonNullable<
-                                EntryColumns['innerMeta']
-                            >;
-                            const newKey = entryObjInnerMeta.oldKey;
                             const newDisplayKey = entryObjInnerMeta.oldDisplayKey;
                             const newInnerMeta: Optional<typeof entryObjInnerMeta> =
                                 entryObjInnerMeta;
