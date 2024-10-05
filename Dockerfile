@@ -54,6 +54,7 @@ RUN chown -R ${USER} /var/log/supervisor/ && \
 
 # build app
 RUN npm ci -q --no-progress --include=dev --also=dev
+RUN npm install -g typescript
 RUN npm run build
 RUN npm prune --production
 RUN rm -rf /tmp/*
