@@ -1,15 +1,6 @@
 import request from 'supertest';
-import {
-    app,
-    auth,
-    testTenantId,
-    authMasterToken,
-    getCollectionBinding,
-    getWorkbookBinding,
-    AuthArgs,
-    AccessBinding,
-} from './auth';
-import {routes} from './routes';
+import {app, auth, testTenantId, authMasterToken, AuthArgs} from './auth';
+import {routes} from '../../routes';
 import {OpensourceRole} from './roles';
 
 export const mockWorkbookEntry = {
@@ -50,11 +41,6 @@ export const createMockWorkbookEntry = async (
     const response = await auth(request(app).post(routes.entries), {
         ...options?.authArgs,
         role: OpensourceRole.Editor,
-        accessBindings: [
-            getWorkbookBinding(workbookId, 'limitedView'), // TODO: delete limitedView checking
-            getWorkbookBinding(workbookId, 'update'),
-            ...(options?.authArgs?.accessBindings ?? []),
-        ],
     })
         .send({
             name,
@@ -111,14 +97,9 @@ export const createMockCollection = async (
     const description = args.description;
     const parentId = args.parentId ?? mockCollection.parentId;
 
-    const accessBindings: AccessBinding[] = parentId
-        ? [getCollectionBinding(parentId, 'createCollection')]
-        : [];
-
     const response = await auth(request(app).post(routes.collections), {
         ...options?.authArgs,
         role: OpensourceRole.Editor,
-        accessBindings: [...accessBindings, ...(options?.authArgs?.accessBindings ?? [])],
     })
         .send({
             title: title ?? mockCollection.title,
@@ -141,10 +122,6 @@ export const deleteMockCollection = (
     return auth(request(app).delete(`${routes.collections}/${collectionId}`), {
         ...options?.authArgs,
         role: OpensourceRole.Editor,
-        accessBindings: [
-            getCollectionBinding(collectionId, 'delete'),
-            ...(options?.authArgs?.accessBindings ?? []),
-        ],
     }).expect(200);
 };
 
@@ -166,14 +143,9 @@ export const createMockWorkbook = async (
     const description = args.description;
     const collectionId = args.collectionId ?? mockWorkbook.collectionId;
 
-    const accessBindings: AccessBinding[] = collectionId
-        ? [getCollectionBinding(collectionId, 'createWorkbook')]
-        : [];
-
     const response = await auth(request(app).post(routes.workbooks), {
         ...options?.authArgs,
         role: OpensourceRole.Editor,
-        accessBindings: [...accessBindings, ...(options?.authArgs?.accessBindings ?? [])],
     })
         .send({
             title,
@@ -195,10 +167,6 @@ export const getMockWorkbook = async (
 ) => {
     const response = await auth(request(app).get(`${routes.workbooks}/${workbookId}`), {
         ...options?.authArgs,
-        accessBindings: [
-            getWorkbookBinding(workbookId, 'limitedView'),
-            ...(options?.authArgs?.accessBindings ?? []),
-        ],
     }).expect(200);
 
     return response.body;
@@ -215,9 +183,5 @@ export const deleteMockWorkbook = (
     return auth(request(app).delete(`${routes.workbooks}/${workbookId}`), {
         ...options?.authArgs,
         role: OpensourceRole.Editor,
-        accessBindings: [
-            getWorkbookBinding(workbookId, 'delete'),
-            ...(options?.authArgs?.accessBindings ?? []),
-        ],
     }).expect(200);
 };

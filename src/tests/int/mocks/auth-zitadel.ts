@@ -1,10 +1,11 @@
 import type {Request, Response, NextFunction} from '@gravity-ui/expresskit';
-import type {AuthArgs} from '../auth';
+import type {AuthArgs as OpensourceAuth} from '../env/opensource/auth';
+import type {AuthArgs as PlatformAuth} from '../env/platform/auth';
 
 jest.mock('../../../components/middlewares/auth-zitadel', () => {
     const originalModule = jest.requireActual('../../../components/middlewares/auth-zitadel');
 
-    const getUserFromToken = (token: string): AuthArgs => {
+    const getUserFromToken = (token: string): OpensourceAuth | PlatformAuth => {
         return JSON.parse(token);
     };
 

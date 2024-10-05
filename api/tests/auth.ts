@@ -1,1 +1,1 @@
-export * from '../../src/tests/int/auth';
+export * from '../../src/tests/int/env/platform/auth';
