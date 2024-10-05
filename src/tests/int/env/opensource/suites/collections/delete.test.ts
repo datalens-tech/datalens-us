@@ -94,6 +94,9 @@ describe('Deleting empty root collection', () => {
     test('Successful delete collection', async () => {
         const response = await auth(
             request(app).delete(`${routes.collections}/${emptyRootCollection.collectionId}`),
+            {
+                role: OpensourceRole.Editor,
+            },
         ).expect(200);
 
         expect(response.body).toStrictEqual({

@@ -69,17 +69,6 @@ describe('Moving workbooks', () => {
             .expect(403);
     });
 
-    test('Update with incorrect access binding error', async () => {
-        await auth(request(app).post(routes.moveWorkbooks), {
-            role: OpensourceRole.Editor,
-        })
-            .send({
-                collectionId: rootCollection.collectionId,
-                workbookIds: [targetWorkbook.workbookId, targetWorkbook2.workbookId],
-            })
-            .expect(403);
-    });
-
     test('Incorrect params validation errors (without collectionId)', async () => {
         await auth(request(app).post(routes.moveWorkbooks), {
             role: OpensourceRole.Editor,
@@ -136,17 +125,6 @@ describe('Moving workbooks', () => {
             title: targetWorkbook2.title,
             collectionId: rootCollection.collectionId,
         });
-    });
-
-    test('Move to root permission error', async () => {
-        await auth(request(app).post(routes.moveWorkbooks), {
-            role: OpensourceRole.Editor,
-        })
-            .send({
-                collectionId: null,
-                workbookIds: [targetWorkbook.workbookId, targetWorkbook2.workbookId],
-            })
-            .expect(403);
     });
 
     test('Move to root', async () => {

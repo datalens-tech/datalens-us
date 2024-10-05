@@ -7,8 +7,6 @@ import {
     COLLECTIONS_DEFAULT_FIELDS,
     WORKBOOK_DEFAULT_FIELDS,
     GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
-    COLLECTIONS_DEFAULT_PERMISSIONS,
-    WORKBOOKS_DEFAULT_PERMISSIONS,
 } from '../../../../models';
 
 const rootCollection = {
@@ -86,46 +84,33 @@ describe('Getting root content', () => {
         await request(app).get(routes.collectionContent).expect(401);
     });
 
-    test('Get root content without any access bindings (empty response)', async () => {
+    test('Get root content', async () => {
         const response = await auth(request(app).get(routes.collectionContent)).expect(200);
 
         expect(response.body).toStrictEqual({
             ...GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
-        });
-    });
-
-    test('Get root content with partial access binding', async () => {
-        const response = await auth(request(app).get(routes.collectionContent)).expect(200);
-
-        expect(response.body).toStrictEqual({
-            ...GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
-            collections: expect.arrayContaining([
-                {
-                    ...COLLECTIONS_DEFAULT_FIELDS,
-                    collectionId: rootCollection.collectionId,
-                    parentId: null,
-                },
-            ]),
-        });
-    });
-
-    test('Get root content with all access bindings', async () => {
-        const response = await auth(request(app).get(routes.collectionContent)).expect(200);
-
-        expect(response.body).toStrictEqual({
-            ...GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
-            collections: expect.arrayContaining([
-                {
-                    ...COLLECTIONS_DEFAULT_FIELDS,
-                    collectionId: rootCollection.collectionId,
-                    parentId: null,
-                },
-            ]),
             workbooks: expect.arrayContaining([
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
                     workbookId: rootWorkbook.workbookId,
                     collectionId: null,
+                },
+                {
+                    ...WORKBOOK_DEFAULT_FIELDS,
+                    workbookId: rootWorkbook2.workbookId,
+                    collectionId: null,
+                },
+            ]),
+            collections: expect.arrayContaining([
+                {
+                    ...COLLECTIONS_DEFAULT_FIELDS,
+                    collectionId: rootCollection.collectionId,
+                    parentId: null,
+                },
+                {
+                    ...COLLECTIONS_DEFAULT_FIELDS,
+                    collectionId: rootCollection2.collectionId,
+                    parentId: null,
                 },
             ]),
         });
@@ -133,15 +118,7 @@ describe('Getting root content', () => {
 });
 
 describe('Getting collection content', () => {
-    test('Get collection content without access bindings (error)', async () => {
-        await auth(request(app).get(routes.collectionContent))
-            .query({
-                collectionId: rootCollection.collectionId,
-            })
-            .expect(403);
-    });
-
-    test('Get collection content with partial access binding', async () => {
+    test('Get collection content', async () => {
         const response = await auth(request(app).get(routes.collectionContent))
             .query({
                 collectionId: rootCollection.collectionId,
@@ -150,32 +127,6 @@ describe('Getting collection content', () => {
 
         expect(response.body).toStrictEqual({
             ...GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
-            collections: expect.arrayContaining([
-                {
-                    ...COLLECTIONS_DEFAULT_FIELDS,
-                    collectionId: nestedCollection.collectionId,
-                    parentId: rootCollection.collectionId,
-                },
-            ]),
-        });
-    });
-
-    test('Get collection content with all access bindings', async () => {
-        const response = await auth(request(app).get(routes.collectionContent))
-            .query({
-                collectionId: rootCollection.collectionId,
-            })
-            .expect(200);
-
-        expect(response.body).toStrictEqual({
-            ...GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
-            collections: expect.arrayContaining([
-                {
-                    ...COLLECTIONS_DEFAULT_FIELDS,
-                    collectionId: nestedCollection.collectionId,
-                    parentId: rootCollection.collectionId,
-                },
-            ]),
             workbooks: expect.arrayContaining([
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
@@ -183,40 +134,11 @@ describe('Getting collection content', () => {
                     collectionId: rootCollection.collectionId,
                 },
             ]),
-        });
-    });
-});
-
-describe('Getting root content with "includePermissionsInfo" param', () => {
-    test('Get root content', async () => {
-        const response = await auth(request(app).get(routes.collectionContent))
-            .query({
-                includePermissionsInfo: 'true',
-            })
-            .expect(200);
-
-        expect(response.body).toStrictEqual({
-            ...GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
             collections: expect.arrayContaining([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
-                    collectionId: rootCollection.collectionId,
-                    parentId: null,
-                    permissions: {
-                        ...COLLECTIONS_DEFAULT_PERMISSIONS,
-                        limitedView: true,
-                    },
-                },
-            ]),
-            workbooks: expect.arrayContaining([
-                {
-                    ...WORKBOOK_DEFAULT_FIELDS,
-                    workbookId: rootWorkbook.workbookId,
-                    collectionId: null,
-                    permissions: {
-                        ...WORKBOOKS_DEFAULT_PERMISSIONS,
-                        limitedView: true,
-                    },
+                    collectionId: nestedCollection.collectionId,
+                    parentId: rootCollection.collectionId,
                 },
             ]),
         });

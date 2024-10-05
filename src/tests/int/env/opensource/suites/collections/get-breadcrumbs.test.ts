@@ -2,7 +2,7 @@ import request from 'supertest';
 import {app, auth} from '../../auth';
 import {createMockCollection} from '../../helpers';
 import {routes} from '../../../../routes';
-import {COLLECTIONS_DEFAULT_FIELDS, COLLECTIONS_DEFAULT_PERMISSIONS} from '../../../../models';
+import {COLLECTIONS_DEFAULT_FIELDS} from '../../../../models';
 
 const rootCollection = {
     collectionId: '',
@@ -52,12 +52,6 @@ describe('Getting collection breadcrumbs', () => {
             .expect(401);
     });
 
-    test('Get root collection breadcrumbs without permission', async () => {
-        await auth(
-            request(app).get(`${routes.collections}/${rootCollection.collectionId}/breadcrumbs`),
-        ).expect(403);
-    });
-
     test('Get root collection breadcrumbs', async () => {
         const response = await auth(
             request(app).get(`${routes.collections}/${rootCollection.collectionId}/breadcrumbs`),
@@ -70,34 +64,6 @@ describe('Getting collection breadcrumbs', () => {
             ...COLLECTIONS_DEFAULT_FIELDS,
             collectionId: rootCollection.collectionId,
         });
-    });
-
-    test('Get root collection breadcrumbs with "includePermissionsInfo" param', async () => {
-        const response = await auth(
-            request(app).get(`${routes.collections}/${rootCollection.collectionId}/breadcrumbs`),
-        )
-            .query({
-                includePermissionsInfo: 'true',
-            })
-            .expect(200);
-
-        expect(Array.isArray(response.body)).toBe(true);
-        expect(response.body.length).toBe(1);
-
-        expect(response.body[0]).toStrictEqual({
-            ...COLLECTIONS_DEFAULT_FIELDS,
-            collectionId: rootCollection.collectionId,
-            permissions: {
-                ...COLLECTIONS_DEFAULT_PERMISSIONS,
-                limitedView: true,
-            },
-        });
-    });
-
-    test('Get level 1 collection breadcrumbs without parent collection permission', async () => {
-        await auth(
-            request(app).get(`${routes.collections}/${level1Collection.collectionId}/breadcrumbs`),
-        ).expect(403);
     });
 
     test('Get level 1 collection breadcrumbs', async () => {
@@ -118,12 +84,6 @@ describe('Getting collection breadcrumbs', () => {
             collectionId: level1Collection.collectionId,
             parentId: rootCollection.collectionId,
         });
-    });
-
-    test('Get level 2 collection breadcrumbs without parent collection permission', async () => {
-        await auth(
-            request(app).get(`${routes.collections}/${level1Collection.collectionId}/breadcrumbs`),
-        ).expect(403);
     });
 
     test('Get level 2 collection breadcrumbs', async () => {

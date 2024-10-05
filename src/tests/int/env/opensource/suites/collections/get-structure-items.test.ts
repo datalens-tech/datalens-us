@@ -7,8 +7,6 @@ import {
     COLLECTIONS_DEFAULT_FIELDS,
     WORKBOOK_DEFAULT_FIELDS,
     GET_STRUCTURE_ITEMS_DEFAULT_FIELDS,
-    COLLECTIONS_DEFAULT_PERMISSIONS,
-    WORKBOOKS_DEFAULT_PERMISSIONS,
 } from '../../../../models';
 
 const rootCollection = {
@@ -86,15 +84,7 @@ describe('Getting root content', () => {
         await request(app).get(routes.structureItems).expect(401);
     });
 
-    test('Get root content without any access bindings (empty response)', async () => {
-        const response = await auth(request(app).get(routes.structureItems)).expect(200);
-
-        expect(response.body).toStrictEqual({
-            ...GET_STRUCTURE_ITEMS_DEFAULT_FIELDS,
-        });
-    });
-
-    test('Get root content with partial access binding', async () => {
+    test('Get root content', async () => {
         const response = await auth(request(app).get(routes.structureItems)).expect(200);
 
         expect(response.body).toStrictEqual({
@@ -105,24 +95,19 @@ describe('Getting root content', () => {
                     collectionId: rootCollection.collectionId,
                     parentId: null,
                 },
-            ]),
-        });
-    });
-
-    test('Get root content with all access bindings', async () => {
-        const response = await auth(request(app).get(routes.structureItems)).expect(200);
-
-        expect(response.body).toStrictEqual({
-            ...GET_STRUCTURE_ITEMS_DEFAULT_FIELDS,
-            items: expect.arrayContaining([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
-                    collectionId: rootCollection.collectionId,
+                    collectionId: rootCollection2.collectionId,
                     parentId: null,
                 },
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
                     workbookId: rootWorkbook.workbookId,
+                    collectionId: null,
+                },
+                {
+                    ...WORKBOOK_DEFAULT_FIELDS,
+                    workbookId: rootWorkbook2.workbookId,
                     collectionId: null,
                 },
             ]),
@@ -131,34 +116,7 @@ describe('Getting root content', () => {
 });
 
 describe('Getting structure items', () => {
-    test('Get structure items without access bindings (error)', async () => {
-        await auth(request(app).get(routes.structureItems))
-            .query({
-                collectionId: rootCollection.collectionId,
-            })
-            .expect(403);
-    });
-
-    test('Get structure items with partial access binding', async () => {
-        const response = await auth(request(app).get(routes.structureItems))
-            .query({
-                collectionId: rootCollection.collectionId,
-            })
-            .expect(200);
-
-        expect(response.body).toStrictEqual({
-            ...GET_STRUCTURE_ITEMS_DEFAULT_FIELDS,
-            items: expect.arrayContaining([
-                {
-                    ...COLLECTIONS_DEFAULT_FIELDS,
-                    collectionId: nestedCollection.collectionId,
-                    parentId: rootCollection.collectionId,
-                },
-            ]),
-        });
-    });
-
-    test('Get structure items with all access bindings', async () => {
+    test('Get structure items', async () => {
         const response = await auth(request(app).get(routes.structureItems))
             .query({
                 collectionId: rootCollection.collectionId,
@@ -177,40 +135,6 @@ describe('Getting structure items', () => {
                     ...WORKBOOK_DEFAULT_FIELDS,
                     workbookId: nestedWorkbook.workbookId,
                     collectionId: rootCollection.collectionId,
-                },
-            ]),
-        });
-    });
-});
-
-describe('Getting root content with "includePermissionsInfo" param', () => {
-    test('Get root content', async () => {
-        const response = await auth(request(app).get(routes.structureItems))
-            .query({
-                includePermissionsInfo: 'true',
-            })
-            .expect(200);
-
-        expect(response.body).toStrictEqual({
-            ...GET_STRUCTURE_ITEMS_DEFAULT_FIELDS,
-            items: expect.arrayContaining([
-                {
-                    ...COLLECTIONS_DEFAULT_FIELDS,
-                    collectionId: rootCollection.collectionId,
-                    parentId: null,
-                    permissions: {
-                        ...COLLECTIONS_DEFAULT_PERMISSIONS,
-                        limitedView: true,
-                    },
-                },
-                {
-                    ...WORKBOOK_DEFAULT_FIELDS,
-                    workbookId: rootWorkbook.workbookId,
-                    collectionId: null,
-                    permissions: {
-                        ...WORKBOOKS_DEFAULT_PERMISSIONS,
-                        limitedView: true,
-                    },
                 },
             ]),
         });

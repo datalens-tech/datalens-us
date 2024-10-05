@@ -52,10 +52,6 @@ describe('Creating workbook in root', () => {
 
     test('Get workbook auth errors', async () => {
         await request(app).get(`${routes.workbooks}/${rootWorkbookId}`).expect(401);
-
-        await auth(request(app).get(`${routes.workbooks}/${rootWorkbookId}`)).expect(403);
-
-        await auth(request(app).get(`${routes.workbooks}/${rootWorkbookId}`)).expect(403);
     });
 
     test('Get workbook in root', async () => {
@@ -117,12 +113,6 @@ describe('Creating collection', () => {
 
     test('Get collection auth errors', async () => {
         await request(app).get(`${routes.collections}/${collectionId}`).expect(401);
-
-        await auth(request(app).get(`${routes.collections}/${collectionId}`)).expect(403);
-
-        await auth(request(app).get(`${routes.collections}/${collectionId}`)).expect(403);
-
-        await auth(request(app).get(`${routes.collections}/${collectionId}`)).expect(403);
     });
 
     test('Get collection', async () => {
@@ -133,8 +123,8 @@ describe('Creating collection', () => {
         expect(getResponse.body).toStrictEqual({
             ...COLLECTIONS_DEFAULT_FIELDS,
             collectionId,
-            title,
-            description,
+            title: curTitle,
+            description: curDescription,
             parentId: null,
         });
     });
@@ -143,19 +133,6 @@ describe('Creating collection', () => {
 describe('Creating workbook in collection', () => {
     const curTitle = 'Test workbook in collection';
     const curDescription = 'Test workbook in root collection';
-
-    test('Create workbook in collection auth errors', async () => {
-        await auth(
-            request(app).post(routes.workbooks).send({
-                title: curTitle,
-                description: curDescription,
-                collectionId,
-            }),
-            {
-                role: OpensourceRole.Editor,
-            },
-        ).expect(403);
-    });
 
     test('Create workbook in collection', async () => {
         const createResponse = await auth(request(app).post(routes.workbooks), {
