@@ -9,3 +9,4 @@ export {
     WorkbookRole,
     Permissions as WorkbookPermissions,
 } from '../src/entities/workbook';
+export {getMockedOperation} from '../src/entities/utils';

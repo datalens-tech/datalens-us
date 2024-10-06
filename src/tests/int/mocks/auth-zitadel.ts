@@ -5,10 +5,6 @@ import type {AuthArgs as PlatformAuth} from '../env/platform/auth';
 jest.mock('../../../components/middlewares/auth-zitadel', () => {
     const originalModule = jest.requireActual('../../../components/middlewares/auth-zitadel');
 
-    const getUserFromToken = (token: string): OpensourceAuth | PlatformAuth => {
-        return JSON.parse(token);
-    };
-
     return {
         ...originalModule,
 
@@ -22,8 +18,9 @@ jest.mock('../../../components/middlewares/auth-zitadel', () => {
                     throw new Error('Empty token');
                 }
 
-                const user = getUserFromToken(token);
+                const user = JSON.parse(token) as OpensourceAuth | PlatformAuth;
 
+                res.locals.userToken = token;
                 res.locals.userId = user.userId;
                 res.locals.login = user.login;
                 res.locals.zitadelUserRole = user.role;

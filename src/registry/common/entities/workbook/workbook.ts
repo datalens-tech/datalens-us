@@ -5,7 +5,7 @@ import {WorkbookConstructor, WorkbookInstance} from './types';
 import {Permissions, WorkbookPermission} from '../../../../entities/workbook/types';
 import {US_ERRORS} from '../../../../const';
 import {ZitadelUserRole} from '../../../../types/zitadel';
-import {getMockedOperation} from '../utils';
+import {getMockedOperation} from '../../../../entities/utils';
 import Utils from '../../../../utils';
 
 export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
