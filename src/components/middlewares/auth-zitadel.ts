@@ -23,6 +23,7 @@ export const authZitadel = async (req: Request, res: Response, next: NextFunctio
             r2.active &&
             (r2.username === ZitadelServiceUser.charts || r2.username === ZitadelServiceUser.bi)
         ) {
+            res.locals.userToken = authToken;
             res.locals.userId = r1.userId;
             res.locals.login = r1.username;
             res.locals.serviceUser = r2.username;
