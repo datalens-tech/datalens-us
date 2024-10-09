@@ -31,6 +31,7 @@ import {
     formatGetEntryMetaPrivateResponse,
     formatEntryModel,
 } from '../services/new/entry/formatters';
+import {EntryScope} from '../db/models/new/entry/types';
 
 export default {
     getEntry: async (req: Request, res: Response) => {
@@ -243,6 +244,9 @@ export default {
                 entryId: params.entryId,
                 direction: query.direction as Optional<RelationDirection>,
                 includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
+                page: (query.page && Number(query.page)) as number | undefined,
+                pageSize: (query.pageSize && Number(query.pageSize)) as number | undefined,
+                scope: query.scope as EntryScope | undefined,
             },
         );
 
