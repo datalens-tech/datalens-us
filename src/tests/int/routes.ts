@@ -15,4 +15,5 @@ export const routes = {
     structureItems: '/v1/structure-items',
     rootCollectionPermissions: '/v1/root-collection-permissions',
     workbooks: '/v2/workbooks',
+    privateWorkbooks: '/private/v2/workbooks',
 };

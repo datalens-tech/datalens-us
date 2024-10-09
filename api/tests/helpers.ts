@@ -1,1 +1,1 @@
-export * from '../../src/tests/int/helpers';
+export * from '../../src/tests/int/env/platform/helpers';

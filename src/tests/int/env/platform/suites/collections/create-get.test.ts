@@ -1,8 +1,8 @@
 import request from 'supertest';
-import {routes} from '../../routes';
-import {OpensourceRole} from '../../roles';
 import {app, auth, getCollectionBinding} from '../../auth';
-import {OPERATION_DEFAULT_FIELDS, COLLECTIONS_DEFAULT_FIELDS} from '../../models';
+import {PlatformRole} from '../../roles';
+import {routes} from '../../../../routes';
+import {OPERATION_DEFAULT_FIELDS, COLLECTIONS_DEFAULT_FIELDS} from '../../../../models';
 
 const unexistedCollectionId = 'unexisted-collection-id';
 
@@ -30,13 +30,13 @@ describe('Creating collection in root', () => {
 
     test('Create without args validation error', async () => {
         await auth(request(app).post(routes.collections), {
-            role: OpensourceRole.Editor,
+            role: PlatformRole.Creator,
         }).expect(400);
     });
 
     test('Create with incorrect args validation error', async () => {
         await auth(request(app).post(routes.collections), {
-            role: OpensourceRole.Editor,
+            role: PlatformRole.Creator,
         })
             .send({
                 parentId: null,
@@ -46,7 +46,7 @@ describe('Creating collection in root', () => {
 
     test('Successful create in root', async () => {
         const response = await auth(request(app).post(routes.collections), {
-            role: OpensourceRole.Editor,
+            role: PlatformRole.Creator,
         })
             .send({
                 title: rootTitle,
@@ -68,7 +68,7 @@ describe('Creating collection in root', () => {
 
     test('Create with same title error', async () => {
         await auth(request(app).post(routes.collections), {
-            role: OpensourceRole.Editor,
+            role: PlatformRole.Creator,
         })
             .send({
                 title: rootTitle,
@@ -114,7 +114,7 @@ describe('Creating nested collection', () => {
 
     test('Create in unexisted collection validation error', async () => {
         await auth(request(app).post(routes.collections), {
-            role: OpensourceRole.Editor,
+            role: PlatformRole.Creator,
             accessBindings: [getCollectionBinding(rootCollectionId, 'createCollection')],
         })
             .send({
@@ -126,7 +126,7 @@ describe('Creating nested collection', () => {
 
     test('Successful create nested collection', async () => {
         const response = await auth(request(app).post(routes.collections), {
-            role: OpensourceRole.Editor,
+            role: PlatformRole.Creator,
             accessBindings: [getCollectionBinding(rootCollectionId, 'createCollection')],
         })
             .send({
@@ -149,7 +149,7 @@ describe('Creating nested collection', () => {
 
     test('Create collection with same title error', async () => {
         await auth(request(app).post(routes.collections), {
-            role: OpensourceRole.Editor,
+            role: PlatformRole.Creator,
             accessBindings: [getCollectionBinding(rootCollectionId, 'createCollection')],
         })
             .send({
@@ -162,6 +162,10 @@ describe('Creating nested collection', () => {
 });
 
 describe('Getting nested collection', () => {
+    test('Auth error', async () => {
+        await request(app).get(`${routes.collections}/${nestedCollectionId}`).expect(401);
+    });
+
     test('Successful get', async () => {
         const response = await auth(
             request(app).get(`${routes.collections}/${nestedCollectionId}`),

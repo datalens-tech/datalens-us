@@ -10,6 +10,7 @@ export type CtxInfo = {
     requestId: string;
     tenantId: string;
     workbookId?: string;
+    userToken?: string;
     user: UserCtxInfo;
     isPrivateRoute: boolean;
     dlContext: string;
