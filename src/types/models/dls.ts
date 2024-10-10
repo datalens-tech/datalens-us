@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
-import {EntryScope} from './entry';
 import {UsPermission} from './permission';
 
 export enum DlsActions {
@@ -23,21 +22,17 @@ export interface DlsPermission {
 export type DlsPermissionsMode = 'explicit' | 'parent_and_owner' | 'owner_only';
 export interface CreationDlsEntityConfig {
     entryId: string;
-    scope: EntryScope;
+    scope: string;
     permissionsMode?: DlsPermissionsMode;
     initialPermissions?: any;
     initialParentId?: string;
     parentFolderKey?: string;
-    parentFolder?: any;
+    parentFolderId?: string;
 }
 export interface CheckPermissionDlsConfig {
     entryId: string;
     action: string;
-    bypassEmitErrorEnabled?: boolean;
     includePermissionsInfo?: boolean;
-}
-export interface GetPermissionDlsConfig {
-    entryId: string;
 }
 
 export interface DlsPermissionSubject {
@@ -53,14 +48,14 @@ interface DlsModifyPermissionSubject extends DlsPermissionSubject {
 }
 
 export type DlsPermissionDiff = {
-    [permission in DlsPermissions]?: DlsPermissionSubject[];
+    [permission in `${DlsPermissions}`]?: DlsPermissionSubject[];
 };
 
 export type DlsModifyPermissionDiff = {
-    [permission in DlsPermissions]?: DlsModifyPermissionSubject[];
+    [permission in `${DlsPermissions}`]?: DlsModifyPermissionSubject[];
 };
 
-interface DlsModifyBody {
+export interface DlsModifyBody {
     diff: {
         added?: DlsPermissionDiff;
         removed?: DlsPermissionDiff;
@@ -68,21 +63,8 @@ interface DlsModifyBody {
     };
 }
 export interface ModifyPermissionDlsConfig {
-    entryId?: any;
+    entryId: string;
     body: DlsModifyBody;
-}
-export interface BatchPermissionDlsConfig {
-    body: {
-        nodes: {
-            node: string;
-            body: DlsModifyBody;
-        }[];
-    };
-}
-export interface GetSuggestDlsConfig {
-    searchText?: string;
-    limit?: string;
-    lang?: string;
 }
 export interface DlsEntity {
     entryId?: string;
@@ -91,6 +73,6 @@ export interface DlsEntity {
 }
 export interface CheckBulkPermissionsDlsConfig {
     entities?: DlsEntity[];
-    action: DlsActions;
+    action: string;
     includePermissionsInfo?: boolean;
 }

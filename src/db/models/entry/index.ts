@@ -377,9 +377,7 @@ class Entry extends Model {
                                         initialParentId,
                                         scope: 'folder',
                                         parentFolderKey: existedParentFolderKey,
-                                        parentFolder: {
-                                            entryId: folderKeysMap[existedParentFolderKey],
-                                        },
+                                        parentFolderId: folderKeysMap[existedParentFolderKey],
                                     },
                                 );
                             }
@@ -484,9 +482,7 @@ class Entry extends Model {
                         initialPermissions,
                         initialParentId,
                         parentFolderKey,
-                        parentFolder: {
-                            entryId: parentFolderKey === '/' ? {} : parentFolder.entryId,
-                        },
+                        parentFolderId: parentFolderKey === '/' ? undefined : parentFolder.entryId,
                     },
                 );
             }
