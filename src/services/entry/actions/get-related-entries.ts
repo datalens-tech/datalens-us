@@ -8,6 +8,7 @@ import {
 } from '../../../const';
 import {getReplica} from '../../new/utils';
 import {EntryScope} from '../../../db/models/new/entry/types';
+import {EntryColumn} from '../../../db/models/new/entry';
 
 export enum RelationDirection {
     Parent = 'parent',
@@ -18,6 +19,9 @@ type GetRelatedEntriesData = {
     entryIds: string[];
     direction?: RelationDirection;
     extendedTimeout?: boolean;
+    scope?: EntryScope;
+    page?: number;
+    pageSize?: number;
 };
 
 type GetRelatedEntriesResult = {
@@ -38,10 +42,13 @@ export async function getRelatedEntries(
     {
         entryIds,
         direction = RelationDirection.Parent,
+        scope,
+        page = 0,
+        pageSize = 100,
         extendedTimeout = false,
     }: GetRelatedEntriesData,
 ) {
-    ctx.log('GET_RELATED_ENTRIES_RUN');
+    ctx.log('GET_RELATED_ENTRIES_RUN', {scope, page, pageSize});
 
     const endToStart = direction === RelationDirection.Parent;
 
@@ -82,7 +89,14 @@ export async function getRelatedEntries(
                 .join('revisions', 'entries.savedId', 'revisions.revId')
                 .as('re');
         })
+        .where((builder) => {
+            if (scope) {
+                builder.where({[EntryColumn.Scope]: scope});
+            }
+        })
         .orderBy('depth')
+        .limit(pageSize)
+        .offset(pageSize * page)
         .timeout(
             extendedTimeout ? EXTENDED_QUERY_TIMEOUT : DEFAULT_QUERY_TIMEOUT,
         )) as unknown[] as GetRelatedEntriesResult[];

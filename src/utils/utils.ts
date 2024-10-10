@@ -441,18 +441,6 @@ export class Utils {
         return dsnList;
     }
 
-    /** @deprecated use getOptimisticNextPageToken */
-    static getNextPageToken(page: number, pageSize: number, total: number) {
-        const lastPage = Math.ceil(total / pageSize) - 1;
-        let nextPageToken;
-
-        if (page >= 0 && page < lastPage) {
-            nextPageToken = String(page + 1);
-        }
-
-        return nextPageToken;
-    }
-
     static getOptimisticNextPageToken({
         page,
         pageSize,
