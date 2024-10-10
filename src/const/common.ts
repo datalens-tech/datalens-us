@@ -251,4 +251,5 @@ export const ALLOWED_ENTRIES_SCOPE = [
     EntryScope.Widget,
     EntryScope.Dataset,
     EntryScope.Connection,
+    EntryScope.Report,
 ] as const;
