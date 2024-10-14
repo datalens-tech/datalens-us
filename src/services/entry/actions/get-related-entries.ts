@@ -8,6 +8,7 @@ import {
 } from '../../../const';
 import {getReplica} from '../../new/utils';
 import {EntryScope} from '../../../db/models/new/entry/types';
+import {EntryColumn} from '../../../db/models/new/entry';
 
 export enum RelationDirection {
     Parent = 'parent',
@@ -67,13 +68,8 @@ export async function getRelatedEntries(
                             endToStart ? 'l.fromId' : 'l.toId',
                         )
                         .join('entries', 'entries.entryId', endToStart ? 'l.toId' : 'l.fromId')
-                        .where((builder) => {
-                            builder.where({isDeleted: false});
-                            builder.andWhere('depth', '<', 5);
-                            if (scope) {
-                                builder.andWhere('entries.scope', scope);
-                            }
-                        });
+                        .where('isDeleted', false)
+                        .where('depth', '<', 5);
                 });
         })
         .select()
@@ -95,7 +91,7 @@ export async function getRelatedEntries(
         })
         .where((builder) => {
             if (scope) {
-                builder.andWhere('scope', scope);
+                builder.where({[EntryColumn.Scope]: scope});
             }
         })
         .orderBy('createdAt');
