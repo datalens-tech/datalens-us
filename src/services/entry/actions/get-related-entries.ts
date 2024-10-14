@@ -8,7 +8,6 @@ import {
 } from '../../../const';
 import {getReplica} from '../../new/utils';
 import {EntryScope} from '../../../db/models/new/entry/types';
-import {EntryColumn} from '../../../db/models/new/entry';
 
 export enum RelationDirection {
     Parent = 'parent',
@@ -68,8 +67,13 @@ export async function getRelatedEntries(
                             endToStart ? 'l.fromId' : 'l.toId',
                         )
                         .join('entries', 'entries.entryId', endToStart ? 'l.toId' : 'l.fromId')
-                        .where('isDeleted', false)
-                        .where('depth', '<', 5);
+                        .where((builder) => {
+                            builder.where({isDeleted: false});
+                            builder.andWhere('depth', '<', 5);
+                            if (scope) {
+                                builder.andWhere('entries.scope', scope);
+                            }
+                        });
                 });
         })
         .select()
@@ -91,10 +95,10 @@ export async function getRelatedEntries(
         })
         .where((builder) => {
             if (scope) {
-                builder.where({[EntryColumn.Scope]: scope});
+                builder.andWhere('scope', scope);
             }
         })
-        .orderBy('depth');
+        .orderBy('createdAt');
 
     if (pageSize) {
         relatedEntries.limit(pageSize);
@@ -103,6 +107,8 @@ export async function getRelatedEntries(
             relatedEntries.offset(pageSize * page);
         }
     }
+
+    console.log('knexSql: ', relatedEntries.toKnexQuery().toSQL().toNative());
 
     const result = (await relatedEntries.timeout(
         extendedTimeout ? EXTENDED_QUERY_TIMEOUT : DEFAULT_QUERY_TIMEOUT,
