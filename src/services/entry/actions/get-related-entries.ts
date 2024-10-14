@@ -108,8 +108,6 @@ export async function getRelatedEntries(
         }
     }
 
-    console.log('knexSql: ', relatedEntries.toKnexQuery().toSQL().toNative());
-
     const result = (await relatedEntries.timeout(
         extendedTimeout ? EXTENDED_QUERY_TIMEOUT : DEFAULT_QUERY_TIMEOUT,
     )) as unknown[] as GetRelatedEntriesResult[];
