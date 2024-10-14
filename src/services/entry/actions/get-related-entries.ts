@@ -43,8 +43,8 @@ export async function getRelatedEntries(
         entryIds,
         direction = RelationDirection.Parent,
         scope,
-        page = 0,
-        pageSize = 100,
+        page,
+        pageSize,
         extendedTimeout = false,
     }: GetRelatedEntriesData,
 ) {
@@ -52,7 +52,7 @@ export async function getRelatedEntries(
 
     const endToStart = direction === RelationDirection.Parent;
 
-    const relatedEntries = (await Entry.query(getReplica(trx))
+    const relatedEntries = Entry.query(getReplica(trx))
         .withRecursive('relatedEntries', (qb) => {
             qb.select(['fromId', 'toId', raw('1 depth')])
                 .from('links')
@@ -94,16 +94,23 @@ export async function getRelatedEntries(
                 builder.where({[EntryColumn.Scope]: scope});
             }
         })
-        .orderBy('depth')
-        .limit(pageSize)
-        .offset(pageSize * page)
-        .timeout(
-            extendedTimeout ? EXTENDED_QUERY_TIMEOUT : DEFAULT_QUERY_TIMEOUT,
-        )) as unknown[] as GetRelatedEntriesResult[];
+        .orderBy('depth');
+
+    if (pageSize) {
+        relatedEntries.limit(pageSize);
+
+        if (page) {
+            relatedEntries.offset(pageSize * page);
+        }
+    }
+
+    const result = (await relatedEntries.timeout(
+        extendedTimeout ? EXTENDED_QUERY_TIMEOUT : DEFAULT_QUERY_TIMEOUT,
+    )) as unknown[] as GetRelatedEntriesResult[];
 
     ctx.log('GET_RELATED_ENTRIES_DONE', {
-        amount: relatedEntries && relatedEntries.length,
+        amount: result && result.length,
     });
 
-    return relatedEntries;
+    return result;
 }

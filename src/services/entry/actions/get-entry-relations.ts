@@ -62,8 +62,8 @@ export async function getEntryRelations(
     const {
         entryId,
         scope,
-        page = 0,
-        pageSize = 100,
+        page,
+        pageSize,
         direction = RelationDirection.Parent,
         includePermissionsInfo = false,
     } = args;
@@ -107,11 +107,14 @@ export async function getEntryRelations(
         },
     );
 
-    const nextPageToken = Utils.getOptimisticNextPageToken({
-        page,
-        pageSize,
-        curPage: relations,
-    });
+    const nextPageToken =
+        page && pageSize
+            ? Utils.getOptimisticNextPageToken({
+                  page,
+                  pageSize,
+                  curPage: relations,
+              })
+            : undefined;
 
     relations = relations.filter((item) => item.tenantId === entry.tenantId);
 
@@ -174,8 +177,13 @@ export async function getEntryRelations(
 
     ctx.log('GET_ENTRY_RELATIONS_SUCCESS', {count: relations.length});
 
-    return {
-        relations,
-        nextPageToken,
-    };
+    // TODO: leave a response with pagination only, when there will be pagination support everywhere in the frontend
+    if (pageSize) {
+        return {
+            relations,
+            nextPageToken,
+        };
+    }
+
+    return relations;
 }
