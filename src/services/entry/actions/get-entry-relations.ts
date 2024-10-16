@@ -180,13 +180,8 @@ export async function getEntryRelations(
 
     ctx.log('GET_ENTRY_RELATIONS_SUCCESS', {count: relations.length});
 
-    // TODO: leave a response with pagination only, when there will be pagination support everywhere in the frontend
-    if (isPagination) {
-        return {
-            relations,
-            nextPageToken,
-        };
-    }
-
-    return relations;
+    return {
+        relations,
+        nextPageToken,
+    };
 }

@@ -250,7 +250,13 @@ export default {
             },
         );
 
-        const {code, response} = await prepareResponseAsync({data: result});
+        // TODO: leave a response with pagination only, when there will be pagination support everywhere in the frontend
+        const formattedResponse =
+            typeof query.page !== 'undefined' && typeof query.pageSize !== 'undefined'
+                ? result
+                : result.relations;
+
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
         res.status(code).send(response);
     },
