@@ -3,18 +3,22 @@ import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {DlsActions} from '../../../types/models';
 import {ServiceArgs} from '../../new/types';
 import Utils from '../../../utils';
-import {US_ERRORS} from '../../../const';
+import {ALLOWED_ENTRIES_SCOPE, US_ERRORS} from '../../../const';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {getEntryPermissionsByWorkbook} from '../../new/workbook/utils';
 import {getRelatedEntries, RelationDirection} from './get-related-entries';
 import {registry} from '../../../registry';
 import {getReplica} from '../../new/utils';
+import {EntryScope} from '../../../db/models/new/entry/types';
 
 export type GetEntryRelationsArgs = {
     entryId: string;
     direction?: RelationDirection;
     includePermissionsInfo?: boolean;
+    scope?: EntryScope;
+    page?: number;
+    pageSize?: number;
 };
 
 const validateArgs = makeSchemaValidator({
@@ -31,6 +35,19 @@ const validateArgs = makeSchemaValidator({
         includePermissionsInfo: {
             type: 'boolean',
         },
+        scope: {
+            type: 'string',
+            enum: ALLOWED_ENTRIES_SCOPE,
+        },
+        page: {
+            type: 'number',
+            minimum: 0,
+        },
+        pageSize: {
+            type: 'number',
+            minimum: 1,
+            maximum: 200,
+        },
     },
 });
 
@@ -42,11 +59,21 @@ export async function getEntryRelations(
 
     const {tenantId, isPrivateRoute} = ctx.get('info');
 
-    const {entryId, direction = RelationDirection.Parent, includePermissionsInfo = false} = args;
+    const {
+        entryId,
+        scope,
+        page,
+        pageSize,
+        direction = RelationDirection.Parent,
+        includePermissionsInfo = false,
+    } = args;
 
     ctx.log('GET_ENTRY_RELATIONS_REQUEST', {
         entryId: Utils.encodeId(entryId),
         direction,
+        scope,
+        page,
+        pageSize,
         includePermissionsInfo,
     });
 
@@ -74,8 +101,23 @@ export async function getEntryRelations(
         {
             entryIds: [entryId],
             direction,
+            scope,
+            page,
+            pageSize,
         },
     );
+
+    const isPagination = typeof page !== 'undefined' && typeof pageSize !== 'undefined';
+
+    let nextPageToken;
+
+    if (isPagination) {
+        nextPageToken = Utils.getOptimisticNextPageToken({
+            page: page,
+            pageSize: pageSize,
+            curPage: relations,
+        });
+    }
 
     relations = relations.filter((item) => item.tenantId === entry.tenantId);
 
@@ -138,5 +180,8 @@ export async function getEntryRelations(
 
     ctx.log('GET_ENTRY_RELATIONS_SUCCESS', {count: relations.length});
 
-    return relations;
+    return {
+        relations,
+        nextPageToken,
+    };
 }

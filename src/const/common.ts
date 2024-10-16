@@ -1,3 +1,4 @@
+import {EntryScope} from '../db/models/new/entry/types';
 import {Mode} from '../types/models';
 
 export const TRUE_FLAGS = ['1', 'true', true];
@@ -244,3 +245,11 @@ export const INTER_TENANT_GET_ENTRIES_SCHEMA = {
 };
 
 export const ModeValues: Mode[] = ['save', 'publish'];
+
+export const ALLOWED_ENTRIES_SCOPE = [
+    EntryScope.Dash,
+    EntryScope.Widget,
+    EntryScope.Dataset,
+    EntryScope.Connection,
+    EntryScope.Report,
+] as const;

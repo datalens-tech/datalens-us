@@ -58,6 +58,10 @@ export async function prepareResponseAsync({data}: {data: any}): Promise<ST.Serv
         response.entry = await Utils.macrotasksEncodeData(response.entry);
     }
 
+    if (response.relations) {
+        response.relations = await Utils.macrotasksEncodeData(response.relations);
+    }
+
     return {
         code: 200,
         response,

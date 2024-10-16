@@ -31,6 +31,7 @@ import {
     formatGetEntryMetaPrivateResponse,
     formatEntryModel,
 } from '../services/new/entry/formatters';
+import {EntryScope} from '../db/models/new/entry/types';
 
 export default {
     getEntry: async (req: Request, res: Response) => {
@@ -243,10 +244,19 @@ export default {
                 entryId: params.entryId,
                 direction: query.direction as Optional<RelationDirection>,
                 includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
+                page: (query.page && Number(query.page)) as number | undefined,
+                pageSize: (query.pageSize && Number(query.pageSize)) as number | undefined,
+                scope: query.scope as EntryScope | undefined,
             },
         );
 
-        const {code, response} = await prepareResponseAsync({data: result});
+        // TODO: leave a response with pagination only, when there will be pagination support everywhere in the frontend
+        const formattedResponse =
+            typeof query.page !== 'undefined' && typeof query.pageSize !== 'undefined'
+                ? result
+                : result.relations;
+
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
         res.status(code).send(response);
     },

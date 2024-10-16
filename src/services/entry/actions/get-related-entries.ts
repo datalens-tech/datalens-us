@@ -8,6 +8,7 @@ import {
 } from '../../../const';
 import {getReplica} from '../../new/utils';
 import {EntryScope} from '../../../db/models/new/entry/types';
+import {EntryColumn} from '../../../db/models/new/entry';
 
 export enum RelationDirection {
     Parent = 'parent',
@@ -18,6 +19,9 @@ type GetRelatedEntriesData = {
     entryIds: string[];
     direction?: RelationDirection;
     extendedTimeout?: boolean;
+    scope?: EntryScope;
+    page?: number;
+    pageSize?: number;
 };
 
 type GetRelatedEntriesResult = {
@@ -38,14 +42,17 @@ export async function getRelatedEntries(
     {
         entryIds,
         direction = RelationDirection.Parent,
+        scope,
+        page,
+        pageSize,
         extendedTimeout = false,
     }: GetRelatedEntriesData,
 ) {
-    ctx.log('GET_RELATED_ENTRIES_RUN');
+    ctx.log('GET_RELATED_ENTRIES_RUN', {scope, page, pageSize});
 
     const endToStart = direction === RelationDirection.Parent;
 
-    const relatedEntries = (await Entry.query(getReplica(trx))
+    const relatedEntries = Entry.query(getReplica(trx))
         .withRecursive('relatedEntries', (qb) => {
             qb.select(['fromId', 'toId', raw('1 depth')])
                 .from('links')
@@ -82,14 +89,28 @@ export async function getRelatedEntries(
                 .join('revisions', 'entries.savedId', 'revisions.revId')
                 .as('re');
         })
-        .orderBy('depth')
-        .timeout(
-            extendedTimeout ? EXTENDED_QUERY_TIMEOUT : DEFAULT_QUERY_TIMEOUT,
-        )) as unknown[] as GetRelatedEntriesResult[];
+        .where((builder) => {
+            if (scope) {
+                builder.where({[EntryColumn.Scope]: scope});
+            }
+        })
+        .orderBy('createdAt');
+
+    if (pageSize) {
+        relatedEntries.limit(pageSize);
+
+        if (page) {
+            relatedEntries.offset(pageSize * page);
+        }
+    }
+
+    const result = (await relatedEntries.timeout(
+        extendedTimeout ? EXTENDED_QUERY_TIMEOUT : DEFAULT_QUERY_TIMEOUT,
+    )) as unknown[] as GetRelatedEntriesResult[];
 
     ctx.log('GET_RELATED_ENTRIES_DONE', {
-        amount: relatedEntries && relatedEntries.length,
+        amount: result?.length,
     });
 
-    return relatedEntries;
+    return result;
 }
