@@ -109,7 +109,7 @@ export async function getRelatedEntries(
     )) as unknown[] as GetRelatedEntriesResult[];
 
     ctx.log('GET_RELATED_ENTRIES_DONE', {
-        amount: result && result.length,
+        amount: result?.length,
     });
 
     return result;
