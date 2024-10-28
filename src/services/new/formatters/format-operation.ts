@@ -1,3 +1,5 @@
+import {OperationError} from '@yandex-data-ui/cloud-schemas/build/models/operations';
+
 type ResultError = {
     error?: {
         code: number;
@@ -24,6 +26,8 @@ export type Operation = {
     metadata?: {};
     done: boolean;
     result?: ResultError | ResultResponse;
+    response?: string;
+    error?: OperationError;
 };
 
 export const formatOperation = (operation: Operation) => {
@@ -36,5 +40,7 @@ export const formatOperation = (operation: Operation) => {
         metadata: {},
         done: operation.done ?? true,
         ...(operation.result ? {result: operation.result} : {}),
+        ...(operation.response ? {response: operation.response} : {}),
+        ...(operation.error ? {error: operation.error} : {}),
     };
 };
