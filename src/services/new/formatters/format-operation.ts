@@ -1,4 +1,8 @@
-import {OperationError} from '@yandex-data-ui/cloud-schemas/build/models/operations';
+interface OperationError<D = any> {
+    code: number;
+    details: D;
+    message?: string;
+}
 
 type ResultError = {
     error?: {
