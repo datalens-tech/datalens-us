@@ -1,6 +1,9 @@
 import {makeFunctionTemplate} from '../utils/make-function-template';
 import type {BulkFetchCollectionsAllPermissions} from './entities/collection/types';
-import type {BulkFetchWorkbooksAllPermissions} from './entities/workbook/types';
+import type {
+    BulkFetchWorkbooksAllPermissions,
+    DeleteWorkbooksList,
+} from './entities/workbook/types';
 import type {CheckOrganizationPermission, CheckProjectPermission} from './components/iam/types';
 import type {
     IsNeedBypassEntryByKey,
@@ -22,4 +25,5 @@ export const commonFunctionsMap = {
     getEntryBeforeDbRequestHook: makeFunctionTemplate<GetEntryBeforeDbRequestHook>(),
     getEntryAddFormattedFieldsHook: makeFunctionTemplate<GetEntryAddFormattedFieldsHook>(),
     checkEmbedding: makeFunctionTemplate<CheckEmbedding>(),
+    deleteWorkbooksList: makeFunctionTemplate<DeleteWorkbooksList>(),
 } as const;

@@ -39,4 +39,6 @@ export {formatWorkbookModel} from '../src/services/new/workbook/formatters';
 
 export {crossSyncCopiedJoinedEntryRevisions} from '../src/services/new/workbook';
 
+export {markWorkbooksAsDeleted} from '../src/services/new/workbook/utils';
+
 export {filterEntriesByPermission} from '../src/services/new/entry/utils';

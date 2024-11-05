@@ -1,9 +1,5 @@
-import {raw} from 'objection';
-import {CURRENT_TIMESTAMP} from '../../../../const';
-import {WorkbookModel, WorkbookModelColumn} from '../../../../db/models/new/workbook';
-import {ServiceArgs} from '../../../../services/new/types';
-import {getPrimary} from '../../../../services/new/utils';
-import type {BulkFetchWorkbooksAllPermissions} from './types';
+import {markWorkbooksAsDeleted} from '../../../../services/new/workbook/utils/mark-workbooks-as-deleted';
+import type {BulkFetchWorkbooksAllPermissions, DeleteWorkbooksList} from './types';
 import {Workbook} from './workbook';
 
 export const bulkFetchWorkbooksAllPermissions: BulkFetchWorkbooksAllPermissions = async (
@@ -21,23 +17,14 @@ export const bulkFetchWorkbooksAllPermissions: BulkFetchWorkbooksAllPermissions 
     });
 };
 
-export const markWorkbooksAsDeleted = async (
-    {ctx, trx}: ServiceArgs,
-    {workbookIds}: {workbookIds: string[]},
-) => {
-    const {
-        user: {userId},
-    } = ctx.get('info');
+export const deleteWorkbooksList: DeleteWorkbooksList = async ({ctx, trx}, {workbooksMap}) => {
+    const workbookIds: string[] = [];
 
-    await WorkbookModel.query(getPrimary(trx))
-        .patch({
-            [WorkbookModelColumn.DeletedBy]: userId,
-            [WorkbookModelColumn.DeletedAt]: raw(CURRENT_TIMESTAMP),
-        })
-        .whereIn([WorkbookModelColumn.WorkbookId], workbookIds)
-        .returning('*')
-        .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
+    workbooksMap.forEach((parentIds, workbook) => {
+        workbookIds.push(workbook.workbookId);
+    });
 
-    if (ctx.config.accessServiceEnabled) {
-    }
+    const workbooks = await markWorkbooksAsDeleted({ctx, trx}, {workbookIds});
+
+    return workbooks;
 };

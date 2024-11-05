@@ -80,6 +80,26 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
         this.permissions = permissions;
     }
 
+    async deletePermissions(args: {parentIds: string[]}): Promise<void> {
+        await this.checkPermission({
+            parentIds: args.parentIds,
+            permission: WorkbookPermission.Delete,
+        });
+
+        this.permissions = {
+            listAccessBindings: false,
+            updateAccessBindings: false,
+            limitedView: false,
+            view: false,
+            update: false,
+            copy: false,
+            move: false,
+            publish: false,
+            embed: false,
+            delete: false,
+        };
+    }
+
     enableAllPermissions() {
         this.permissions = {
             listAccessBindings: true,
