@@ -86,18 +86,7 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
             permission: WorkbookPermission.Delete,
         });
 
-        this.permissions = {
-            listAccessBindings: false,
-            updateAccessBindings: false,
-            limitedView: false,
-            view: false,
-            update: false,
-            copy: false,
-            move: false,
-            publish: false,
-            embed: false,
-            delete: false,
-        };
+        this.permissions = undefined;
     }
 
     enableAllPermissions() {
