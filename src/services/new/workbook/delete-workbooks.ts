@@ -11,8 +11,8 @@ import Utils, {makeUserId} from '../../../utils';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {markEntryAsDeleted} from '../../entry/crud';
 import {getWorkbooksListByIds} from './get-workbooks-list-by-ids';
-import {registry} from '../../../registry';
-import {WorkbookModel} from '../../../db/models/new/workbook';
+import {markWorkbooksAsDeleted} from './utils';
+import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -58,7 +58,7 @@ export const deleteWorkbooks = async (
         {workbookIds},
     );
 
-    const workbooksMap: Map<WorkbookModel, string[]> = new Map();
+    const workbooksMap: Map<WorkbookInstance, string[]> = new Map();
 
     const checkDeletePermissionPromises = workbooks.map(async (workbook) => {
         if (workbook.model.isTemplate) {
@@ -78,7 +78,7 @@ export const deleteWorkbooks = async (
                 });
             }
 
-            workbooksMap.set(workbook.model, parentIds);
+            workbooksMap.set(workbook, parentIds);
 
             await workbook.checkPermission({
                 parentIds,
@@ -89,10 +89,11 @@ export const deleteWorkbooks = async (
 
     await Promise.all(checkDeletePermissionPromises);
 
-    const {deleteWorkbooksList} = registry.common.functions.get();
-
     const result = await transaction(targetTrx, async (transactionTrx) => {
-        const deletedWorkbooks = await deleteWorkbooksList({ctx, trx}, {workbooksMap});
+        const deletedWorkbooks = await markWorkbooksAsDeleted(
+            {ctx, trx, skipCheckPermissions: true},
+            {workbooksMap},
+        );
 
         const entries = await Entry.query(transactionTrx)
             .select()

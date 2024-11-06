@@ -1,7 +1,7 @@
 import {DLS} from './components/dls/dls';
 import {Workbook} from './entities/workbook/workbook';
 import {Collection} from './entities/collection/collection';
-import {bulkFetchWorkbooksAllPermissions, deleteWorkbooksList} from './entities/workbook/utils';
+import {bulkFetchWorkbooksAllPermissions} from './entities/workbook/utils';
 import {bulkFetchCollectionsAllPermissions} from './entities/collection/utils';
 import {checkOrganizationPermission, checkProjectPermission} from './components/iam/utils';
 import {
@@ -33,6 +33,5 @@ export const registerCommonPlugins = () => {
         getEntryBeforeDbRequestHook,
         getEntryAddFormattedFieldsHook,
         checkEmbedding,
-        deleteWorkbooksList,
     });
 };

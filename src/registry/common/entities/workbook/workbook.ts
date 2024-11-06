@@ -80,11 +80,16 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
         this.permissions = permissions;
     }
 
-    async deletePermissions(args: {parentIds: string[]}): Promise<void> {
-        await this.checkPermission({
-            parentIds: args.parentIds,
-            permission: WorkbookPermission.Delete,
-        });
+    async deletePermissions(args: {
+        parentIds: string[];
+        skipCheckPermissions?: boolean;
+    }): Promise<void> {
+        if (!args.skipCheckPermissions) {
+            await this.checkPermission({
+                parentIds: args.parentIds,
+                permission: WorkbookPermission.Delete,
+            });
+        }
 
         this.permissions = undefined;
     }

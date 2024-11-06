@@ -31,9 +31,9 @@ export const checkAndSetCollectionPermission = async (
     const {accessServiceEnabled} = ctx.config;
 
     const targetTrx = getReplica(trx);
+    let parentIds: string[] = [];
 
     if (accessServiceEnabled && !skipCheckPermissions && !isPrivateRoute) {
-        let parentIds: string[] = [];
         let localPermission: CollectionPermission;
 
         if (permission) {
@@ -68,5 +68,5 @@ export const checkAndSetCollectionPermission = async (
 
     ctx.log('CHECK_COLLECTION_PERMISSION_FINISH');
 
-    return collectionInstance;
+    return {collectionInstance, parentIds};
 };

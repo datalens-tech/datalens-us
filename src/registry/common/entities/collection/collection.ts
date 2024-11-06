@@ -88,6 +88,20 @@ export const Collection: CollectionConstructor = class Collection implements Col
         this.permissions = permissions;
     }
 
+    async deletePermissions(args: {
+        parentIds: string[];
+        skipCheckPermissions?: boolean;
+    }): Promise<void> {
+        if (!args.skipCheckPermissions) {
+            await this.checkPermission({
+                parentIds: args.parentIds,
+                permission: CollectionPermission.Delete,
+            });
+        }
+
+        this.permissions = undefined;
+    }
+
     async fetchAllPermissions() {
         this.permissions = this.getAllPermissions();
         return Promise.resolve();

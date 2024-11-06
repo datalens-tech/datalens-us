@@ -6,6 +6,7 @@ import {CollectionPermission} from '../../../entities/collection';
 import Utils from '../../../utils';
 import {registry} from '../../../registry';
 import {checkAndSetCollectionPermission} from './utils';
+import {CollectionInstance} from '../../../registry/common/entities/collection/types';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -56,7 +57,9 @@ export const getCollectionsListByIds = async (
         .whereIn(CollectionModelColumn.CollectionId, collectionIds)
         .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
 
-    const modelsWithPermissions = await Promise.all(
+    const collectionsMap: Map<CollectionInstance, string[]> = new Map();
+
+    await Promise.all(
         models.map(async (model) => {
             const {Collection} = registry.common.classes.get();
 
@@ -65,12 +68,17 @@ export const getCollectionsListByIds = async (
                 model,
             });
 
-            const collection = await checkAndSetCollectionPermission(
+            const collectionWithParents = await checkAndSetCollectionPermission(
                 {ctx, trx},
                 {collectionInstance, skipCheckPermissions, includePermissionsInfo, permission},
             );
 
-            return collection;
+            collectionsMap.set(
+                collectionWithParents.collectionInstance,
+                collectionWithParents.parentIds,
+            );
+
+            return collectionWithParents;
         }),
     );
 
@@ -81,5 +89,5 @@ export const getCollectionsListByIds = async (
         ),
     });
 
-    return modelsWithPermissions;
+    return collectionsMap;
 };
