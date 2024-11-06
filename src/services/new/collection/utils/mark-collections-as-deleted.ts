@@ -11,7 +11,7 @@ export const markCollectionsAsDeleted = async (
 ) => {
     const collectionIds: string[] = [];
 
-    collectionsMap.forEach(async (parentIds, collectionInstance) => {
+    collectionsMap.forEach((parentIds, collectionInstance) => {
         collectionIds.push(collectionInstance.model.collectionId);
     });
 
@@ -33,7 +33,7 @@ export const markCollectionsAsDeleted = async (
 
     const deletePermissionsPromises: Promise<void>[] = [];
 
-    collectionsMap.forEach(async (parentIds, collectionInstance) => {
+    collectionsMap.forEach((parentIds, collectionInstance) => {
         deletePermissionsPromises.push(
             collectionInstance.deletePermissions({
                 parentIds,

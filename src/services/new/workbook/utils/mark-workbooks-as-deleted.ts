@@ -11,7 +11,7 @@ export const markWorkbooksAsDeleted = async (
 ) => {
     const workbookIds: string[] = [];
 
-    workbooksMap.forEach(async (parentIds, workbookInstance) => {
+    workbooksMap.forEach((parentIds, workbookInstance) => {
         workbookIds.push(workbookInstance.model.workbookId);
     });
 
@@ -30,7 +30,7 @@ export const markWorkbooksAsDeleted = async (
 
     const deletePermissionsPromises: Promise<void>[] = [];
 
-    workbooksMap.forEach(async (parentIds, workbookInstance) => {
+    workbooksMap.forEach((parentIds, workbookInstance) => {
         deletePermissionsPromises.push(
             workbookInstance.deletePermissions({
                 parentIds,
