@@ -176,6 +176,7 @@ export async function deleteEntry(
                 ...entryObj.innerMeta,
                 oldKey: oldKeyLowerCase,
                 oldDisplayKey: oldKey,
+                lastDeletionUserId: user.userId,
             };
 
             await markEntryAsDeleted(trx, {
