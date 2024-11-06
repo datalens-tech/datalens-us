@@ -33,11 +33,7 @@ export const deleteCollections = async (
 ) => {
     const {collectionIds} = args;
 
-    const {
-        tenantId,
-        projectId,
-        // user: {userId},
-    } = ctx.get('info');
+    const {tenantId, projectId} = ctx.get('info');
 
     ctx.log('DELETE_COLLECTIONS_START', {
         collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),

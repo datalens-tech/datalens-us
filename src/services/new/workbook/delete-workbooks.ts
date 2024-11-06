@@ -60,6 +60,8 @@ export const deleteWorkbooks = async (
 
     const workbooksMap: Map<WorkbookInstance, string[]> = new Map();
 
+    let parentIds: string[] = [];
+
     const checkDeletePermissionPromises = workbooks.map(async (workbook) => {
         if (workbook.model.isTemplate) {
             throw new AppError("Workbook template can't be deleted", {
@@ -67,9 +69,7 @@ export const deleteWorkbooks = async (
             });
         }
 
-        if (accessServiceEnabled && !skipCheckPermissions) {
-            let parentIds: string[] = [];
-
+        if (accessServiceEnabled) {
             if (workbook.model.collectionId !== null) {
                 parentIds = await getParentIds({
                     ctx,
@@ -80,10 +80,12 @@ export const deleteWorkbooks = async (
 
             workbooksMap.set(workbook, parentIds);
 
-            await workbook.checkPermission({
-                parentIds,
-                permission: WorkbookPermission.Delete,
-            });
+            if (!skipCheckPermissions) {
+                await workbook.checkPermission({
+                    parentIds,
+                    permission: WorkbookPermission.Delete,
+                });
+            }
         }
     });
 
