@@ -80,7 +80,7 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
         model,
     });
 
-    const {collectionInstance: collection} = await checkAndSetCollectionPermission(
+    const collection = await checkAndSetCollectionPermission(
         {ctx, trx},
         {collectionInstance, skipCheckPermissions, includePermissionsInfo, permission},
     );

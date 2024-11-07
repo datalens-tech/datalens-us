@@ -31,19 +31,9 @@ export const checkAndSetCollectionPermission = async (
     const {accessServiceEnabled} = ctx.config;
 
     const targetTrx = getReplica(trx);
-    let parentIds: string[] = [];
-
-    if (accessServiceEnabled) {
-        if (collectionInstance.model.parentId !== null) {
-            parentIds = await getParentIds({
-                ctx,
-                trx: targetTrx,
-                collectionId: collectionInstance.model.parentId,
-            });
-        }
-    }
 
     if (accessServiceEnabled && !skipCheckPermissions && !isPrivateRoute) {
+        let parentIds: string[] = [];
         let localPermission: CollectionPermission;
 
         if (permission) {
@@ -52,6 +42,14 @@ export const checkAndSetCollectionPermission = async (
             localPermission = CollectionPermission.LimitedView;
         } else {
             localPermission = CollectionPermission.View;
+        }
+
+        if (collectionInstance.model.parentId !== null) {
+            parentIds = await getParentIds({
+                ctx,
+                trx: targetTrx,
+                collectionId: collectionInstance.model.parentId,
+            });
         }
 
         ctx.log('CHECK_PERMISSION', {permission: localPermission});
@@ -70,5 +68,5 @@ export const checkAndSetCollectionPermission = async (
 
     ctx.log('CHECK_COLLECTION_PERMISSION_FINISH');
 
-    return {collectionInstance, parentIds};
+    return collectionInstance;
 };

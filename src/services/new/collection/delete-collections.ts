@@ -11,6 +11,9 @@ import {CollectionPermission} from '../../../entities/collection';
 import {AppError} from '@gravity-ui/nodekit';
 import {getCollectionsListByIds} from './get-collections-list-by-ids';
 import {markCollectionsAsDeleted} from './utils/mark-collections-as-deleted';
+import {getParents, getParentsIdsFromMap} from './utils';
+import {registry} from '../../../registry';
+import {CollectionInstance} from '../../../registry/common/entities/collection/types';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -44,6 +47,11 @@ export const deleteCollections = async (
     }
 
     const targetTrx = getPrimary(trx);
+
+    await getCollectionsListByIds(
+        {ctx, trx: targetTrx, skipValidation, skipCheckPermissions},
+        {collectionIds, permission: CollectionPermission.Delete},
+    );
 
     const recursiveName = 'collectionChildren';
 
@@ -81,10 +89,31 @@ export const deleteCollections = async (
 
     const collectionsForDeleteIds = collectionsForDelete.map((item) => item.collectionId);
 
-    const collectionsMap = await getCollectionsListByIds(
-        {ctx, trx: targetTrx, skipValidation, skipCheckPermissions},
-        {collectionIds: collectionsForDeleteIds, permission: CollectionPermission.Delete},
-    );
+    const collectionsMap = new Map<CollectionInstance, string[]>();
+
+    const parents = await getParents({
+        ctx,
+        trx: targetTrx,
+        collectionIds: collectionsForDeleteIds,
+    });
+
+    const parentsMap = new Map<string, Nullable<string>>();
+
+    parents.forEach((parent: CollectionModel) => {
+        parentsMap.set(parent.collectionId, parent.parentId);
+    });
+
+    const {Collection} = registry.common.classes.get();
+
+    collectionsForDelete.forEach((model) => {
+        const collectionId = model.collectionId;
+
+        const parentsForCollection = getParentsIdsFromMap(collectionId, parentsMap);
+
+        const collection = new Collection({ctx, model});
+
+        collectionsMap.set(collection, parentsForCollection);
+    });
 
     const workbooksForDelete = await WorkbookModel.query(getReplica(trx))
         .select()
