@@ -11,6 +11,7 @@ export type EntryScope =
 export type EntryInnerMeta = {
     oldKey: string;
     oldDisplayKey: string;
+    lastDeletionUserId?: string;
 };
 
 /** @deprecated use EntryColumns */
