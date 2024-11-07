@@ -52,7 +52,7 @@ export const deleteWorkbooks = async (
 
     const targetTrx = getPrimary(trx);
 
-    const workbooks = await getWorkbooksListByIds(
+    const {workbooks} = await getWorkbooksListByIds(
         {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions: true},
         {workbookIds},
     );

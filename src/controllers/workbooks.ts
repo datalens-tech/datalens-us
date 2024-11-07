@@ -112,6 +112,28 @@ export default {
         res.status(code).send(response);
     },
 
+    getWorkbooksListByIds: async (req: Request, res: Response) => {
+        const {query} = req;
+
+        const result = await getWorkbooksList(
+            {ctx: req.ctx},
+            {
+                collectionId: (query.collectionId as Optional<string>) ?? null,
+                includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
+                filterString: query.filterString as Optional<string>,
+                page: (query.page && Number(query.page)) as number | undefined,
+                pageSize: (query.pageSize && Number(query.pageSize)) as number | undefined,
+                orderField: query.orderField as Optional<OrderField>,
+                orderDirection: query.orderDirection as Optional<OrderDirection>,
+                onlyMy: Utils.isTrueArg(query.onlyMy),
+            },
+        );
+
+        const formattedResponse = formatWorkbooksList(result);
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
+        res.status(code).send(response);
+    },
+
     update: async (req: Request, res: Response) => {
         const {body, params} = req;
 

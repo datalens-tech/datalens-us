@@ -24,12 +24,23 @@ const validateArgs = makeSchemaValidator({
         includePermissionsInfo: {
             type: 'boolean',
         },
+        page: {
+            type: 'number',
+            minimum: 0,
+        },
+        pageSize: {
+            type: 'number',
+            minimum: 1,
+            maximum: 200,
+        },
     },
 });
 
 type GetWorkbooksListAndAllParentsArgs = {
     workbookIds: string[];
     includePermissionsInfo?: boolean;
+    page?: number;
+    pageSize?: number;
 };
 
 export const getParentsIdsFromMap = (
@@ -54,7 +65,7 @@ export const getWorkbooksListByIds = async (
     {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
     args: GetWorkbooksListAndAllParentsArgs,
 ) => {
-    const {workbookIds, includePermissionsInfo = false} = args;
+    const {workbookIds, includePermissionsInfo = false, page, pageSize} = args;
 
     ctx.log('GET_WORKBOOKS_LIST_BY_IDS_STARTED', {
         workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.encodeId(id)),
@@ -69,101 +80,124 @@ export const getWorkbooksListByIds = async (
 
     const targetTrx = getReplica(trx);
 
-    const workbookList = await WorkbookModel.query(targetTrx)
+    const workbooksModel = WorkbookModel.query(targetTrx)
         .where({
             [WorkbookModelColumn.DeletedAt]: null,
             [WorkbookModelColumn.TenantId]: tenantId,
             [WorkbookModelColumn.ProjectId]: projectId,
         })
-        .whereIn([WorkbookModelColumn.WorkbookId], workbookIds)
-        .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
+        .whereIn([WorkbookModelColumn.WorkbookId], workbookIds);
+
+    if (pageSize) {
+        workbooksModel.limit(pageSize);
+
+        if (page) {
+            workbooksModel.offset(pageSize * page);
+        }
+    }
+
+    const workbookList = await workbooksModel.timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
     const {accessServiceEnabled} = ctx.config;
 
     const {Workbook} = registry.common.classes.get();
 
+    let result;
+
     if (!accessServiceEnabled || skipCheckPermissions || isPrivateRoute) {
         if (includePermissionsInfo) {
-            return workbookList.map((model) => {
+            result = workbookList.map((model) => {
                 const workbook = new Workbook({ctx, model});
                 workbook.enableAllPermissions();
                 return workbook;
             });
+        } else {
+            result = workbookList.map((model) => new Workbook({ctx, model}));
+        }
+    } else {
+        const collectionIds = workbookList
+            .map((workbook) => workbook.collectionId)
+            .filter((item) => Boolean(item));
+
+        const parents = await getParents({
+            ctx,
+            trx: targetTrx,
+            collectionIds,
+        });
+
+        const workbooksMap = new Map<WorkbookModel, string[]>();
+        const acceptedWorkbooksMap = new Map<WorkbookModel, string[]>();
+
+        const parentsMap = new Map<string, Nullable<string>>();
+
+        parents.forEach((parent: CollectionModel) => {
+            parentsMap.set(parent.collectionId, parent.parentId);
+        });
+
+        workbookList.forEach((model) => {
+            const collectionId = model.collectionId;
+
+            const parentsforWorkbook = getParentsIdsFromMap(collectionId, parentsMap);
+
+            workbooksMap.set(model, parentsforWorkbook);
+        });
+
+        const checkPermissionPromises: Promise<WorkbookInstance | void>[] = [];
+
+        workbooksMap.forEach((parentIds, workbookModel) => {
+            const workbook = new Workbook({
+                ctx,
+                model: workbookModel,
+            });
+
+            const promise = workbook
+                .checkPermission({
+                    parentIds,
+                    permission: isEnabledFeature(ctx, Feature.UseLimitedView)
+                        ? WorkbookPermission.LimitedView
+                        : WorkbookPermission.View,
+                })
+                .then(() => {
+                    acceptedWorkbooksMap.set(workbookModel, parentIds);
+
+                    return workbook;
+                })
+                .catch(() => {});
+
+            checkPermissionPromises.push(promise);
+        });
+
+        let workbooks = await Promise.all(checkPermissionPromises);
+
+        if (includePermissionsInfo) {
+            const {bulkFetchWorkbooksAllPermissions} = registry.common.functions.get();
+
+            const mappedWorkbooks: {model: WorkbookModel; parentIds: string[]}[] = [];
+
+            acceptedWorkbooksMap.forEach((parentIds, workbookModel) => {
+                mappedWorkbooks.push({
+                    model: workbookModel,
+                    parentIds,
+                });
+            });
+
+            workbooks = await bulkFetchWorkbooksAllPermissions(ctx, mappedWorkbooks);
         }
 
-        return workbookList.map((model) => new Workbook({ctx, model}));
+        result = workbooks.filter((item) => Boolean(item)) as WorkbookInstance[];
     }
 
-    const collectionIds = workbookList
-        .map((workbook) => workbook.collectionId)
-        .filter((item) => Boolean(item));
+    const isPagination = typeof page !== 'undefined' && typeof pageSize !== 'undefined';
 
-    const parents = await getParents({
-        ctx,
-        trx: targetTrx,
-        collectionIds,
-    });
+    let nextPageToken;
 
-    const workbooksMap = new Map<WorkbookModel, string[]>();
-    const acceptedWorkbooksMap = new Map<WorkbookModel, string[]>();
-
-    const parentsMap = new Map<string, Nullable<string>>();
-
-    parents.forEach((parent: CollectionModel) => {
-        parentsMap.set(parent.collectionId, parent.parentId);
-    });
-
-    workbookList.forEach((model) => {
-        const collectionId = model.collectionId;
-
-        const parentsforWorkbook = getParentsIdsFromMap(collectionId, parentsMap);
-
-        workbooksMap.set(model, parentsforWorkbook);
-    });
-
-    const checkPermissionPromises: Promise<WorkbookInstance | void>[] = [];
-
-    workbooksMap.forEach((parentIds, workbookModel) => {
-        const workbook = new Workbook({
-            ctx,
-            model: workbookModel,
+    if (isPagination) {
+        nextPageToken = Utils.getOptimisticNextPageToken({
+            page: page,
+            pageSize: pageSize,
+            curPage: result,
         });
-
-        const promise = workbook
-            .checkPermission({
-                parentIds,
-                permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                    ? WorkbookPermission.LimitedView
-                    : WorkbookPermission.View,
-            })
-            .then(() => {
-                acceptedWorkbooksMap.set(workbookModel, parentIds);
-
-                return workbook;
-            })
-            .catch(() => {});
-
-        checkPermissionPromises.push(promise);
-    });
-
-    let workbooks = await Promise.all(checkPermissionPromises);
-
-    if (includePermissionsInfo) {
-        const {bulkFetchWorkbooksAllPermissions} = registry.common.functions.get();
-
-        const mappedWorkbooks: {model: WorkbookModel; parentIds: string[]}[] = [];
-
-        acceptedWorkbooksMap.forEach((parentIds, workbookModel) => {
-            mappedWorkbooks.push({
-                model: workbookModel,
-                parentIds,
-            });
-        });
-
-        workbooks = await bulkFetchWorkbooksAllPermissions(ctx, mappedWorkbooks);
     }
-
-    const result = workbooks.filter((item) => Boolean(item)) as WorkbookInstance[];
 
     ctx.log('GET_WORKBOOKS_LIST_BY_IDS_FINISHED', {
         workbookIds: await Utils.macrotasksMap(workbookList, (workbook) =>
@@ -171,5 +205,8 @@ export const getWorkbooksListByIds = async (
         ),
     });
 
-    return result;
+    return {
+        workbooks: result,
+        nextPageToken,
+    };
 };

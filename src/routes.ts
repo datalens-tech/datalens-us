@@ -297,6 +297,10 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
                 route: 'GET /v2/workbooks',
                 handler: workbooksController.getList,
             }),
+            getWorkbooksListByIds: makeRoute({
+                route: 'GET /v2/workbooks-by-ids',
+                handler: workbooksController.getWorkbooksListByIds,
+            }),
             updateWorkbook: makeRoute({
                 route: 'POST /v2/workbooks/:workbookId/update',
                 handler: workbooksController.update,
