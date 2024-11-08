@@ -13,6 +13,7 @@ export const EmbedModelColumn = {
     CreatedAt: 'createdAt',
     UpdatedBy: 'updatedBy',
     UpdatedAt: 'updatedAt',
+    Settings: 'settings',
 } as const;
 
 export class EmbedModel extends Model {
@@ -36,4 +37,5 @@ export class EmbedModel extends Model {
     [EmbedModelColumn.CreatedAt]!: string;
     [EmbedModelColumn.UpdatedBy]!: string;
     [EmbedModelColumn.UpdatedAt]!: string;
+    [EmbedModelColumn.Settings]!: Record<string, unknown>;
 }
