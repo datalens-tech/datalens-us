@@ -49,7 +49,7 @@ export const deleteCollections = async (
     const targetTrx = getPrimary(trx);
 
     await getCollectionsListByIds(
-        {ctx, trx: targetTrx, skipValidation, skipCheckPermissions},
+        {ctx, trx: getReplica(trx), skipValidation, skipCheckPermissions},
         {collectionIds, permission: CollectionPermission.Delete},
     );
 
@@ -93,7 +93,7 @@ export const deleteCollections = async (
 
     const parents = await getParents({
         ctx,
-        trx: targetTrx,
+        trx: getReplica(trx),
         collectionIds: collectionsForDeleteIds,
     });
 
@@ -106,9 +106,9 @@ export const deleteCollections = async (
     const {Collection} = registry.common.classes.get();
 
     collectionsForDelete.forEach((model) => {
-        const collectionId = model.collectionId;
+        const parentId = model.parentId;
 
-        const parentsForCollection = getParentsIdsFromMap(collectionId, parentsMap);
+        const parentsForCollection = getParentsIdsFromMap(parentId, parentsMap);
 
         const collection = new Collection({ctx, model});
 
