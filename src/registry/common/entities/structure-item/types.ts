@@ -25,6 +25,8 @@ export interface StructureItemInstance {
 
     setPermissions(permissions: CollectionPermissions | WorkbookPermissions): void;
 
+    deletePermissions(args: {parentIds: string[]; skipCheckPermissions?: boolean}): Promise<void>;
+
     enableAllPermissions(): void;
 
     fetchAllPermissions(args: {parentIds: string[]}): Promise<void>;

@@ -88,6 +88,10 @@ export const Collection: CollectionConstructor = class Collection implements Col
         this.permissions = permissions;
     }
 
+    async deletePermissions(): Promise<void> {
+        this.permissions = undefined;
+    }
+
     async fetchAllPermissions() {
         this.permissions = this.getAllPermissions();
         return Promise.resolve();

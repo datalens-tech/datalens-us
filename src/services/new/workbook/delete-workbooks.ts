@@ -3,15 +3,16 @@ import {getParentIds} from '../collection/utils/get-parents';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {US_ERRORS, CURRENT_TIMESTAMP} from '../../../const';
-import {raw, transaction} from 'objection';
-import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
+import {US_ERRORS} from '../../../const';
+import {transaction} from 'objection';
 import Lock from '../../../db/models/lock';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import Utils, {makeUserId} from '../../../utils';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {markEntryAsDeleted} from '../../entry/crud';
 import {getWorkbooksListByIds} from './get-workbooks-list-by-ids';
+import {markWorkbooksAsDeleted} from './utils';
+import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -57,6 +58,10 @@ export const deleteWorkbooks = async (
         {workbookIds},
     );
 
+    const workbooksMap: Map<WorkbookInstance, string[]> = new Map();
+
+    let parentIds: string[] = [];
+
     const checkDeletePermissionPromises = workbooks.map(async (workbook) => {
         if (workbook.model.isTemplate) {
             throw new AppError("Workbook template can't be deleted", {
@@ -64,9 +69,7 @@ export const deleteWorkbooks = async (
             });
         }
 
-        if (accessServiceEnabled && !skipCheckPermissions) {
-            let parentIds: string[] = [];
-
+        if (accessServiceEnabled) {
             if (workbook.model.collectionId !== null) {
                 parentIds = await getParentIds({
                     ctx,
@@ -75,24 +78,24 @@ export const deleteWorkbooks = async (
                 });
             }
 
-            await workbook.checkPermission({
-                parentIds,
-                permission: WorkbookPermission.Delete,
-            });
+            workbooksMap.set(workbook, parentIds);
+
+            if (!skipCheckPermissions) {
+                await workbook.checkPermission({
+                    parentIds,
+                    permission: WorkbookPermission.Delete,
+                });
+            }
         }
     });
 
     await Promise.all(checkDeletePermissionPromises);
 
     const result = await transaction(targetTrx, async (transactionTrx) => {
-        const deletedWorkbooks = await WorkbookModel.query(transactionTrx)
-            .patch({
-                [WorkbookModelColumn.DeletedBy]: userId,
-                [WorkbookModelColumn.DeletedAt]: raw(CURRENT_TIMESTAMP),
-            })
-            .whereIn([WorkbookModelColumn.WorkbookId], workbookIds)
-            .returning('*')
-            .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
+        const deletedWorkbooks = await markWorkbooksAsDeleted(
+            {ctx, trx, skipCheckPermissions: true},
+            {workbooksMap},
+        );
 
         const entries = await Entry.query(transactionTrx)
             .select()

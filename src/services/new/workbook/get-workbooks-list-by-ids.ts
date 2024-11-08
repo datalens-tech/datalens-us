@@ -5,7 +5,7 @@ import {getReplica} from '../utils';
 import Utils from '../../../utils';
 import {registry} from '../../../registry';
 
-import {getParents} from '../collection/utils';
+import {getParents, getParentsIdsFromMap} from '../collection/utils';
 
 import {WorkbookPermission} from '../../../entities/workbook';
 
@@ -30,24 +30,6 @@ const validateArgs = makeSchemaValidator({
 type GetWorkbooksListAndAllParentsArgs = {
     workbookIds: string[];
     includePermissionsInfo?: boolean;
-};
-
-export const getParentsIdsFromMap = (
-    collectionId: string | null,
-    parentsMap: Map<string, Nullable<string>>,
-): string[] => {
-    let id: Nullable<string> = collectionId;
-    const arr: string[] = id ? [id] : [];
-
-    while (id !== null) {
-        const curr: Nullable<string> = parentsMap.get(id) || null;
-
-        if (curr) arr.push(curr);
-
-        id = curr;
-    }
-
-    return arr;
 };
 
 export const getWorkbooksListByIds = async (
