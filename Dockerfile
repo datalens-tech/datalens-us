@@ -88,6 +88,7 @@ ENV APP_VERSION=$app_version
 WORKDIR /opt/app
 
 COPY package.json package-lock.json /opt/app/
+COPY ./scripts/preflight.sh /opt/app/scripts/preflight.sh
 
 COPY --from=install-stage /opt/app/node_modules /opt/app/node_modules
 COPY --from=native-build-stage /opt/app/dist /opt/app/dist
