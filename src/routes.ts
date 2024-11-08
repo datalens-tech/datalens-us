@@ -393,6 +393,10 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
                 authPolicy: AuthPolicy.disabled,
                 private: true,
             }),
+            getCollectionsListByIds: makeRoute({
+                route: 'GET /v1/collections-by-ids',
+                handler: collectionsController.get,
+            }),
             getCollectionContent: makeRoute({
                 route: 'GET /v1/collection-content',
                 handler: collectionsController.getContent,

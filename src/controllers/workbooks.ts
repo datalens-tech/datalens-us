@@ -29,6 +29,7 @@ import {
     formatRestoreWorkbook,
     formatGetWorkbookContent,
 } from '../services/new/workbook/formatters';
+import {getWorkbooksListByIds} from '../services/new/workbook/get-workbooks-list-by-ids';
 
 export default {
     create: async (req: Request, res: Response) => {
@@ -113,19 +114,15 @@ export default {
     },
 
     getWorkbooksListByIds: async (req: Request, res: Response) => {
-        const {query} = req;
+        const {query, body} = req;
 
-        const result = await getWorkbooksList(
+        const result = await getWorkbooksListByIds(
             {ctx: req.ctx},
             {
-                collectionId: (query.collectionId as Optional<string>) ?? null,
+                workbookIds: body.workbookIds,
                 includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
-                filterString: query.filterString as Optional<string>,
                 page: (query.page && Number(query.page)) as number | undefined,
                 pageSize: (query.pageSize && Number(query.pageSize)) as number | undefined,
-                orderField: query.orderField as Optional<OrderField>,
-                orderDirection: query.orderDirection as Optional<OrderDirection>,
-                onlyMy: Utils.isTrueArg(query.onlyMy),
             },
         );
 

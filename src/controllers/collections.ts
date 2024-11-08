@@ -14,6 +14,7 @@ import {
     OrderDirection,
     Mode,
     deleteCollections,
+    getCollectionsListByIds,
 } from '../services/new/collection';
 import {
     formatCollectionModel,
@@ -62,6 +63,24 @@ export default {
 
         const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
+        res.status(code).send(response);
+    },
+
+    getCollectionsListByIds: async (req: Request, res: Response) => {
+        const {query, body} = req;
+
+        const result = await getCollectionsListByIds(
+            {ctx: req.ctx},
+            {
+                collectionIds: body.collectionIds,
+                includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
+                page: (query.page && Number(query.page)) as number | undefined,
+                pageSize: (query.pageSize && Number(query.pageSize)) as number | undefined,
+            },
+        );
+
+        const formattedResponse = formatCollectionModelsList(result);
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
         res.status(code).send(response);
     },
 
