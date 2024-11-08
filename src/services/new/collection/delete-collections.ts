@@ -11,9 +11,7 @@ import {CollectionPermission} from '../../../entities/collection';
 import {AppError} from '@gravity-ui/nodekit';
 import {getCollectionsListByIds} from './get-collections-list-by-ids';
 import {markCollectionsAsDeleted} from './utils/mark-collections-as-deleted';
-import {getParents, getParentsIdsFromMap} from './utils';
-import {registry} from '../../../registry';
-import {CollectionInstance} from '../../../registry/common/entities/collection/types';
+import {makeMapCollectionsWithParents} from './utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -89,31 +87,10 @@ export const deleteCollections = async (
 
     const collectionsForDeleteIds = collectionsForDelete.map((item) => item.collectionId);
 
-    const collectionsMap = new Map<CollectionInstance, string[]>();
-
-    const parents = await getParents({
-        ctx,
-        trx: getReplica(trx),
-        collectionIds: collectionsForDeleteIds,
-    });
-
-    const parentsMap = new Map<string, Nullable<string>>();
-
-    parents.forEach((parent: CollectionModel) => {
-        parentsMap.set(parent.collectionId, parent.parentId);
-    });
-
-    const {Collection} = registry.common.classes.get();
-
-    collectionsForDelete.forEach((model) => {
-        const parentId = model.parentId;
-
-        const parentsForCollection = getParentsIdsFromMap(parentId, parentsMap);
-
-        const collection = new Collection({ctx, model});
-
-        collectionsMap.set(collection, parentsForCollection);
-    });
+    const collectionsMap = await makeMapCollectionsWithParents(
+        {ctx, trx},
+        {models: collectionsForDelete},
+    );
 
     const workbooksForDelete = await WorkbookModel.query(getReplica(trx))
         .select()
