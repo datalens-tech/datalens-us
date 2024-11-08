@@ -7,7 +7,7 @@ else
     echo "Start setting up extensions"
     node /opt/app/dist/server/db/scripts/extensions.js
     echo "Finish setting up extensions"
-fi;
+fi
 
 echo "Start migration"
 npm run db:migrate
@@ -31,5 +31,4 @@ if [ "$USE_E2E_MOCK_DATA" = "1" ]; then
     echo "Finish setting up e2e data"
 fi
 
-supervisorctl -c /etc/supervisor/conf.d/supervisor.conf start node
-supervisorctl -c /etc/supervisor/conf.d/supervisor.conf start nginx
+node dist/server
