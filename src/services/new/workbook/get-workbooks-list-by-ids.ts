@@ -5,7 +5,7 @@ import {getReplica} from '../utils';
 import Utils from '../../../utils';
 import {registry} from '../../../registry';
 
-import {makeMapWorkbooksWithParents} from '../collection/utils';
+import {makeWorkbooksWithParentsMap} from '../collection/utils';
 
 import {WorkbookPermission} from '../../../entities/workbook';
 
@@ -75,7 +75,7 @@ export const getWorkbooksListByIds = async (
         return workbookList.map((model) => new Workbook({ctx, model}));
     }
 
-    const workbooksMap = await makeMapWorkbooksWithParents({ctx, trx}, {models: workbookList});
+    const workbooksMap = await makeWorkbooksWithParentsMap({ctx, trx}, {models: workbookList});
     const acceptedWorkbooksMap = new Map<WorkbookModel, string[]>();
 
     const checkPermissionPromises: Promise<WorkbookInstance | void>[] = [];

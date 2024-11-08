@@ -10,8 +10,8 @@ export {
 export {getCollection} from '../src/services/new/collection/get-collection';
 export {
     getParentIds,
-    makeMapWorkbooksWithParents,
-    makeMapCollectionsWithParents,
+    makeWorkbooksWithParentsMap,
+    makeCollectionsWithParentsMap,
 } from '../src/services/new/collection/utils/get-parents';
 
 export {getWorkbook, createWorkbook, setWorkbookIsTemplate} from '../src/services/new/workbook';

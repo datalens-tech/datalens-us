@@ -109,7 +109,7 @@ const makeParentsMap = (collectionModels: CollectionModel[]) => {
     return parentsMap;
 };
 
-export const makeMapWorkbooksWithParents = async (
+export const makeWorkbooksWithParentsMap = async (
     {trx, ctx}: ServiceArgs,
     {
         models,
@@ -143,7 +143,7 @@ export const makeMapWorkbooksWithParents = async (
     return collectionsWithParentsMap;
 };
 
-export const makeMapCollectionsWithParents = async (
+export const makeCollectionsWithParentsMap = async (
     {ctx, trx}: ServiceArgs,
     {
         models,
@@ -152,7 +152,7 @@ export const makeMapCollectionsWithParents = async (
     },
 ): Promise<Map<CollectionInstance, string[]>> => {
     const collectionsWithParentsMap = new Map<CollectionInstance, string[]>();
-    const collectionIds = models.map((item) => item.collectionId);
+    const collectionIds = models.map((item) => item.collectionId).filter((item) => Boolean(item));
 
     const parents = await getParents({
         ctx,

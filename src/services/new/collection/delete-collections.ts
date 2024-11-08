@@ -11,7 +11,7 @@ import {CollectionPermission} from '../../../entities/collection';
 import {AppError} from '@gravity-ui/nodekit';
 import {getCollectionsListByIds} from './get-collections-list-by-ids';
 import {markCollectionsAsDeleted} from './utils/mark-collections-as-deleted';
-import {makeMapCollectionsWithParents} from './utils';
+import {makeCollectionsWithParentsMap} from './utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -87,7 +87,7 @@ export const deleteCollections = async (
 
     const collectionsForDeleteIds = collectionsForDelete.map((item) => item.collectionId);
 
-    const collectionsMap = await makeMapCollectionsWithParents(
+    const collectionsMap = await makeCollectionsWithParentsMap(
         {ctx, trx},
         {models: collectionsForDelete},
     );
