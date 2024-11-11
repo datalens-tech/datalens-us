@@ -16,6 +16,7 @@ const selectedEmbedColumns = [
     EmbedModelColumn.CreatedAt,
     EmbedModelColumn.UpdatedBy,
     EmbedModelColumn.UpdatedAt,
+    EmbedModelColumn.Settings,
 ] as const;
 
 const selectedEmbeddingSecretsColumns = [EmbeddingSecretModelColumn.PublicKey] as const;
