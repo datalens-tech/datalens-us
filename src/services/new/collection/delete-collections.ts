@@ -1,15 +1,19 @@
 import {ServiceArgs} from '../types';
-import {getPrimary} from '../utils';
+import {getPrimary, getReplica} from '../utils';
 import {deleteWorkbooks} from '../workbook';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
-import {raw, transaction} from 'objection';
+import {US_ERRORS} from '../../../const';
+import {transaction} from 'objection';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import Utils from '../../../utils';
 import {CollectionPermission} from '../../../entities/collection';
 import {AppError} from '@gravity-ui/nodekit';
 import {getCollectionsListByIds} from './get-collections-list-by-ids';
+import {markCollectionsAsDeleted} from './utils/mark-collections-as-deleted';
+import {getParents, getParentsIdsFromMap} from './utils';
+import {registry} from '../../../registry';
+import {CollectionInstance} from '../../../registry/common/entities/collection/types';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -32,11 +36,7 @@ export const deleteCollections = async (
 ) => {
     const {collectionIds} = args;
 
-    const {
-        tenantId,
-        projectId,
-        user: {userId},
-    } = ctx.get('info');
+    const {tenantId, projectId} = ctx.get('info');
 
     ctx.log('DELETE_COLLECTIONS_START', {
         collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),
@@ -49,65 +49,91 @@ export const deleteCollections = async (
     const targetTrx = getPrimary(trx);
 
     await getCollectionsListByIds(
-        {ctx, trx: targetTrx, skipValidation, skipCheckPermissions},
+        {ctx, trx: getReplica(trx), skipValidation, skipCheckPermissions},
         {collectionIds, permission: CollectionPermission.Delete},
     );
 
-    const result = await transaction(targetTrx, async (transactionTrx) => {
-        const recursiveName = 'collectionChildren';
+    const recursiveName = 'collectionChildren';
 
-        const collectionsForDelete = await CollectionModel.query(transactionTrx)
-            .withRecursive(recursiveName, (qb1) => {
-                qb1.select()
-                    .from(CollectionModel.tableName)
-                    .where({
-                        [CollectionModelColumn.TenantId]: tenantId,
-                        [CollectionModelColumn.ProjectId]: projectId,
-                        [CollectionModelColumn.DeletedAt]: null,
-                    })
-                    .whereIn([CollectionModelColumn.CollectionId], collectionIds)
-                    .union((qb2) => {
-                        qb2.select(`${CollectionModel.tableName}.*`)
-                            .from(CollectionModel.tableName)
-                            .where({
-                                [`${CollectionModel.tableName}.${CollectionModelColumn.TenantId}`]:
-                                    tenantId,
-                                [`${CollectionModel.tableName}.${CollectionModelColumn.ProjectId}`]:
-                                    projectId,
-                                [`${CollectionModel.tableName}.${CollectionModelColumn.DeletedAt}`]:
-                                    null,
-                            })
-                            .join(
-                                recursiveName,
-                                `${recursiveName}.${CollectionModelColumn.CollectionId}`,
-                                `${CollectionModel.tableName}.${CollectionModelColumn.ParentId}`,
-                            );
-                    });
-            })
-            .select()
-            .from(recursiveName)
-            .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
-
-        const collectionsForDeleteIds = collectionsForDelete.map((item) => item.collectionId);
-
-        const workbooksForDelete = await WorkbookModel.query(transactionTrx)
-            .select()
-            .where(WorkbookModelColumn.CollectionId, 'in', collectionsForDeleteIds)
-            .where({
-                [WorkbookModelColumn.DeletedAt]: null,
-            })
-            .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
-
-        for (const workbook of workbooksForDelete) {
-            if (workbook.isTemplate) {
-                throw new AppError("Collection with workbook template can't be deleted", {
-                    code: US_ERRORS.COLLECTION_WITH_WORKBOOK_TEMPLATE_CANT_BE_DELETED,
+    const collectionsForDelete = await CollectionModel.query(getReplica(trx))
+        .withRecursive(recursiveName, (qb1) => {
+            qb1.select()
+                .from(CollectionModel.tableName)
+                .where({
+                    [CollectionModelColumn.TenantId]: tenantId,
+                    [CollectionModelColumn.ProjectId]: projectId,
+                    [CollectionModelColumn.DeletedAt]: null,
+                })
+                .whereIn([CollectionModelColumn.CollectionId], collectionIds)
+                .union((qb2) => {
+                    qb2.select(`${CollectionModel.tableName}.*`)
+                        .from(CollectionModel.tableName)
+                        .where({
+                            [`${CollectionModel.tableName}.${CollectionModelColumn.TenantId}`]:
+                                tenantId,
+                            [`${CollectionModel.tableName}.${CollectionModelColumn.ProjectId}`]:
+                                projectId,
+                            [`${CollectionModel.tableName}.${CollectionModelColumn.DeletedAt}`]:
+                                null,
+                        })
+                        .join(
+                            recursiveName,
+                            `${recursiveName}.${CollectionModelColumn.CollectionId}`,
+                            `${CollectionModel.tableName}.${CollectionModelColumn.ParentId}`,
+                        );
                 });
-            }
+        })
+        .select()
+        .from(recursiveName)
+        .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
+
+    const collectionsForDeleteIds = collectionsForDelete.map((item) => item.collectionId);
+
+    const collectionsMap = new Map<CollectionInstance, string[]>();
+
+    const parents = await getParents({
+        ctx,
+        trx: getReplica(trx),
+        collectionIds: collectionsForDeleteIds,
+    });
+
+    const parentsMap = new Map<string, Nullable<string>>();
+
+    parents.forEach((parent: CollectionModel) => {
+        parentsMap.set(parent.collectionId, parent.parentId);
+    });
+
+    const {Collection} = registry.common.classes.get();
+
+    collectionsForDelete.forEach((model) => {
+        const parentId = model.parentId;
+
+        const parentsForCollection = getParentsIdsFromMap(parentId, parentsMap);
+
+        const collection = new Collection({ctx, model});
+
+        collectionsMap.set(collection, parentsForCollection);
+    });
+
+    const workbooksForDelete = await WorkbookModel.query(getReplica(trx))
+        .select()
+        .where(WorkbookModelColumn.CollectionId, 'in', collectionsForDeleteIds)
+        .where({
+            [WorkbookModelColumn.DeletedAt]: null,
+        })
+        .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
+
+    for (const workbook of workbooksForDelete) {
+        if (workbook.isTemplate) {
+            throw new AppError("Collection with workbook template can't be deleted", {
+                code: US_ERRORS.COLLECTION_WITH_WORKBOOK_TEMPLATE_CANT_BE_DELETED,
+            });
         }
+    }
 
-        const workbookIds = workbooksForDelete.map((workbook) => workbook.workbookId);
+    const workbookIds = workbooksForDelete.map((workbook) => workbook.workbookId);
 
+    const result = await transaction(targetTrx, async (transactionTrx) => {
         if (workbookIds.length) {
             await deleteWorkbooks(
                 {ctx, trx: transactionTrx, skipCheckPermissions: true},
@@ -117,17 +143,10 @@ export const deleteCollections = async (
             );
         }
 
-        const deletedCollections = await CollectionModel.query(transactionTrx)
-            .patch({
-                [CollectionModelColumn.DeletedBy]: userId,
-                [CollectionModelColumn.DeletedAt]: raw(CURRENT_TIMESTAMP),
-            })
-            .where(CollectionModelColumn.CollectionId, 'in', collectionsForDeleteIds)
-            .andWhere({
-                [CollectionModelColumn.DeletedAt]: null,
-            })
-            .returning('*')
-            .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
+        const deletedCollections = await markCollectionsAsDeleted(
+            {ctx, trx, skipCheckPermissions: true},
+            {collectionsMap},
+        );
 
         return deletedCollections;
     });

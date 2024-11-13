@@ -75,3 +75,21 @@ export const getCollectionsParentIds = async ({
     const parents = await getParents({ctx, trx, collectionIds});
     return parents.map((item) => item.collectionId);
 };
+
+export const getParentsIdsFromMap = (
+    collectionId: string | null,
+    parentsMap: Map<string, Nullable<string>>,
+): string[] => {
+    let id: Nullable<string> = collectionId;
+    const arr: string[] = id ? [id] : [];
+
+    while (id !== null) {
+        const curr: Nullable<string> = parentsMap.get(id) || null;
+
+        if (curr) arr.push(curr);
+
+        id = curr;
+    }
+
+    return arr;
+};

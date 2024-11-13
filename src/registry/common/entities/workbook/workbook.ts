@@ -80,6 +80,10 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
         this.permissions = permissions;
     }
 
+    async deletePermissions(): Promise<void> {
+        this.permissions = undefined;
+    }
+
     enableAllPermissions() {
         this.permissions = {
             listAccessBindings: true,
