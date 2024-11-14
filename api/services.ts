@@ -8,7 +8,12 @@ export {
 } from '../src/services/entry/actions/get-related-entries';
 
 export {getCollection} from '../src/services/new/collection/get-collection';
-export {getParentIds} from '../src/services/new/collection/utils/get-parents';
+export {
+    getParentIds,
+    makeWorkbooksWithParentsMap,
+    makeCollectionsWithParentsMap,
+} from '../src/services/new/collection/utils/get-parents';
+
 export {getWorkbook, createWorkbook, setWorkbookIsTemplate} from '../src/services/new/workbook';
 export {checkWorkbookPermission} from '../src/services/new/workbook/utils/check-workbook-permission';
 export {copyEntriesToWorkbook} from '../src/services/new/entry';

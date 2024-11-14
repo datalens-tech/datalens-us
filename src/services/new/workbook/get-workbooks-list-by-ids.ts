@@ -5,13 +5,12 @@ import {getReplica} from '../utils';
 import Utils from '../../../utils';
 import {registry} from '../../../registry';
 
-import {getParents, getParentsIdsFromMap} from '../collection/utils';
+import {makeWorkbooksWithParentsMap} from '../collection/utils';
 
 import {WorkbookPermission} from '../../../entities/workbook';
 
 import {Feature, isEnabledFeature} from '../../../components/features';
 
-import {CollectionModel} from '../../../db/models/new/collection';
 import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
 
 const validateArgs = makeSchemaValidator({
@@ -76,41 +75,12 @@ export const getWorkbooksListByIds = async (
         return workbookList.map((model) => new Workbook({ctx, model}));
     }
 
-    const collectionIds = workbookList
-        .map((workbook) => workbook.collectionId)
-        .filter((item) => Boolean(item));
-
-    const parents = await getParents({
-        ctx,
-        trx: targetTrx,
-        collectionIds,
-    });
-
-    const workbooksMap = new Map<WorkbookModel, string[]>();
+    const workbooksMap = await makeWorkbooksWithParentsMap({ctx, trx}, {models: workbookList});
     const acceptedWorkbooksMap = new Map<WorkbookModel, string[]>();
-
-    const parentsMap = new Map<string, Nullable<string>>();
-
-    parents.forEach((parent: CollectionModel) => {
-        parentsMap.set(parent.collectionId, parent.parentId);
-    });
-
-    workbookList.forEach((model) => {
-        const collectionId = model.collectionId;
-
-        const parentsforWorkbook = getParentsIdsFromMap(collectionId, parentsMap);
-
-        workbooksMap.set(model, parentsforWorkbook);
-    });
 
     const checkPermissionPromises: Promise<WorkbookInstance | void>[] = [];
 
-    workbooksMap.forEach((parentIds, workbookModel) => {
-        const workbook = new Workbook({
-            ctx,
-            model: workbookModel,
-        });
-
+    workbooksMap.forEach((parentIds, workbook) => {
         const promise = workbook
             .checkPermission({
                 parentIds,
@@ -119,7 +89,7 @@ export const getWorkbooksListByIds = async (
                     : WorkbookPermission.View,
             })
             .then(() => {
-                acceptedWorkbooksMap.set(workbookModel, parentIds);
+                acceptedWorkbooksMap.set(workbook.model, parentIds);
 
                 return workbook;
             })
