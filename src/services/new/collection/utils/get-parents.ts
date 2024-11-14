@@ -117,7 +117,7 @@ export const makeWorkbooksWithParentsMap = async (
         models: WorkbookModel[];
     },
 ): Promise<Map<WorkbookInstance, string[]>> => {
-    const collectionsWithParentsMap = new Map<WorkbookInstance, string[]>();
+    const workbooksWithParentsMap = new Map<WorkbookInstance, string[]>();
     const collectionIds = models.map((item) => item.collectionId).filter((item) => Boolean(item));
 
     const parents = await getParents({
@@ -133,14 +133,14 @@ export const makeWorkbooksWithParentsMap = async (
     models.forEach((model) => {
         const collectionId = model.collectionId;
 
-        const parentsForCollection = getParentsIdsFromMap(collectionId, parentsMap);
+        const parentsForWorkbook = getParentsIdsFromMap(collectionId, parentsMap);
 
-        const collection = new Workbook({ctx, model});
+        const workbook = new Workbook({ctx, model});
 
-        collectionsWithParentsMap.set(collection, parentsForCollection);
+        workbooksWithParentsMap.set(workbook, parentsForWorkbook);
     });
 
-    return collectionsWithParentsMap;
+    return workbooksWithParentsMap;
 };
 
 export const makeCollectionsWithParentsMap = async (
