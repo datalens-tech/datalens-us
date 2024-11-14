@@ -20,6 +20,13 @@ const wrapperGetGatewayControllers = (
 
 let gateway: ReturnType<typeof wrapperGetGatewayControllers>;
 
+export type GatewayApi<TSchema extends SchemasByScope> = ApiWithRoot<
+    TSchema,
+    AppContext,
+    Request,
+    Response
+>;
+
 export const registry = {
     setupApp(appInstance: ExpressKit) {
         if (app) {
@@ -58,8 +65,9 @@ export const registry = {
         if (!gateway) {
             throw new Error('First of all setup the gateway');
         }
+
         return {gatewayApi: gateway.api} as {
-            gatewayApi: ApiWithRoot<TSchema, AppContext, Request, Response>;
+            gatewayApi: GatewayApi<TSchema>;
         };
     },
     common: commonRegistry,
