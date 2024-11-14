@@ -24,30 +24,19 @@ const validateArgs = makeSchemaValidator({
         includePermissionsInfo: {
             type: 'boolean',
         },
-        page: {
-            type: 'number',
-            minimum: 0,
-        },
-        pageSize: {
-            type: 'number',
-            minimum: 1,
-            maximum: 200,
-        },
     },
 });
 
 type GetWorkbooksListAndAllParentsArgs = {
     workbookIds: string[];
     includePermissionsInfo?: boolean;
-    page?: number;
-    pageSize?: number;
 };
 
 export const getWorkbooksListByIds = async (
     {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
     args: GetWorkbooksListAndAllParentsArgs,
 ) => {
-    const {workbookIds, includePermissionsInfo = false, page, pageSize} = args;
+    const {workbookIds, includePermissionsInfo = false} = args;
 
     ctx.log('GET_WORKBOOKS_LIST_BY_IDS_STARTED', {
         workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.encodeId(id)),
@@ -62,23 +51,14 @@ export const getWorkbooksListByIds = async (
 
     const targetTrx = getReplica(trx);
 
-    const workbooksModel = WorkbookModel.query(targetTrx)
+    const workbookList = await WorkbookModel.query(targetTrx)
         .where({
             [WorkbookModelColumn.DeletedAt]: null,
             [WorkbookModelColumn.TenantId]: tenantId,
             [WorkbookModelColumn.ProjectId]: projectId,
         })
-        .whereIn([WorkbookModelColumn.WorkbookId], workbookIds);
-
-    if (pageSize) {
-        workbooksModel.limit(pageSize);
-
-        if (page) {
-            workbooksModel.offset(pageSize * page);
-        }
-    }
-
-    const workbookList = await workbooksModel.timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
+        .whereIn([WorkbookModelColumn.WorkbookId], workbookIds)
+        .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
     const {accessServiceEnabled} = ctx.config;
 
@@ -169,26 +149,11 @@ export const getWorkbooksListByIds = async (
         result = workbooks.filter((item) => Boolean(item)) as WorkbookInstance[];
     }
 
-    const isPagination = typeof page !== 'undefined' && typeof pageSize !== 'undefined';
-
-    let nextPageToken;
-
-    if (isPagination) {
-        nextPageToken = Utils.getOptimisticNextPageToken({
-            page: page,
-            pageSize: pageSize,
-            curPage: result,
-        });
-    }
-
     ctx.log('GET_WORKBOOKS_LIST_BY_IDS_FINISHED', {
         workbookIds: await Utils.macrotasksMap(workbookList, (workbook) =>
             Utils.encodeId(workbook.workbookId),
         ),
     });
 
-    return {
-        workbooks: result,
-        nextPageToken,
-    };
+    return result;
 };

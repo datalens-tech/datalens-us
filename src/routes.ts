@@ -395,7 +395,7 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
             }),
             getCollectionsListByIds: makeRoute({
                 route: 'GET /v1/collections-by-ids',
-                handler: collectionsController.get,
+                handler: collectionsController.getCollectionsListByIds,
             }),
             getCollectionContent: makeRoute({
                 route: 'GET /v1/collection-content',
