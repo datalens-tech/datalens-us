@@ -16,7 +16,6 @@ export {
 } from '../src/db/models/new/revision';
 
 export {Tenant, TenantColumn} from '../src/db/models/new/tenant';
-export {MigrationTenant, MigrationTenantColumn} from '../src/db/models/new/migration-tenant';
 
 export {WorkbookModel, WorkbookModelColumn} from '../src/db/models/new/workbook';
 export {CollectionModel, CollectionModelColumn} from '../src/db/models/new/collection';
@@ -55,15 +54,6 @@ export {
     JoinedEntryRevisionFavorite,
     JoinedEntryRevisionFavoriteColumns,
 } from '../src/db/presentations/joined-entry-revision-favorite';
-export {
-    JoinMigrationTenantArgs,
-    JoinedMigrationTenant,
-    JoinedMigrationTenantColumn,
-    joinMigrationTenant,
-    LeftJoinedMigrationTenantColumns,
-    SelectedTenantColumns,
-} from '../src/db/presentations/joined-migration-tenant';
-export {JoinedEntryMigrationTenant} from '../src/db/presentations/joined-entry-migration-tenant';
 export {
     JoinedEmbedEmbeddingSecret,
     JoinedEmbedEmbeddingSecretColumns,
