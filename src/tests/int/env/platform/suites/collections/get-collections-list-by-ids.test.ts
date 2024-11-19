@@ -2,6 +2,7 @@ import request from 'supertest';
 import {app, auth, getCollectionBinding, US_ERRORS} from '../../auth';
 import {createMockCollection} from '../../helpers';
 import {routes} from '../../../../routes';
+import {COLLECTIONS_DEFAULT_FIELDS} from '../../../../models';
 
 const rootCollection = {
     collectionId: '',
@@ -70,6 +71,15 @@ describe('Get collections by ids', () => {
             })
             .expect(200);
 
-        console.log('resass: ', response.body);
+        expect(response.body).toStrictEqual([
+            {
+                ...COLLECTIONS_DEFAULT_FIELDS,
+                collectionId: rootCollection.collectionId,
+            },
+            {
+                ...COLLECTIONS_DEFAULT_FIELDS,
+                collectionId: rootCollection2.collectionId,
+            },
+        ]);
     });
 });
