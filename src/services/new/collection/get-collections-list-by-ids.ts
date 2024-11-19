@@ -54,7 +54,6 @@ export const getCollectionsListByIds = async (
             [CollectionModelColumn.ProjectId]: projectId,
         })
         .whereIn(CollectionModelColumn.CollectionId, collectionIds)
-        .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT)
         .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
 
     const modelsWithPermissions = await Promise.all(

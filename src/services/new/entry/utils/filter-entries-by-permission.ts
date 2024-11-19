@@ -84,7 +84,7 @@ export const filterEntriesByPermission = async <T extends PartialEntry>(
 
     if (workbookEntries.length > 0) {
         if (!isPrivateRoute && ctx.config.accessServiceEnabled) {
-            const workbooks = await getWorkbooksListByIds(
+            const workbookList = await getWorkbooksListByIds(
                 {ctx, trx: getReplica(trx)},
                 {
                     workbookIds: workbookEntries.map((entry) => entry.workbookId) as string[],
@@ -94,7 +94,7 @@ export const filterEntriesByPermission = async <T extends PartialEntry>(
 
             const workbooksMap = new Map<string, WorkbookInstance>();
 
-            workbooks.forEach((workbook) => {
+            workbookList.forEach((workbook) => {
                 workbooksMap.set(workbook.model.workbookId, workbook);
             });
 

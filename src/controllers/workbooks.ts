@@ -114,13 +114,12 @@ export default {
     },
 
     getWorkbooksListByIds: async (req: Request, res: Response) => {
-        const {query, body} = req;
+        const {body} = req;
 
         const result = await getWorkbooksListByIds(
             {ctx: req.ctx},
             {
                 workbookIds: body.workbookIds,
-                includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
             },
         );
 

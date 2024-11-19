@@ -67,13 +67,12 @@ export default {
     },
 
     getCollectionsListByIds: async (req: Request, res: Response) => {
-        const {query, body} = req;
+        const {body} = req;
 
         const result = await getCollectionsListByIds(
             {ctx: req.ctx},
             {
                 collectionIds: body.collectionIds,
-                includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
             },
         );
 
