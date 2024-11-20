@@ -11,7 +11,7 @@ import {CollectionPermission} from '../../../entities/collection';
 import {AppError} from '@gravity-ui/nodekit';
 import {getCollectionsListByIds} from './get-collections-list-by-ids';
 import {markCollectionsAsDeleted} from './utils/mark-collections-as-deleted';
-import {makeCollectionsWithParentsMap} from './utils';
+import {makeCollectionsWithParentsMap, checkAndSetCollectionPermission} from './utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -46,9 +46,25 @@ export const deleteCollections = async (
 
     const targetTrx = getPrimary(trx);
 
-    await getCollectionsListByIds(
-        {ctx, trx: getReplica(trx), skipValidation, skipCheckPermissions},
-        {collectionIds, permission: CollectionPermission.Delete},
+    const collectionsInstances = await getCollectionsListByIds(
+        {ctx, trx: getReplica(trx), skipValidation, skipCheckPermissions: true},
+        {collectionIds},
+    );
+
+    await Promise.all(
+        collectionsInstances.map(async (collectionInstance) => {
+            const collection = await checkAndSetCollectionPermission(
+                {ctx, trx},
+                {
+                    collectionInstance,
+                    skipCheckPermissions,
+                    includePermissionsInfo: false,
+                    permission: CollectionPermission.Delete,
+                },
+            );
+
+            return collection;
+        }),
     );
 
     const recursiveName = 'collectionChildren';

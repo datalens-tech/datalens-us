@@ -33,7 +33,7 @@ describe('Setup', () => {
 describe('Get collections by ids', () => {
     test('Auth error', async () => {
         await request(app)
-            .get(routes.getCollectionsListByIds)
+            .post(routes.getCollectionsListByIds)
             .send({
                 collectionIds: [rootCollection.collectionId, rootCollection2.collectionId],
             })
@@ -41,7 +41,7 @@ describe('Get collections by ids', () => {
     });
 
     test('Get list without permissions', async () => {
-        await auth(request(app).get(routes.getCollectionsListByIds))
+        await auth(request(app).post(routes.getCollectionsListByIds))
             .send({
                 collectionIds: [rootCollection.collectionId, rootCollection2.collectionId],
             })
@@ -49,7 +49,7 @@ describe('Get collections by ids', () => {
     });
 
     test('Get list without ids, should be a validation error', async () => {
-        const response = await auth(request(app).get(routes.getCollectionsListByIds), {
+        const response = await auth(request(app).post(routes.getCollectionsListByIds), {
             accessBindings: [
                 getCollectionBinding(rootCollection.collectionId, 'limitedView'),
                 getCollectionBinding(rootCollection2.collectionId, 'limitedView'),
@@ -60,7 +60,7 @@ describe('Get collections by ids', () => {
     });
 
     test('Successfully get list by ids', async () => {
-        const response = await auth(request(app).get(routes.getCollectionsListByIds), {
+        const response = await auth(request(app).post(routes.getCollectionsListByIds), {
             accessBindings: [
                 getCollectionBinding(rootCollection.collectionId, 'limitedView'),
                 getCollectionBinding(rootCollection2.collectionId, 'limitedView'),
