@@ -1,7 +1,6 @@
 import {ServiceArgs} from '../../services/new/types';
 import {makeSchemaValidator} from '../../components/validation-schema-compiler';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
-import {registry} from '../../registry';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -27,6 +26,7 @@ export const deleteColorPalette = async (
         colorPaletteId,
     });
 
+    const registry = ctx.get('registry');
     const {colorPalettesAdminValidator} = registry.common.functions.get();
 
     if (!skipValidation) {

@@ -5,7 +5,6 @@ import Utils from '../../../utils';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {AppContext, AppError} from '@gravity-ui/nodekit';
-import {registry} from '../../../registry';
 import {isWorkbookInstance} from '../../../registry/common/entities/structure-item/types';
 import {Feature, isEnabledFeature} from '../../../components/features';
 import {WorkbookPermission} from '../../../entities/workbook';
@@ -132,6 +131,7 @@ export const processPermissions = async ({
     let result;
 
     const {accessServiceEnabled} = ctx.config;
+    const registry = ctx.get('registry');
     const {Workbook, Collection} = registry.common.classes.get();
 
     if (accessServiceEnabled && !skipCheckPermissions) {
@@ -224,6 +224,7 @@ const bulkFetchStructureItemsAllPermissions = async (
         return [];
     }
 
+    const registry = ctx.get('registry');
     const {bulkFetchCollectionsAllPermissions, bulkFetchWorkbooksAllPermissions} =
         registry.common.functions.get();
 

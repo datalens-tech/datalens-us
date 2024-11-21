@@ -1,11 +1,11 @@
 import {CTX} from '../../../../types/models';
-import {registry} from '../../../../registry';
 import {GetEntryResult} from '../../../../services/new/entry/get-entry';
 
 export const formatGetEntryResponse = async (ctx: CTX, result: GetEntryResult) => {
     const {joinedEntryRevisionFavorite, permissions, includePermissionsInfo, includeLinks} = result;
 
     const {privatePermissions, onlyPublic} = ctx.get('info');
+    const registry = ctx.get('registry');
 
     let isHiddenUnversionedData = false;
     if (!privatePermissions.ownedScopes.includes(joinedEntryRevisionFavorite?.scope!)) {

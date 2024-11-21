@@ -13,7 +13,6 @@ import {
     validateRenameFavorite,
 } from './scheme';
 import {RETURN_FAVORITES_COLUMNS, US_ERRORS} from '../../../const';
-import {registry} from '../../../registry';
 
 import {getWorkbook} from '../../../services/new/workbook';
 import {filterEntriesByPermission} from '../../../services/new/entry/utils';
@@ -174,6 +173,7 @@ class Favorite extends Model {
             dlContext,
         });
 
+        const registry = ctx.get('registry');
         const {DLS} = registry.common.classes.get();
 
         const {login} = requestedBy;

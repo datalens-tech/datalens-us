@@ -6,7 +6,6 @@ import {RETURN_COLUMNS, DEFAULT_QUERY_TIMEOUT, US_ERRORS} from '../../../const';
 import Utils from '../../../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {checkEntry} from './check-entry';
-import {registry} from '../../../registry';
 
 const validateGetEntryByKey = makeSchemaValidator({
     type: 'object',
@@ -53,6 +52,7 @@ export async function getEntryByKey(
         customErrorBypassEnabled = false,
     }: GetEntryByKeyData,
 ) {
+    const registry = ctx.get('registry');
     const {tenantId, isPrivateRoute: infoIsPrivateRoute} = ctx.get('info');
     const isPrivateRoute = customIsPrivateRoute || infoIsPrivateRoute;
 

@@ -26,7 +26,6 @@ import {checkWorkbookPermission} from '../../new/workbook/utils';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {Optional} from 'utility-types';
 import {checkEntry} from './check-entry';
-import {registry} from '../../../registry';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import {EntryColumn} from '../../../db/models/new/entry';
 
@@ -132,6 +131,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         updateRevision,
     });
 
+    const registry = ctx.get('registry');
     const {DLS} = registry.common.classes.get();
 
     const {accessServiceEnabled} = ctx.config;

@@ -72,3 +72,5 @@ export const registry = {
     },
     common: commonRegistry,
 };
+
+export type Registry = typeof registry;

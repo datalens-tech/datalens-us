@@ -4,7 +4,6 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import Utils from '../../../utils';
 import {makeCollectionsWithParentsMap} from './utils';
-import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
 import {CollectionPermission} from '../../../entities/collection';
 import {CollectionInstance} from '../../../registry/common/entities/collection/types';
@@ -47,6 +46,7 @@ export const getCollectionsListByIds = async (
     }
 
     const {tenantId, projectId} = ctx.get('info');
+    const registry = ctx.get('registry');
 
     const models = await CollectionModel.query(getReplica(trx))
         .where({

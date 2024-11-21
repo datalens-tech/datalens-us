@@ -8,7 +8,6 @@ import {AppError} from '@gravity-ui/nodekit';
 import * as MT from '../../../types/models';
 import {validateCreateEntry, validateResolveTenantIdByEntryId} from './scheme';
 import {RETURN_COLUMNS, BiTrackingLogs, US_ERRORS} from '../../../const';
-import {registry} from '../../../registry';
 
 interface Entry extends MT.EntryColumns {
     revisions: any; // TODO: Figure out how to type a upsertGraph
@@ -187,6 +186,8 @@ class Entry extends Model {
             isPrivateRoute,
             dlContext,
         });
+
+        const registry = ctx.get('registry');
 
         const {DLS} = registry.common.classes.get();
 
@@ -578,6 +579,8 @@ class Entry extends Model {
             isPrivateRoute,
         });
 
+        const registry = ctx.get('registry');
+
         const {DLS} = registry.common.classes.get();
 
         const result = await transaction(this.primary, async (trx) => {
@@ -691,6 +694,8 @@ class Entry extends Model {
         ctx,
         trx,
     }: MT.CheckExistenceEntriesWithInsufficientPermissions): Promise<boolean> {
+        const registry = ctx.get('registry');
+
         const {DLS} = registry.common.classes.get();
 
         const entriesWithPermissionsInfo = await DLS.checkBulkPermission(

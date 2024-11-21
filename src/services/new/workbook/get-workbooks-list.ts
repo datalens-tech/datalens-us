@@ -9,7 +9,6 @@ import Utils from '../../../utils';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {CollectionPermission} from '../../../entities/collection';
 import {getParents} from '../collection/utils';
-import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
 
 const validateArgs = makeSchemaValidator({
@@ -89,6 +88,7 @@ export const getWorkbooksList = async (
     }
 
     const {accessServiceEnabled} = ctx.config;
+    const registry = ctx.get('registry');
     const {Workbook, Collection} = registry.common.classes.get();
     const {bulkFetchWorkbooksAllPermissions} = registry.common.functions.get();
 

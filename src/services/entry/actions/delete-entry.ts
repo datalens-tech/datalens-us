@@ -12,7 +12,6 @@ import {checkWorkbookPermission} from '../../new/workbook/utils';
 import {markEntryAsDeleted} from '../crud';
 import {checkEntry} from './check-entry';
 import {ServiceArgs} from '../../new/types';
-import {registry} from '../../../registry';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -47,6 +46,7 @@ export async function deleteEntry(
         lockToken,
     });
 
+    const registry = ctx.get('registry');
     const {DLS} = registry.common.classes.get();
 
     if (!skipValidation) {
