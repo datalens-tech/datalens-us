@@ -40,12 +40,31 @@ describe('Get workbooks by ids', () => {
             .expect(401);
     });
 
-    test('Get list without permissions', async () => {
-        await auth(request(app).post(routes.getWorkbooksListByIds))
+    test('Get list without permissions, should return empty list', async () => {
+        const response = await auth(request(app).post(routes.getWorkbooksListByIds))
             .send({
                 workbookIds: [rootWorkbook.workbookId, rootWorkbook2.workbookId],
             })
-            .expect(403);
+            .expect(200);
+
+        expect(response.body).toStrictEqual([]);
+    });
+
+    test('Get list with permission only 1 workbook, should return 1 workbook', async () => {
+        const response = await auth(request(app).post(routes.getWorkbooksListByIds), {
+            accessBindings: [getWorkbookBinding(rootWorkbook.workbookId, 'limitedView')],
+        })
+            .send({
+                workbookIds: [rootWorkbook.workbookId, rootWorkbook2.workbookId],
+            })
+            .expect(200);
+
+        expect(response.body).toStrictEqual([
+            {
+                ...WORKBOOK_DEFAULT_FIELDS,
+                workbookId: rootWorkbook.workbookId,
+            },
+        ]);
     });
 
     test('Get list without ids, should be a validation error', async () => {

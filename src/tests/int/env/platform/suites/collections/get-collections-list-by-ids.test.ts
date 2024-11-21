@@ -40,12 +40,31 @@ describe('Get collections by ids', () => {
             .expect(401);
     });
 
-    test('Get list without permissions', async () => {
-        await auth(request(app).post(routes.getCollectionsListByIds))
+    test('Get list without permissions, should return empty list', async () => {
+        const response = await auth(request(app).post(routes.getCollectionsListByIds))
             .send({
                 collectionIds: [rootCollection.collectionId, rootCollection2.collectionId],
             })
-            .expect(403);
+            .expect(200);
+
+        expect(response.body).toStrictEqual([]);
+    });
+
+    test('Get list with permission only 1 collection, should return 1 collection', async () => {
+        const response = await auth(request(app).post(routes.getCollectionsListByIds), {
+            accessBindings: [getCollectionBinding(rootCollection.collectionId, 'limitedView')],
+        })
+            .send({
+                collectionIds: [rootCollection.collectionId, rootCollection.collectionId],
+            })
+            .expect(200);
+
+        expect(response.body).toStrictEqual([
+            {
+                ...COLLECTIONS_DEFAULT_FIELDS,
+                collectionId: rootCollection.collectionId,
+            },
+        ]);
     });
 
     test('Get list without ids, should be a validation error', async () => {
