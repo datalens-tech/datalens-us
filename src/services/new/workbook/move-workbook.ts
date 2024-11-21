@@ -13,7 +13,6 @@ import Utils from '../../../utils';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {CollectionPermission} from '../../../entities/collection';
 import {getCollection} from '../collection';
-import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
 
 const validateArgs = makeSchemaValidator({
@@ -59,6 +58,7 @@ export const moveWorkbook = async (
     const {
         user: {userId},
     } = ctx.get('info');
+    const registry = ctx.get('registry');
 
     const targetTrx = getPrimary(trx);
 

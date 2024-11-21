@@ -8,7 +8,6 @@ import {transaction} from 'objection';
 import {US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import Utils from '../../../utils';
-import {registry} from '../../../registry';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -56,6 +55,7 @@ export const createWorkbook = async (
         projectId,
         isPrivateRoute,
     } = ctx.get('info');
+    const registry = ctx.get('registry');
 
     const targetTrx = getPrimary(trx);
 

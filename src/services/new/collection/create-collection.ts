@@ -8,7 +8,6 @@ import {transaction} from 'objection';
 import {US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import Utils from '../../../utils';
-import {registry} from '../../../registry';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -37,6 +36,8 @@ export const createCollection = async (
     args: CreateCollectionArgs,
 ) => {
     const {title, description, parentId} = args;
+
+    const registry = ctx.get('registry');
 
     ctx.log('CREATE_COLLECTION_START', {
         title,

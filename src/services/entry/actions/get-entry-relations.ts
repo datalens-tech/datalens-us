@@ -8,7 +8,6 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {getEntryPermissionsByWorkbook} from '../../new/workbook/utils';
 import {getRelatedEntries, RelationDirection} from './get-related-entries';
-import {registry} from '../../../registry';
 import {getReplica} from '../../new/utils';
 import {EntryScope} from '../../../db/models/new/entry/types';
 
@@ -55,9 +54,10 @@ export async function getEntryRelations(
     {ctx, trx, skipValidation = false}: ServiceArgs,
     args: GetEntryRelationsArgs,
 ) {
-    const {DLS} = registry.common.classes.get();
-
+    const registry = ctx.get('registry');
     const {tenantId, isPrivateRoute} = ctx.get('info');
+
+    const {DLS} = registry.common.classes.get();
 
     const {
         entryId,

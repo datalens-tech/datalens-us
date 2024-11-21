@@ -17,7 +17,9 @@ import {
 import {AppEnv} from './const';
 import {registry} from './registry';
 import {getRoutes} from './routes';
+import {setRegistryToContext} from './components/app-context';
 
+setRegistryToContext(nodekit, registry);
 registerAppPlugins();
 
 const beforeAuth: AppMiddleware[] = [];

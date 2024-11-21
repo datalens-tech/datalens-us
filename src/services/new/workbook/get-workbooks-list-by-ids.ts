@@ -3,7 +3,6 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 import Utils from '../../../utils';
-import {registry} from '../../../registry';
 
 import {makeWorkbooksWithParentsMap} from '../collection/utils';
 
@@ -43,6 +42,7 @@ export const getWorkbooksListByIds = async (
     });
 
     const {tenantId, isPrivateRoute, projectId} = ctx.get('info');
+    const registry = ctx.get('registry');
 
     if (!skipValidation) {
         validateArgs(args);

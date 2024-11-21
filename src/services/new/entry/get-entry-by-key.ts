@@ -14,7 +14,6 @@ import OldEntry from '../../../db/models/entry';
 import {getWorkbook} from '../workbook';
 import {getEntryPermissionsByWorkbook} from '../workbook/utils';
 import {validateTenantId} from './validators';
-import {registry} from '../../../registry';
 
 const validateGetEntryByKey = makeSchemaValidator({
     type: 'object',
@@ -71,6 +70,7 @@ export const getEntryByKey = async (
         customErrorBypassEnabled,
     });
 
+    const registry = ctx.get('registry');
     const {DLS} = registry.common.classes.get();
 
     const {tenantId, isPrivateRoute: infoIsPrivateRoute} = ctx.get('info');

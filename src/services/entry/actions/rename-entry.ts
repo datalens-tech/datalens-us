@@ -9,7 +9,6 @@ import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission} from '../../new/workbook/utils';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {checkEntry} from './check-entry';
-import {registry} from '../../../registry';
 
 const validateRenameEntry = makeSchemaValidator({
     type: 'object',
@@ -40,6 +39,7 @@ export const renameEntry = async (ctx: CTX, renameEntryData: RenameEntryData) =>
         name,
     });
 
+    const registry = ctx.get('registry');
     const {DLS} = registry.common.classes.get();
 
     const {accessServiceEnabled} = ctx.config;

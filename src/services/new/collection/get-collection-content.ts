@@ -9,7 +9,6 @@ import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/col
 import Utils from '../../../utils';
 import {getWorkbooksList} from '../workbook';
 import {getCollection} from './get-collection';
-import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
 
 const validateArgs = makeSchemaValidator({
@@ -99,6 +98,7 @@ export const getCollectionContent = async (
         validateArgs(args);
     }
 
+    const registry = ctx.get('registry');
     const {accessServiceEnabled} = ctx.config;
     const {Workbook, Collection} = registry.common.classes.get();
     const {bulkFetchCollectionsAllPermissions} = registry.common.functions.get();

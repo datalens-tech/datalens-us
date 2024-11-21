@@ -9,7 +9,6 @@ import Utils from '../../../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
 import {getWorkbook} from '../workbook';
-import {registry} from '../../../registry';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -40,6 +39,7 @@ export const getEntryMeta = async (
         entryId: Utils.encodeId(entryId),
     });
 
+    const registry = ctx.get('registry');
     const {DLS} = registry.common.classes.get();
 
     if (!skipValidation) {

@@ -6,7 +6,6 @@ import {US_ERRORS} from '../../../const';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import Utils from '../../../utils';
 import {CollectionPermission} from '../../../entities/collection';
-import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
 
 const validateArgs = makeSchemaValidator({
@@ -29,6 +28,8 @@ export const getCollectionBreadcrumbs = async (
     args: GetCollectionBreadcrumbsArgs,
 ) => {
     const {collectionId, includePermissionsInfo} = args;
+
+    const registry = ctx.get('registry');
 
     const {accessServiceEnabled} = ctx.config;
 

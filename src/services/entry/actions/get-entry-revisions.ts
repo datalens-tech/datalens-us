@@ -14,7 +14,6 @@ import Utils from '../../../utils';
 import {checkEntry} from './check-entry';
 import {getWorkbook} from '../../new/workbook';
 import {ServiceArgs} from '../../new/types';
-import {registry} from '../../../registry';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -67,6 +66,7 @@ export async function getEntryRevisions(
         pageSize,
     });
 
+    const registry = ctx.get('registry');
     const {DLS} = registry.common.classes.get();
 
     if (!skipValidation) {

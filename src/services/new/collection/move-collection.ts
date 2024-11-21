@@ -11,7 +11,6 @@ import {raw} from 'objection';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import Utils from '../../../utils';
 import {CollectionPermission} from '../../../entities/collection';
-import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
 
 const validateArgs = makeSchemaValidator({
@@ -47,6 +46,7 @@ export const moveCollection = async (
     const {
         user: {userId},
     } = ctx.get('info');
+    const registry = ctx.get('registry');
 
     ctx.log('MOVE_COLLECTION_START', {
         collectionId: Utils.encodeId(collectionId),

@@ -2,7 +2,6 @@ import {AppError, AppContext} from '@gravity-ui/nodekit';
 import {ServiceArgs} from '../types';
 import {US_ERRORS} from '../../../const';
 import {OrganizationPermission, ProjectPermission} from '../../../components/iam';
-import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
 
 export const getRootCollectionPermissions = async ({ctx}: ServiceArgs) => {
@@ -31,6 +30,7 @@ export const getRootCollectionPermissions = async ({ctx}: ServiceArgs) => {
 };
 
 async function checkCreateCollectionInRoot(ctx: AppContext) {
+    const registry = ctx.get('registry');
     const {checkOrganizationPermission, checkProjectPermission} = registry.common.functions.get();
     try {
         if (isEnabledFeature(ctx, Feature.ProjectsEnabled)) {
@@ -56,6 +56,7 @@ async function checkCreateCollectionInRoot(ctx: AppContext) {
 }
 
 async function checkCreateWorkbookInRoot(ctx: AppContext) {
+    const registry = ctx.get('registry');
     const {checkOrganizationPermission, checkProjectPermission} = registry.common.functions.get();
     try {
         if (isEnabledFeature(ctx, Feature.ProjectsEnabled)) {

@@ -7,7 +7,6 @@ import {US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../entities/workbook';
 import Utils from '../../../utils';
-import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
 import type {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
 
@@ -71,6 +70,7 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
         });
     }
 
+    const registry = ctx.get('registry');
     const {Workbook} = registry.common.classes.get();
 
     const workbook = new Workbook({

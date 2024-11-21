@@ -3,7 +3,6 @@ import {Utils} from './utils';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import {ZitadelUserRole} from '../types/zitadel';
-import {registry} from '../registry';
 
 type IntrospectionResult = {
     active: boolean;
@@ -51,6 +50,7 @@ export const introspect = async (ctx: AppContext, token?: string): Promise<Intro
 
         const {active, username, sub} = response.data;
 
+        const registry = ctx.get('registry');
         const {getZitadelUserRole} = registry.common.functions.get();
 
         const role = getZitadelUserRole(response.data);
