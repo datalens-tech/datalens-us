@@ -1,5 +1,6 @@
 import {CtxInfo} from '../src/types/ctx';
 import {FeaturesConfig} from '../src/components/features/types';
+import type {Registry} from '../src/registry';
 
 export interface SharedAppConfig {
     features: FeaturesConfig;
@@ -28,6 +29,7 @@ declare module '@gravity-ui/nodekit' {
 
     interface AppContextParams {
         info: CtxInfo;
+        registry: Registry;
     }
 }
 

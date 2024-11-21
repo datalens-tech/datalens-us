@@ -20,3 +20,5 @@ export type {FeaturesConfig} from '../src/components/features/types';
 export {isGatewayError} from '../src/components/gateway';
 
 export {resolvePrivatePermissions} from '../src/components/private-permissions';
+
+export {setRegistryToContext} from '../src/components/app-context';

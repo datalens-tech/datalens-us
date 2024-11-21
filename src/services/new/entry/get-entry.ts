@@ -15,7 +15,6 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import OldEntry from '../../../db/models/entry';
 import {getWorkbook} from '../workbook';
 import {getEntryPermissionsByWorkbook} from '../workbook/utils';
-import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
 
 const validateArgs = makeSchemaValidator({
@@ -71,6 +70,7 @@ export const getEntry = async (
         includeLinks,
     });
 
+    const registry = ctx.get('registry');
     const {DLS} = registry.common.classes.get();
 
     const {isPrivateRoute, user, onlyPublic, onlyMirrored} = ctx.get('info');

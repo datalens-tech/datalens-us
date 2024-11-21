@@ -4,7 +4,6 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {CollectionPermission} from '../../../entities/collection';
 import {CollectionModel} from '../../../db/models/new/collection';
 import Utils from '../../../utils';
-import {registry} from '../../../registry';
 import {Feature, isEnabledFeature} from '../../../components/features';
 import {getCollection} from '../collection';
 import {getParentIds} from '../collection/utils';
@@ -95,6 +94,7 @@ export const getStructureItems = async (
     }
 
     const {accessServiceEnabled} = ctx.config;
+    const registry = ctx.get('registry');
     const {Workbook, Collection} = registry.common.classes.get();
 
     const targetTrx = getReplica(trx);

@@ -1,5 +1,4 @@
 import {DlsActions, EntryScope} from '../../../../types/models';
-import {registry} from '../../../../registry';
 import {getWorkbooksListByIds} from '../../workbook/get-workbooks-list-by-ids';
 import {EntryPermissions} from '../types';
 import {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
@@ -39,6 +38,7 @@ export const filterEntriesByPermission = async <T extends PartialEntry>(
     const {entries, permission = 'read', includePermissionsInfo} = args;
 
     const {isPrivateRoute} = ctx.get('info');
+    const registry = ctx.get('registry');
 
     let result: EntryWithPermissions<T>[] = [];
 

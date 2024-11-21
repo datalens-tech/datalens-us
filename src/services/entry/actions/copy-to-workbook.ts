@@ -8,7 +8,6 @@ import {WorkbookModel} from '../../../db/models/new/workbook';
 import {CTX} from '../../../types/models';
 import {US_ERRORS, BiTrackingLogs} from '../../../const';
 import Utils, {makeUserId} from '../../../utils';
-import {registry} from '../../../registry';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {getParentIds} from '../../new/collection/utils/get-parents';
 
@@ -78,6 +77,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
     validateParams(params);
 
     const {tenantId, user} = ctx.get('info');
+    const registry = ctx.get('registry');
     const createdBy = makeUserId(user.userId);
 
     const targetTenantId = tenantIdOverride ?? tenantId;

@@ -7,7 +7,6 @@ import {AppContext, AppError} from '@gravity-ui/nodekit';
 import * as MT from '../../../types/models';
 import US_ERRORS from '../../../const/us-error-constants';
 import {CURRENT_TIMESTAMP} from '../../../const';
-import {registry} from '../../../registry';
 import {Entry} from '../new/entry';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {getWorkbook} from '../../../services/new/workbook';
@@ -82,6 +81,7 @@ class Lock extends Model {
         tenantId: string;
         permission: 'read' | 'edit';
     }) {
+        const registry = ctx.get('registry');
         const {accessServiceEnabled} = ctx.config;
 
         const entry = await Entry.query(Entry.replica)

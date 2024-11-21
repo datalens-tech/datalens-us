@@ -4,7 +4,6 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
 import Utils from '../../../utils';
-import {registry} from '../../../registry';
 import {checkAndSetCollectionPermission} from './utils';
 
 const validateArgs = makeSchemaValidator({
@@ -46,6 +45,7 @@ export const getCollectionsListByIds = async (
     }
 
     const {tenantId, projectId} = ctx.get('info');
+    const registry = ctx.get('registry');
 
     const models = await CollectionModel.query(getReplica(trx))
         .where({

@@ -14,7 +14,6 @@ import {WorkbookPermission} from '../../../entities/workbook';
 import Utils from '../../../utils';
 import {copyToWorkbook} from '../../entry/actions';
 import {getCollection} from '../collection';
-import {registry} from '../../../registry';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -82,6 +81,7 @@ export const copyWorkbook = async (
         user: {userId},
     } = ctx.get('info');
 
+    const registry = ctx.get('registry');
     const {Workbook} = registry.common.classes.get();
 
     const originWorkbookModel: Optional<WorkbookModel> = await WorkbookModel.query(getReplica(trx))

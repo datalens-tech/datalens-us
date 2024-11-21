@@ -5,7 +5,6 @@ import {CollectionModel, CollectionModelColumn} from '../../../../db/models/new/
 import {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
 import {CollectionInstance} from '../../../../registry/common/entities/collection/types';
 import {ServiceArgs} from '../../types';
-import {registry} from '../../../../registry';
 import {WorkbookModel} from '../../../../db/models/new/workbook';
 
 interface Ctx {
@@ -128,6 +127,7 @@ export const makeWorkbooksWithParentsMap = async (
 
     const parentsMap = makeParentsMap(parents);
 
+    const registry = ctx.get('registry');
     const {Workbook} = registry.common.classes.get();
 
     models.forEach((model) => {
@@ -162,6 +162,7 @@ export const makeCollectionsWithParentsMap = async (
 
     const parentsMap = makeParentsMap(parents);
 
+    const registry = ctx.get('registry');
     const {Collection} = registry.common.classes.get();
 
     models.forEach((model) => {

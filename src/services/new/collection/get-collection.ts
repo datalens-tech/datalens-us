@@ -6,7 +6,6 @@ import {US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
 import Utils from '../../../utils';
-import {registry} from '../../../registry';
 
 import type {CollectionInstance} from '../../../registry/common/entities/collection/types';
 import {checkAndSetCollectionPermission} from './utils';
@@ -73,6 +72,7 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
         });
     }
 
+    const registry = ctx.get('registry');
     const {Collection} = registry.common.classes.get();
 
     const collectionInstance = new Collection({

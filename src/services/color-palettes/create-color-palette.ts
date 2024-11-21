@@ -4,7 +4,6 @@ import {ServiceArgs} from '../../services/new/types';
 import {makeSchemaValidator} from '../../components/validation-schema-compiler';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
 import Utils from '../../utils';
-import {registry} from '../../registry';
 import {getColorPalettesCount} from './get-color-palettes-count';
 import {US_ERRORS} from '../../const';
 
@@ -53,6 +52,7 @@ export const createColorPalette = async (
         isDefault,
     });
 
+    const registry = ctx.get('registry');
     const {colorPalettesAdminValidator} = registry.common.functions.get();
 
     if (!skipValidation) {

@@ -6,7 +6,6 @@ import {DlsActions} from '../../../types/models';
 import {US_ERRORS} from '../../../const';
 import Utils from '../../../utils';
 import {getWorkbook} from '../workbook';
-import {registry} from '../../../registry';
 
 export type GetEntryMetaPrivateArgs = {
     entryId: string;
@@ -22,6 +21,7 @@ export const getEntryMetaPrivate = async (
         entryId: Utils.encodeId(entryId),
     });
 
+    const registry = ctx.get('registry');
     const {DLS} = registry.common.classes.get();
 
     const masterTokenReal = ctx.config.masterToken;
