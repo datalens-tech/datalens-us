@@ -60,8 +60,11 @@ const extendedRoutes = getRoutes(nodekit, {beforeAuth, afterAuth});
 
 const routes: AppRoutes = {};
 objectKeys(extendedRoutes).forEach((key) => {
-    const {route, feat, ...params} = extendedRoutes[key];
-    if (!Array.isArray(feat) || feat.every((flag) => isEnabledFeature(nodekit.ctx, flag))) {
+    const {route, features, ...params} = extendedRoutes[key];
+    if (
+        !Array.isArray(features) ||
+        features.every((feature) => isEnabledFeature(nodekit.ctx, feature))
+    ) {
         routes[route] = params;
     }
 });
