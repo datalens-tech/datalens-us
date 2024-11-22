@@ -18,6 +18,8 @@ import {AppEnv} from './const';
 import {registry} from './registry';
 import {getRoutes} from './routes';
 import {setRegistryToContext} from './components/app-context';
+import {isEnabledFeature} from './components/features';
+import {objectKeys} from './utils/utility-types';
 
 setRegistryToContext(nodekit, registry);
 registerAppPlugins();
@@ -57,9 +59,14 @@ nodekit.config.appFinalErrorHandler = finalRequestHandler;
 const extendedRoutes = getRoutes(nodekit, {beforeAuth, afterAuth});
 
 const routes: AppRoutes = {};
-Object.keys(extendedRoutes).forEach((key) => {
-    const {route, ...params} = extendedRoutes[key];
-    routes[route] = params;
+objectKeys(extendedRoutes).forEach((key) => {
+    const {route, features, ...params} = extendedRoutes[key];
+    if (
+        !Array.isArray(features) ||
+        features.every((feature) => isEnabledFeature(nodekit.ctx, feature))
+    ) {
+        routes[route] = params;
+    }
 });
 
 const app = new ExpressKit(nodekit, routes);
