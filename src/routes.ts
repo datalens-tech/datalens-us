@@ -298,7 +298,7 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
                 handler: workbooksController.getList,
             }),
             getWorkbooksListByIds: makeRoute({
-                route: 'POST /v2/workbooks-by-ids',
+                route: 'POST /v2/workbooks-get-list-by-ids',
                 handler: workbooksController.getWorkbooksListByIds,
             }),
             updateWorkbook: makeRoute({
@@ -394,7 +394,7 @@ export function getRoutes(nodekit: NodeKit, options: GetRoutesOptions) {
                 private: true,
             }),
             getCollectionsListByIds: makeRoute({
-                route: 'POST /v1/collections-by-ids',
+                route: 'POST /v1/collections-get-list-by-ids',
                 handler: collectionsController.getCollectionsListByIds,
             }),
             getCollectionContent: makeRoute({
