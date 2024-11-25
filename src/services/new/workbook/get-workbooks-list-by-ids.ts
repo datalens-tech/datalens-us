@@ -16,8 +16,11 @@ const validateArgs = makeSchemaValidator({
     type: 'object',
     required: ['workbookIds'],
     properties: {
-        workbookId: {
-            type: ['array', 'string'],
+        workbookIds: {
+            type: 'array',
+            minItems: 1,
+            maxItems: 1000,
+            items: {type: 'string'},
         },
         includePermissionsInfo: {
             type: 'boolean',

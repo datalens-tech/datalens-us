@@ -8,6 +8,8 @@ export const routes = {
     collections: '/v1/collections',
     deleteCollections: '/v1/delete-collections',
     deleteWorkbooks: '/v2/delete-workbooks',
+    getCollectionsListByIds: '/v1/collections-get-list-by-ids',
+    getWorkbooksListByIds: '/v2/workbooks-get-list-by-ids',
     moveCollections: '/v1/move-collections',
     moveWorkbooks: '/v2/move-workbooks',
     privateCollections: '/private/v1/collections',

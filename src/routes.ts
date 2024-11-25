@@ -296,6 +296,11 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             handler: workbooksController.getList,
             features: [Feature.CollectionsEnabled],
         }),
+        getWorkbooksListByIds: makeRoute({
+            route: 'POST /v2/workbooks-get-list-by-ids',
+            handler: workbooksController.getWorkbooksListByIds,
+            features: [Feature.CollectionsEnabled],
+        }),
         updateWorkbook: makeRoute({
             route: 'POST /v2/workbooks/:workbookId/update',
             handler: workbooksController.update,
@@ -402,6 +407,11 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             handler: collectionsController.get,
             authPolicy: AuthPolicy.disabled,
             private: true,
+            features: [Feature.CollectionsEnabled],
+        }),
+        getCollectionsListByIds: makeRoute({
+            route: 'POST /v1/collections-get-list-by-ids',
+            handler: collectionsController.getCollectionsListByIds,
             features: [Feature.CollectionsEnabled],
         }),
         getCollectionContent: makeRoute({
