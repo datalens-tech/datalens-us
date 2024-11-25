@@ -14,6 +14,8 @@ const validateArgs = makeSchemaValidator({
     properties: {
         collectionIds: {
             type: 'array',
+            minItems: 1,
+            maxItems: 1000,
             items: {type: 'string'},
         },
         includePermissionsInfo: {
