@@ -70,7 +70,9 @@ export async function getRelatedEntries(
                         .join('entries', 'entries.entryId', endToStart ? 'l.toId' : 'l.fromId')
                         .where((builder) => {
                             builder.where({isDeleted: false});
+
                             builder.andWhere('depth', '<', 5);
+
                             if (scope) {
                                 builder.andWhere('entries.scope', scope);
                             }
