@@ -68,8 +68,13 @@ export async function getRelatedEntries(
                             endToStart ? 'l.fromId' : 'l.toId',
                         )
                         .join('entries', 'entries.entryId', endToStart ? 'l.toId' : 'l.fromId')
-                        .where('isDeleted', false)
-                        .where('depth', '<', 5);
+                        .where((builder) => {
+                            builder.where({isDeleted: false});
+                            builder.andWhere('depth', '<', 5);
+                            if (scope) {
+                                builder.andWhere('entries.scope', scope);
+                            }
+                        });
                 });
         })
         .select()
