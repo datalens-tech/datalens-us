@@ -1,5 +1,6 @@
-import {raw} from 'objection';
 import type {Knex} from 'knex';
+import {raw} from 'objection';
+
 import {COMPARISON_OPERATORS} from '../../../const';
 import {InterTenantGetEntriesConfig} from '../../../types/models';
 

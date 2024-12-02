@@ -2,9 +2,11 @@
 // However the types described there are incorrect: const DBError: typeof dbErrors.DBError;
 // Due to incorrect types Typescript casts DBError as a constant.
 // DBError cannot be used as a type and typeof DBError does not infer the original type
-import {DBError} from 'db-errors';
 import {AppError} from '@gravity-ui/nodekit';
+import {DBError} from 'db-errors';
+
 import US_ERRORS from '../const/us-error-constants';
+
 const PG_ERRORS = require('pg-error-constants');
 
 function getDBErrorCode(error: DBError): string {

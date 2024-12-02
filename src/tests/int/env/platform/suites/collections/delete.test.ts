@@ -1,8 +1,9 @@
 import request from 'supertest';
+
+import {COLLECTIONS_DEFAULT_FIELDS} from '../../../../models';
+import {routes} from '../../../../routes';
 import {app, auth, getCollectionBinding, getWorkbookBinding} from '../../auth';
 import {createMockCollection, createMockWorkbook, createMockWorkbookEntry} from '../../helpers';
-import {routes} from '../../../../routes';
-import {COLLECTIONS_DEFAULT_FIELDS} from '../../../../models';
 
 const emptyRootCollection = {
     collectionId: '',

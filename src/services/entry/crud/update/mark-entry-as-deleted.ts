@@ -1,7 +1,8 @@
 import {TransactionOrKnex, raw} from 'objection';
-import {EntryColumns} from '../../../../types/models';
+
+import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, TRASH_FOLDER} from '../../../../const';
 import Entry from '../../../../db/models/entry';
-import {DEFAULT_QUERY_TIMEOUT, TRASH_FOLDER, CURRENT_TIMESTAMP} from '../../../../const';
+import {EntryColumns} from '../../../../types/models';
 
 export type MarkEntryDeletedData = {
     entryId: EntryColumns['entryId'];

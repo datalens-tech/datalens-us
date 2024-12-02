@@ -1,13 +1,15 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {raw, transaction} from 'objection';
-import Entry from '../../../db/models/entry';
-import {CTX, DlsActions} from '../../../types/models';
-import {RETURN_COLUMNS, BiTrackingLogs, US_ERRORS, CURRENT_TIMESTAMP} from '../../../const';
-import Utils, {makeUserId} from '../../../utils';
+
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {BiTrackingLogs, CURRENT_TIMESTAMP, RETURN_COLUMNS, US_ERRORS} from '../../../const';
+import Entry from '../../../db/models/entry';
+import {WorkbookPermission} from '../../../entities/workbook';
+import {CTX, DlsActions} from '../../../types/models';
+import Utils, {makeUserId} from '../../../utils';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission} from '../../new/workbook/utils';
-import {WorkbookPermission} from '../../../entities/workbook';
+
 import {checkEntry} from './check-entry';
 
 const validateRenameEntry = makeSchemaValidator({

@@ -1,8 +1,9 @@
 import request from 'supertest';
+
+import {COLLECTIONS_DEFAULT_FIELDS, COLLECTIONS_DEFAULT_PERMISSIONS} from '../../../../models';
+import {routes} from '../../../../routes';
 import {app, auth, getCollectionBinding} from '../../auth';
 import {createMockCollection} from '../../helpers';
-import {routes} from '../../../../routes';
-import {COLLECTIONS_DEFAULT_FIELDS, COLLECTIONS_DEFAULT_PERMISSIONS} from '../../../../models';
 
 const rootCollection = {
     collectionId: '',

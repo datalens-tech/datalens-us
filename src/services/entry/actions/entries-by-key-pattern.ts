@@ -1,6 +1,6 @@
-import Entry from '../../../db/models/entry';
-import {DEFAULT_QUERY_TIMEOUT} from '../../../const';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {DEFAULT_QUERY_TIMEOUT} from '../../../const';
+import Entry from '../../../db/models/entry';
 import {ServiceArgs} from '../../new/types';
 
 const validateArgs = makeSchemaValidator({

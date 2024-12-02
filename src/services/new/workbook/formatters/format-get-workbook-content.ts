@@ -1,5 +1,5 @@
-import {EntryPermissions} from '../../entry/types';
 import {JoinedEntryRevisionFavoriteColumns} from '../../../../db/presentations/joined-entry-revision-favorite';
+import {EntryPermissions} from '../../entry/types';
 
 export type GetContentResult = {
     permissions?: EntryPermissions;

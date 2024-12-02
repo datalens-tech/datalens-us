@@ -1,8 +1,9 @@
 import {Request, Response} from '@gravity-ui/expresskit';
-import {getStructureItems, Mode, OrderDirection, OrderField} from '../services/new/structure-item';
-import Utils from '../utils';
+
 import {prepareResponseAsync} from '../components/response-presenter';
+import {Mode, OrderDirection, OrderField, getStructureItems} from '../services/new/structure-item';
 import {formatStructureItems} from '../services/new/structure-item/formatters/format-structure-items';
+import Utils from '../utils';
 
 export default {
     getStructureItems: async (req: Request, res: Response) => {

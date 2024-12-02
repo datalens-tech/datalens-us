@@ -1,7 +1,8 @@
+import {SYSTEM_USER} from '../const';
 import Entry from '../db/models/entry';
 import * as ST from '../types/services.types';
+
 import {createEntryInWorkbook} from './entry';
-import {SYSTEM_USER} from '../const';
 
 export default class EntryService {
     static async _getEntriesByKey({key, branch, ctx}: ST.PrivateGetEntriesByKey) {

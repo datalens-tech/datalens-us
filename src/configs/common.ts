@@ -1,5 +1,6 @@
-import {AppConfig} from '@gravity-ui/nodekit';
 import {AuthPolicy} from '@gravity-ui/expresskit';
+import {AppConfig} from '@gravity-ui/nodekit';
+
 import {US_MASTER_TOKEN_HEADER} from '../const';
 import Utils from '../utils';
 

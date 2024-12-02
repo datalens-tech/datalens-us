@@ -1,7 +1,8 @@
-import Utils from '../../utils';
-import {Request, Response, NextFunction} from '@gravity-ui/expresskit';
+import {NextFunction, Request, Response} from '@gravity-ui/expresskit';
 import {AppError} from '@gravity-ui/nodekit';
+
 import US_ERRORS from '../../const/us-error-constants';
+import Utils from '../../utils';
 
 export const decodeId = async (req: Request, _res: Response, next: NextFunction) => {
     try {

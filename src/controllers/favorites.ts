@@ -1,9 +1,10 @@
-import FavoriteService from '../services/favorite.service';
 import {Request, Response} from '@gravity-ui/expresskit';
-import Utils from '../utils';
+
 import {prepareResponseAsync} from '../components/response-presenter';
-import * as ST from '../types/services.types';
 import Entry from '../db/models/entry';
+import FavoriteService from '../services/favorite.service';
+import * as ST from '../types/services.types';
+import Utils from '../utils';
 
 export default {
     getFavorites: async (req: Request, res: Response) => {

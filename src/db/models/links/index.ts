@@ -1,9 +1,11 @@
-import {Model} from '../..';
-import Utils from '../../../utils';
 import {AppError} from '@gravity-ui/nodekit';
-import * as MT from '../../../types/models';
-import {validateCreateLink} from './scheme';
+
+import {Model} from '../..';
 import {US_ERRORS} from '../../../const';
+import * as MT from '../../../types/models';
+import Utils from '../../../utils';
+
+import {validateCreateLink} from './scheme';
 
 interface Links extends MT.LinksColumns {}
 class Links extends Model {

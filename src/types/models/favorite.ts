@@ -1,6 +1,6 @@
 import {BasicRequestParams} from './common';
 import {CTX} from './core';
-import {EntriesOrderByFilter, EntriesFilters} from './filters';
+import {EntriesFilters, EntriesOrderByFilter} from './filters';
 
 export interface GetFavoriteConfig extends BasicRequestParams {
     tenantId?: any;

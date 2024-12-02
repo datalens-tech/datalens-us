@@ -1,6 +1,7 @@
-import {Request, Response, NextFunction} from '@gravity-ui/expresskit';
-import {resolvePrivatePermissions} from '../private-permissions';
+import {NextFunction, Request, Response} from '@gravity-ui/expresskit';
+
 import {DL_COMPONENT_HEADER} from '../../const';
+import {resolvePrivatePermissions} from '../private-permissions';
 
 export const ctx = async (req: Request, res: Response, next: NextFunction) => {
     const {

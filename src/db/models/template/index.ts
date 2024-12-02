@@ -1,8 +1,10 @@
-import {Model} from '../..';
 import {AppError} from '@gravity-ui/nodekit';
-import * as MT from '../../../types/models';
-import {validateGet, validateCreate, validateUpdate, validateDelete} from './scheme';
+
+import {Model} from '../..';
 import {US_ERRORS} from '../../../const';
+import * as MT from '../../../types/models';
+
+import {validateCreate, validateDelete, validateGet, validateUpdate} from './scheme';
 
 interface Template extends MT.TemplateColumns {}
 class Template extends Model {

@@ -1,8 +1,10 @@
-import {NextFunction, Request, Response} from '@gravity-ui/expresskit';
-import {introspect} from '../../utils/zitadel';
 import {IncomingHttpHeaders} from 'http';
+
+import {NextFunction, Request, Response} from '@gravity-ui/expresskit';
+
 import {DL_AUTH_HEADER_KEY, DL_SERVICE_USER_ACCESS_TOKEN} from '../../const';
 import {ZitadelServiceUser} from '../../types/zitadel';
+import {introspect} from '../../utils/zitadel';
 
 export const authZitadel = async (req: Request, res: Response, next: NextFunction) => {
     const {ctx} = req;

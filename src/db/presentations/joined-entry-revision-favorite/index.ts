@@ -1,18 +1,16 @@
 import type {Knex} from 'knex';
-import {TransactionOrKnex, raw, Modifier} from 'objection';
-import {
-    selectedColumns as joinedEntryRevisionColumns,
-    joinRevision,
-    JoinedEntryRevision,
-    JoinedEntryRevisionColumns,
-    JoinRevisionArgs,
-} from '../joined-entry-revision';
+import {Modifier, TransactionOrKnex, raw} from 'objection';
 
 import {Entry} from '../../models/new/entry';
-
-import {RevisionModel} from '../../models/new/revision';
 import {Favorite} from '../../models/new/favorite';
-
+import {RevisionModel} from '../../models/new/revision';
+import {
+    JoinRevisionArgs,
+    JoinedEntryRevision,
+    JoinedEntryRevisionColumns,
+    joinRevision,
+    selectedColumns as joinedEntryRevisionColumns,
+} from '../joined-entry-revision';
 import {leftJoinFavorite} from '../utils';
 
 const selectedColumns = [

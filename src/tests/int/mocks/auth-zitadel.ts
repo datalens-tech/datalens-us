@@ -1,4 +1,5 @@
-import type {Request, Response, NextFunction} from '@gravity-ui/expresskit';
+import type {NextFunction, Request, Response} from '@gravity-ui/expresskit';
+
 import type {AuthArgs as OpensourceAuth} from '../env/opensource/auth';
 import type {AuthArgs as PlatformAuth} from '../env/platform/auth';
 

@@ -1,11 +1,13 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
-import {ServiceArgs} from '../../services/new/types';
+
 import {makeSchemaValidator} from '../../components/validation-schema-compiler';
-import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
-import Utils from '../../utils';
-import {getColorPalettesCount} from './get-color-palettes-count';
 import {US_ERRORS} from '../../const';
+import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
+import {ServiceArgs} from '../../services/new/types';
+import Utils from '../../utils';
+
+import {getColorPalettesCount} from './get-color-palettes-count';
 
 const MAX_PALETTES_COUNT = 50;
 

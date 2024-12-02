@@ -1,5 +1,6 @@
 import type {AppContext} from '@gravity-ui/nodekit';
 import {TransactionOrKnex} from 'objection';
+
 import * as MT from '../../../../types/models';
 
 export interface DLSConstructor {

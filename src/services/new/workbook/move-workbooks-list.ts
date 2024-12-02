@@ -1,11 +1,9 @@
-import {getPrimary} from '../utils';
 import {transaction} from 'objection';
 
-import {ServiceArgs} from '../types';
-
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-
 import Utils from '../../../utils';
+import {ServiceArgs} from '../types';
+import {getPrimary} from '../utils';
 
 import {moveWorkbook} from './move-workbook';
 

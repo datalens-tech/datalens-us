@@ -1,6 +1,6 @@
-import {CtxInfo} from '../src/types/ctx';
 import {FeaturesConfig} from '../src/components/features/types';
 import type {Registry} from '../src/registry';
+import {CtxInfo} from '../src/types/ctx';
 
 export interface SharedAppConfig {
     features: FeaturesConfig;

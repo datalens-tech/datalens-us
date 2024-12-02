@@ -1,8 +1,9 @@
 import request from 'supertest';
-import {app, auth, testTenantId, authMasterToken} from '../../auth';
+
 import {testUserId} from '../../../../constants';
-import {WORKBOOK_DEFAULT_FIELDS, OPERATION_DEFAULT_FIELDS} from '../../../../models';
+import {OPERATION_DEFAULT_FIELDS, WORKBOOK_DEFAULT_FIELDS} from '../../../../models';
 import {routes} from '../../../../routes';
+import {app, auth, authMasterToken, testTenantId} from '../../auth';
 import {OpensourceRole} from '../../roles';
 
 const workbooksData = [

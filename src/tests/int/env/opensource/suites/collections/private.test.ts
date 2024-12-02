@@ -1,7 +1,8 @@
 import request from 'supertest';
-import {app, authMasterToken} from '../../auth';
-import {routes} from '../../../../routes';
+
 import {COLLECTIONS_DEFAULT_FIELDS} from '../../../../models';
+import {routes} from '../../../../routes';
+import {app, authMasterToken} from '../../auth';
 
 const testCollection = {
     collectionId: '',

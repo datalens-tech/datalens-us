@@ -1,8 +1,9 @@
 import request from 'supertest';
+
+import {COLLECTIONS_DEFAULT_FIELDS, OPERATION_DEFAULT_FIELDS} from '../../../../models';
 import {routes} from '../../../../routes';
-import {OpensourceRole} from '../../roles';
 import {app, auth} from '../../auth';
-import {OPERATION_DEFAULT_FIELDS, COLLECTIONS_DEFAULT_FIELDS} from '../../../../models';
+import {OpensourceRole} from '../../roles';
 
 const unexistedCollectionId = 'unexisted-collection-id';
 

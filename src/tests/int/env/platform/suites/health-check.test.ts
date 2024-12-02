@@ -1,4 +1,5 @@
 import request from 'supertest';
+
 import {app} from '../auth';
 
 describe('Check ping endpoints', () => {

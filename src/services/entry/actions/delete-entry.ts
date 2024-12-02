@@ -1,17 +1,19 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
+
+import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {BiTrackingLogs, DEFAULT_QUERY_TIMEOUT, RETURN_COLUMNS, US_ERRORS} from '../../../const';
 import Entry from '../../../db/models/entry';
 import Lock from '../../../db/models/lock';
-import {EntryColumns, DlsActions, UsPermissions} from '../../../types/models';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {RETURN_COLUMNS, BiTrackingLogs, DEFAULT_QUERY_TIMEOUT, US_ERRORS} from '../../../const';
-import Utils, {makeUserId} from '../../../utils';
-import {getWorkbook} from '../../new/workbook/get-workbook';
 import {WorkbookPermission} from '../../../entities/workbook';
+import {DlsActions, EntryColumns, UsPermissions} from '../../../types/models';
+import Utils, {makeUserId} from '../../../utils';
+import {ServiceArgs} from '../../new/types';
+import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission} from '../../new/workbook/utils';
 import {markEntryAsDeleted} from '../crud';
+
 import {checkEntry} from './check-entry';
-import {ServiceArgs} from '../../new/types';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',

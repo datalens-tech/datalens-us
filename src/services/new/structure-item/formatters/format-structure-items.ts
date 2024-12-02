@@ -1,8 +1,8 @@
 import type {CollectionInstance} from '../../../../registry/common/entities/collection/types';
 import {isWorkbookInstance} from '../../../../registry/common/entities/structure-item/types';
+import {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
 import {formatCollection} from '../../collection/formatters';
 import {formatWorkbook} from '../../workbook/formatters';
-import {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
 
 export const formatStructureItems = ({
     items,

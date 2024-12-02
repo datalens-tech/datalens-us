@@ -1,7 +1,7 @@
 require('dotenv').config();
 require('../../index');
-import {helpers} from '../index';
 import {Utils} from '../../utils/utils';
+import {helpers} from '../index';
 
 let dsnList;
 

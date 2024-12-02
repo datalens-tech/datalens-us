@@ -1,6 +1,7 @@
 import type {CollectionInstance} from '../../../../registry/common/entities/collection/types';
 import type {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
 import {formatWorkbook} from '../../workbook/formatters';
+
 import {formatCollection} from './format-collection';
 
 export const formatCollectionContent = ({

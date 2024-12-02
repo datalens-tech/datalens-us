@@ -1,18 +1,20 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {checkFetchedEntry} from './utils';
-import {EntryPermissions} from './types';
+
+import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {US_ERRORS} from '../../../const';
+import OldEntry from '../../../db/models/entry';
+import {Entry, EntryColumn} from '../../../db/models/new/entry';
+import {RevisionModel} from '../../../db/models/new/revision';
+import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
+import {DlsActions} from '../../../types/models';
+import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
-import {Entry, EntryColumn} from '../../../db/models/new/entry';
-import {DlsActions} from '../../../types/models';
-import {US_ERRORS} from '../../../const';
-import Utils from '../../../utils';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
-import {RevisionModel} from '../../../db/models/new/revision';
-import OldEntry from '../../../db/models/entry';
 import {getWorkbook} from '../workbook';
 import {getEntryPermissionsByWorkbook} from '../workbook/utils';
+
+import {EntryPermissions} from './types';
+import {checkFetchedEntry} from './utils';
 import {validateTenantId} from './validators';
 
 const validateGetEntryByKey = makeSchemaValidator({

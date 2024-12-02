@@ -1,13 +1,15 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {checkCollectionByTitle} from './check-collection-by-title';
-import {getParentIds} from './utils/get-parents';
-import {ServiceArgs} from '../types';
-import {getPrimary} from '../utils';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {transaction} from 'objection';
+
+import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import Utils from '../../../utils';
+import {ServiceArgs} from '../types';
+import {getPrimary} from '../utils';
+
+import {checkCollectionByTitle} from './check-collection-by-title';
+import {getParentIds} from './utils/get-parents';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',

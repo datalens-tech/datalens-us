@@ -1,8 +1,9 @@
 import request from 'supertest';
-import {app, authMasterToken} from '../../auth';
+
 import {systemUserId} from '../../../../constants';
-import {routes} from '../../../../routes';
 import {WORKBOOK_DEFAULT_FIELDS} from '../../../../models';
+import {routes} from '../../../../routes';
+import {app, authMasterToken} from '../../auth';
 
 const workbooksData = {
     id: null,

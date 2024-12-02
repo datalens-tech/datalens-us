@@ -1,19 +1,17 @@
-import {TransactionOrKnex} from 'objection';
 import {AppError} from '@gravity-ui/nodekit';
-
-import {getId} from '../../../db';
-import {Entry, EntryColumn} from '../../../db/models/new/entry';
-import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
-import {WorkbookModel} from '../../../db/models/new/workbook';
-import {CTX} from '../../../types/models';
-import {US_ERRORS, BiTrackingLogs} from '../../../const';
-import Utils, {makeUserId} from '../../../utils';
-import {WorkbookPermission} from '../../../entities/workbook';
-import {getParentIds} from '../../new/collection/utils/get-parents';
-
-import Link from '../../../db/models/links';
+import {TransactionOrKnex} from 'objection';
 
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {BiTrackingLogs, US_ERRORS} from '../../../const';
+import {getId} from '../../../db';
+import Link from '../../../db/models/links';
+import {Entry, EntryColumn} from '../../../db/models/new/entry';
+import {WorkbookModel} from '../../../db/models/new/workbook';
+import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
+import {WorkbookPermission} from '../../../entities/workbook';
+import {CTX} from '../../../types/models';
+import Utils, {makeUserId} from '../../../utils';
+import {getParentIds} from '../../new/collection/utils/get-parents';
 import {resolveEntriesNameCollisions} from '../../new/entry/utils/resolveNameCollisions';
 
 interface Params {

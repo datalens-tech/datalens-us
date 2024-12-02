@@ -1,6 +1,7 @@
 import {Request, Response} from '@gravity-ui/expresskit';
-import LockService from '../services/lock.service';
+
 import {prepareResponseAsync} from '../components/response-presenter';
+import LockService from '../services/lock.service';
 import * as ST from '../types/services.types';
 
 export default {

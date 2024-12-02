@@ -1,8 +1,10 @@
-import {TransactionOrKnex} from 'objection';
 import {AppError} from '@gravity-ui/nodekit';
+import {TransactionOrKnex} from 'objection';
+
+import {DEFAULT_QUERY_TIMEOUT, US_ERRORS} from '../../../../const';
 import {Entry} from '../../../../db/models/new/entry';
 import {CTX} from '../../../../types/models';
-import {US_ERRORS, DEFAULT_QUERY_TIMEOUT} from '../../../../const';
+
 import {checkFetchedEntry} from './check-fetched-entry';
 
 export const checkEntry = async (ctx: CTX, entryId: string, trx: TransactionOrKnex) => {

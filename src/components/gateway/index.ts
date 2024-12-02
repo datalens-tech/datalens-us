@@ -1,8 +1,9 @@
-import {NodeKit, AppError, AppContext} from '@gravity-ui/nodekit';
 import {Request, Response} from '@gravity-ui/expresskit';
-import {GatewayConfig, Headers as DebugHeaders, GatewayError} from '@gravity-ui/gateway';
+import {Headers as DebugHeaders, GatewayConfig, GatewayError} from '@gravity-ui/gateway';
+import {AppContext, AppError, NodeKit} from '@gravity-ui/nodekit';
+
 import {IPV6_AXIOS_OPTIONS} from '../../utils/axios';
-import {isEnabledFeature, Feature} from '../features';
+import {Feature, isEnabledFeature} from '../features';
 
 export const getGatewayConfig = (
     nodekit: NodeKit,

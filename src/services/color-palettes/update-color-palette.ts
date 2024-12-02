@@ -1,12 +1,13 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {ServiceArgs} from '../../services/new/types';
-import {getPrimary} from '../../services/new/utils';
+import {transaction} from 'objection';
+
 import {makeSchemaValidator} from '../../components/validation-schema-compiler';
-import {WorkbookModel} from '../../db/models/new/workbook';
-import Utils from '../../utils';
 import {US_ERRORS} from '../../const';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
-import {transaction} from 'objection';
+import {WorkbookModel} from '../../db/models/new/workbook';
+import {ServiceArgs} from '../../services/new/types';
+import {getPrimary} from '../../services/new/utils';
+import Utils from '../../utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',

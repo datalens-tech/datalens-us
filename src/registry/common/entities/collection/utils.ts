@@ -1,5 +1,5 @@
-import type {BulkFetchCollectionsAllPermissions} from './types';
 import {Collection} from './collection';
+import type {BulkFetchCollectionsAllPermissions} from './types';
 
 export const bulkFetchCollectionsAllPermissions: BulkFetchCollectionsAllPermissions = async (
     ctx,

@@ -1,8 +1,10 @@
 import {AppContext, AppError} from '@gravity-ui/nodekit';
-import type {CheckOrganizationPermission, CheckProjectPermission} from './types';
+
 import {OrganizationPermission, ProjectPermission} from '../../../../components/iam';
 import {US_ERRORS} from '../../../../const';
 import {ZitadelUserRole} from '../../../../types/zitadel';
+
+import type {CheckOrganizationPermission, CheckProjectPermission} from './types';
 
 const throwAccessServicePermissionDenied = () => {
     throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {

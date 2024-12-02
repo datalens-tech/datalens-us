@@ -1,4 +1,5 @@
 import {TransactionOrKnex} from 'objection';
+
 import {Model} from '../../../db';
 
 export const getPrimary = (trx?: TransactionOrKnex) => {

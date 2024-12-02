@@ -1,15 +1,16 @@
 import request from 'supertest';
-import {app, auth, getCollectionBinding, getWorkbookBinding} from '../../auth';
-import {createMockCollection, createMockWorkbook} from '../../helpers';
+
 import {testOtherUserId} from '../../../../constants';
-import {routes} from '../../../../routes';
 import {
     COLLECTIONS_DEFAULT_FIELDS,
-    WORKBOOK_DEFAULT_FIELDS,
-    GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
     COLLECTIONS_DEFAULT_PERMISSIONS,
+    GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
     WORKBOOKS_DEFAULT_PERMISSIONS,
+    WORKBOOK_DEFAULT_FIELDS,
 } from '../../../../models';
+import {routes} from '../../../../routes';
+import {app, auth, getCollectionBinding, getWorkbookBinding} from '../../auth';
+import {createMockCollection, createMockWorkbook} from '../../helpers';
 
 const rootCollection = {
     collectionId: '',

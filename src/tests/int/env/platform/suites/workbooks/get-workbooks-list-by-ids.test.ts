@@ -1,8 +1,9 @@
 import request from 'supertest';
-import {app, auth, getWorkbookBinding, US_ERRORS} from '../../auth';
-import {createMockWorkbook} from '../../helpers';
-import {routes} from '../../../../routes';
+
 import {WORKBOOK_DEFAULT_FIELDS} from '../../../../models';
+import {routes} from '../../../../routes';
+import {US_ERRORS, app, auth, getWorkbookBinding} from '../../auth';
+import {createMockWorkbook} from '../../helpers';
 
 const rootWorkbook = {
     workbookId: '',

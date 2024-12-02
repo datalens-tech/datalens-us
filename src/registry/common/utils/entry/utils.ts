@@ -1,7 +1,7 @@
 import type {
-    IsNeedBypassEntryByKey,
-    GetEntryBeforeDbRequestHook,
     GetEntryAddFormattedFieldsHook,
+    GetEntryBeforeDbRequestHook,
+    IsNeedBypassEntryByKey,
 } from './types';
 
 export const isNeedBypassEntryByKey: IsNeedBypassEntryByKey = () => false;

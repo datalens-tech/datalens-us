@@ -1,8 +1,9 @@
 import {AppContext} from '@gravity-ui/nodekit';
 import {TransactionOrKnex} from 'objection';
+
 import {WorkbookPermission} from '../../../../entities/workbook';
-import {getParentIds} from '../../collection/utils';
 import type {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
+import {getParentIds} from '../../collection/utils';
 
 export const checkWorkbookPermission = async ({
     ctx,

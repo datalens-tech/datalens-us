@@ -1,10 +1,11 @@
 import request from 'supertest';
-import {testUserLogin, testUserId} from '../../../constants';
+
+import {makeUserId} from '../../../../../utils';
+import {testUserId, testUserLogin} from '../../../constants';
+import {GET_FAVORITES_ENTRY_DEFAULT_FIELDS, MODIFY_FAVORITES_DEFAULT_FIELDS} from '../../../models';
 import {routes} from '../../../routes';
 import {app, auth, testTenantId} from '../auth';
 import {createMockWorkbook, createMockWorkbookEntry} from '../helpers';
-import {makeUserId} from '../../../../../utils';
-import {MODIFY_FAVORITES_DEFAULT_FIELDS, GET_FAVORITES_ENTRY_DEFAULT_FIELDS} from '../../../models';
 import {OpensourceRole} from '../roles';
 
 let workbookId: string;

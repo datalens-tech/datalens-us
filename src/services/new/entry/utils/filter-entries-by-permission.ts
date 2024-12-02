@@ -1,10 +1,10 @@
-import {DlsActions, EntryScope} from '../../../../types/models';
-import {getWorkbooksListByIds} from '../../workbook/get-workbooks-list-by-ids';
-import {EntryPermissions} from '../types';
 import {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
-import {getEntryPermissionsByWorkbook} from '../../workbook/utils';
-import {getReplica} from '../../utils';
+import {DlsActions, EntryScope} from '../../../../types/models';
 import {ServiceArgs} from '../../types';
+import {getReplica} from '../../utils';
+import {getWorkbooksListByIds} from '../../workbook/get-workbooks-list-by-ids';
+import {getEntryPermissionsByWorkbook} from '../../workbook/utils';
+import {EntryPermissions} from '../types';
 
 type Permission = 'execute' | 'read' | 'edit' | 'admin';
 

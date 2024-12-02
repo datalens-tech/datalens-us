@@ -1,19 +1,20 @@
+import {AppContext, AppError} from '@gravity-ui/nodekit';
 import {TransactionOrKnex, transaction} from 'objection';
-import {AppError, AppContext} from '@gravity-ui/nodekit';
-import {getParentIds} from '../collection/utils/get-parents';
-import {ServiceArgs} from '../types';
-import {getPrimary, getReplica} from '../utils';
+
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
-import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
-import {JoinedEntryRevisionColumns} from '../../../db/presentations/joined-entry-revision';
-import {RevisionModel} from '../../../db/models/new/revision';
 import Link from '../../../db/models/links';
 import {Entry} from '../../../db/models/new/entry';
+import {RevisionModel} from '../../../db/models/new/revision';
+import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
+import {JoinedEntryRevisionColumns} from '../../../db/presentations/joined-entry-revision';
 import {WorkbookPermission} from '../../../entities/workbook';
 import Utils from '../../../utils';
 import {copyToWorkbook} from '../../entry/actions';
 import {getCollection} from '../collection';
+import {getParentIds} from '../collection/utils/get-parents';
+import {ServiceArgs} from '../types';
+import {getPrimary, getReplica} from '../utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',

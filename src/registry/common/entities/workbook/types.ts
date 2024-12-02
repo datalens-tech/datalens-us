@@ -1,6 +1,7 @@
 import type {AppContext} from '@gravity-ui/nodekit';
+
 import type {WorkbookModel} from '../../../../db/models/new/workbook';
-import type {WorkbookPermission, Permissions} from '../../../../entities/workbook/types';
+import type {Permissions, WorkbookPermission} from '../../../../entities/workbook/types';
 import {StructureItemInstance} from '../structure-item/types';
 
 export interface WorkbookConstructor<T = void> {

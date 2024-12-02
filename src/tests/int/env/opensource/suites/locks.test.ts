@@ -1,9 +1,10 @@
 import request from 'supertest';
-import {app, auth, US_ERRORS} from '../auth';
-import {createMockWorkbook, createMockWorkbookEntry} from '../helpers';
+
 import {testUserLogin} from '../../../constants';
-import {routes} from '../../../routes';
 import {LOCK_DEFAULT_FIELDS} from '../../../models';
+import {routes} from '../../../routes';
+import {US_ERRORS, app, auth} from '../auth';
+import {createMockWorkbook, createMockWorkbookEntry} from '../helpers';
 import {OpensourceRole} from '../roles';
 
 let workbookId: string;

@@ -1,9 +1,10 @@
 import {raw} from 'objection';
+
 import {CURRENT_TIMESTAMP} from '../../../../const';
+import {WorkbookModel, WorkbookModelColumn} from '../../../../db/models/new/workbook';
+import {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
 import {ServiceArgs} from '../../types';
 import {getPrimary} from '../../utils';
-import {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
-import {WorkbookModel, WorkbookModelColumn} from '../../../../db/models/new/workbook';
 
 export const markWorkbooksAsDeleted = async (
     {ctx, trx, skipCheckPermissions}: ServiceArgs,

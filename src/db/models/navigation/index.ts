@@ -1,14 +1,16 @@
-import {raw} from 'objection';
-import {Model} from '../..';
-import Utils from '../../../utils';
-import Revision from '../revision';
-import Favorite from '../favorite';
 import {AppError} from '@gravity-ui/nodekit';
-import * as MT from '../../../types/models';
+import {raw} from 'objection';
+
+import {Model} from '../..';
 import {RETURN_NAVIGATION_COLUMNS, US_ERRORS} from '../../../const';
+import {filterEntriesByPermission} from '../../../services/new/entry/utils';
+import * as MT from '../../../types/models';
+import Utils from '../../../utils';
+import Favorite from '../favorite';
+import Revision from '../revision';
+
 import {validateGetEntries, validateInterTenantGetEntries} from './scheme';
 import {whereBuilderInterTenantGetEntries} from './utils';
-import {filterEntriesByPermission} from '../../../services/new/entry/utils';
 
 interface NavigationFields extends MT.EntryColumns {
     isLocked?: boolean;

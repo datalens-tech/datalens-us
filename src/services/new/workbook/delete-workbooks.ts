@@ -1,18 +1,20 @@
 import {AppError} from '@gravity-ui/nodekit';
+import {transaction} from 'objection';
+
+import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {US_ERRORS} from '../../../const';
+import Lock from '../../../db/models/lock';
+import {Entry, EntryColumn} from '../../../db/models/new/entry';
+import {WorkbookPermission} from '../../../entities/workbook';
+import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+import Utils, {makeUserId} from '../../../utils';
+import {markEntryAsDeleted} from '../../entry/crud';
 import {getParentIds} from '../collection/utils/get-parents';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {US_ERRORS} from '../../../const';
-import {transaction} from 'objection';
-import Lock from '../../../db/models/lock';
-import {Entry, EntryColumn} from '../../../db/models/new/entry';
-import Utils, {makeUserId} from '../../../utils';
-import {WorkbookPermission} from '../../../entities/workbook';
-import {markEntryAsDeleted} from '../../entry/crud';
+
 import {getWorkbooksListByIds} from './get-workbooks-list-by-ids';
 import {markWorkbooksAsDeleted} from './utils';
-import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',

@@ -1,4 +1,5 @@
 import {ZitadelUserRole} from '../../types/zitadel';
+
 import {GetZitadelUserRole} from './types';
 
 export const getZitadelUserRole: GetZitadelUserRole = (data: any): ZitadelUserRole => {

@@ -1,8 +1,10 @@
 import {AppContext} from '@gravity-ui/nodekit';
-import {Utils} from './utils';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
+
 import {ZitadelUserRole} from '../types/zitadel';
+
+import {Utils} from './utils';
 
 type IntrospectionResult = {
     active: boolean;

@@ -1,6 +1,7 @@
 import request from 'supertest';
-import {app, auth} from '../../auth';
+
 import {routes} from '../../../../routes';
+import {app, auth} from '../../auth';
 import {PlatformRole} from '../../roles';
 
 describe('Getting root collection permissions', () => {

@@ -1,4 +1,5 @@
-import {Request, Response, NextFunction} from '@gravity-ui/expresskit';
+import {NextFunction, Request, Response} from '@gravity-ui/expresskit';
+
 import {SYSTEM_USER, US_MASTER_TOKEN_HEADER} from '../../const';
 
 function replaceDotsInLogin(login: string) {

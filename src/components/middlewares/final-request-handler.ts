@@ -1,5 +1,6 @@
 import {Request, Response} from '@gravity-ui/expresskit';
 import {AppError} from '@gravity-ui/nodekit';
+
 import prepareErrorResponse from '../error-response-presenter';
 
 export function logError(error: AppError, req: Request) {

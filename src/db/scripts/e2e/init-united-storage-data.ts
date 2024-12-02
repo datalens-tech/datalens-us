@@ -1,6 +1,7 @@
 require('dotenv').config();
 require('../../../index');
 import * as fs from 'fs';
+
 import {db} from '../../index';
 
 const E2E_WORKBOOK_ID = '1540491943966934028';

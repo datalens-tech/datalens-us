@@ -1,13 +1,15 @@
+import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
+
 import {Model, getId} from '../..';
+import {BiTrackingLogs, RETURN_COLUMNS, US_ERRORS} from '../../../const';
+import * as MT from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
+import Link from '../links';
 import Revision from '../revision';
 import Tenant from '../tenant';
-import Link from '../links';
-import {AppError} from '@gravity-ui/nodekit';
-import * as MT from '../../../types/models';
+
 import {validateCreateEntry, validateResolveTenantIdByEntryId} from './scheme';
-import {RETURN_COLUMNS, BiTrackingLogs, US_ERRORS} from '../../../const';
 
 interface Entry extends MT.EntryColumns {
     revisions: any; // TODO: Figure out how to type a upsertGraph

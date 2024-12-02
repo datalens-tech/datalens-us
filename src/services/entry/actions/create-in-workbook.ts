@@ -1,29 +1,30 @@
 import {transaction} from 'objection';
-import Entry from '../../../db/models/entry';
-import Revision from '../../../db/models/revision';
-import {
-    CTX,
-    WorkbookColumns,
-    EntryScope,
-    SyncLinks,
-    EntryColumns,
-    RevisionColumns,
-    UsPermission,
-    Mode,
-} from '../../../types/models';
+
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {
     AJV_PATTERN_KEYS_NOT_OBJECT,
-    DEFAULT_QUERY_TIMEOUT,
-    RETURN_COLUMNS,
     BiTrackingLogs,
+    DEFAULT_QUERY_TIMEOUT,
     ModeValues,
+    RETURN_COLUMNS,
 } from '../../../const';
+import {getId} from '../../../db';
+import Entry from '../../../db/models/entry';
+import Revision from '../../../db/models/revision';
+import {WorkbookPermission} from '../../../entities/workbook';
+import {
+    CTX,
+    EntryColumns,
+    EntryScope,
+    Mode,
+    RevisionColumns,
+    SyncLinks,
+    UsPermission,
+    WorkbookColumns,
+} from '../../../types/models';
+import Utils, {makeUserId} from '../../../utils';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission, getEntryPermissionsByWorkbook} from '../../new/workbook/utils';
-import {WorkbookPermission} from '../../../entities/workbook';
-import Utils, {makeUserId} from '../../../utils';
-import {getId} from '../../../db';
 
 export const validateCreateEntryInWorkbook = makeSchemaValidator({
     type: 'object',

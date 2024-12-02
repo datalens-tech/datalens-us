@@ -1,13 +1,13 @@
-import {transaction, raw} from 'objection';
 import {AppError} from '@gravity-ui/nodekit';
-import {ServiceArgs} from '../types';
-import {getReplica, getPrimary} from '../utils';
+import {raw, transaction} from 'objection';
+
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, TRASH_FOLDER, US_ERRORS} from '../../../const';
+import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import Utils from '../../../utils';
-import {Entry, EntryColumn} from '../../../db/models/new/entry';
-
-import {US_ERRORS, CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, TRASH_FOLDER} from '../../../const';
+import {ServiceArgs} from '../types';
+import {getPrimary, getReplica} from '../utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',

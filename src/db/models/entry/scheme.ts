@@ -1,5 +1,5 @@
 import compileSchema from '../../../components/validation-schema-compiler';
-import {ALLOWED_SCOPE_VALUES, AJV_PATTERN_KEYS_NOT_OBJECT, ModeValues} from '../../../const';
+import {AJV_PATTERN_KEYS_NOT_OBJECT, ALLOWED_SCOPE_VALUES, ModeValues} from '../../../const';
 
 export const validateCreateEntry = compileSchema({
     type: 'object',

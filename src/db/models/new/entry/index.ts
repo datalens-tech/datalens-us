@@ -1,9 +1,10 @@
 import {Model} from '../../..';
+import {EntryPermissions} from '../../../../services/new/entry/types';
+import {Favorite} from '../favorite';
 import {RevisionModel} from '../revision';
 import {WorkbookModel} from '../workbook';
-import {Favorite} from '../favorite';
+
 import {EntryScope} from './types';
-import {EntryPermissions} from '../../../../services/new/entry/types';
 
 export const EntryColumn = {
     Scope: 'scope',

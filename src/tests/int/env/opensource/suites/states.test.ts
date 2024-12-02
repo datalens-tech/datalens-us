@@ -1,8 +1,9 @@
 import request from 'supertest';
-import {app, auth} from '../auth';
-import {routes} from '../../../routes';
-import {createMockWorkbook, createMockWorkbookEntry} from '../helpers';
+
 import {STATE_DEFAULT_FIELDS} from '../../../models';
+import {routes} from '../../../routes';
+import {app, auth} from '../auth';
+import {createMockWorkbook, createMockWorkbookEntry} from '../helpers';
 
 const stateData = {
     'test-key': 'test-value1',

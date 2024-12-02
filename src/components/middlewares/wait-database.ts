@@ -1,4 +1,5 @@
-import {Request, Response, NextFunction} from '@gravity-ui/expresskit';
+import {NextFunction, Request, Response} from '@gravity-ui/expresskit';
+
 import {db} from '../../db';
 
 export const waitDatabase = async (_req: Request, _res: Response, next: NextFunction) => {

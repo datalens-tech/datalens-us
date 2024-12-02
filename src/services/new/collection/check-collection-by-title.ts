@@ -1,9 +1,10 @@
-import {getCollection} from './';
-import {ServiceArgs} from '../types';
-import {getReplica} from '../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import Utils from '../../../utils';
+import {ServiceArgs} from '../types';
+import {getReplica} from '../utils';
+
+import {getCollection} from './';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
