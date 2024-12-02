@@ -3,7 +3,7 @@ import {objectKeys} from '../../utils/utility-types';
 export const createFunctionsRegistry = function <FunctionsMap extends Record<string, any>>(
     functionsMap: FunctionsMap,
 ) {
-    const map: {[key in keyof typeof functionsMap]?: typeof functionsMap[key]} = {};
+    const map: {[key in keyof typeof functionsMap]?: (typeof functionsMap)[key]} = {};
 
     const internalRegister = <T extends keyof typeof functionsMap>(id: T, fn: any): void => {
         map[id] = fn;

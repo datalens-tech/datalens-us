@@ -213,7 +213,8 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                     updatedAt: raw(CURRENT_TIMESTAMP),
                 })
                 .where({
-                    revId: mode === 'publish' ? entry.publishedId ?? entry.savedId : entry.savedId,
+                    revId:
+                        mode === 'publish' ? (entry.publishedId ?? entry.savedId) : entry.savedId,
                     entryId: entry.entryId,
                 })
                 .returning('*')
