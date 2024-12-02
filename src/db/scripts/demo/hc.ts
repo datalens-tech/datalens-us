@@ -1,6 +1,7 @@
 require('dotenv').config();
 require('../../../index');
 import * as fs from 'fs';
+
 import {db} from '../../index';
 
 const DEMO_WORKBOOK_ID = '1507164764046888724';

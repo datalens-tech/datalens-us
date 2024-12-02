@@ -1,15 +1,16 @@
 import type {OrderByDirection} from 'objection';
+
 import {
     CTX,
-    EntriesOrderByFilter,
+    DlsPermissionsMode,
     EntriesFilters,
-    TemplateData,
-    EntryScope,
-    WorkbookColumns,
+    EntriesOrderByFilter,
     EntryColumns,
+    EntryScope,
     RevisionColumns,
     SyncLinks,
-    DlsPermissionsMode,
+    TemplateData,
+    WorkbookColumns,
 } from './models';
 
 export interface ServiceResponse {

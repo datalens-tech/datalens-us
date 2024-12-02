@@ -1,9 +1,11 @@
 import request from 'supertest';
+
+import {AUTHORIZATION_HEADER, DL_AUTH_HEADER_KEY} from '../../../../const';
+import {ZitadelUserRole} from '../../../../types/zitadel';
 import type {CommonAuthArgs} from '../../auth';
 import {testUserId, testUserLogin} from '../../constants';
-import {AUTHORIZATION_HEADER, DL_AUTH_HEADER_KEY} from '../../../../const';
+
 import {OpensourceRole} from './roles';
-import {ZitadelUserRole} from '../../../../types/zitadel';
 
 export {US_ERRORS, app, appConfig, testTenantId, testProjectId, authMasterToken} from '../../auth';
 

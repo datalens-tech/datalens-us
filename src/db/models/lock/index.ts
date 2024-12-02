@@ -1,23 +1,25 @@
-import {transaction, DBError} from 'objection';
-import PG_ERRORS from 'pg-error-constants';
-import {Model} from '../..';
-import Utils from '../../../utils';
-import moment from 'moment';
 import {AppContext, AppError} from '@gravity-ui/nodekit';
-import * as MT from '../../../types/models';
-import US_ERRORS from '../../../const/us-error-constants';
+import moment from 'moment';
+import {DBError, transaction} from 'objection';
+import PG_ERRORS from 'pg-error-constants';
+
+import {Model} from '../..';
+import {Feature, isEnabledFeature} from '../../../components/features';
 import {CURRENT_TIMESTAMP} from '../../../const';
-import {Entry} from '../new/entry';
+import US_ERRORS from '../../../const/us-error-constants';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {getWorkbook} from '../../../services/new/workbook';
 import {checkWorkbookPermission} from '../../../services/new/workbook/utils/check-workbook-permission';
+import * as MT from '../../../types/models';
+import Utils from '../../../utils';
+import {Entry} from '../new/entry';
+
 import {
-    validateVerifyExistenceEntry,
+    validateExtendLockEntry,
     validateLockEntry,
     validateUnlockEntry,
-    validateExtendLockEntry,
+    validateVerifyExistenceEntry,
 } from './scheme';
-import {Feature, isEnabledFeature} from '../../../components/features';
 
 interface Lock extends MT.LockColumns {}
 class Lock extends Model {
@@ -68,69 +70,6 @@ class Lock extends Model {
         ctx.log('CHECK_LOCK_ENTRY_SUCCESS');
 
         return result;
-    }
-
-    private static async checkLockPermission({
-        ctx,
-        entryId,
-        tenantId,
-        permission,
-    }: {
-        ctx: AppContext;
-        entryId: string;
-        tenantId: string;
-        permission: 'read' | 'edit';
-    }) {
-        const registry = ctx.get('registry');
-        const {accessServiceEnabled} = ctx.config;
-
-        const entry = await Entry.query(Entry.replica)
-            .where({
-                entryId,
-                tenantId,
-                isDeleted: false,
-            })
-            .first()
-            .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
-
-        if (!entry) {
-            throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-                code: US_ERRORS.NOT_EXIST_ENTRY,
-            });
-        }
-
-        if (entry.workbookId) {
-            if (accessServiceEnabled) {
-                const workbook = await getWorkbook(
-                    {ctx, skipCheckPermissions: true},
-                    {workbookId: entry.workbookId},
-                );
-
-                let workbookPermission: WorkbookPermission;
-                if (permission === 'edit') {
-                    workbookPermission = WorkbookPermission.Update;
-                } else {
-                    workbookPermission = isEnabledFeature(ctx, Feature.UseLimitedView)
-                        ? WorkbookPermission.LimitedView
-                        : WorkbookPermission.View;
-                }
-
-                await checkWorkbookPermission({
-                    ctx,
-                    workbook,
-                    permission: workbookPermission,
-                });
-            }
-        } else if (ctx.config.dlsEnabled) {
-            const {DLS} = registry.common.classes.get();
-            await DLS.checkPermission(
-                {ctx},
-                {
-                    entryId,
-                    action: permission,
-                },
-            );
-        }
     }
 
     static async verifyExistence(
@@ -463,6 +402,69 @@ class Lock extends Model {
         ctx.log('EXTEND_LOCK_ENTRY_SUCCESS');
 
         return result;
+    }
+
+    private static async checkLockPermission({
+        ctx,
+        entryId,
+        tenantId,
+        permission,
+    }: {
+        ctx: AppContext;
+        entryId: string;
+        tenantId: string;
+        permission: 'read' | 'edit';
+    }) {
+        const registry = ctx.get('registry');
+        const {accessServiceEnabled} = ctx.config;
+
+        const entry = await Entry.query(Entry.replica)
+            .where({
+                entryId,
+                tenantId,
+                isDeleted: false,
+            })
+            .first()
+            .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
+
+        if (!entry) {
+            throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
+                code: US_ERRORS.NOT_EXIST_ENTRY,
+            });
+        }
+
+        if (entry.workbookId) {
+            if (accessServiceEnabled) {
+                const workbook = await getWorkbook(
+                    {ctx, skipCheckPermissions: true},
+                    {workbookId: entry.workbookId},
+                );
+
+                let workbookPermission: WorkbookPermission;
+                if (permission === 'edit') {
+                    workbookPermission = WorkbookPermission.Update;
+                } else {
+                    workbookPermission = isEnabledFeature(ctx, Feature.UseLimitedView)
+                        ? WorkbookPermission.LimitedView
+                        : WorkbookPermission.View;
+                }
+
+                await checkWorkbookPermission({
+                    ctx,
+                    workbook,
+                    permission: workbookPermission,
+                });
+            }
+        } else if (ctx.config.dlsEnabled) {
+            const {DLS} = registry.common.classes.get();
+            await DLS.checkPermission(
+                {ctx},
+                {
+                    entryId,
+                    action: permission,
+                },
+            );
+        }
     }
 }
 

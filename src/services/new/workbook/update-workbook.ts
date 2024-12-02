@@ -1,15 +1,17 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {getWorkbook} from './get-workbook';
-import {checkWorkbookByTitle} from './check-workbook-by-title';
+import {raw} from 'objection';
+
+import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
+import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
+import {WorkbookPermission} from '../../../entities/workbook';
+import Utils from '../../../utils';
 import {getParentIds} from '../collection/utils';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
-import {raw} from 'objection';
-import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
-import Utils from '../../../utils';
-import {WorkbookPermission} from '../../../entities/workbook';
+
+import {checkWorkbookByTitle} from './check-workbook-by-title';
+import {getWorkbook} from './get-workbook';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',

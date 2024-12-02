@@ -1,5 +1,6 @@
 import type {Knex} from 'knex';
 import {TransactionOrKnex} from 'objection';
+
 import {EmbedModel, EmbedModelColumn} from '../../models/new/embed';
 import {EmbeddingSecretModel, EmbeddingSecretModelColumn} from '../../models/new/embedding-secret';
 

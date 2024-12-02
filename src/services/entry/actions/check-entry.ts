@@ -1,10 +1,11 @@
-import {TransactionOrKnex} from 'objection';
 import {AppError} from '@gravity-ui/nodekit';
+import {TransactionOrKnex} from 'objection';
+
+import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {DEFAULT_QUERY_TIMEOUT, US_ERRORS} from '../../../const';
 import Entry from '../../../db/models/entry';
 import {CTX, EntryColumns} from '../../../types/models';
-import {US_ERRORS, DEFAULT_QUERY_TIMEOUT} from '../../../const';
 import {getWorkbook} from '../../new/workbook/get-workbook';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 
 const validateVerifiableEntry = makeSchemaValidator({
     type: 'object',

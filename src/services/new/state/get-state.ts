@@ -1,7 +1,8 @@
-import {ServiceArgs} from '../types';
 import {AppError} from '@gravity-ui/nodekit';
+
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {State} from '../../../db/models/new/state';
+import {ServiceArgs} from '../types';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',

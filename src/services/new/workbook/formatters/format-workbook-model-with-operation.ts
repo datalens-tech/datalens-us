@@ -1,6 +1,7 @@
-import {formatWorkbookModel} from './format-workbook-model';
-import {formatOperation, Operation} from '../../formatters/format-operation';
 import {WorkbookModel} from '../../../../db/models/new/workbook';
+import {Operation, formatOperation} from '../../formatters/format-operation';
+
+import {formatWorkbookModel} from './format-workbook-model';
 
 export const formatWorkbookModelWithOperation = (
     workbookModel: WorkbookModel,

@@ -1,6 +1,8 @@
 import request from 'supertest';
-import {app, auth, testTenantId, authMasterToken, AuthArgs} from './auth';
+
 import {routes} from '../../routes';
+
+import {AuthArgs, app, auth, authMasterToken, testTenantId} from './auth';
 import {OpensourceRole} from './roles';
 
 export const mockWorkbookEntry = {

@@ -1,4 +1,5 @@
 import {AppConfig} from '@gravity-ui/nodekit';
+
 import {Feature, FeaturesConfig} from '../../components/features/types';
 import {DL_SERVICE_USER_ACCESS_TOKEN} from '../../const';
 

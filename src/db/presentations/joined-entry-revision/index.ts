@@ -1,11 +1,11 @@
 import type {Knex} from 'knex';
 import {TransactionOrKnex, raw} from 'objection';
+
 import {Model} from '../..';
+import {EntriesOrderByFilter} from '../../../types/models';
 import {Entry} from '../../models/new/entry';
 import {RevisionModel} from '../../models/new/revision';
-
 import {selectedEntryColumns} from '../constants';
-import {EntriesOrderByFilter} from '../../../types/models';
 
 const selectedRevisionColumns = [
     'data',

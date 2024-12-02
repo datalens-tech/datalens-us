@@ -1,9 +1,11 @@
 import repl = require('repl');
+
+import {raw, transaction} from 'objection';
+
+import {Model, db, getId} from './db';
 import Entry from './db/models/entry';
 import Tenant from './db/models/tenant';
 import Utils from './utils';
-import {raw, transaction} from 'objection';
-import {db, Model, getId} from './db';
 
 async function runConsole(): Promise<void> {
     process.env.REPL_MODE = '1';

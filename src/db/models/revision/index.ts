@@ -1,4 +1,5 @@
 import {Model} from 'objection';
+
 import {RevisionColumns} from '../../../types/models';
 
 interface Revision extends RevisionColumns {}

@@ -1,13 +1,14 @@
 import {Request, Response} from '@gravity-ui/expresskit';
+
 import {prepareResponseAsync} from '../components/response-presenter';
 import {
     deleteColorPalette,
-    getColorPalettesList,
     getColorPalette,
+    getColorPalettesList,
     updateColorPalette,
 } from '../services/color-palettes';
 import {createColorPalette} from '../services/color-palettes/create-color-palette';
-import {formatColorPaletteList, formatColorPalette} from '../services/color-palettes/formatters';
+import {formatColorPalette, formatColorPaletteList} from '../services/color-palettes/formatters';
 
 export default {
     create: async (req: Request, res: Response) => {

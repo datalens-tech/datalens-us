@@ -1,7 +1,7 @@
-import {TenantMeta} from './tenant';
-import {TemplateData} from './template';
-import {EntryScope, EntryInnerMeta} from './entry';
+import {EntryInnerMeta, EntryScope} from './entry';
 import {SyncLinks} from './link';
+import {TemplateData} from './template';
+import {TenantMeta} from './tenant';
 
 export interface TenantColumns {
     tenantId: string;

@@ -1,37 +1,38 @@
-import EntryService from '../services/entry.service';
 import {Request, Response} from '@gravity-ui/expresskit';
+
 import {prepareResponseAsync} from '../components/response-presenter';
-import Utils from '../utils';
 import {US_MASTER_TOKEN_HEADER} from '../const';
-import NavigationService from '../services/navigation.service';
-import * as ST from '../types/services.types';
+import {EntryScope} from '../db/models/new/entry/types';
 import {
-    deleteEntry,
     DeleteEntryData,
-    renameEntry,
-    updateEntry,
-    getEntryRevisions,
     GetEntryRevisionsData,
-    getEntryRelations,
-    switchRevisionEntry,
     RelationDirection,
+    deleteEntry,
+    getEntryRelations,
+    getEntryRevisions,
+    renameEntry,
+    switchRevisionEntry,
+    updateEntry,
 } from '../services/entry';
+import EntryService from '../services/entry.service';
+import NavigationService from '../services/navigation.service';
 import {
-    getEntry,
     GetEntryArgs,
+    GetEntryMetaPrivateArgs,
+    copyEntriesToWorkbook,
+    copyEntryToWorkbook,
+    getEntry,
     getEntryMeta,
     getEntryMetaPrivate,
-    GetEntryMetaPrivateArgs,
-    copyEntryToWorkbook,
-    copyEntriesToWorkbook,
 } from '../services/new/entry';
 import {
-    formatGetEntryResponse,
-    formatGetEntryMetaResponse,
-    formatGetEntryMetaPrivateResponse,
     formatEntryModel,
+    formatGetEntryMetaPrivateResponse,
+    formatGetEntryMetaResponse,
+    formatGetEntryResponse,
 } from '../services/new/entry/formatters';
-import {EntryScope} from '../db/models/new/entry/types';
+import * as ST from '../types/services.types';
+import Utils from '../utils';
 
 export default {
     getEntry: async (req: Request, res: Response) => {

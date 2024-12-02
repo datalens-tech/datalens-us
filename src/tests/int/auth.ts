@@ -1,6 +1,7 @@
 import request from 'supertest';
-import {US_ERRORS, US_MASTER_TOKEN_HEADER} from '../../const';
+
 import usApp from '../..';
+import {US_ERRORS, US_MASTER_TOKEN_HEADER} from '../../const';
 
 export type CommonAuthArgs = {
     userId?: string;

@@ -1,15 +1,17 @@
 import request from 'supertest';
+
+import {routes} from '../../routes';
+
 import {
+    AccessBinding,
+    AuthArgs,
     app,
     auth,
-    testTenantId,
     authMasterToken,
     getCollectionBinding,
     getWorkbookBinding,
-    AuthArgs,
-    AccessBinding,
+    testTenantId,
 } from './auth';
-import {routes} from '../../routes';
 import {PlatformRole} from './roles';
 
 export const mockWorkbookEntry = {

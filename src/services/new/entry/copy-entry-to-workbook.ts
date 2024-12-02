@@ -1,19 +1,20 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
+
+import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {BiTrackingLogs, US_ERRORS} from '../../../const';
 import {getId} from '../../../db';
 import OldEntry from '../../../db/models/entry';
-import {EntryScope} from '../../../db/models/new/entry/types';
 import {Entry} from '../../../db/models/new/entry';
+import {EntryScope} from '../../../db/models/new/entry/types';
 import {RevisionModel, RevisionModelColumn} from '../../../db/models/new/revision';
-import {SyncLinks} from '../../../types/models/link';
-import {US_ERRORS, BiTrackingLogs} from '../../../const';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import Utils, {makeUserId} from '../../../utils';
 import {WorkbookPermission} from '../../../entities/workbook';
+import {SyncLinks} from '../../../types/models/link';
+import Utils, {makeUserId} from '../../../utils';
 import {ServiceArgs} from '../../new/types';
 import {checkWorkbookPermission} from '../../new/workbook/utils/check-workbook-permission';
-import {getWorkbook} from '../workbook';
 import {getPrimary} from '../utils';
+import {getWorkbook} from '../workbook';
 
 const validateCopyEntryToWorkbook = makeSchemaValidator({
     type: 'object',

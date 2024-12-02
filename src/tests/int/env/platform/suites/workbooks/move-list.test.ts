@@ -1,8 +1,9 @@
 import request from 'supertest';
+
+import {WORKBOOK_DEFAULT_FIELDS} from '../../../../models';
+import {routes} from '../../../../routes';
 import {app, auth, getCollectionBinding, getWorkbookBinding} from '../../auth';
 import {createMockCollection, createMockWorkbook} from '../../helpers';
-import {routes} from '../../../../routes';
-import {WORKBOOK_DEFAULT_FIELDS} from '../../../../models';
 import {PlatformRole} from '../../roles';
 
 const unexistedCollectionId = 'unexisted-collection-id';

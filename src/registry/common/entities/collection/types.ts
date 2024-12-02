@@ -1,4 +1,5 @@
 import type {AppContext} from '@gravity-ui/nodekit';
+
 import type {CollectionModel} from '../../../../db/models/new/collection';
 import type {CollectionPermission, Permissions} from '../../../../entities/collection/types';
 import {StructureItemInstance} from '../structure-item/types';

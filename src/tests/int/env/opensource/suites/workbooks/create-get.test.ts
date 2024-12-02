@@ -1,11 +1,12 @@
 import request from 'supertest';
-import {app, auth} from '../../auth';
+
 import {
-    OPERATION_DEFAULT_FIELDS,
     COLLECTIONS_DEFAULT_FIELDS,
+    OPERATION_DEFAULT_FIELDS,
     WORKBOOK_DEFAULT_FIELDS,
 } from '../../../../models';
 import {routes} from '../../../../routes';
+import {app, auth} from '../../auth';
 import {OpensourceRole} from '../../roles';
 
 let rootWorkbookId: string;

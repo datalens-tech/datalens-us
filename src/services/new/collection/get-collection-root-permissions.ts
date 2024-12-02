@@ -1,8 +1,9 @@
-import {AppError, AppContext} from '@gravity-ui/nodekit';
-import {ServiceArgs} from '../types';
-import {US_ERRORS} from '../../../const';
-import {OrganizationPermission, ProjectPermission} from '../../../components/iam';
+import {AppContext, AppError} from '@gravity-ui/nodekit';
+
 import {Feature, isEnabledFeature} from '../../../components/features';
+import {OrganizationPermission, ProjectPermission} from '../../../components/iam';
+import {US_ERRORS} from '../../../const';
+import {ServiceArgs} from '../types';
 
 export const getRootCollectionPermissions = async ({ctx}: ServiceArgs) => {
     ctx.log('GET_ROOT_COLLECTION_PERMISSIONS_START');

@@ -1,10 +1,12 @@
 import {AppError} from '@gravity-ui/nodekit';
-import Entry from '../../../db/models/entry';
 import {Optional as OptionalFields} from 'utility-types';
-import {CTX, DlsActions, RevisionColumns} from '../../../types/models';
-import {RETURN_COLUMNS, DEFAULT_QUERY_TIMEOUT, US_ERRORS} from '../../../const';
-import Utils from '../../../utils';
+
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {DEFAULT_QUERY_TIMEOUT, RETURN_COLUMNS, US_ERRORS} from '../../../const';
+import Entry from '../../../db/models/entry';
+import {CTX, DlsActions, RevisionColumns} from '../../../types/models';
+import Utils from '../../../utils';
+
 import {checkEntry} from './check-entry';
 
 const validateGetEntryByKey = makeSchemaValidator({

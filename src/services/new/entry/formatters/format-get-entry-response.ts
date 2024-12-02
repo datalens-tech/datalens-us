@@ -1,5 +1,5 @@
-import {CTX} from '../../../../types/models';
 import {GetEntryResult} from '../../../../services/new/entry/get-entry';
+import {CTX} from '../../../../types/models';
 
 export const formatGetEntryResponse = async (ctx: CTX, result: GetEntryResult) => {
     const {joinedEntryRevisionFavorite, permissions, includePermissionsInfo, includeLinks} = result;

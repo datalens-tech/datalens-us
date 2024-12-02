@@ -1,6 +1,6 @@
-import {EntryPermissions} from '../types';
 import {JoinedEntryRevisionColumns} from '../../../../db/presentations/joined-entry-revision';
 import {CTX} from '../../../../types/models';
+import {EntryPermissions} from '../types';
 
 interface GetEntryByKeyResult {
     joinedEntryRevision: JoinedEntryRevisionColumns;

@@ -1,4 +1,5 @@
 import type {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
+
 import {formatWorkbook} from './format-workbook';
 
 export const formatWorkbooksList = ({

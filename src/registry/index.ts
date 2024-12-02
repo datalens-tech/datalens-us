@@ -1,11 +1,13 @@
 import type {ExpressKit, Request, Response} from '@gravity-ui/expresskit';
-import type {AppContext} from '@gravity-ui/nodekit';
 import getGatewayControllers, {
     ApiWithRoot,
     GatewayConfig,
     SchemasByScope,
 } from '@gravity-ui/gateway';
+import type {AppContext} from '@gravity-ui/nodekit';
+
 import type {initDB} from '../db/init-db';
+
 import {commonRegistry} from './common';
 
 type DbInstance = ReturnType<typeof initDB>;

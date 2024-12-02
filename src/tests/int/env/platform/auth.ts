@@ -1,12 +1,14 @@
 import request from 'supertest';
-import {PlatformRole} from './roles';
+
+import {AUTHORIZATION_HEADER, DL_AUTH_HEADER_KEY} from '../../../../const';
+import {CollectionPermission} from '../../../../entities/collection/types';
+import {ResourceType} from '../../../../entities/types';
+import {WorkbookPermission} from '../../../../entities/workbook/types';
+import {ZitadelUserRole} from '../../../../types/zitadel';
 import type {CommonAuthArgs} from '../../auth';
 import {testUserId, testUserLogin} from '../../constants';
-import {AUTHORIZATION_HEADER, DL_AUTH_HEADER_KEY} from '../../../../const';
-import {ZitadelUserRole} from '../../../../types/zitadel';
-import {CollectionPermission} from '../../../../entities/collection/types';
-import {WorkbookPermission} from '../../../../entities/workbook/types';
-import {ResourceType} from '../../../../entities/types';
+
+import {PlatformRole} from './roles';
 
 export {US_ERRORS, app, appConfig, testTenantId, testProjectId, authMasterToken} from '../../auth';
 

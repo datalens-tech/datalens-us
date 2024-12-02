@@ -1,11 +1,12 @@
-import {TransactionOrKnex} from 'objection';
 import {AppContext} from '@gravity-ui/nodekit';
-import {getReplica} from '../../utils';
+import {TransactionOrKnex} from 'objection';
+
 import {CollectionModel, CollectionModelColumn} from '../../../../db/models/new/collection';
-import {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
-import {CollectionInstance} from '../../../../registry/common/entities/collection/types';
-import {ServiceArgs} from '../../types';
 import {WorkbookModel} from '../../../../db/models/new/workbook';
+import {CollectionInstance} from '../../../../registry/common/entities/collection/types';
+import {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
+import {ServiceArgs} from '../../types';
+import {getReplica} from '../../utils';
 
 interface Ctx {
     ctx: AppContext;

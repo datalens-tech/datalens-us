@@ -1,10 +1,10 @@
-import {getParentIds} from './get-parents';
+import {Feature, isEnabledFeature} from '../../../../components/features';
+import {CollectionPermission} from '../../../../entities/collection';
+import {CollectionInstance} from '../../../../registry/common/entities/collection/types';
 import {ServiceArgs} from '../../types';
 import {getReplica} from '../../utils';
-import {CollectionPermission} from '../../../../entities/collection';
 
-import {Feature, isEnabledFeature} from '../../../../components/features';
-import {CollectionInstance} from '../../../../registry/common/entities/collection/types';
+import {getParentIds} from './get-parents';
 
 export interface CheckAndSetCollectionPermissionArgs {
     collectionInstance: CollectionInstance;

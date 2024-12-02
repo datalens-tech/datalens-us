@@ -1,8 +1,9 @@
 import request from 'supertest';
-import {app, auth, getCollectionBinding, US_ERRORS} from '../../auth';
-import {createMockCollection} from '../../helpers';
-import {routes} from '../../../../routes';
+
 import {COLLECTIONS_DEFAULT_FIELDS} from '../../../../models';
+import {routes} from '../../../../routes';
+import {US_ERRORS, app, auth, getCollectionBinding} from '../../auth';
+import {createMockCollection} from '../../helpers';
 
 const rootCollection = {
     collectionId: '',

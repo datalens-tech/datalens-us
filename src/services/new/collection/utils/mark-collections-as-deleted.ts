@@ -1,9 +1,10 @@
 import {raw} from 'objection';
+
 import {CURRENT_TIMESTAMP} from '../../../../const';
-import {ServiceArgs} from '../../types';
-import {getPrimary} from '../../utils';
 import {CollectionModel, CollectionModelColumn} from '../../../../db/models/new/collection';
 import {CollectionInstance} from '../../../../registry/common/entities/collection/types';
+import {ServiceArgs} from '../../types';
+import {getPrimary} from '../../utils';
 
 export const markCollectionsAsDeleted = async (
     {ctx, trx, skipCheckPermissions}: ServiceArgs,

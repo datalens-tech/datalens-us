@@ -1,10 +1,11 @@
 import type {AppContext} from '@gravity-ui/nodekit';
+
 import type {CollectionModel} from '../../../../db/models/new/collection';
+import {WorkbookModel} from '../../../../db/models/new/workbook';
 import type {
     CollectionPermission,
     Permissions as CollectionPermissions,
 } from '../../../../entities/collection/types';
-import {WorkbookModel} from '../../../../db/models/new/workbook';
 import {
     WorkbookPermission,
     Permissions as WorkbookPermissions,

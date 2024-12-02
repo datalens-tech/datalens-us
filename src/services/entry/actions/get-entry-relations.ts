@@ -1,15 +1,17 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {Entry, EntryColumn} from '../../../db/models/new/entry';
-import {DlsActions} from '../../../types/models';
-import {ServiceArgs} from '../../new/types';
-import Utils from '../../../utils';
-import {ALLOWED_ENTRIES_SCOPE, US_ERRORS} from '../../../const';
+
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {ALLOWED_ENTRIES_SCOPE, US_ERRORS} from '../../../const';
+import {Entry, EntryColumn} from '../../../db/models/new/entry';
+import {EntryScope} from '../../../db/models/new/entry/types';
+import {DlsActions} from '../../../types/models';
+import Utils from '../../../utils';
+import {ServiceArgs} from '../../new/types';
+import {getReplica} from '../../new/utils';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {getEntryPermissionsByWorkbook} from '../../new/workbook/utils';
-import {getRelatedEntries, RelationDirection} from './get-related-entries';
-import {getReplica} from '../../new/utils';
-import {EntryScope} from '../../../db/models/new/entry/types';
+
+import {RelationDirection, getRelatedEntries} from './get-related-entries';
 
 export type GetEntryRelationsArgs = {
     entryId: string;

@@ -1,6 +1,7 @@
-import {formatCollectionModel} from './format-collection-model';
-import {formatOperation, Operation} from '../../formatters/format-operation';
 import {CollectionModel} from '../../../../db/models/new/collection';
+import {Operation, formatOperation} from '../../formatters/format-operation';
+
+import {formatCollectionModel} from './format-collection-model';
 
 export const formatCollectionModelWithOperation = (
     collectionModel: CollectionModel,

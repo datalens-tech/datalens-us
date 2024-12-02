@@ -1,33 +1,35 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {raw, transaction, TransactionOrKnex} from 'objection';
+import {TransactionOrKnex, raw, transaction} from 'objection';
+import {Optional} from 'utility-types';
+
+import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {
+    AJV_PATTERN_KEYS_NOT_OBJECT,
+    BiTrackingLogs,
+    CURRENT_TIMESTAMP,
+    DEFAULT_QUERY_TIMEOUT,
+    RETURN_COLUMNS,
+    US_ERRORS,
+} from '../../../const';
 import Entry from '../../../db/models/entry';
 import Lock from '../../../db/models/lock';
+import {EntryColumn} from '../../../db/models/new/entry';
+import {EntryScope} from '../../../db/models/new/entry/types';
 import Revision from '../../../db/models/revision';
+import {WorkbookPermission} from '../../../entities/workbook';
 import {
     CTX,
+    DlsActions,
     EntryColumns,
     RevisionColumns,
     SyncLinks,
-    DlsActions,
     SyncLinksConf,
 } from '../../../types/models';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {
-    RETURN_COLUMNS,
-    BiTrackingLogs,
-    DEFAULT_QUERY_TIMEOUT,
-    US_ERRORS,
-    AJV_PATTERN_KEYS_NOT_OBJECT,
-    CURRENT_TIMESTAMP,
-} from '../../../const';
 import Utils, {makeUserId} from '../../../utils';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission} from '../../new/workbook/utils';
-import {WorkbookPermission} from '../../../entities/workbook';
-import {Optional} from 'utility-types';
+
 import {checkEntry} from './check-entry';
-import {EntryScope} from '../../../db/models/new/entry/types';
-import {EntryColumn} from '../../../db/models/new/entry';
 
 type Mode = 'save' | 'publish' | 'recover';
 const ModeValues: Mode[] = ['save', 'publish', 'recover'];

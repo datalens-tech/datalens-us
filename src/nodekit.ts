@@ -1,10 +1,13 @@
+/* eslint-disable import/order */
 import dotenv from 'dotenv';
 dotenv.config();
 
 import * as path from 'path';
+
 import {NodeKit} from '@gravity-ui/nodekit';
-import {schema} from './components/gateway/schema';
+
 import {getGatewayConfig} from './components/gateway';
+import {schema} from './components/gateway/schema';
 import {initDB} from './db/init-db';
 import {registry} from './registry';
 

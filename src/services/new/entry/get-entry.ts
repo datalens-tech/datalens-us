@@ -1,8 +1,9 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {EntryPermissions} from './types';
-import {checkFetchedEntry, checkWorkbookIsolation} from './utils';
-import {getReplica} from '../utils';
-import {ServiceArgs} from '../types';
+
+import {Feature, isEnabledFeature} from '../../../components/features';
+import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {US_ERRORS} from '../../../const';
+import OldEntry from '../../../db/models/entry';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {
     JoinedEntryRevisionFavorite,
@@ -10,12 +11,13 @@ import {
 } from '../../../db/presentations/joined-entry-revision-favorite';
 import {DlsActions} from '../../../types/models';
 import Utils from '../../../utils';
-import {US_ERRORS} from '../../../const';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import OldEntry from '../../../db/models/entry';
+import {ServiceArgs} from '../types';
+import {getReplica} from '../utils';
 import {getWorkbook} from '../workbook';
 import {getEntryPermissionsByWorkbook} from '../workbook/utils';
-import {Feature, isEnabledFeature} from '../../../components/features';
+
+import {EntryPermissions} from './types';
+import {checkFetchedEntry, checkWorkbookIsolation} from './utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',

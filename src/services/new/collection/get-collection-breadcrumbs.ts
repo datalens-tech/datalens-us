@@ -1,12 +1,14 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {getParents} from './utils/get-parents';
+
+import {Feature, isEnabledFeature} from '../../../components/features';
+import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {US_ERRORS} from '../../../const';
+import {CollectionPermission} from '../../../entities/collection';
+import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
-import {US_ERRORS} from '../../../const';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import Utils from '../../../utils';
-import {CollectionPermission} from '../../../entities/collection';
-import {Feature, isEnabledFeature} from '../../../components/features';
+
+import {getParents} from './utils/get-parents';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',

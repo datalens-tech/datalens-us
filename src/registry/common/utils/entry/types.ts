@@ -1,4 +1,5 @@
 import type {AppContext} from '@gravity-ui/nodekit';
+
 import type {GetEntryResult} from '../../../../services/new/entry/get-entry';
 
 export type IsNeedBypassEntryByKey = (ctx: AppContext, key?: string) => boolean;

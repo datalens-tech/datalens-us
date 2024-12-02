@@ -1,18 +1,18 @@
-import type {NodeKit} from '@gravity-ui/nodekit';
-import {AuthPolicy, AppMiddleware, AppRouteDescription} from '@gravity-ui/expresskit';
+import {AppMiddleware, AppRouteDescription, AuthPolicy} from '@gravity-ui/expresskit';
 import type {HttpMethod} from '@gravity-ui/expresskit/dist/types';
-import {Feature} from './components/features';
+import type {NodeKit} from '@gravity-ui/nodekit';
 
-import homeController from './controllers/home';
-import helpersController from './controllers/helpers';
-import entriesController from './controllers/entries';
-import locksController from './controllers/locks';
-import statesController from './controllers/states';
-import favoritesController from './controllers/favorites';
-import workbooksController from './controllers/workbooks';
+import {Feature} from './components/features';
 import collectionsController from './controllers/collections';
 import colorPalettesController from './controllers/color-palettes';
+import entriesController from './controllers/entries';
+import favoritesController from './controllers/favorites';
+import helpersController from './controllers/helpers';
+import homeController from './controllers/home';
+import locksController from './controllers/locks';
+import statesController from './controllers/states';
 import structureItemsController from './controllers/structure-items';
+import workbooksController from './controllers/workbooks';
 
 export type GetRoutesOptions = {
     beforeAuth: AppMiddleware[];

@@ -4,15 +4,5 @@
         "node": true,
         "jest": true
     },
-    "root": true,
-    "overrides": [
-        {
-            "files": ["*.ts"],
-            "rules": {
-                "@typescript-eslint/member-ordering": [0],
-                "import/order": [0],
-                "sort-imports": [0]
-            }
-        }
-    ]
+    "root": true
 }

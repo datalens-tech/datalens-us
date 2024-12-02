@@ -1,13 +1,14 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
+
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import Entry from '../../../db/models/entry';
 import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, SYSTEM_USER, US_ERRORS} from '../../../const';
+import Entry from '../../../db/models/entry';
+import {EntryColumn} from '../../../db/models/new/entry';
+import {RevisionModelColumn} from '../../../db/models/new/revision';
+import Revision from '../../../db/models/revision';
 import Utils, {makeUserId} from '../../../utils';
 import {ServiceArgs} from '../../new/types';
-import Revision from '../../../db/models/revision';
-import {RevisionModelColumn} from '../../../db/models/new/revision';
-import {EntryColumn} from '../../../db/models/new/entry';
 import {getPrimary, getReplica} from '../../new/utils';
 
 const validateArgs = makeSchemaValidator({

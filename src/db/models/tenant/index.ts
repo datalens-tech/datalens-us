@@ -1,7 +1,9 @@
-import {Model} from '../..';
 import {AppError} from '@gravity-ui/nodekit';
+
+import {Model} from '../..';
 import {US_ERRORS} from '../../../const';
 import * as MT from '../../../types/models';
+
 import {validateGet} from './scheme';
 
 interface Tenant extends MT.TenantColumns {}

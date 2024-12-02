@@ -1,15 +1,17 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {getParentIds} from './utils/get-parents';
-import {ServiceArgs} from '../types';
-import {getReplica} from '../utils';
+
+import {Feature, isEnabledFeature} from '../../../components/features';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
-import {CollectionPermission} from '../../../entities/collection';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
+import {CollectionPermission} from '../../../entities/collection';
 import Utils from '../../../utils';
+import {ServiceArgs} from '../types';
+import {getReplica} from '../utils';
 import {getWorkbooksList} from '../workbook';
+
 import {getCollection} from './get-collection';
-import {Feature, isEnabledFeature} from '../../../components/features';
+import {getParentIds} from './utils/get-parents';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',

@@ -1,4 +1,4 @@
-import {Request, Response, NextFunction} from '@gravity-ui/expresskit';
+import {NextFunction, Request, Response} from '@gravity-ui/expresskit';
 
 export const setCiEnv = (req: Request, res: Response, next: NextFunction) => {
     res.locals.userId = 'dev-user-id';

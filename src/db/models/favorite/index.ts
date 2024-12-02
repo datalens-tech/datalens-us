@@ -1,21 +1,22 @@
-import {raw} from 'objection';
-import {Model} from '../..';
-import Entry from '../entry';
-import {Entry as EntryModel} from '../new/entry';
 import {AppError} from '@gravity-ui/nodekit';
+import {raw} from 'objection';
+
+import {Model} from '../..';
+import {RETURN_FAVORITES_COLUMNS, US_ERRORS} from '../../../const';
+import {filterEntriesByPermission} from '../../../services/new/entry/utils';
+import {getWorkbook} from '../../../services/new/workbook';
 import * as MT from '../../../types/models';
 import {DlsActions} from '../../../types/models';
 import Utils from '../../../utils';
+import Entry from '../entry';
+import {Entry as EntryModel} from '../new/entry';
+
 import {
-    validateGetFavorites,
     validateAddFavorite,
     validateDeleteFavorite,
+    validateGetFavorites,
     validateRenameFavorite,
 } from './scheme';
-import {RETURN_FAVORITES_COLUMNS, US_ERRORS} from '../../../const';
-
-import {getWorkbook} from '../../../services/new/workbook';
-import {filterEntriesByPermission} from '../../../services/new/entry/utils';
 
 interface FavoriteFields extends MT.FavoriteColumns {
     isLocked?: boolean;

@@ -1,8 +1,9 @@
-import {Request, Response, NextFunction} from '@gravity-ui/expresskit';
+import {NextFunction, Request, Response} from '@gravity-ui/expresskit';
 import {AppError} from '@gravity-ui/nodekit';
-import {US_ERRORS, DL_WORKBOOK_ID_HEADER} from '../../const';
-import Utils from '../../utils';
+
 import {Feature, isEnabledFeature} from '../../components/features';
+import {DL_WORKBOOK_ID_HEADER, US_ERRORS} from '../../const';
+import Utils from '../../utils';
 
 export const resolveWorkbookId = (req: Request, res: Response, next: NextFunction) => {
     if (isEnabledFeature(req.ctx, Feature.WorkbookIsolationEnabled)) {

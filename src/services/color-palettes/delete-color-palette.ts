@@ -1,6 +1,6 @@
-import {ServiceArgs} from '../../services/new/types';
 import {makeSchemaValidator} from '../../components/validation-schema-compiler';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
+import {ServiceArgs} from '../../services/new/types';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',

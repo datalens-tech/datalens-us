@@ -1,5 +1,5 @@
-import {TransactionOrKnex} from 'objection';
 import {AppContext} from '@gravity-ui/nodekit';
+import {TransactionOrKnex} from 'objection';
 
 export interface ServiceArgs {
     ctx: AppContext;

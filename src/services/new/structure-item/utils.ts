@@ -1,17 +1,18 @@
+import {AppContext, AppError} from '@gravity-ui/nodekit';
+import {raw} from 'objection';
+
+import {Feature, isEnabledFeature} from '../../../components/features';
+import {US_ERRORS} from '../../../const';
+import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
+import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
+import {CollectionPermission} from '../../../entities/collection';
+import {WorkbookPermission} from '../../../entities/workbook';
+import {CollectionInstance} from '../../../registry/common/entities/collection/types';
+import {isWorkbookInstance} from '../../../registry/common/entities/structure-item/types';
+import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
-import {raw} from 'objection';
-import Utils from '../../../utils';
-import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
-import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
-import {AppContext, AppError} from '@gravity-ui/nodekit';
-import {isWorkbookInstance} from '../../../registry/common/entities/structure-item/types';
-import {Feature, isEnabledFeature} from '../../../components/features';
-import {WorkbookPermission} from '../../../entities/workbook';
-import {CollectionPermission} from '../../../entities/collection';
-import {US_ERRORS} from '../../../const';
-import {CollectionInstance} from '../../../registry/common/entities/collection/types';
-import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
 
 interface GetWorkbooksQueryArgs {
     collectionId: Nullable<string>;

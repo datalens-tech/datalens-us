@@ -1,12 +1,11 @@
 import type {Knex} from 'knex';
-import {TransactionOrKnex, raw, Modifier} from 'objection';
+import {Modifier, TransactionOrKnex, raw} from 'objection';
+
 import {Model} from '../..';
 import {Entry} from '../../models/new/entry';
 import {Favorite} from '../../models/new/favorite';
-
-import {leftJoinFavorite} from '../utils';
-
 import {selectedEntryColumns} from '../constants';
+import {leftJoinFavorite} from '../utils';
 
 const selectedColumns = [
     ...selectedEntryColumns.map((col) => `${Entry.tableName}.${col}`),

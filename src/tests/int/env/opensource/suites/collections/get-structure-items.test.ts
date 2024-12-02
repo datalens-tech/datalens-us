@@ -1,13 +1,14 @@
 import request from 'supertest';
-import {app, auth} from '../../auth';
-import {createMockCollection, createMockWorkbook} from '../../helpers';
+
 import {testOtherUserId} from '../../../../constants';
-import {routes} from '../../../../routes';
 import {
     COLLECTIONS_DEFAULT_FIELDS,
-    WORKBOOK_DEFAULT_FIELDS,
     GET_STRUCTURE_ITEMS_DEFAULT_FIELDS,
+    WORKBOOK_DEFAULT_FIELDS,
 } from '../../../../models';
+import {routes} from '../../../../routes';
+import {app, auth} from '../../auth';
+import {createMockCollection, createMockWorkbook} from '../../helpers';
 
 const rootCollection = {
     collectionId: '',

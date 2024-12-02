@@ -1,13 +1,12 @@
-const fs = require('fs');
-const PowerRadix = require('power-radix');
-
 import chunk from 'lodash/chunk';
 
+import {CODING_BASE, COPY_END, COPY_START, ID_VARIABLES, TRUE_FLAGS} from '../const';
+import {EntryScope as EntryScopeEnum, EntryType} from '../db/models/new/entry/types';
 import {EntryScope, USAPIResponse} from '../types/models';
 
-import {ID_VARIABLES, CODING_BASE, TRUE_FLAGS, COPY_START, COPY_END} from '../const';
+const fs = require('fs');
 
-import {EntryScope as EntryScopeEnum, EntryType} from '../db/models/new/entry/types';
+const PowerRadix = require('power-radix');
 
 const MAX_PAGE_LIMIT = 10000;
 

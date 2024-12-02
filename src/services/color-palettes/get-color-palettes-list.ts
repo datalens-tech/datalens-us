@@ -1,5 +1,5 @@
-import {ServiceArgs} from '../../services/new/types';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
+import {ServiceArgs} from '../../services/new/types';
 import Utils from '../../utils';
 
 const PAGE = 0;

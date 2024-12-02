@@ -1,14 +1,16 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {checkFetchedEntry} from './utils';
+
+import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {US_ERRORS} from '../../../const';
+import {Entry} from '../../../db/models/new/entry';
+import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
+import {DlsActions} from '../../../types/models';
+import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
-import {Entry} from '../../../db/models/new/entry';
-import {DlsActions} from '../../../types/models';
-import {US_ERRORS} from '../../../const';
-import Utils from '../../../utils';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
 import {getWorkbook} from '../workbook';
+
+import {checkFetchedEntry} from './utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',

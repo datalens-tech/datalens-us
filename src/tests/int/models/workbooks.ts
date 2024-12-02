@@ -1,4 +1,4 @@
-import {testTenantId, testProjectId} from '../auth';
+import {testProjectId, testTenantId} from '../auth';
 
 export const WORKBOOK_DEFAULT_FIELDS = {
     workbookId: expect.any(String),

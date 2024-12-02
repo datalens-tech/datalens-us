@@ -1,7 +1,8 @@
 import {OrderByDirection} from 'objection';
-import {EntriesOrderByFilter, EntriesFilters} from './filters';
-import {EntryScope} from './entry';
+
 import {BasicRequestParams, RequestedBy} from './common';
+import {EntryScope} from './entry';
+import {EntriesFilters, EntriesOrderByFilter} from './filters';
 
 export interface PaginationEntriesResponse {
     nextPageToken?: string;

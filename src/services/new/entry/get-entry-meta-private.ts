@@ -1,11 +1,13 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {getEntryMeta} from './get-entry-meta';
+
+import {US_ERRORS} from '../../../const';
+import {DlsActions} from '../../../types/models';
+import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
-import {DlsActions} from '../../../types/models';
-import {US_ERRORS} from '../../../const';
-import Utils from '../../../utils';
 import {getWorkbook} from '../workbook';
+
+import {getEntryMeta} from './get-entry-meta';
 
 export type GetEntryMetaPrivateArgs = {
     entryId: string;

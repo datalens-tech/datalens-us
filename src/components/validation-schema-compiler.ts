@@ -1,14 +1,15 @@
 'use strict';
 
+import {AppError} from '@gravity-ui/nodekit';
 import Ajv from 'ajv';
+
 import {
-    MAX_META_OBJECT_SYMBOLS,
-    MAX_UNVERSIONED_DATA_OBJECT_SYMBOLS,
-    MAX_PRESET_DATA_OBJECT_SYMBOLS,
     MAX_BRANDING_OBJECT_SYMBOLS,
+    MAX_META_OBJECT_SYMBOLS,
+    MAX_PRESET_DATA_OBJECT_SYMBOLS,
+    MAX_UNVERSIONED_DATA_OBJECT_SYMBOLS,
 } from '../const';
 import US_ERRORS from '../const/us-error-constants';
-import {AppError} from '@gravity-ui/nodekit';
 
 const ajv = new Ajv({
     allErrors: true,

@@ -1,17 +1,19 @@
+import {AppError} from '@gravity-ui/nodekit';
+import {transaction} from 'objection';
+
+import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {US_ERRORS} from '../../../const';
+import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
+import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
+import {CollectionPermission} from '../../../entities/collection';
+import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getPrimary, getReplica} from '../utils';
 import {deleteWorkbooks} from '../workbook';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {US_ERRORS} from '../../../const';
-import {transaction} from 'objection';
-import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
-import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
-import Utils from '../../../utils';
-import {CollectionPermission} from '../../../entities/collection';
-import {AppError} from '@gravity-ui/nodekit';
+
 import {getCollectionsListByIds} from './get-collections-list-by-ids';
+import {checkAndSetCollectionPermission, makeCollectionsWithParentsMap} from './utils';
 import {markCollectionsAsDeleted} from './utils/mark-collections-as-deleted';
-import {makeCollectionsWithParentsMap, checkAndSetCollectionPermission} from './utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',

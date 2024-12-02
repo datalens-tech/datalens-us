@@ -1,5 +1,6 @@
-import {db} from '../db';
 import {Request, Response} from '@gravity-ui/expresskit';
+
+import {db} from '../db';
 
 export default {
     ping: async (_: Request, res: Response) => {

@@ -1,4 +1,5 @@
 import {JoinedEntryRevisionColumns} from '../../../../db/presentations/joined-entry-revision';
+
 import {formatGetEntryMetaResponse} from './format-get-entry-meta-response';
 
 export const formatGetEntryMetaPrivateResponse = ({

@@ -1,8 +1,8 @@
-import {ServiceArgs} from '../types';
-import {getPrimary} from '../utils';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {WorkbookModel} from '../../../db/models/new/workbook';
 import Utils from '../../../utils';
+import {ServiceArgs} from '../types';
+import {getPrimary} from '../utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',

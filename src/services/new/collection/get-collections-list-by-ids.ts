@@ -1,12 +1,13 @@
-import {ServiceArgs} from '../types';
-import {getReplica} from '../utils';
+import {Feature, isEnabledFeature} from '../../../components/features';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
-import Utils from '../../../utils';
-import {makeCollectionsWithParentsMap} from './utils';
-import {Feature, isEnabledFeature} from '../../../components/features';
 import {CollectionPermission} from '../../../entities/collection';
 import {CollectionInstance} from '../../../registry/common/entities/collection/types';
+import Utils from '../../../utils';
+import {ServiceArgs} from '../types';
+import {getReplica} from '../utils';
+
+import {makeCollectionsWithParentsMap} from './utils';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
