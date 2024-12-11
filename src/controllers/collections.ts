@@ -26,18 +26,43 @@ import {
 } from '../services/new/collection/formatters';
 import Utils from '../utils';
 
+export type CreateCollectionReqBody = {
+    title: string;
+    description?: string;
+    parentId: Nullable<string>;
+};
+
 export default {
-    create: async (req: Request, res: Response) => {
+    create: async (req: Request<{}, {}, CreateCollectionReqBody>, res: Response) => {
         const {body} = req;
 
-        const result = await createCollection(
-            {ctx: req.ctx},
-            {
-                title: body.title,
-                description: body.description as Optional<string>,
-                parentId: body.parentId as Nullable<string>,
-            },
-        );
+        const registry = req.ctx.get('registry');
+        const {
+            controllersCallbacks: {onCreateCollectionError, onCreateCollectionSuccess},
+        } = registry.common.functions.get();
+
+        let result;
+
+        try {
+            result = await createCollection(
+                {ctx: req.ctx},
+                {
+                    title: body.title,
+                    description: body.description,
+                    parentId: body.parentId,
+                },
+            );
+
+            onCreateCollectionSuccess({
+                ctx: req.ctx,
+                reqBody: body,
+                collection: result.collection.model,
+            });
+        } catch (error) {
+            onCreateCollectionError({ctx: req.ctx, reqBody: body, error});
+
+            throw error;
+        }
 
         const formattedResponse = formatCollectionWithOperation(
             result.collection,

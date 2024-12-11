@@ -5,6 +5,10 @@ import type {CheckOrganizationPermission, CheckProjectPermission} from './compon
 import type {BulkFetchCollectionsAllPermissions} from './entities/collection/types';
 import type {BulkFetchWorkbooksAllPermissions} from './entities/workbook/types';
 import type {ColorPalettesAdminValidator} from './utils/color-palettes/types';
+import type {
+    OnCreateCollectionError,
+    OnCreateCollectionSuccess,
+} from './utils/controllers-callbacks/collections';
 import type {CheckEmbedding} from './utils/embedding/types';
 import type {
     GetEntryAddFormattedFieldsHook,
@@ -23,4 +27,9 @@ export const commonFunctionsMap = {
     getEntryBeforeDbRequestHook: makeFunctionTemplate<GetEntryBeforeDbRequestHook>(),
     getEntryAddFormattedFieldsHook: makeFunctionTemplate<GetEntryAddFormattedFieldsHook>(),
     checkEmbedding: makeFunctionTemplate<CheckEmbedding>(),
+
+    controllersCallbacks: {
+        onCreateCollectionSuccess: makeFunctionTemplate<OnCreateCollectionSuccess>(),
+        onCreateCollectionError: makeFunctionTemplate<OnCreateCollectionError>(),
+    },
 } as const;
