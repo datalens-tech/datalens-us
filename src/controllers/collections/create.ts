@@ -5,7 +5,7 @@ import {makeSchemaValidator} from '../../components/validation-schema-compiler';
 import {createCollection} from '../../services/new/collection';
 import {formatCollectionWithOperation} from '../../services/new/collection/formatters';
 
-type CreateCollectionReqBody = {
+export type CreateCollectionReqBody = {
     title: string;
     description?: string;
     parentId: Nullable<string>;
