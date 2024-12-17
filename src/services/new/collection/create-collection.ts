@@ -1,7 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import Utils from '../../../utils';
@@ -11,22 +10,6 @@ import {getPrimary} from '../utils';
 import {checkCollectionByTitle} from './check-collection-by-title';
 import {getParentIds} from './utils/get-parents';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['title', 'parentId'],
-    properties: {
-        title: {
-            type: 'string',
-        },
-        description: {
-            type: 'string',
-        },
-        parentId: {
-            type: ['string', 'null'],
-        },
-    },
-});
-
 export interface CreateCollectionArgs {
     title: string;
     description?: string;
@@ -34,7 +17,7 @@ export interface CreateCollectionArgs {
 }
 
 export const createCollection = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: CreateCollectionArgs,
 ) => {
     const {title, description, parentId} = args;
@@ -46,10 +29,6 @@ export const createCollection = async (
         description,
         parentId: parentId ? Utils.encodeId(parentId) : null,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const {
         user: {userId},

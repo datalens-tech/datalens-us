@@ -1,11 +1,10 @@
 import {Request, Response} from '@gravity-ui/expresskit';
 
-import {prepareResponseAsync} from '../components/response-presenter';
+import {prepareResponseAsync} from '../../components/response-presenter';
 import {
     Mode,
     OrderDirection,
     OrderField,
-    createCollection,
     deleteCollections,
     getCollection,
     getCollectionBreadcrumbs,
@@ -15,64 +14,20 @@ import {
     moveCollection,
     moveCollectionsList,
     updateCollection,
-} from '../services/new/collection';
+} from '../../services/new/collection';
 import {
     formatCollection,
     formatCollectionContent,
     formatCollectionModel,
     formatCollectionModelsList,
-    formatCollectionWithOperation,
     formatGetCollectionBreadcrumbs,
-} from '../services/new/collection/formatters';
-import Utils from '../utils';
+} from '../../services/new/collection/formatters';
+import Utils from '../../utils';
 
-export type CreateCollectionReqBody = {
-    title: string;
-    description?: string;
-    parentId: Nullable<string>;
-};
+import {createCollectionController} from './create';
 
 export default {
-    create: async (req: Request<{}, {}, CreateCollectionReqBody>, res: Response) => {
-        const {body} = req;
-
-        const registry = req.ctx.get('registry');
-        const {
-            controllersCallbacks: {onCreateCollectionError, onCreateCollectionSuccess},
-        } = registry.common.functions.get();
-
-        let result;
-
-        try {
-            result = await createCollection(
-                {ctx: req.ctx},
-                {
-                    title: body.title,
-                    description: body.description,
-                    parentId: body.parentId,
-                },
-            );
-
-            onCreateCollectionSuccess({
-                ctx: req.ctx,
-                reqBody: body,
-                collection: result.collection.model,
-            });
-        } catch (error) {
-            onCreateCollectionError({ctx: req.ctx, reqBody: body, error});
-
-            throw error;
-        }
-
-        const formattedResponse = formatCollectionWithOperation(
-            result.collection,
-            result.operation,
-        );
-
-        const {code, response} = await prepareResponseAsync({data: formattedResponse});
-
-        res.status(code).send(response);
-    },
+    create: createCollectionController,
 
     get: async (req: Request, res: Response) => {
         const {params, query} = req;
