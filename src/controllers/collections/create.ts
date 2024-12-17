@@ -31,9 +31,7 @@ export const createCollectionController = async (
     req: Request<{}, {}, CreateCollectionReqBody>,
     res: Response,
 ) => {
-    const {body} = req;
-
-    validateBody(body);
+    const body = validateBody<CreateCollectionReqBody>(req.body);
 
     const registry = req.ctx.get('registry');
     const {
