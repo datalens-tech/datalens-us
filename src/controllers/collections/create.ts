@@ -27,10 +27,7 @@ const validateBody = makeSchemaValidator({
     },
 });
 
-export const createCollectionController = async (
-    req: Request<{}, {}, CreateCollectionReqBody>,
-    res: Response,
-) => {
+export const createCollectionController = async (req: Request, res: Response) => {
     const body = validateBody<CreateCollectionReqBody>(req.body);
 
     const registry = req.ctx.get('registry');
