@@ -1,6 +1,8 @@
 import type {AppContext} from '@gravity-ui/nodekit';
 
 import type {CreateCollectionReqBody} from '../../../../controllers/collections/create';
+import type {DeleteCollectionReqParams} from '../../../../controllers/collections/delete';
+import type {DeleteCollectionsListReqBody} from '../../../../controllers/collections/deleteList';
 import type {
     MoveCollectionReqBody,
     MoveCollectionReqParams,
@@ -61,5 +63,29 @@ export type OnMoveCollectionsListSuccess = (args: {
 export type OnMoveCollectionsListError = (args: {
     ctx: AppContext;
     reqBody: MoveCollectionsListReqBody;
+    error: unknown;
+}) => void;
+
+export type OnDeleteCollectionSuccess = (args: {
+    ctx: AppContext;
+    reqParams: DeleteCollectionReqParams;
+    collections: CollectionModel[];
+}) => void;
+
+export type OnDeleteCollectionError = (args: {
+    ctx: AppContext;
+    reqParams: DeleteCollectionReqParams;
+    error: unknown;
+}) => void;
+
+export type OnDeleteCollectionsListSuccess = (args: {
+    ctx: AppContext;
+    reqBody: DeleteCollectionsListReqBody;
+    collections: CollectionModel[];
+}) => void;
+
+export type OnDeleteCollectionsListError = (args: {
+    ctx: AppContext;
+    reqBody: DeleteCollectionsListReqBody;
     error: unknown;
 }) => void;

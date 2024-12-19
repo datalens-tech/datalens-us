@@ -1,196 +1,40 @@
-import {Request, Response} from '@gravity-ui/expresskit';
-
-import {prepareResponseAsync} from '../../components/response-presenter';
-import {
-    Mode,
-    OrderDirection,
-    OrderField,
-    deleteCollections,
-    getCollection,
-    getCollectionBreadcrumbs,
-    getCollectionContent,
-    getCollectionsListByIds,
-    getRootCollectionPermissions,
-    updateCollection,
-} from '../../services/new/collection';
-import {
-    formatCollection,
-    formatCollectionContent,
-    formatCollectionModel,
-    formatCollectionModelsList,
-    formatGetCollectionBreadcrumbs,
-} from '../../services/new/collection/formatters';
-import Utils from '../../utils';
-
 import {createCollectionController} from './create';
+import {deleteCollectionController} from './delete';
+import {deleteListController} from './deleteList';
+import {getCollectionController} from './get';
+import {getCollectionBreadcrumbsController} from './getBreadcrumbs';
+import {getCollectionsListByIdsController} from './getCollectionsListByIds';
+import {getCollectionContentController} from './getContent';
+import {getRootCollectionPermissionsController} from './getRootPermissions';
 import {moveCollectionController} from './move';
 import {moveCollectionsListController} from './moveList';
+import {updateCollectionController} from './update';
 
 export default {
     create: createCollectionController,
 
-    get: async (req: Request, res: Response) => {
-        const {params, query} = req;
+    get: getCollectionController,
 
-        const result = await getCollection(
-            {ctx: req.ctx},
-            {
-                collectionId: params.collectionId,
-                includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
-            },
-        );
-
-        const formattedResponse = formatCollection(result);
-
-        const {code, response} = await prepareResponseAsync({data: formattedResponse});
-
-        res.status(code).send(response);
-    },
-
-    getCollectionsListByIds: async (req: Request, res: Response) => {
-        const {body} = req;
-
-        const result = await getCollectionsListByIds(
-            {ctx: req.ctx},
-            {
-                collectionIds: body.collectionIds,
-            },
-        );
-
-        const formattedResponse = result.map((instance) => formatCollectionModel(instance.model));
-        const {code, response} = await prepareResponseAsync({data: formattedResponse});
-        res.status(code).send(response);
-    },
+    getCollectionsListByIds: getCollectionsListByIdsController,
 
     /**
      * @deprecated for structureItemsController.getStructureItems,
      * @todo remove, after successful deploy with UI.
      * Exists for reverse compatibility.
      */
-    getContent: async (req: Request, res: Response) => {
-        const {query} = req;
+    getContent: getCollectionContentController,
 
-        let collectionsPage: Optional<Nullable<number>>;
-        if (query.collectionsPage === 'null') {
-            collectionsPage = null;
-        } else {
-            collectionsPage = query.collectionsPage
-                ? parseInt(query.collectionsPage as string, 10)
-                : undefined;
-        }
+    getRootPermissions: getRootCollectionPermissionsController,
 
-        let workbooksPage: Optional<Nullable<number>>;
-        if (query.workbooksPage === 'null') {
-            workbooksPage = null;
-        } else {
-            workbooksPage = query.workbooksPage
-                ? parseInt(query.workbooksPage as string, 10)
-                : undefined;
-        }
+    getBreadcrumbs: getCollectionBreadcrumbsController,
 
-        const result = await getCollectionContent(
-            {ctx: req.ctx},
-            {
-                collectionId: (query.collectionId as Optional<string>) ?? null,
-                includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
-                filterString: query.filterString as Optional<string>,
-                collectionsPage,
-                workbooksPage,
-                pageSize: query.pageSize ? parseInt(query.pageSize as string, 10) : undefined,
-                orderField: query.orderField as Optional<OrderField>,
-                orderDirection: query.orderDirection as Optional<OrderDirection>,
-                onlyMy: Utils.isTrueArg(query.onlyMy),
-                mode: query.mode as Optional<Mode>,
-            },
-        );
+    delete: deleteCollectionController,
 
-        const formattedResponse = formatCollectionContent(result);
-
-        const {code, response} = await prepareResponseAsync({data: formattedResponse});
-
-        res.status(code).send(response);
-    },
-
-    getRootPermissions: async (req: Request, res: Response) => {
-        const result = await getRootCollectionPermissions({ctx: req.ctx});
-
-        const {code, response} = await prepareResponseAsync({data: result});
-
-        res.status(code).send(response);
-    },
-
-    getBreadcrumbs: async (req: Request, res: Response) => {
-        const {params, query} = req;
-
-        const result = await getCollectionBreadcrumbs(
-            {ctx: req.ctx},
-            {
-                collectionId: params.collectionId,
-                includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
-            },
-        );
-
-        const formattedResponse = formatGetCollectionBreadcrumbs(result);
-
-        const {code, response} = await prepareResponseAsync({data: formattedResponse});
-
-        res.status(code).send(response);
-    },
-
-    delete: async (req: Request, res: Response) => {
-        const {params} = req;
-
-        const result = await deleteCollections(
-            {ctx: req.ctx},
-            {
-                collectionIds: [params.collectionId],
-            },
-        );
-
-        const formattedResponse = formatCollectionModelsList(result);
-
-        const {code, response} = await prepareResponseAsync({data: formattedResponse});
-
-        res.status(code).send(response);
-    },
-
-    deleteList: async (req: Request, res: Response) => {
-        const {body} = req;
-
-        const result = await deleteCollections(
-            {ctx: req.ctx},
-            {
-                collectionIds: body.collectionIds,
-            },
-        );
-
-        const formattedResponse = formatCollectionModelsList(result);
-
-        const {code, response} = await prepareResponseAsync({data: formattedResponse});
-
-        res.status(code).send(response);
-    },
+    deleteList: deleteListController,
 
     move: moveCollectionController,
 
     moveList: moveCollectionsListController,
 
-    update: async (req: Request, res: Response) => {
-        const {params, body} = req;
-
-        const result = await updateCollection(
-            {ctx: req.ctx},
-            {
-                collectionId: params.collectionId,
-                title: body.title as Optional<string>,
-                description: body.description as Optional<string>,
-            },
-        );
-
-        const formattedResponse = formatCollectionModel(result);
-
-        const {code, response} = await prepareResponseAsync({data: formattedResponse});
-
-        res.status(code).send(response);
-    },
+    update: updateCollectionController,
 };

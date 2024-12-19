@@ -8,5 +8,9 @@ export type {
     OnMoveCollectionsListSuccess,
     OnUpdateCollectionError,
     OnUpdateCollectionSuccess,
+    OnDeleteCollectionError,
+    OnDeleteCollectionSuccess,
+    OnDeleteCollectionsListError,
+    OnDeleteCollectionsListSuccess,
 } from '../../src/registry/common/utils/controllers-callbacks/collections';
 export type {GatewayApi} from '../../src/registry';

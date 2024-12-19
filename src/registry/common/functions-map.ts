@@ -8,6 +8,10 @@ import type {ColorPalettesAdminValidator} from './utils/color-palettes/types';
 import type {
     OnCreateCollectionError,
     OnCreateCollectionSuccess,
+    OnDeleteCollectionError,
+    OnDeleteCollectionSuccess,
+    OnDeleteCollectionsListError,
+    OnDeleteCollectionsListSuccess,
     OnMoveCollectionError,
     OnMoveCollectionSuccess,
     OnMoveCollectionsListError,
@@ -43,5 +47,9 @@ export const commonFunctionsMap = {
         onMoveCollectionsListSuccess: makeFunctionTemplate<OnMoveCollectionsListSuccess>(),
         onUpdateCollectionError: makeFunctionTemplate<OnUpdateCollectionError>(),
         onUpdateCollectionSuccess: makeFunctionTemplate<OnUpdateCollectionSuccess>(),
+        onDeleteCollectionError: makeFunctionTemplate<OnDeleteCollectionError>(),
+        onDeleteCollectionSuccess: makeFunctionTemplate<OnDeleteCollectionSuccess>(),
+        onDeleteCollectionsListError: makeFunctionTemplate<OnDeleteCollectionsListError>(),
+        onDeleteCollectionsListSuccess: makeFunctionTemplate<OnDeleteCollectionsListSuccess>(),
     },
 } as const;
