@@ -35,10 +35,8 @@ export const createCollectionController = async (req: Request, res: Response) =>
         controllersCallbacks: {onCreateCollectionError, onCreateCollectionSuccess},
     } = registry.common.functions.get();
 
-    let result;
-
     try {
-        result = await createCollection(
+        const result = await createCollection(
             {ctx: req.ctx},
             {
                 title: body.title,
@@ -52,15 +50,18 @@ export const createCollectionController = async (req: Request, res: Response) =>
             reqBody: body,
             collection: result.collection.model,
         });
+
+        const formattedResponse = formatCollectionWithOperation(
+            result.collection,
+            result.operation,
+        );
+
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
+
+        res.status(code).send(response);
     } catch (error) {
         onCreateCollectionError({ctx: req.ctx, reqBody: body, error});
 
         throw error;
     }
-
-    const formattedResponse = formatCollectionWithOperation(result.collection, result.operation);
-
-    const {code, response} = await prepareResponseAsync({data: formattedResponse});
-
-    res.status(code).send(response);
 };

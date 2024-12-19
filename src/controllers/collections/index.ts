@@ -11,8 +11,6 @@ import {
     getCollectionContent,
     getCollectionsListByIds,
     getRootCollectionPermissions,
-    moveCollection,
-    moveCollectionsList,
     updateCollection,
 } from '../../services/new/collection';
 import {
@@ -25,6 +23,8 @@ import {
 import Utils from '../../utils';
 
 import {createCollectionController} from './create';
+import {moveCollectionController} from './move';
+import {moveCollectionsListController} from './moveList';
 
 export default {
     create: createCollectionController,
@@ -171,42 +171,10 @@ export default {
         res.status(code).send(response);
     },
 
-    move: async (req: Request, res: Response) => {
-        const {params, body} = req;
+    move: moveCollectionController,
 
-        const result = await moveCollection(
-            {ctx: req.ctx},
-            {
-                collectionId: params.collectionId,
-                parentId: body.parentId as string,
-                title: body.title as Optional<string>,
-            },
-        );
+    moveList: moveCollectionsListController,
 
-        const formattedResponse = formatCollectionModel(result);
-
-        const {code, response} = await prepareResponseAsync({data: formattedResponse});
-
-        res.status(code).send(response);
-    },
-
-    moveList: async (req: Request, res: Response) => {
-        const {body} = req;
-
-        const result = await moveCollectionsList(
-            {ctx: req.ctx},
-            {
-                collectionIds: body.collectionIds,
-                parentId: body.parentId as string,
-            },
-        );
-
-        const formattedResponse = formatCollectionModelsList(result);
-
-        const {code, response} = await prepareResponseAsync({data: formattedResponse});
-
-        res.status(code).send(response);
-    },
     update: async (req: Request, res: Response) => {
         const {params, body} = req;
 

@@ -8,6 +8,12 @@ import type {ColorPalettesAdminValidator} from './utils/color-palettes/types';
 import type {
     OnCreateCollectionError,
     OnCreateCollectionSuccess,
+    OnMoveCollectionError,
+    OnMoveCollectionSuccess,
+    OnMoveCollectionsListError,
+    OnMoveCollectionsListSuccess,
+    OnUpdateCollectionError,
+    OnUpdateCollectionSuccess,
 } from './utils/controllers-callbacks/collections';
 import type {CheckEmbedding} from './utils/embedding/types';
 import type {
@@ -29,7 +35,13 @@ export const commonFunctionsMap = {
     checkEmbedding: makeFunctionTemplate<CheckEmbedding>(),
 
     controllersCallbacks: {
-        onCreateCollectionSuccess: makeFunctionTemplate<OnCreateCollectionSuccess>(),
         onCreateCollectionError: makeFunctionTemplate<OnCreateCollectionError>(),
+        onCreateCollectionSuccess: makeFunctionTemplate<OnCreateCollectionSuccess>(),
+        onMoveCollectionError: makeFunctionTemplate<OnMoveCollectionError>(),
+        onMoveCollectionSuccess: makeFunctionTemplate<OnMoveCollectionSuccess>(),
+        onMoveCollectionsListError: makeFunctionTemplate<OnMoveCollectionsListError>(),
+        onMoveCollectionsListSuccess: makeFunctionTemplate<OnMoveCollectionsListSuccess>(),
+        onUpdateCollectionError: makeFunctionTemplate<OnUpdateCollectionError>(),
+        onUpdateCollectionSuccess: makeFunctionTemplate<OnUpdateCollectionSuccess>(),
     },
 } as const;
