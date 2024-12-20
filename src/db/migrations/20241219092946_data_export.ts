@@ -2,10 +2,10 @@ import type {Knex} from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
     return knex.raw(`
-        CREATE TABLE data_export (
+        CREATE TABLE data_exports (
             data_export_id BIGINT NOT NULL PRIMARY KEY DEFAULT get_id(),
             title TEXT NOT NULL,
-            tenant_id TEXT,
+            tenant_id TEXT NOT NULL DEFAULT 'common' REFERENCES tenants (tenant_id) ON UPDATE CASCADE ON DELETE CASCADE,
             chart_id BIGINT NOT NULL,
             chart_rev_id BIGINT NOT NULL,
             dataset_id BIGINT,
@@ -25,6 +25,6 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
     return knex.raw(`
-        DROP TABLE data_export;
+        DROP TABLE data_exports;
     `);
 }
