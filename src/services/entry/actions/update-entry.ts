@@ -158,7 +158,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         await Promise.all([
             checkEntryPromise,
             Lock.checkLock({entryId, lockToken}, ctx),
-            checkUpdateEntryAvailability({ctx, scope: entry.scope}),
+            checkUpdateEntryAvailability({ctx, scope: entry.scope, type: entry.type}),
         ]);
     } else {
         throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {

@@ -18,9 +18,11 @@ export type GetEntryAddFormattedFieldsHook = (args: {
 export type CheckCreateEntryAvailability = (args: {
     ctx: AppContext;
     scope: EntryScope;
+    type: string | undefined;
 }) => Promise<void>;
 
 export type CheckUpdateEntryAvailability = (args: {
     ctx: AppContext;
     scope: EntryScope;
+    type: string | undefined;
 }) => Promise<void>;

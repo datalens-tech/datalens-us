@@ -44,7 +44,7 @@ export default class EntryService {
         const registry = ctx.get('registry');
         const {checkCreateEntryAvailability} = registry.common.functions.get();
 
-        await checkCreateEntryAvailability({ctx, scope});
+        await checkCreateEntryAvailability({ctx, scope, type});
 
         if (workbookId) {
             return await createEntryInWorkbook(ctx, {
@@ -114,7 +114,7 @@ export default class EntryService {
         const registry = ctx.get('registry');
         const {checkCreateEntryAvailability} = registry.common.functions.get();
 
-        await checkCreateEntryAvailability({ctx, scope});
+        await checkCreateEntryAvailability({ctx, scope, type});
 
         if (workbookId) {
             return await createEntryInWorkbook(ctx, {
