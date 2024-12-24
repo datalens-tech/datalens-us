@@ -41,6 +41,11 @@ export default class EntryService {
         initialParentId,
         ctx,
     }: ST.CreateEntry) {
+        const registry = ctx.get('registry');
+        const {checkCreateEntryAvailability} = registry.common.functions.get();
+
+        await checkCreateEntryAvailability({ctx, scope, type});
+
         if (workbookId) {
             return await createEntryInWorkbook(ctx, {
                 workbookId,
@@ -106,6 +111,11 @@ export default class EntryService {
         initialParentId,
         ctx,
     }: ST.CreateEntry) {
+        const registry = ctx.get('registry');
+        const {checkCreateEntryAvailability} = registry.common.functions.get();
+
+        await checkCreateEntryAvailability({ctx, scope, type});
+
         if (workbookId) {
             return await createEntryInWorkbook(ctx, {
                 workbookId,
