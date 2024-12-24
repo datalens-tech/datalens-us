@@ -147,11 +147,19 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         .timeout(DEFAULT_QUERY_TIMEOUT);
 
     if (entry) {
+        let checkEntryPromise;
+
         if (!isPrivateRoute && !entry.workbookId) {
-            await checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
+            checkEntryPromise = checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
         }
 
-        await Lock.checkLock({entryId, lockToken}, ctx);
+        const {checkUpdateEntryAvailability} = registry.common.functions.get();
+
+        await Promise.all([
+            checkEntryPromise,
+            Lock.checkLock({entryId, lockToken}, ctx),
+            checkUpdateEntryAvailability({ctx, scope: entry.scope}),
+        ]);
     } else {
         throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
             code: US_ERRORS.NOT_EXIST_ENTRY,

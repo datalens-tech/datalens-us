@@ -7,6 +7,8 @@ import type {BulkFetchWorkbooksAllPermissions} from './entities/workbook/types';
 import type {ColorPalettesAdminValidator} from './utils/color-palettes/types';
 import type {CheckEmbedding} from './utils/embedding/types';
 import type {
+    CheckCreateEntryAvailability,
+    CheckUpdateEntryAvailability,
     GetEntryAddFormattedFieldsHook,
     GetEntryBeforeDbRequestHook,
     IsNeedBypassEntryByKey,
@@ -23,4 +25,6 @@ export const commonFunctionsMap = {
     getEntryBeforeDbRequestHook: makeFunctionTemplate<GetEntryBeforeDbRequestHook>(),
     getEntryAddFormattedFieldsHook: makeFunctionTemplate<GetEntryAddFormattedFieldsHook>(),
     checkEmbedding: makeFunctionTemplate<CheckEmbedding>(),
+    checkCreateEntryAvailability: makeFunctionTemplate<CheckCreateEntryAvailability>(),
+    checkUpdateEntryAvailability: makeFunctionTemplate<CheckUpdateEntryAvailability>(),
 } as const;
