@@ -20,11 +20,21 @@ export async function up(knex: Knex): Promise<void> {
             result_link TEXT,
             error JSONB
         );
+
+        CREATE INDEX data_exports_chart_id_idx ON data_exports(chart_id);
+        CREATE INDEX data_exports_dataset_id_idx ON data_exports(dataset_id);
+        CREATE INDEX data_exports_connection_id_idx ON data_exports(connection_id);
+        CREATE INDEX data_exports_expired_at_idx ON data_exports(expired_at);
     `);
 }
 
 export async function down(knex: Knex): Promise<void> {
     return knex.raw(`
+        DROP INDEX data_exports_chart_id_idx;
+        DROP INDEX data_exports_dataset_id_idx;
+        DROP INDEX data_exports_connection_id_idx;
+        DROP INDEX data_exports_expired_at_idx;
+
         DROP TABLE data_exports;
     `);
 }
