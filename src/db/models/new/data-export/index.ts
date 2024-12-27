@@ -15,7 +15,7 @@ export class DataExport extends Model {
     chartId!: string;
     chartRevId!: string;
     datasetId!: Nullable<string>;
-    datasetRevId!: string;
+    datasetRevId!: Nullable<string>;
     connectionId!: string;
     connectionRevId!: string;
     params!: Record<string, unknown>;
