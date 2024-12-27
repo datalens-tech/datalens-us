@@ -30,7 +30,7 @@ export default ({data}: {data: any}): ST.ServiceResponse => {
     };
 };
 
-export async function prepareResponseAsync<T extends any = any>({
+export async function prepareResponseAsync<T extends object = object>({
     data,
 }: {
     data: T;
