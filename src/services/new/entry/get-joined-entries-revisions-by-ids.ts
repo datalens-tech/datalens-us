@@ -69,6 +69,15 @@ const checkFolderEntriesPermissions = async ({
     permittedFolderEntries: JoinedEntryRevisionColumns[];
     accessDeniedFolderEntryIds: string[];
 }> => {
+    const {dlsEnabled} = ctx.config;
+
+    if (!dlsEnabled) {
+        return {
+            permittedFolderEntries: entries,
+            accessDeniedFolderEntryIds: [],
+        };
+    }
+
     const registry = ctx.get('registry');
     const {DLS} = registry.common.classes.get();
 
