@@ -1,8 +1,8 @@
 import {Request, Response} from '@gravity-ui/expresskit';
 
-import {prepareResponseAsync} from '../components/response-presenter';
-import {US_MASTER_TOKEN_HEADER} from '../const';
-import {EntryScope} from '../db/models/new/entry/types';
+import {prepareResponseAsync} from '../../components/response-presenter';
+import {US_MASTER_TOKEN_HEADER} from '../../const';
+import {EntryScope} from '../../db/models/new/entry/types';
 import {
     DeleteEntryData,
     GetEntryRevisionsData,
@@ -13,9 +13,9 @@ import {
     renameEntry,
     switchRevisionEntry,
     updateEntry,
-} from '../services/entry';
-import EntryService from '../services/entry.service';
-import NavigationService from '../services/navigation.service';
+} from '../../services/entry';
+import EntryService from '../../services/entry.service';
+import NavigationService from '../../services/navigation.service';
 import {
     GetEntryArgs,
     GetEntryMetaPrivateArgs,
@@ -24,15 +24,17 @@ import {
     getEntry,
     getEntryMeta,
     getEntryMetaPrivate,
-} from '../services/new/entry';
+} from '../../services/new/entry';
 import {
     formatEntryModel,
     formatGetEntryMetaPrivateResponse,
     formatGetEntryMetaResponse,
     formatGetEntryResponse,
-} from '../services/new/entry/formatters';
-import * as ST from '../types/services.types';
-import Utils from '../utils';
+} from '../../services/new/entry/formatters';
+import * as ST from '../../types/services.types';
+import Utils from '../../utils';
+
+import {getEntriesDataController} from './getEntriesData';
 
 export default {
     getEntry: async (req: Request, res: Response) => {
@@ -320,4 +322,6 @@ export default {
 
         res.status(code).send(response);
     },
+
+    getEntriesData: getEntriesDataController,
 };

@@ -187,6 +187,11 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             private: true,
         }),
 
+        getEntriesData: makeRoute({
+            route: 'POST /v1/get-entries-data',
+            handler: entriesController.getEntriesData,
+        }),
+
         verifyLockExistence: makeRoute({
             route: 'GET /v1/locks/:entryId',
             handler: locksController.verifyExistence,

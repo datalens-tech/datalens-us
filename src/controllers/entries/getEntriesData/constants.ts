@@ -1,0 +1,2 @@
+export const NOT_FOUND_ERROR_CODE = 'NOT_FOUND';
+export const ACCESS_DENIED_ERROR_CODE = 'ACCESS_DENIED';
