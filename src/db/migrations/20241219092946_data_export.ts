@@ -9,7 +9,7 @@ export async function up(knex: Knex): Promise<void> {
             chart_id BIGINT NOT NULL,
             chart_rev_id BIGINT NOT NULL,
             dataset_id BIGINT,
-            dataset_rev_id BIGINT NOT NULL,
+            dataset_rev_id BIGINT,
             connection_id BIGINT NOT NULL,
             connection_rev_id BIGINT NOT NULL,
             params JSONB NOT NULL DEFAULT '{}'::jsonb,
