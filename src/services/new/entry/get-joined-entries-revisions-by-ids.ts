@@ -71,7 +71,7 @@ const checkFolderEntriesPermissions = async ({
 }> => {
     const {dlsEnabled} = ctx.config;
 
-    if (!dlsEnabled) {
+    if (entries.length === 0 || !dlsEnabled) {
         return {
             permittedFolderEntries: entries,
             accessDeniedFolderEntryIds: [],

@@ -18,4 +18,5 @@ export const routes = {
     rootCollectionPermissions: '/v1/root-collection-permissions',
     workbooks: '/v2/workbooks',
     privateWorkbooks: '/private/v2/workbooks',
+    getEntriesData: '/v1/get-entries-data',
 } as const;
