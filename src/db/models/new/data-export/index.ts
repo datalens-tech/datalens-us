@@ -1,4 +1,5 @@
 import {Model} from '../../..';
+import {Utils} from '../../../../../api/utils';
 
 export class DataExport extends Model {
     static get tableName() {
@@ -25,4 +26,17 @@ export class DataExport extends Model {
     jobId!: string;
     resultLink!: Nullable<string>;
     error!: Nullable<Record<string, unknown>>;
+
+    $serialize() {
+        return {
+            ...this,
+            dataExportId: Utils.encodeId(this.dataExportId),
+            chartId: this.chartId && Utils.encodeId(this.chartId),
+            chartRevId: this.chartRevId && Utils.encodeId(this.chartRevId),
+            datasetId: this.datasetId && Utils.encodeId(this.datasetId),
+            datasetRevId: this.datasetRevId && Utils.encodeId(this.datasetRevId),
+            connectionId: this.connectionId && Utils.encodeId(this.connectionId),
+            connectionRevId: this.connectionRevId && Utils.encodeId(this.connectionRevId),
+        };
+    }
 }
