@@ -102,7 +102,7 @@ const checkFolderEntriesPermissions = async ({
 
     return {
         permittedFolderEntries,
-        accessDeniedFolderEntryIds: [],
+        accessDeniedFolderEntryIds,
     };
 };
 
