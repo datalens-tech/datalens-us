@@ -71,7 +71,7 @@ export interface DlsEntity {
     isLocked?: boolean;
     permissions?: UsPermission;
 }
-export interface CheckBulkPermissionsDlsConfig<E extends DlsEntity = DlsEntity> {
+export interface CheckBulkPermissionsDlsConfig<E extends object = object> {
     entities?: E[];
     action: string;
     includePermissionsInfo?: boolean;

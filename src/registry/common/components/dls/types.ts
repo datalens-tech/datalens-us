@@ -11,7 +11,7 @@ export interface DLSConstructor {
         checkPermissionsArgs: MT.CheckPermissionDlsConfig,
     ) => Promise<any>;
 
-    checkBulkPermission<E extends MT.DlsEntity>(
+    checkBulkPermission<E extends object>(
         {ctx, trx}: {ctx: AppContext; trx?: TransactionOrKnex},
         checkBulkPermissionArgs: MT.CheckBulkPermissionsDlsConfig<E>,
     ): Promise<Array<E & MT.DlsEntity>>;
