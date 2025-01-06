@@ -10,6 +10,8 @@ import {Workbook} from './entities/workbook/workbook';
 import {colorPalettesAdminValidator} from './utils/color-palettes/utils';
 import {checkEmbedding} from './utils/embedding/utils';
 import {
+    checkCreateEntryAvailability,
+    checkUpdateEntryAvailability,
     getEntryAddFormattedFieldsHook,
     getEntryBeforeDbRequestHook,
     isNeedBypassEntryByKey,
@@ -33,5 +35,7 @@ export const registerCommonPlugins = () => {
         getEntryBeforeDbRequestHook,
         getEntryAddFormattedFieldsHook,
         checkEmbedding,
+        checkCreateEntryAvailability,
+        checkUpdateEntryAvailability,
     });
 };

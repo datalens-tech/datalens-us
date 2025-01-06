@@ -1,4 +1,6 @@
 import type {
+    CheckCreateEntryAvailability,
+    CheckUpdateEntryAvailability,
     GetEntryAddFormattedFieldsHook,
     GetEntryBeforeDbRequestHook,
     IsNeedBypassEntryByKey,
@@ -10,3 +12,7 @@ export const getEntryBeforeDbRequestHook: GetEntryBeforeDbRequestHook = () => Pr
 
 export const getEntryAddFormattedFieldsHook: GetEntryAddFormattedFieldsHook = () =>
     Promise.resolve({});
+
+export const checkCreateEntryAvailability: CheckCreateEntryAvailability = () => Promise.resolve();
+
+export const checkUpdateEntryAvailability: CheckUpdateEntryAvailability = () => Promise.resolve();
