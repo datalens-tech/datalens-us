@@ -1,7 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 
 import {Feature, isEnabledFeature} from '../../../components/features';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
 import {CollectionPermission} from '../../../entities/collection';
 import Utils from '../../../utils';
@@ -10,23 +9,13 @@ import {getReplica} from '../utils';
 
 import {getParents} from './utils/get-parents';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['collectionId'],
-    properties: {
-        collectionId: {
-            type: 'string',
-        },
-    },
-});
-
 export interface GetCollectionBreadcrumbsArgs {
     collectionId: string;
     includePermissionsInfo?: boolean;
 }
 
 export const getCollectionBreadcrumbs = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: GetCollectionBreadcrumbsArgs,
 ) => {
     const {collectionId, includePermissionsInfo} = args;
@@ -39,10 +28,6 @@ export const getCollectionBreadcrumbs = async (
         collectionId: Utils.encodeId(collectionId),
         includePermissionsInfo,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const targetTrx = getReplica(trx);
 

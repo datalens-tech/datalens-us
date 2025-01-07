@@ -22,3 +22,6 @@ export {isGatewayError} from '../src/components/gateway';
 export {resolvePrivatePermissions} from '../src/components/private-permissions';
 
 export {setRegistryToContext} from '../src/components/app-context';
+
+export {registerApiRoute, initSwagger} from '../src/components/api-docs';
+export {makeValidator, z, zc} from '../src/components/zod';

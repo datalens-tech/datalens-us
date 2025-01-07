@@ -411,7 +411,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
         }),
         getCollectionsListByIds: makeRoute({
             route: 'POST /v1/collections-get-list-by-ids',
-            handler: collectionsController.getCollectionsListByIds,
+            handler: collectionsController.getListByIds,
             features: [Feature.CollectionsEnabled],
         }),
         getCollectionContent: makeRoute({
@@ -436,13 +436,13 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
         }),
         deleteCollection: makeRoute({
             route: 'DELETE /v1/collections/:collectionId',
-            handler: collectionsController.delete,
+            handler: collectionsController.deleteCollection,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         deleteCollections: makeRoute({
             route: 'DELETE /v1/delete-collections',
-            handler: collectionsController.deleteList,
+            handler: collectionsController.deleteCollectionsList,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),

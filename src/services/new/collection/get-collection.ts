@@ -1,6 +1,5 @@
 import {AppError} from '@gravity-ui/nodekit';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
@@ -11,22 +10,6 @@ import {getReplica} from '../utils';
 
 import {checkAndSetCollectionPermission} from './utils';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['collectionId'],
-    properties: {
-        collectionId: {
-            type: 'string',
-        },
-        includePermissionsInfo: {
-            type: 'boolean',
-        },
-        permission: {
-            type: 'string',
-        },
-    },
-});
-
 export interface GetCollectionArgs {
     collectionId: string;
     includePermissionsInfo?: boolean;
@@ -34,7 +17,7 @@ export interface GetCollectionArgs {
 }
 
 export const getCollection = async <T extends CollectionInstance = CollectionInstance>(
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: GetCollectionArgs,
 ): Promise<T> => {
     const {collectionId, includePermissionsInfo = false, permission} = args;
@@ -43,10 +26,6 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
         collectionId: Utils.encodeId(collectionId),
         includePermissionsInfo,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const {tenantId, projectId, isPrivateRoute} = ctx.get('info');
 
