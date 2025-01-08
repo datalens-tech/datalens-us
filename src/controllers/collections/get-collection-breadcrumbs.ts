@@ -19,7 +19,7 @@ const requestSchema = {
 const validateParams = makeValidator(requestSchema.params);
 const validateQuery = makeValidator(requestSchema.query);
 
-export const getBreadcrumbs: AppRouteHandler = async (req, res) => {
+export const controller: AppRouteHandler = async (req, res) => {
     const params = validateParams(req.params);
     const query = validateQuery(req.query);
 
@@ -34,7 +34,7 @@ export const getBreadcrumbs: AppRouteHandler = async (req, res) => {
     res.status(200).send(await collectionInstanceArray.format(result));
 };
 
-getBreadcrumbs.api = {
+controller.api = {
     summary: 'Get collection breadcrumbs',
     tags: [ApiTag.Collections],
     request: {
@@ -53,4 +53,6 @@ getBreadcrumbs.api = {
     },
 };
 
-getBreadcrumbs.manualDecodeId = true;
+controller.manualDecodeId = true;
+
+export {controller as getCollectionBreadcrumbs};

@@ -6,12 +6,12 @@ import {getRootCollectionPermissions} from '../../services/new/collection';
 
 import {rootPermissions} from './response-models';
 
-export const getRootPermissions: AppRouteHandler = async (req, res) => {
+export const controller: AppRouteHandler = async (req, res) => {
     const result = await getRootCollectionPermissions({ctx: req.ctx});
     res.status(200).send(rootPermissions.format(result));
 };
 
-getRootPermissions.api = {
+controller.api = {
     summary: 'Get root permissions',
     tags: [ApiTag.Collections],
     responses: {
@@ -25,3 +25,5 @@ getRootPermissions.api = {
         },
     },
 };
+
+export {controller as getRootPermissions};

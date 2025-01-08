@@ -3,39 +3,35 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeValidator, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-import {createCollection} from '../../services/new/collection';
+import {moveCollectionsList} from '../../services/new/collection';
 
-import {collectionInstanceWithOperation} from './response-models';
+import {collectionModelArrayInObject} from './response-models';
 
 const requestSchema = {
     body: z.object({
-        title: z.string(),
-        description: z.string().optional(),
+        collectionIds: zc.encodedIdArray({min: 1, max: 1000}),
         parentId: zc.encodedId().nullable(),
     }),
 };
 
 const validateBody = makeValidator(requestSchema.body);
 
-export const create: AppRouteHandler = async (req, res) => {
+export const controller: AppRouteHandler = async (req, res) => {
     const body = validateBody(req.body);
 
-    const result = await createCollection(
+    const result = await moveCollectionsList(
         {ctx: req.ctx},
         {
-            title: body.title,
-            description: body.description,
+            collectionIds: body.collectionIds,
             parentId: body.parentId,
         },
     );
 
-    res.status(200).send(
-        collectionInstanceWithOperation.format(result.collection, result.operation),
-    );
+    res.status(200).send(await collectionModelArrayInObject.format(result));
 };
 
-create.api = {
-    summary: 'Create collection',
+controller.api = {
+    summary: 'Move collections list',
     tags: [ApiTag.Collections],
     request: {
         body: {
@@ -48,14 +44,16 @@ create.api = {
     },
     responses: {
         200: {
-            description: collectionInstanceWithOperation.schema.description ?? '',
+            description: collectionModelArrayInObject.schema.description ?? '',
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: collectionInstanceWithOperation.schema.omit({permissions: true}),
+                    schema: collectionModelArrayInObject.schema,
                 },
             },
         },
     },
 };
 
-create.manualDecodeId = true;
+controller.manualDecodeId = true;
+
+export {controller as moveCollectionsList};

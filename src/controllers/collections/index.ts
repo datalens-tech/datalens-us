@@ -1,25 +1,25 @@
-import {create} from './create';
+import {createCollection} from './create-collection';
 import {deleteCollection} from './delete-collection';
 import {deleteCollectionsList} from './delete-collections-list';
-import {get} from './get';
-import {getBreadcrumbs} from './get-breadcrumbs';
-import {getContent} from './get-content';
-import {getListByIds} from './get-list-by-ids';
+import {getCollection} from './get-collection';
+import {getCollectionBreadcrumbs} from './get-collection-breadcrumbs';
+import {getCollectionContent} from './get-collection-content';
+import {getCollectionsListByIds} from './get-collections-list-by-ids';
 import {getRootPermissions} from './get-root-permissions';
-import {move} from './move';
-import {moveList} from './move-list';
-import {update} from './update';
+import {moveCollection} from './move-collection';
+import {moveCollectionsList} from './move-collections-list';
+import {updateCollection} from './update-collection';
 
 export default {
-    create,
-    get,
-    update,
-    getListByIds,
-    getContent,
+    createCollection,
+    getCollection,
+    updateCollection,
+    getCollectionsListByIds,
+    getCollectionContent,
     getRootPermissions,
-    getBreadcrumbs,
+    getCollectionBreadcrumbs,
     deleteCollection,
     deleteCollectionsList,
-    move,
-    moveList,
+    moveCollection,
+    moveCollectionsList,
 };

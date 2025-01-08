@@ -19,7 +19,7 @@ const requestSchema = {
 const validateParams = makeValidator(requestSchema.params);
 const validateQuery = makeValidator(requestSchema.query);
 
-export const get: AppRouteHandler = async (req, res) => {
+export const controller: AppRouteHandler = async (req, res) => {
     const params = validateParams(req.params);
     const query = validateQuery(req.query);
 
@@ -34,7 +34,7 @@ export const get: AppRouteHandler = async (req, res) => {
     res.status(200).send(collectionInstance.format(result));
 };
 
-get.api = {
+controller.api = {
     summary: 'Get collection',
     tags: [ApiTag.Collections],
     request: {
@@ -53,4 +53,6 @@ get.api = {
     },
 };
 
-get.manualDecodeId = true;
+controller.manualDecodeId = true;
+
+export {controller as getCollection};

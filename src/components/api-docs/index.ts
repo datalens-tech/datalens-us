@@ -79,19 +79,25 @@ export const registerApiRoute = (
 export const initSwagger = (app: ExpressKit) => {
     const {config} = app;
 
-    app.express.use(
-        '/api-docs',
-        swaggerUi.serve,
-        swaggerUi.setup(
-            new OpenApiGeneratorV31(openApiRegistry.definitions).generateDocument({
-                openapi: '3.1.0',
-                info: {
-                    version: config.appVersion ?? '',
-                    title: 'United Storage',
-                    description: 'Storage for DataLens entities',
-                },
-                servers: [{url: '/'}],
-            }),
-        ),
-    );
+    const installationText = `Installation – <b>${config.appInstallation}</b>`;
+    const envText = `Env – <b>${config.appEnv}</b>`;
+    const descriptionText = `<br />Storage for DataLens entities.`;
+
+    setImmediate(() => {
+        app.express.use(
+            '/api-docs',
+            swaggerUi.serve,
+            swaggerUi.setup(
+                new OpenApiGeneratorV31(openApiRegistry.definitions).generateDocument({
+                    openapi: '3.1.0',
+                    info: {
+                        version: `${config.appVersion}`,
+                        title: `United Storage `,
+                        description: [installationText, envText, descriptionText].join('<br />'),
+                    },
+                    servers: [{url: '/'}],
+                }),
+            ),
+        );
+    });
 };

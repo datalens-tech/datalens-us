@@ -9,19 +9,19 @@ const schema = originalCollectionInstance.schema
         z.object({
             operation: z
                 .object({
+                    id: z.string(),
+                    description: z.string(),
+                    createdBy: z.string(),
                     createdAt: z.object({
                         nanos: z.number().optional(),
                         seconds: z.string(),
                     }),
-                    createdBy: z.string(),
-                    description: z.string(),
-                    done: z.boolean(),
-                    id: z.string(),
-                    metadata: z.object({}),
                     modifiedAt: z.object({
                         nanos: z.number().optional(),
                         seconds: z.string(),
                     }),
+                    metadata: z.object({}),
+                    done: z.boolean(),
                 })
                 .optional(),
         }),

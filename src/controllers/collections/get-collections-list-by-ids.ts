@@ -15,7 +15,7 @@ const requestSchema = {
 
 const validateBody = makeValidator(requestSchema.body);
 
-export const getListByIds: AppRouteHandler = async (req, res) => {
+export const controller: AppRouteHandler = async (req, res) => {
     const body = validateBody(req.body);
 
     const result = await getCollectionsListByIds(
@@ -30,7 +30,7 @@ export const getListByIds: AppRouteHandler = async (req, res) => {
     );
 };
 
-getListByIds.api = {
+controller.api = {
     summary: 'Get collections list by ids',
     tags: [ApiTag.Collections],
     request: {
@@ -54,4 +54,6 @@ getListByIds.api = {
     },
 };
 
-getListByIds.manualDecodeId = true;
+controller.manualDecodeId = true;
+
+export {controller as getCollectionsListByIds};

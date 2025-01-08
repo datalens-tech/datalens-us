@@ -3,37 +3,44 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeValidator, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-import {moveCollectionsList} from '../../services/new/collection';
+import {moveCollection} from '../../services/new/collection';
 
-import {collectionModelArrayInObject} from './response-models';
+import {collectionModel} from './response-models';
 
 const requestSchema = {
+    params: z.object({
+        collectionId: zc.encodedId(),
+    }),
     body: z.object({
-        collectionIds: zc.encodedIdArray({min: 1, max: 1000}),
         parentId: zc.encodedId().nullable(),
+        title: z.string().optional(),
     }),
 };
 
+const validateParams = makeValidator(requestSchema.params);
 const validateBody = makeValidator(requestSchema.body);
 
-export const moveList: AppRouteHandler = async (req, res) => {
+export const controller: AppRouteHandler = async (req, res) => {
+    const params = validateParams(req.params);
     const body = validateBody(req.body);
 
-    const result = await moveCollectionsList(
+    const result = await moveCollection(
         {ctx: req.ctx},
         {
-            collectionIds: body.collectionIds,
+            collectionId: params.collectionId,
             parentId: body.parentId,
+            title: body.title,
         },
     );
 
-    res.status(200).send(await collectionModelArrayInObject.format(result));
+    res.status(200).send(collectionModel.format(result));
 };
 
-moveList.api = {
-    summary: 'Move collections list',
+controller.api = {
+    summary: 'Move collection',
     tags: [ApiTag.Collections],
     request: {
+        params: requestSchema.params,
         body: {
             content: {
                 [CONTENT_TYPE_JSON]: {
@@ -44,14 +51,16 @@ moveList.api = {
     },
     responses: {
         200: {
-            description: collectionModelArrayInObject.schema.description ?? '',
+            description: collectionModel.schema.description ?? '',
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: collectionModelArrayInObject.schema,
+                    schema: collectionModel.schema,
                 },
             },
         },
     },
 };
 
-moveList.manualDecodeId = true;
+controller.manualDecodeId = true;
+
+export {controller as moveCollection};

@@ -385,13 +385,13 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         createCollection: makeRoute({
             route: 'POST /v1/collections',
-            handler: collectionsController.create,
+            handler: collectionsController.createCollection,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         privateCreateCollection: makeRoute({
             route: 'POST /private/v1/collections',
-            handler: collectionsController.create,
+            handler: collectionsController.createCollection,
             write: true,
             authPolicy: AuthPolicy.disabled,
             private: true,
@@ -399,24 +399,24 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
         }),
         getCollection: makeRoute({
             route: 'GET /v1/collections/:collectionId',
-            handler: collectionsController.get,
+            handler: collectionsController.getCollection,
             features: [Feature.CollectionsEnabled],
         }),
         privateGetCollection: makeRoute({
             route: 'GET /private/v1/collections/:collectionId',
-            handler: collectionsController.get,
+            handler: collectionsController.getCollection,
             authPolicy: AuthPolicy.disabled,
             private: true,
             features: [Feature.CollectionsEnabled],
         }),
         getCollectionsListByIds: makeRoute({
             route: 'POST /v1/collections-get-list-by-ids',
-            handler: collectionsController.getListByIds,
+            handler: collectionsController.getCollectionsListByIds,
             features: [Feature.CollectionsEnabled],
         }),
         getCollectionContent: makeRoute({
             route: 'GET /v1/collection-content',
-            handler: collectionsController.getContent,
+            handler: collectionsController.getCollectionContent,
             features: [Feature.CollectionsEnabled],
         }),
         getStructureItems: makeRoute({
@@ -431,7 +431,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
         }),
         getCollectionBreadcrumbs: makeRoute({
             route: 'GET /v1/collections/:collectionId/breadcrumbs',
-            handler: collectionsController.getBreadcrumbs,
+            handler: collectionsController.getCollectionBreadcrumbs,
             features: [Feature.CollectionsEnabled],
         }),
         deleteCollection: makeRoute({
@@ -448,19 +448,19 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
         }),
         moveCollection: makeRoute({
             route: 'POST /v1/collections/:collectionId/move',
-            handler: collectionsController.move,
+            handler: collectionsController.moveCollection,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         moveCollections: makeRoute({
             route: 'POST /v1/move-collections',
-            handler: collectionsController.moveList,
+            handler: collectionsController.moveCollectionsList,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         updateCollection: makeRoute({
             route: 'POST /v1/collections/:collectionId/update',
-            handler: collectionsController.update,
+            handler: collectionsController.updateCollection,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),

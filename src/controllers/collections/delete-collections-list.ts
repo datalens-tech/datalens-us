@@ -15,7 +15,7 @@ const requestSchema = {
 
 const validateBody = makeValidator(requestSchema.body);
 
-export const deleteCollectionsList: AppRouteHandler = async (req, res) => {
+export const controller: AppRouteHandler = async (req, res) => {
     const body = validateBody(req.body);
 
     const result = await deleteCollections(
@@ -28,7 +28,7 @@ export const deleteCollectionsList: AppRouteHandler = async (req, res) => {
     res.status(200).send(await collectionModelArrayInObject.format(result));
 };
 
-deleteCollectionsList.api = {
+controller.api = {
     summary: 'Delete collections list',
     tags: [ApiTag.Collections],
     request: {
@@ -52,4 +52,6 @@ deleteCollectionsList.api = {
     },
 };
 
-deleteCollectionsList.manualDecodeId = true;
+controller.manualDecodeId = true;
+
+export {controller as deleteCollectionsList};

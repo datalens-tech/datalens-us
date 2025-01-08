@@ -3,7 +3,7 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeValidator, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-import {getCollectionContent} from '../../services/new/collection';
+import {getCollectionContent as getCollectionContentService} from '../../services/new/collection';
 
 import {collectionContent} from './response-models';
 
@@ -24,7 +24,7 @@ const requestSchema = {
 
 const validateQuery = makeValidator(requestSchema.query);
 
-export const getContent: AppRouteHandler = async (req, res) => {
+export const controller: AppRouteHandler = async (req, res) => {
     const query = validateQuery(req.query);
 
     let collectionsPage: Optional<Nullable<number>>;
@@ -41,7 +41,7 @@ export const getContent: AppRouteHandler = async (req, res) => {
         workbooksPage = query.workbooksPage ? parseInt(query.workbooksPage, 10) : undefined;
     }
 
-    const result = await getCollectionContent(
+    const result = await getCollectionContentService(
         {ctx: req.ctx},
         {
             collectionId: query.collectionId ?? null,
@@ -60,7 +60,7 @@ export const getContent: AppRouteHandler = async (req, res) => {
     res.status(200).send(await collectionContent.format(result));
 };
 
-getContent.api = {
+controller.api = {
     summary: 'Get collection content',
     description: 'Get collection content',
     deprecated: true,
@@ -80,4 +80,6 @@ getContent.api = {
     },
 };
 
-getContent.manualDecodeId = true;
+controller.manualDecodeId = true;
+
+export {controller as getCollectionContent};
