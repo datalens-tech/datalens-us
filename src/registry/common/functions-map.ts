@@ -21,6 +21,8 @@ import type {
 } from './utils/controllers-callbacks/collections';
 import type {CheckEmbedding} from './utils/embedding/types';
 import type {
+    CheckCreateEntryAvailability,
+    CheckUpdateEntryAvailability,
     GetEntryAddFormattedFieldsHook,
     GetEntryBeforeDbRequestHook,
     IsNeedBypassEntryByKey,
@@ -37,6 +39,8 @@ export const commonFunctionsMap = {
     getEntryBeforeDbRequestHook: makeFunctionTemplate<GetEntryBeforeDbRequestHook>(),
     getEntryAddFormattedFieldsHook: makeFunctionTemplate<GetEntryAddFormattedFieldsHook>(),
     checkEmbedding: makeFunctionTemplate<CheckEmbedding>(),
+    checkCreateEntryAvailability: makeFunctionTemplate<CheckCreateEntryAvailability>(),
+    checkUpdateEntryAvailability: makeFunctionTemplate<CheckUpdateEntryAvailability>(),
 
     controllersCallbacks: {
         onCreateCollectionError: makeFunctionTemplate<OnCreateCollectionError>(),

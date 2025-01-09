@@ -14,3 +14,7 @@ export type {
     OnDeleteCollectionsListSuccess,
 } from '../../src/registry/common/utils/controllers-callbacks/collections';
 export type {GatewayApi} from '../../src/registry';
+export type {
+    CheckCreateEntryAvailability,
+    CheckUpdateEntryAvailability,
+} from '../../src/registry/common/utils/entry/types';

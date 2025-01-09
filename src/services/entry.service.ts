@@ -41,6 +41,13 @@ export default class EntryService {
         initialParentId,
         ctx,
     }: ST.CreateEntry) {
+        const {requestId, tenantId, user, dlContext, isPrivateRoute} = ctx.get('info');
+
+        const registry = ctx.get('registry');
+        const {checkCreateEntryAvailability} = registry.common.functions.get();
+
+        await checkCreateEntryAvailability({ctx, tenantId, scope, type});
+
         if (workbookId) {
             return await createEntryInWorkbook(ctx, {
                 workbookId,
@@ -57,8 +64,6 @@ export default class EntryService {
                 includePermissionsInfo,
             });
         }
-
-        const {requestId, tenantId, user, dlContext, isPrivateRoute} = ctx.get('info');
 
         return await Entry.create(
             {
@@ -106,6 +111,18 @@ export default class EntryService {
         initialParentId,
         ctx,
     }: ST.CreateEntry) {
+        const {
+            requestId,
+            tenantId,
+            dlContext,
+            // TODO: Send isPrivateRoute. The issue is that the backend takes dl_config from the public and private APIs.
+        } = ctx.get('info');
+
+        const registry = ctx.get('registry');
+        const {checkCreateEntryAvailability} = registry.common.functions.get();
+
+        await checkCreateEntryAvailability({ctx, tenantId, scope, type});
+
         if (workbookId) {
             return await createEntryInWorkbook(ctx, {
                 workbookId,
@@ -123,12 +140,6 @@ export default class EntryService {
             });
         }
 
-        const {
-            requestId,
-            tenantId,
-            dlContext,
-            // TODO: Send isPrivateRoute. The issue is that the backend takes dl_config from the public and private APIs.
-        } = ctx.get('info');
         const requestedBy = {
             userId: SYSTEM_USER.ID,
             login: SYSTEM_USER.LOGIN,
