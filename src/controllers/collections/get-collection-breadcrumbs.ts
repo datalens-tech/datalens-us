@@ -1,7 +1,7 @@
 import {AppRouteHandler} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
-import {makeValidator, z, zc} from '../../components/zod';
+import {makeParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {getCollectionBreadcrumbs} from '../../services/new/collection';
 
@@ -16,12 +16,11 @@ const requestSchema = {
     }),
 };
 
-const validateParams = makeValidator(requestSchema.params);
-const validateQuery = makeValidator(requestSchema.query);
+const parseParams = makeParser(requestSchema.params);
+const parseQuery = makeParser(requestSchema.query);
 
 export const controller: AppRouteHandler = async (req, res) => {
-    const params = validateParams(req.params);
-    const query = validateQuery(req.query);
+    const [params, query] = await Promise.all([parseParams(req.params), parseQuery(req.query)]);
 
     const result = await getCollectionBreadcrumbs(
         {ctx: req.ctx},

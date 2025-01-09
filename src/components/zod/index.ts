@@ -8,11 +8,30 @@ import * as zc from './custom-types';
 
 extendZodWithOpenApi(z);
 
-export const makeValidator =
+export const makeParser =
+    <T extends ZodTypeAny>(schema: T) =>
+    async (data: unknown): Promise<z.infer<T>> | never => {
+        try {
+            const parsedData = await schema.parseAsync(data);
+            return parsedData;
+        } catch (err) {
+            if (err instanceof ZodError) {
+                throw new AppError('Validation error', {
+                    code: US_ERRORS.VALIDATION_ERROR,
+                    details: err.issues,
+                });
+            } else {
+                throw err;
+            }
+        }
+    };
+
+export const makeParserSync =
     <T extends ZodTypeAny>(schema: T) =>
     (data: unknown): z.infer<T> | never => {
         try {
-            return schema.parse(data);
+            const parsedData = schema.parse(data);
+            return parsedData;
         } catch (err) {
             if (err instanceof ZodError) {
                 throw new AppError('Validation error', {

@@ -1,8 +1,16 @@
 import {z} from 'zod';
 
-import {encodedId} from './encoded-id';
+import Utils from '../../../utils';
+
+import {transformDecodedId} from './utils';
 
 export const encodedIdArray = ({min = 0, max = Infinity}: {min?: number; max?: number}) => {
-    const res = z.string().array().min(min).max(max).pipe(encodedId().array());
-    return res;
+    return z
+        .string()
+        .array()
+        .min(min)
+        .max(max)
+        .transform(async (val) => {
+            return Utils.macrotasksMap(val, transformDecodedId);
+        });
 };
