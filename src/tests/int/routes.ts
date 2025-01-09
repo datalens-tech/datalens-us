@@ -19,4 +19,6 @@ export const routes = {
     workbooks: '/v2/workbooks',
     privateWorkbooks: '/private/v2/workbooks',
     getEntriesData: '/v1/get-entries-data',
+    privateSetIsTemplateWorkbook: (workbookId: string) =>
+        `/private/v2/workbooks/${workbookId}/setIsTemplate`,
 } as const;
