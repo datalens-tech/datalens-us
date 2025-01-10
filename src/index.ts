@@ -20,6 +20,7 @@ import {registry} from './registry';
 import {getRoutes} from './routes';
 import {setRegistryToContext} from './components/app-context';
 import {isEnabledFeature} from './components/features';
+import {getAdditionalHeaders, initSwagger, registerApiRoute} from './components/api-docs';
 import {objectKeys} from './utils/utility-types';
 
 setRegistryToContext(nodekit, registry);
@@ -66,12 +67,26 @@ objectKeys(extendedRoutes).forEach((key) => {
         !Array.isArray(features) ||
         features.every((feature) => isEnabledFeature(nodekit.ctx, feature))
     ) {
-        routes[route] = params;
+        if (nodekit.config.swaggerEnabled) {
+            registerApiRoute(
+                extendedRoutes[key],
+                getAdditionalHeaders(extendedRoutes[key], nodekit),
+            );
+        }
+
+        routes[route] = {
+            ...params,
+            manualDecodeId: extendedRoutes[key].handler.manualDecodeId,
+        };
     }
 });
 
 const app = new ExpressKit(nodekit, routes);
 registry.setupApp(app);
+
+if (nodekit.config.swaggerEnabled) {
+    initSwagger(app);
+}
 
 if (require.main === module) {
     app.run();

@@ -1,4 +1,6 @@
-export const getMockedOperation = (id: string) => {
+import {Operation} from './types';
+
+export const getMockedOperation = (id: string): Operation => {
     const [seconds, nanoseconds] = process.hrtime();
     return {
         createdAt: {

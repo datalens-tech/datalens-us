@@ -23,7 +23,7 @@ let testWorkbookId: string;
 let testCopiedWorkbookId: string;
 
 const testTemplateWorkbookData = {
-    id: null,
+    id: '',
     title: 'Test template workbook title',
     description: 'Testt template workbook description',
 };
@@ -557,7 +557,7 @@ describe('Workbook template', () => {
 
     test('Make workbook as template', async () => {
         await request(app)
-            .post(`${routes.privateWorkbooks}/${testTemplateWorkbookData.id}/setIsTemplate`)
+            .post(routes.privateSetIsTemplateWorkbook(testTemplateWorkbookData.id))
             .send({
                 workbookId: testTemplateWorkbookData.id,
                 isTemplate: true,
@@ -565,9 +565,7 @@ describe('Workbook template', () => {
             .expect(403);
 
         const response = await authMasterToken(
-            request(app).post(
-                `${routes.privateWorkbooks}/${testTemplateWorkbookData.id}/setIsTemplate`,
-            ),
+            request(app).post(routes.privateSetIsTemplateWorkbook(testTemplateWorkbookData.id)),
         ).send({
             workbookId: testTemplateWorkbookData.id,
             isTemplate: true,
