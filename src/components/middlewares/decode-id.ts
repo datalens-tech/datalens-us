@@ -5,6 +5,10 @@ import US_ERRORS from '../../const/us-error-constants';
 import Utils from '../../utils';
 
 export const decodeId = async (req: Request, _res: Response, next: NextFunction) => {
+    if (req.routeInfo.manualDecodeId) {
+        return next();
+    }
+
     try {
         for (const idVariable of Utils.idVariables) {
             if (req.params && req.params[idVariable]) {
