@@ -107,7 +107,6 @@ export const getCollectionContent = async (
 
     const {
         tenantId,
-        projectId,
         user: {userId},
     } = ctx.get('info');
 
@@ -147,7 +146,6 @@ export const getCollectionContent = async (
             .select()
             .where({
                 [CollectionModelColumn.TenantId]: tenantId,
-                [CollectionModelColumn.ProjectId]: projectId,
                 [CollectionModelColumn.DeletedAt]: null,
                 [CollectionModelColumn.ParentId]: collectionId,
             })

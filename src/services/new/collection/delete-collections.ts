@@ -36,7 +36,7 @@ export const deleteCollections = async (
 ) => {
     const {collectionIds} = args;
 
-    const {tenantId, projectId} = ctx.get('info');
+    const {tenantId} = ctx.get('info');
 
     ctx.log('DELETE_COLLECTIONS_START', {
         collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),
@@ -77,7 +77,6 @@ export const deleteCollections = async (
                 .from(CollectionModel.tableName)
                 .where({
                     [CollectionModelColumn.TenantId]: tenantId,
-                    [CollectionModelColumn.ProjectId]: projectId,
                     [CollectionModelColumn.DeletedAt]: null,
                 })
                 .whereIn([CollectionModelColumn.CollectionId], collectionIds)
@@ -87,8 +86,6 @@ export const deleteCollections = async (
                         .where({
                             [`${CollectionModel.tableName}.${CollectionModelColumn.TenantId}`]:
                                 tenantId,
-                            [`${CollectionModel.tableName}.${CollectionModelColumn.ProjectId}`]:
-                                projectId,
                             [`${CollectionModel.tableName}.${CollectionModelColumn.DeletedAt}`]:
                                 null,
                         })

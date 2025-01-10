@@ -6,7 +6,6 @@ export const formatCollection = (collection: CollectionInstance) => {
         title: collection.model.title,
         description: collection.model.description,
         parentId: collection.model.parentId,
-        projectId: collection.model.projectId,
         tenantId: collection.model.tenantId,
         createdBy: collection.model.createdBy,
         createdAt: collection.model.createdAt,

@@ -54,7 +54,6 @@ export const createCollection = async (
     const {
         user: {userId},
         tenantId,
-        projectId,
         isPrivateRoute,
     } = ctx.get('info');
 
@@ -108,7 +107,6 @@ export const createCollection = async (
                 [CollectionModelColumn.Description]: description ?? null,
                 [CollectionModelColumn.ParentId]: parentId,
                 [CollectionModelColumn.TenantId]: tenantId,
-                [CollectionModelColumn.ProjectId]: projectId,
                 [CollectionModelColumn.CreatedBy]: userId,
                 [CollectionModelColumn.UpdatedBy]: userId,
             })

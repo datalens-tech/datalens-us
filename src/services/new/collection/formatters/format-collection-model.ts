@@ -6,7 +6,6 @@ export const formatCollectionModel = (model: CollectionModel) => {
         title: model.title,
         description: model.description,
         parentId: model.parentId,
-        projectId: model.projectId,
         tenantId: model.tenantId,
         createdBy: model.createdBy,
         createdAt: model.createdAt,

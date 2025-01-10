@@ -7,7 +7,6 @@ export const CollectionModelColumn = {
     Description: 'description',
     ParentId: 'parentId',
     TenantId: 'tenantId',
-    ProjectId: 'projectId',
     CreatedBy: 'createdBy',
     CreatedAt: 'createdAt',
     UpdatedBy: 'updatedBy',
@@ -33,7 +32,6 @@ export class CollectionModel extends Model {
     [CollectionModelColumn.Description]!: Nullable<string>;
     [CollectionModelColumn.ParentId]!: Nullable<string>;
     [CollectionModelColumn.TenantId]!: string;
-    [CollectionModelColumn.ProjectId]!: Nullable<string>;
     [CollectionModelColumn.CreatedBy]!: string;
     [CollectionModelColumn.CreatedAt]!: string;
     [CollectionModelColumn.UpdatedBy]!: string;

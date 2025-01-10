@@ -23,7 +23,6 @@ export const getWorkbooksQuery = ({ctx, trx}: ServiceArgs, args: GetWorkbooksQue
     const {filterString, onlyMy, collectionId} = args;
     const {
         tenantId,
-        projectId,
         user: {userId},
     } = ctx.get('info');
 
@@ -37,7 +36,6 @@ export const getWorkbooksQuery = ({ctx, trx}: ServiceArgs, args: GetWorkbooksQue
             WorkbookModelColumn.SortTitle,
             WorkbookModelColumn.Description,
             raw('null as ??', 'parentId'),
-            WorkbookModelColumn.ProjectId,
             WorkbookModelColumn.TenantId,
             WorkbookModelColumn.CreatedBy,
             WorkbookModelColumn.CreatedAt,
@@ -47,7 +45,6 @@ export const getWorkbooksQuery = ({ctx, trx}: ServiceArgs, args: GetWorkbooksQue
         ])
         .where({
             [WorkbookModelColumn.TenantId]: tenantId,
-            [WorkbookModelColumn.ProjectId]: projectId,
             [WorkbookModelColumn.CollectionId]: collectionId,
             [WorkbookModelColumn.DeletedAt]: null,
         })
@@ -73,7 +70,6 @@ export const getCollectionsQuery = ({ctx, trx}: ServiceArgs, args: GetCollection
     const {filterString, onlyMy, collectionId} = args;
     const {
         tenantId,
-        projectId,
         user: {userId},
     } = ctx.get('info');
 
@@ -88,7 +84,6 @@ export const getCollectionsQuery = ({ctx, trx}: ServiceArgs, args: GetCollection
             CollectionModelColumn.SortTitle,
             CollectionModelColumn.Description,
             CollectionModelColumn.ParentId,
-            CollectionModelColumn.ProjectId,
             CollectionModelColumn.TenantId,
             CollectionModelColumn.CreatedBy,
             CollectionModelColumn.CreatedAt,
@@ -98,7 +93,6 @@ export const getCollectionsQuery = ({ctx, trx}: ServiceArgs, args: GetCollection
         ])
         .where({
             [CollectionModelColumn.TenantId]: tenantId,
-            [CollectionModelColumn.ProjectId]: projectId,
             [CollectionModelColumn.DeletedAt]: null,
             [CollectionModelColumn.ParentId]: collectionId,
         })
