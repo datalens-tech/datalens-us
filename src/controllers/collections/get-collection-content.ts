@@ -1,7 +1,7 @@
 import {AppRouteHandler} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
-import {makeParser, z, zc} from '../../components/zod';
+import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {getCollectionContent as getCollectionContentService} from '../../services/new/collection';
 
@@ -22,10 +22,10 @@ const requestSchema = {
     }),
 };
 
-const parseQuery = makeParser(requestSchema.query);
+const parseReq = makeReqParser(requestSchema);
 
 export const controller: AppRouteHandler = async (req, res) => {
-    const query = await parseQuery(req.query);
+    const {query} = await parseReq(req);
 
     let collectionsPage: Optional<Nullable<number>>;
     if (query.collectionsPage === 'null') {

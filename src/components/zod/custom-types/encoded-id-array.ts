@@ -10,7 +10,7 @@ export const encodedIdArray = ({min = 0, max = Infinity}: {min?: number; max?: n
         .array()
         .min(min)
         .max(max)
-        .transform(async (val) => {
-            return Utils.macrotasksMap(val, transformDecodedId);
+        .transform(async (val, ctx) => {
+            return Utils.macrotasksMap(val, transformDecodedId(ctx));
         });
 };
