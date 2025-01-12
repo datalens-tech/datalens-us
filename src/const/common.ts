@@ -255,3 +255,5 @@ export const ALLOWED_ENTRIES_SCOPE = [
     EntryScope.Connection,
     EntryScope.Report,
 ] as const;
+
+export const CONTENT_TYPE_JSON = 'application/json';

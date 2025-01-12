@@ -11,6 +11,7 @@
   },
   "main": "dist/index.js",
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.3.0",
     "@gravity-ui/expresskit": "^2.1.0",
     "@gravity-ui/gateway": "^2.6.2",
     "@gravity-ui/nodekit": "^1.7.0",
@@ -28,8 +29,10 @@
     "objection": "^3.1.5",
     "pg-error-constants": "^1.0.0",
     "power-radix": "^2.5.6",
+    "swagger-ui-express": "^5.0.1",
     "utility-types": "^3.10.0",
-    "uuid": "^3.4.0"
+    "uuid": "^3.4.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@gravity-ui/eslint-config": "^3.2.0",
@@ -42,6 +45,7 @@
     "@types/node": "^18.14.4",
     "@types/pg": "^7.14.11",
     "@types/supertest": "^2.0.10",
+    "@types/swagger-ui-express": "^4.1.7",
     "@types/uuid": "^8.3.0",
     "dsn-parser": "^1.0.3",
     "eslint": "^8.57.1",

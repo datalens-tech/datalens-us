@@ -42,4 +42,6 @@ export default {
     features: {},
 
     debug: Utils.isTrueArg(Utils.getEnvVariable('DEBUG')),
+
+    swaggerEnabled: !Utils.isTrueArg(Utils.getEnvVariable('DISABLE_SWAGGER')),
 } as Partial<AppConfig>;

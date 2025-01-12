@@ -1,7 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
@@ -13,22 +12,6 @@ import {checkCollectionByTitle} from './check-collection-by-title';
 import {getCollection} from './get-collection';
 import {getParentIds} from './utils/get-parents';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['collectionId'],
-    properties: {
-        collectionId: {
-            type: 'string',
-        },
-        title: {
-            type: 'string',
-        },
-        description: {
-            type: 'string',
-        },
-    },
-});
-
 export interface UpdateCollectionArgs {
     collectionId: string;
     title?: string;
@@ -36,7 +19,7 @@ export interface UpdateCollectionArgs {
 }
 
 export const updateCollection = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: UpdateCollectionArgs,
 ) => {
     const {collectionId, title: newTitle, description: newDescription} = args;
@@ -52,10 +35,6 @@ export const updateCollection = async (
         newTitle,
         newDescription,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const targetTrx = getPrimary(trx);
 
