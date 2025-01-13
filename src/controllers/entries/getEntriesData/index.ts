@@ -12,7 +12,7 @@ import {entriesData} from './response-model';
 const requestSchema = {
     body: z.object({
         entryIds: zc.encodedIdArray({min: 1, max: 1000}),
-        scope: z.nativeEnum(EntryScope),
+        scope: z.nativeEnum(EntryScope).optional(),
         type: z.string().optional(),
         fields: z.string().array().min(1),
     }),
