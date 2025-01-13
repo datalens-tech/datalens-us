@@ -44,7 +44,7 @@ const controller: AppRouteHandler = async (
 
 controller.api = {
     summary: 'Get entries data',
-    tags: [ApiTag.Collections],
+    tags: [ApiTag.Entries],
     request: {
         body: {
             content: {
