@@ -1,5 +1,6 @@
 import {AppContext} from '@gravity-ui/nodekit';
 
+import {Feature, isEnabledFeature} from '../../../components/features';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import {
@@ -36,7 +37,9 @@ const checkWorkbookEntriesPermissions = async ({
             checkWorkbookPermissionById({
                 ctx,
                 workbookId,
-                permission: WorkbookPermission.View,
+                permission: isEnabledFeature(ctx, Feature.UseLimitedView)
+                    ? WorkbookPermission.LimitedView
+                    : WorkbookPermission.View,
             })
                 .then(() => workbookId)
                 .catch(() => null),
