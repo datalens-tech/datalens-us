@@ -3,7 +3,6 @@ import {raw} from 'objection';
 
 import {Feature, isEnabledFeature} from '../../../components/features';
 import {OrganizationPermission, ProjectPermission} from '../../../components/iam';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
@@ -15,22 +14,6 @@ import {checkCollectionByTitle} from './check-collection-by-title';
 import {getCollection} from './get-collection';
 import {getParentIds} from './utils/get-parents';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['collectionId', 'parentId'],
-    properties: {
-        collectionId: {
-            type: 'string',
-        },
-        parentId: {
-            type: ['string', 'null'],
-        },
-        title: {
-            type: 'string',
-        },
-    },
-});
-
 export interface MoveCollectionArgs {
     collectionId: string;
     parentId: Nullable<string>;
@@ -38,7 +21,7 @@ export interface MoveCollectionArgs {
 }
 
 export const moveCollection = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: MoveCollectionArgs,
 ) => {
     const {collectionId, parentId: newParentId, title: newTitle} = args;
@@ -55,10 +38,6 @@ export const moveCollection = async (
         newParentId: Utils.encodeId(newParentId),
         newTitle,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const targetTrx = getPrimary(trx);
 

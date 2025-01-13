@@ -5,4 +5,5 @@ export default {
     zitadelEnabled: true,
     accessServiceEnabled: true,
     appAuthPolicy: AuthPolicy.required,
+    swaggerEnabled: false,
 } as Partial<AppConfig>;
