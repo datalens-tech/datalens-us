@@ -1,14 +1,15 @@
-import {AppError} from '@gravity-ui/nodekit';
+import {z} from 'zod';
 
-import US_ERRORS from '../../../const/us-error-constants';
 import Utils from '../../../utils';
 
-export const transformDecodedId = (val: string) => {
+export const makeIdDecoder = (ctx: z.RefinementCtx) => (val: string) => {
     try {
         return Utils.decodeId(val);
     } catch (err) {
-        throw new AppError(`id '${val}' has incorrect format`, {
-            code: US_ERRORS.DECODE_ID_FAILED,
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `id '${val}' has incorrect format`,
         });
+        return z.NEVER;
     }
 };
