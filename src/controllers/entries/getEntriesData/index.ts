@@ -1,48 +1,32 @@
-import {Request, Response} from '@gravity-ui/expresskit';
+import {AppRouteHandler, Request, Response} from '@gravity-ui/expresskit';
 
-import {prepareResponseAsync} from '../../../components/response-presenter';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {ALLOWED_SCOPE_VALUES} from '../../../const';
+import {ApiTag} from '../../../components/api-docs';
+import {makeParser, z, zc} from '../../../components/zod';
+import {CONTENT_TYPE_JSON} from '../../../const';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import {getJoinedEntriesRevisionsByIds} from '../../../services/new/entry';
 
-import type {GetEntriesDataResponseBody} from './types';
-import {formatGetEntriesDataResponse} from './utils';
+import type {GetEntriesDataResponseBody} from './response-model';
+import {entriesData} from './response-model';
 
-type GetEntriesDataRequestBody = {
-    entryIds: string[];
-    scope?: EntryScope;
-    type?: string;
-    fields: string[];
+const requestSchema = {
+    body: z.object({
+        entryIds: zc.encodedIdArray({min: 1, max: 1000}),
+        scope: z.nativeEnum(EntryScope),
+        type: z.string().optional(),
+        fields: z.string().array().min(1),
+    }),
 };
 
-const validateBody = makeSchemaValidator({
-    type: 'object',
-    required: ['entryIds', 'fields'],
-    properties: {
-        entryIds: {
-            type: 'array',
-            items: {type: 'string'},
-        },
-        scope: {
-            type: 'string',
-            enum: ALLOWED_SCOPE_VALUES,
-        },
-        type: {
-            type: 'string',
-        },
-        fields: {
-            type: 'array',
-            items: {type: 'string'},
-        },
-    },
-});
+export type GetEntriesDataRequestBody = z.infer<typeof requestSchema.body>;
 
-export const getEntriesDataController = async (
+const parseBody = makeParser(requestSchema.body);
+
+const controller: AppRouteHandler = async (
     req: Request,
     res: Response<GetEntriesDataResponseBody>,
 ) => {
-    const body = validateBody<GetEntriesDataRequestBody>(req.body);
+    const body = await parseBody(req.body);
 
     const result = await getJoinedEntriesRevisionsByIds(
         {ctx: req.ctx},
@@ -53,9 +37,35 @@ export const getEntriesDataController = async (
         },
     );
 
-    const formattedResponse = formatGetEntriesDataResponse({result, fields: body.fields});
+    const response = entriesData.format({result, fields: body.fields});
 
-    const {code, response} = await prepareResponseAsync({data: formattedResponse});
-
-    res.status(code).send(response);
+    res.status(200).send(response);
 };
+
+controller.api = {
+    summary: 'Get entries data',
+    tags: [ApiTag.Collections],
+    request: {
+        body: {
+            content: {
+                [CONTENT_TYPE_JSON]: {
+                    schema: requestSchema.body,
+                },
+            },
+        },
+    },
+    responses: {
+        200: {
+            description: entriesData.schema.description ?? '',
+            content: {
+                [CONTENT_TYPE_JSON]: {
+                    schema: entriesData.schema,
+                },
+            },
+        },
+    },
+};
+
+controller.manualDecodeId = true;
+
+export {controller as getEntriesData};

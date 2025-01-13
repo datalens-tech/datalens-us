@@ -34,7 +34,7 @@ import {
 import * as ST from '../../types/services.types';
 import Utils from '../../utils';
 
-import {getEntriesDataController} from './getEntriesData';
+import {getEntriesData} from './getEntriesData';
 
 export default {
     getEntry: async (req: Request, res: Response) => {
@@ -323,5 +323,5 @@ export default {
         res.status(code).send(response);
     },
 
-    getEntriesData: getEntriesDataController,
+    getEntriesData,
 };
