@@ -1,7 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 
 import {Feature, isEnabledFeature} from '../../../components/features';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
@@ -12,39 +11,6 @@ import {getWorkbooksList} from '../workbook';
 
 import {getCollection} from './get-collection';
 import {getParentIds} from './utils/get-parents';
-
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['collectionId'],
-    properties: {
-        collectionId: {
-            type: ['string', 'null'],
-        },
-        includePermissionsInfo: {
-            type: 'boolean',
-        },
-        filterString: {
-            type: 'string',
-        },
-        collectionsPage: {
-            type: ['number', 'null'],
-        },
-        workbooksPage: {
-            type: ['number', 'null'],
-        },
-        pageSize: {
-            type: 'number',
-        },
-        orderField: {
-            type: 'string',
-            enum: ['title', 'createdAt', 'updatedAt'],
-        },
-        orderDirection: {
-            type: 'string',
-            enum: ['asc', 'desc'],
-        },
-    },
-});
 
 export type OrderField = 'title' | 'createdAt' | 'updatedAt';
 
@@ -95,10 +61,6 @@ export const getCollectionContent = async (
         onlyMy,
         mode,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const registry = ctx.get('registry');
     const {accessServiceEnabled} = ctx.config;

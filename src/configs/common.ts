@@ -1,11 +1,11 @@
 import {AuthPolicy} from '@gravity-ui/expresskit';
 import {AppConfig} from '@gravity-ui/nodekit';
 
-import {US_MASTER_TOKEN_HEADER} from '../const';
+import {APP_NAME, US_MASTER_TOKEN_HEADER} from '../const';
 import Utils from '../utils';
 
 export default {
-    appName: 'united-storage',
+    appName: APP_NAME,
 
     appSocket: 'dist/run/server.sock',
 
@@ -42,4 +42,6 @@ export default {
     features: {},
 
     debug: Utils.isTrueArg(Utils.getEnvVariable('DEBUG')),
+
+    swaggerEnabled: !Utils.isTrueArg(Utils.getEnvVariable('DISABLE_SWAGGER')),
 } as Partial<AppConfig>;

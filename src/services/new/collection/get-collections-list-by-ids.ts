@@ -1,5 +1,4 @@
 import {Feature, isEnabledFeature} from '../../../components/features';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
 import {CollectionInstance} from '../../../registry/common/entities/collection/types';
@@ -9,32 +8,13 @@ import {getReplica} from '../utils';
 
 import {makeCollectionsWithParentsMap} from './utils';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['collectionIds'],
-    properties: {
-        collectionIds: {
-            type: 'array',
-            minItems: 1,
-            maxItems: 1000,
-            items: {type: 'string'},
-        },
-        includePermissionsInfo: {
-            type: 'boolean',
-        },
-        permission: {
-            type: 'string',
-        },
-    },
-});
-
 export interface GetCollectionsListByIdsArgs {
     collectionIds: string[];
     includePermissionsInfo?: boolean;
 }
 
 export const getCollectionsListByIds = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: GetCollectionsListByIdsArgs,
 ) => {
     const {collectionIds, includePermissionsInfo = false} = args;
@@ -43,10 +23,6 @@ export const getCollectionsListByIds = async (
         collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),
         includePermissionsInfo,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const {tenantId} = ctx.get('info');
     const registry = ctx.get('registry');
