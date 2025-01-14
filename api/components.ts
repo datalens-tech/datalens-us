@@ -6,7 +6,7 @@ export {
     KEY_REG,
 } from '../src/components/validation-schema-compiler';
 
-export {OrganizationPermission, ProjectPermission} from '../src/components/iam';
+export {OrganizationPermission} from '../src/components/iam';
 
 export {
     default as prepareResponse,
