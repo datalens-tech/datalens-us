@@ -10,7 +10,6 @@ import {
     MAX_UNVERSIONED_DATA_OBJECT_SYMBOLS,
 } from '../const';
 import US_ERRORS from '../const/us-error-constants';
-import Utils from '../utils';
 
 const ajv = new Ajv({
     allErrors: true,
@@ -188,41 +187,6 @@ ajv.addKeyword('restrictPresetDataSize', {
         }
     },
     errors: true,
-});
-
-ajv.addKeyword('restrictJsonSize', {
-    validate: function validate(schema: number, data: any) {
-        if (data === null) {
-            return true;
-        } else {
-            const dataStringified = JSON.stringify(data);
-
-            // @ts-ignore
-            validate.errors = [
-                {
-                    format: 'string',
-                    message: `Json object can contain not greater ${schema} symbols`,
-                    params: {
-                        keyword: 'restrictJsonSize',
-                    },
-                },
-            ];
-
-            return dataStringified.length <= schema;
-        }
-    },
-    errors: true,
-});
-
-ajv.addKeyword('decodeId', {
-    compile: () => {
-        return function (data, _, parentData, parentDataPath) {
-            // @ts-ignore
-            // eslint-disable-next-line no-param-reassign
-            parentData[parentDataPath] = data && Utils.decodeId(data);
-            return true;
-        };
-    },
 });
 
 const compileSchema = (schema: object) => {
