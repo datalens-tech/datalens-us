@@ -32,17 +32,24 @@ const checkWorkbookEntriesPermissions = async ({
         return {permittedWorkbookEntries: entries, accessDeniedWorkbookEntryIds: []};
     }
 
-    const permittedWorkbookIds = await Promise.all(
-        workbookIds.map((workbookId) =>
-            checkWorkbookPermissionById({
-                ctx,
-                workbookId,
-                permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                    ? WorkbookPermission.LimitedView
-                    : WorkbookPermission.View,
-            })
-                .then(() => workbookId)
-                .catch(() => null),
+    const permission = isEnabledFeature(ctx, Feature.UseLimitedView)
+        ? WorkbookPermission.LimitedView
+        : WorkbookPermission.View;
+
+    const workbookPermissionMapping = new Map(
+        await Promise.all(
+            workbookIds.map(async (workbookId): Promise<[string, boolean]> => {
+                try {
+                    await checkWorkbookPermissionById({
+                        ctx,
+                        workbookId,
+                        permission,
+                    });
+                    return [workbookId, true];
+                } catch {
+                    return [workbookId, false];
+                }
+            }),
         ),
     );
 
@@ -52,7 +59,7 @@ const checkWorkbookEntriesPermissions = async ({
     entries.forEach((entry) => {
         const {workbookId} = entry;
 
-        if (workbookId && permittedWorkbookIds.includes(workbookId)) {
+        if (workbookId && workbookPermissionMapping.get(workbookId)) {
             permittedWorkbookEntries.push(entry);
         } else {
             accessDeniedWorkbookEntryIds.push(entry.entryId);

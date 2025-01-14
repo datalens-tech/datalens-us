@@ -34,7 +34,7 @@ import {
 import * as ST from '../../types/services.types';
 import Utils from '../../utils';
 
-import {getEntriesData} from './getEntriesData';
+import {getEntriesData} from './get-entries-data';
 
 export default {
     getEntry: async (req: Request, res: Response) => {
