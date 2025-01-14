@@ -9,7 +9,6 @@ export const features: FeaturesConfig = {
     [Feature.ColorPalettesEnabled]: true,
     [Feature.UseIpV6]: false,
     [Feature.ProjectsEnabled]: false,
-    [Feature.UseLimitedView]: true,
     [Feature.WorkbookIsolationEnabled]: true,
 };
 

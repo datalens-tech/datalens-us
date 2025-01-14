@@ -4,7 +4,6 @@ import {DBError, transaction} from 'objection';
 import PG_ERRORS from 'pg-error-constants';
 
 import {Model} from '../..';
-import {Feature, isEnabledFeature} from '../../../components/features';
 import {CURRENT_TIMESTAMP} from '../../../const';
 import US_ERRORS from '../../../const/us-error-constants';
 import {WorkbookPermission} from '../../../entities/workbook';
@@ -444,9 +443,7 @@ class Lock extends Model {
                 if (permission === 'edit') {
                     workbookPermission = WorkbookPermission.Update;
                 } else {
-                    workbookPermission = isEnabledFeature(ctx, Feature.UseLimitedView)
-                        ? WorkbookPermission.LimitedView
-                        : WorkbookPermission.View;
+                    workbookPermission = WorkbookPermission.LimitedView;
                 }
 
                 await checkWorkbookPermission({

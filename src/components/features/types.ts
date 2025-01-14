@@ -4,7 +4,6 @@ export enum Feature {
     ColorPalettesEnabled = 'ColorPalettesEnabled',
     UseIpV6 = 'UseIpV6',
     ProjectsEnabled = 'ProjectsEnabled',
-    UseLimitedView = 'UseLimitedView',
     WorkbookIsolationEnabled = 'WorkbookIsolationEnabled',
 }
 

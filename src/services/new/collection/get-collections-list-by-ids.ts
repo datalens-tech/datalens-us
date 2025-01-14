@@ -1,4 +1,3 @@
-import {Feature, isEnabledFeature} from '../../../components/features';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
 import {CollectionInstance} from '../../../registry/common/entities/collection/types';
@@ -61,9 +60,7 @@ export const getCollectionsListByIds = async (
         const promise = collection
             .checkPermission({
                 parentIds,
-                permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                    ? CollectionPermission.LimitedView
-                    : CollectionPermission.View,
+                permission: CollectionPermission.LimitedView,
             })
             .then(() => {
                 acceptedCollectionsMap.set(collection.model, parentIds);

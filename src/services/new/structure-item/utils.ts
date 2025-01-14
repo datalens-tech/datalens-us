@@ -1,7 +1,6 @@
 import {AppContext, AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
-import {Feature, isEnabledFeature} from '../../../components/features';
 import {US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
@@ -146,16 +145,12 @@ export const processPermissions = async ({
                     if (isWorkbookInstance(item)) {
                         await item.checkPermission({
                             parentIds,
-                            permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                                ? WorkbookPermission.LimitedView
-                                : WorkbookPermission.View,
+                            permission: WorkbookPermission.LimitedView,
                         });
                     } else {
                         await item.checkPermission({
                             parentIds,
-                            permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                                ? CollectionPermission.LimitedView
-                                : CollectionPermission.View,
+                            permission: CollectionPermission.LimitedView,
                         });
                     }
 

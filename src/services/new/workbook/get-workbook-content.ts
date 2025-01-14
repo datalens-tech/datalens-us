@@ -1,4 +1,3 @@
-import {Feature, isEnabledFeature} from '../../../components/features';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE} from '../../../const';
 import {EntryScope} from '../../../db/models/new/entry/types';
@@ -131,7 +130,7 @@ export const getWorkbookContent = async (
                 isDeleted: false,
             });
 
-            if (isEnabledFeature(ctx, Feature.UseLimitedView) && !workbook.permissions?.view) {
+            if (!workbook.permissions?.view) {
                 builder.whereNotIn('scope', ['dataset', 'connection']);
             }
             if (createdBy) {

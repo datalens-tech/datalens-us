@@ -1,6 +1,5 @@
 import {AppError} from '@gravity-ui/nodekit';
 
-import {Feature, isEnabledFeature} from '../../../components/features';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
@@ -94,9 +93,7 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
 
         await workbook.checkPermission({
             parentIds,
-            permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                ? WorkbookPermission.LimitedView
-                : WorkbookPermission.View,
+            permission: WorkbookPermission.LimitedView,
         });
 
         if (includePermissionsInfo) {
