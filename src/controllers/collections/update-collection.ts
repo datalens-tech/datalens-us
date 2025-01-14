@@ -17,21 +17,48 @@ const requestSchema = {
     }),
 };
 
+export type UpdateCollectionReqParams = z.infer<typeof requestSchema.params>;
+
+export type UpdateCollectionReqBody = z.infer<typeof requestSchema.body>;
+
 const parseReq = makeReqParser(requestSchema);
 
 export const controller: AppRouteHandler = async (req, res) => {
     const {params, body} = await parseReq(req);
 
-    const result = await updateCollection(
-        {ctx: req.ctx},
-        {
-            collectionId: params.collectionId,
-            title: body.title,
-            description: body.description,
-        },
-    );
+    const registry = req.ctx.get('registry');
+    const {
+        controllersCallbacks: {onUpdateCollectionError, onUpdateCollectionSuccess},
+    } = registry.common.functions.get();
 
-    res.status(200).send(collectionModel.format(result));
+    try {
+        const result = await updateCollection(
+            {ctx: req.ctx},
+            {
+                collectionId: params.collectionId,
+                title: body.title,
+                description: body.description,
+            },
+        );
+
+        onUpdateCollectionSuccess({
+            ctx: req.ctx,
+            reqBody: body,
+            reqParams: params,
+            collection: result,
+        });
+
+        res.status(200).send(collectionModel.format(result));
+    } catch (error) {
+        onUpdateCollectionError({
+            ctx: req.ctx,
+            reqBody: body,
+            reqParams: params,
+            error,
+        });
+
+        throw error;
+    }
 };
 
 controller.api = {

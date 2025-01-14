@@ -13,19 +13,38 @@ const requestSchema = {
     }),
 };
 
+export type DeleteCollectionReqParams = z.infer<typeof requestSchema.params>;
+
 const parseReq = makeReqParser(requestSchema);
 
 export const controller: AppRouteHandler = async (req, res) => {
     const {params} = await parseReq(req);
 
-    const result = await deleteCollections(
-        {ctx: req.ctx},
-        {
-            collectionIds: [params.collectionId],
-        },
-    );
+    const registry = req.ctx.get('registry');
+    const {
+        controllersCallbacks: {onDeleteCollectionError, onDeleteCollectionSuccess},
+    } = registry.common.functions.get();
 
-    res.status(200).send(await collectionModelArrayInObject.format(result));
+    try {
+        const result = await deleteCollections(
+            {ctx: req.ctx},
+            {
+                collectionIds: [params.collectionId],
+            },
+        );
+
+        onDeleteCollectionSuccess({
+            ctx: req.ctx,
+            reqParams: params,
+            collections: result.collections,
+        });
+
+        res.status(200).send(await collectionModelArrayInObject.format(result));
+    } catch (error) {
+        onDeleteCollectionError({ctx: req.ctx, reqParams: params, error});
+
+        throw error;
+    }
 };
 
 controller.api = {

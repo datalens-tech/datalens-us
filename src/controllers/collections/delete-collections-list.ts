@@ -13,19 +13,42 @@ const requestSchema = {
     }),
 };
 
+export type DeleteCollectionsListReqBody = z.infer<typeof requestSchema.body>;
+
 const parseReq = makeReqParser(requestSchema);
 
 export const controller: AppRouteHandler = async (req, res) => {
     const {body} = await parseReq(req);
 
-    const result = await deleteCollections(
-        {ctx: req.ctx},
-        {
-            collectionIds: body.collectionIds,
-        },
-    );
+    const registry = req.ctx.get('registry');
+    const {
+        controllersCallbacks: {onDeleteCollectionsListError, onDeleteCollectionsListSuccess},
+    } = registry.common.functions.get();
 
-    res.status(200).send(await collectionModelArrayInObject.format(result));
+    try {
+        const result = await deleteCollections(
+            {ctx: req.ctx},
+            {
+                collectionIds: body.collectionIds,
+            },
+        );
+
+        onDeleteCollectionsListSuccess({
+            ctx: req.ctx,
+            reqBody: body,
+            collections: result.collections,
+        });
+
+        res.status(200).send(await collectionModelArrayInObject.format(result));
+    } catch (error) {
+        onDeleteCollectionsListError({
+            ctx: req.ctx,
+            reqBody: body,
+            error,
+        });
+
+        throw error;
+    }
 };
 
 controller.api = {

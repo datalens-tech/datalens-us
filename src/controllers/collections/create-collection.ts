@@ -15,23 +15,42 @@ const requestSchema = {
     }),
 };
 
+export type CreateCollectionReqBody = z.infer<typeof requestSchema.body>;
+
 const parseReq = makeReqParser(requestSchema);
 
 const controller: AppRouteHandler = async (req, res) => {
     const {body} = await parseReq(req);
 
-    const result = await createCollection(
-        {ctx: req.ctx},
-        {
-            title: body.title,
-            description: body.description,
-            parentId: body.parentId,
-        },
-    );
+    const registry = req.ctx.get('registry');
+    const {
+        controllersCallbacks: {onCreateCollectionError, onCreateCollectionSuccess},
+    } = registry.common.functions.get();
 
-    res.status(200).send(
-        collectionInstanceWithOperation.format(result.collection, result.operation),
-    );
+    try {
+        const result = await createCollection(
+            {ctx: req.ctx},
+            {
+                title: body.title,
+                description: body.description,
+                parentId: body.parentId,
+            },
+        );
+
+        onCreateCollectionSuccess({
+            ctx: req.ctx,
+            reqBody: body,
+            collection: result.collection.model,
+        });
+
+        res.status(200).send(
+            collectionInstanceWithOperation.format(result.collection, result.operation),
+        );
+    } catch (error) {
+        onCreateCollectionError({ctx: req.ctx, reqBody: body, error});
+
+        throw error;
+    }
 };
 
 controller.api = {

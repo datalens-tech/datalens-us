@@ -17,21 +17,48 @@ const requestSchema = {
     }),
 };
 
+export type MoveCollectionReqParams = z.infer<typeof requestSchema.params>;
+
+export type MoveCollectionReqBody = z.infer<typeof requestSchema.body>;
+
 const parseReq = makeReqParser(requestSchema);
 
 export const controller: AppRouteHandler = async (req, res) => {
     const {params, body} = await parseReq(req);
 
-    const result = await moveCollection(
-        {ctx: req.ctx},
-        {
-            collectionId: params.collectionId,
-            parentId: body.parentId,
-            title: body.title,
-        },
-    );
+    const registry = req.ctx.get('registry');
+    const {
+        controllersCallbacks: {onMoveCollectionError, onMoveCollectionSuccess},
+    } = registry.common.functions.get();
 
-    res.status(200).send(collectionModel.format(result));
+    try {
+        const result = await moveCollection(
+            {ctx: req.ctx},
+            {
+                collectionId: params.collectionId,
+                parentId: body.parentId,
+                title: body.title,
+            },
+        );
+
+        onMoveCollectionSuccess({
+            ctx: req.ctx,
+            reqBody: body,
+            reqParams: params,
+            collection: result,
+        });
+
+        res.status(200).send(collectionModel.format(result));
+    } catch (error) {
+        onMoveCollectionError({
+            ctx: req.ctx,
+            reqBody: body,
+            reqParams: params,
+            error,
+        });
+
+        throw error;
+    }
 };
 
 controller.api = {

@@ -1,17 +1,17 @@
 import type {AppContext} from '@gravity-ui/nodekit';
 
-import type {CreateCollectionReqBody} from '../../../../controllers/collections/create';
-import type {DeleteCollectionReqParams} from '../../../../controllers/collections/delete';
-import type {DeleteCollectionsListReqBody} from '../../../../controllers/collections/deleteList';
+import type {CreateCollectionReqBody} from '../../../../controllers/collections/create-collection';
+import type {DeleteCollectionReqParams} from '../../../../controllers/collections/delete-collection';
+import type {DeleteCollectionsListReqBody} from '../../../../controllers/collections/delete-collections-list';
 import type {
     MoveCollectionReqBody,
     MoveCollectionReqParams,
-} from '../../../../controllers/collections/move';
-import type {MoveCollectionsListReqBody} from '../../../../controllers/collections/moveList';
+} from '../../../../controllers/collections/move-collection';
+import type {MoveCollectionsListReqBody} from '../../../../controllers/collections/move-collections-list';
 import type {
     UpdateCollectionReqBody,
     UpdateCollectionReqParams,
-} from '../../../../controllers/collections/update';
+} from '../../../../controllers/collections/update-collection';
 import type {CollectionModel} from '../../../../db/models/new/collection';
 
 export type OnCreateCollectionSuccess = (args: {

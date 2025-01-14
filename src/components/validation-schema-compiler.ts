@@ -12,6 +12,7 @@ import {
 import US_ERRORS from '../const/us-error-constants';
 
 const ajv = new Ajv({
+    allErrors: true,
     verbose: true,
 });
 
