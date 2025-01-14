@@ -1,6 +1,7 @@
 export {
     AppEnv,
     BiTrackingLogs,
+    APP_NAME,
     US_MASTER_TOKEN_HEADER,
     COOKIE_HEADER,
     DL_SERVICE_USER_ACCESS_TOKEN,
