@@ -3,6 +3,7 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
+import {LogEventType} from '../../registry/common/utils/log-event/types';
 import {deleteCollections} from '../../services/new/collection';
 
 import {collectionModelArrayInObject} from './response-models';
@@ -21,9 +22,7 @@ export const controller: AppRouteHandler = async (req, res) => {
     const {body} = await parseReq(req);
 
     const registry = req.ctx.get('registry');
-    const {
-        controllersCallbacks: {onDeleteCollectionsListError, onDeleteCollectionsListSuccess},
-    } = registry.common.functions.get();
+    const {logEvent} = registry.common.functions.get();
 
     try {
         const result = await deleteCollections(
@@ -33,7 +32,8 @@ export const controller: AppRouteHandler = async (req, res) => {
             },
         );
 
-        onDeleteCollectionsListSuccess({
+        logEvent({
+            type: LogEventType.DeleteCollectionsListSuccess,
             ctx: req.ctx,
             reqBody: body,
             collections: result.collections,
@@ -41,7 +41,8 @@ export const controller: AppRouteHandler = async (req, res) => {
 
         res.status(200).send(await collectionModelArrayInObject.format(result));
     } catch (error) {
-        onDeleteCollectionsListError({
+        logEvent({
+            type: LogEventType.DeleteCollectionsListFail,
             ctx: req.ctx,
             reqBody: body,
             error,

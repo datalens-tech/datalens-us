@@ -3,6 +3,7 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
+import {LogEventType} from '../../registry/common/utils/log-event/types';
 import {updateCollection} from '../../services/new/collection';
 
 import {collectionModel} from './response-models';
@@ -27,9 +28,7 @@ export const controller: AppRouteHandler = async (req, res) => {
     const {params, body} = await parseReq(req);
 
     const registry = req.ctx.get('registry');
-    const {
-        controllersCallbacks: {onUpdateCollectionError, onUpdateCollectionSuccess},
-    } = registry.common.functions.get();
+    const {logEvent} = registry.common.functions.get();
 
     try {
         const result = await updateCollection(
@@ -41,7 +40,8 @@ export const controller: AppRouteHandler = async (req, res) => {
             },
         );
 
-        onUpdateCollectionSuccess({
+        logEvent({
+            type: LogEventType.UpdateCollectionSuccess,
             ctx: req.ctx,
             reqBody: body,
             reqParams: params,
@@ -50,7 +50,8 @@ export const controller: AppRouteHandler = async (req, res) => {
 
         res.status(200).send(collectionModel.format(result));
     } catch (error) {
-        onUpdateCollectionError({
+        logEvent({
+            type: LogEventType.UpdateCollectionFail,
             ctx: req.ctx,
             reqBody: body,
             reqParams: params,

@@ -3,6 +3,7 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
+import {LogEventType} from '../../registry/common/utils/log-event/types';
 import {createCollection} from '../../services/new/collection';
 
 import {collectionInstanceWithOperation} from './response-models';
@@ -23,9 +24,7 @@ const controller: AppRouteHandler = async (req, res) => {
     const {body} = await parseReq(req);
 
     const registry = req.ctx.get('registry');
-    const {
-        controllersCallbacks: {onCreateCollectionError, onCreateCollectionSuccess},
-    } = registry.common.functions.get();
+    const {logEvent} = registry.common.functions.get();
 
     try {
         const result = await createCollection(
@@ -37,7 +36,8 @@ const controller: AppRouteHandler = async (req, res) => {
             },
         );
 
-        onCreateCollectionSuccess({
+        logEvent({
+            type: LogEventType.CreateCollectionSuccess,
             ctx: req.ctx,
             reqBody: body,
             collection: result.collection.model,
@@ -47,7 +47,12 @@ const controller: AppRouteHandler = async (req, res) => {
             collectionInstanceWithOperation.format(result.collection, result.operation),
         );
     } catch (error) {
-        onCreateCollectionError({ctx: req.ctx, reqBody: body, error});
+        logEvent({
+            type: LogEventType.CreateCollectionFail,
+            ctx: req.ctx,
+            reqBody: body,
+            error,
+        });
 
         throw error;
     }
