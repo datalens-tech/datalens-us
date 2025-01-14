@@ -1,9 +1,9 @@
 import {z} from 'zod';
 
-import {transformDecodedId} from './utils';
+import {makeIdDecoder} from './utils';
 
 export const encodedId = () => {
-    return z.string().transform((val) => {
-        return transformDecodedId(val);
+    return z.string().transform((val, ctx) => {
+        return makeIdDecoder(ctx)(val);
     });
 };

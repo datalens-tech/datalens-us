@@ -194,6 +194,8 @@ export const DEFAULT_PAGE = 0;
 
 export const CURRENT_TIMESTAMP = 'CURRENT_TIMESTAMP';
 
+export const APP_NAME = 'united-storage';
+
 export enum AppInstallation {
     Opensource = 'opensource',
 }
