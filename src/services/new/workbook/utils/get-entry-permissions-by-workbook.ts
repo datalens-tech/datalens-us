@@ -1,5 +1,3 @@
-import {AppContext} from '@gravity-ui/nodekit';
-
 import {EntryScope} from '../../../../db/models/new/entry/types';
 import {Permissions} from '../../../../entities/workbook';
 import type {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
@@ -9,7 +7,6 @@ export const getEntryPermissionsByWorkbook = ({
     workbook,
     scope,
 }: {
-    ctx: AppContext;
     workbook: WorkbookInstance;
     scope?: EntryScopeType | null;
 }) => {
