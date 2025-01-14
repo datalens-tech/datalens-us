@@ -1,4 +1,4 @@
-import {testProjectId, testTenantId} from '../auth';
+import {testTenantId} from '../auth';
 
 export const WORKBOOK_DEFAULT_FIELDS = {
     workbookId: expect.any(String),
@@ -11,7 +11,6 @@ export const WORKBOOK_DEFAULT_FIELDS = {
     updatedBy: expect.any(String),
     meta: {},
     tenantId: testTenantId,
-    projectId: testProjectId,
 };
 
 export const WORKBOOKS_DEFAULT_PERMISSIONS = {

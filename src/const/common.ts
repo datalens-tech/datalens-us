@@ -108,7 +108,6 @@ export const RETURN_WORKBOOK_COLUMNS = [
     'workbookId',
     'title',
     'description',
-    'projectId',
     'tenantId',
     'meta',
     'createdBy',

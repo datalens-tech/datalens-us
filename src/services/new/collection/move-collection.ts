@@ -1,8 +1,7 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
-import {Feature, isEnabledFeature} from '../../../components/features';
-import {OrganizationPermission, ProjectPermission} from '../../../components/iam';
+import {OrganizationPermission} from '../../../components/iam';
 import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
@@ -47,7 +46,7 @@ export const moveCollection = async (
     );
 
     const {Collection} = registry.common.classes.get();
-    const {checkOrganizationPermission, checkProjectPermission} = registry.common.functions.get();
+    const {checkOrganizationPermission} = registry.common.functions.get();
 
     let newParentCollection: Optional<InstanceType<typeof Collection>>;
     let newParentParentIds: string[] = [];
@@ -103,11 +102,6 @@ export const moveCollection = async (
             await newParentCollection.checkPermission({
                 parentIds: newParentParentIds,
                 permission: CollectionPermission.CreateCollection,
-            });
-        } else if (isEnabledFeature(ctx, Feature.ProjectsEnabled)) {
-            await checkProjectPermission({
-                ctx,
-                permission: ProjectPermission.CreateCollectionInRoot,
             });
         } else {
             await checkOrganizationPermission({

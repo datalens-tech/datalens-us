@@ -1,8 +1,7 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
-import {Feature, isEnabledFeature} from '../../../components/features';
-import {OrganizationPermission, ProjectPermission} from '../../../components/iam';
+import {OrganizationPermission} from '../../../components/iam';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
@@ -64,7 +63,7 @@ export const moveWorkbook = async (
 
     const targetTrx = getPrimary(trx);
 
-    const {checkOrganizationPermission, checkProjectPermission} = registry.common.functions.get();
+    const {checkOrganizationPermission} = registry.common.functions.get();
 
     const workbook = await getWorkbook(
         {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions: true},
@@ -106,11 +105,6 @@ export const moveWorkbook = async (
             await newCollection.checkPermission({
                 parentIds: newCollectionParentIds,
                 permission: CollectionPermission.CreateWorkbook,
-            });
-        } else if (isEnabledFeature(ctx, Feature.ProjectsEnabled)) {
-            await checkProjectPermission({
-                ctx,
-                permission: ProjectPermission.CreateWorkbookInRoot,
             });
         } else {
             await checkOrganizationPermission({

@@ -14,7 +14,6 @@ export const app = usApp.express;
 export const appConfig = usApp.config;
 
 export const testTenantId = 'common';
-export const testProjectId = null;
 
 export const authMasterToken = (req: request.Test) => {
     const token = process.env.MASTER_TOKEN ?? '';

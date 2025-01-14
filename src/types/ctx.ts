@@ -17,7 +17,6 @@ export type CtxInfo = {
     onlyPublic: boolean;
     onlyMirrored?: boolean;
     privatePermissions: PrivatePermissions;
-    projectId: string | null;
     serviceUser?: ZitadelServiceUser;
     zitadelUserRole?: ZitadelUserRole;
 };

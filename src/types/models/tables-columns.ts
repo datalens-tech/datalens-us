@@ -14,7 +14,6 @@ export interface WorkbookColumns {
     workbookId: string;
     title: string;
     description: string | null;
-    projectId: string | null;
     tenantId: string;
     meta: Record<string, unknown>;
     createdBy: string;
