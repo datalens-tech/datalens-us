@@ -3,6 +3,7 @@ import {transaction} from 'objection';
 
 import {US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
+import {Operation} from '../../../entities/types';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
@@ -75,7 +76,7 @@ export const createCollection = async (
         });
     }
 
-    let operation: any;
+    let operation: Operation | undefined;
 
     const result = await transaction(targetTrx, async (transactionTrx) => {
         ctx.log('CREATE_COLLECTION_IN_DB_START');

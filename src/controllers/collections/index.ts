@@ -1,40 +1,25 @@
-import {createCollectionController} from './create';
-import {deleteCollectionController} from './delete';
-import {deleteListController} from './deleteList';
-import {getCollectionController} from './get';
-import {getCollectionBreadcrumbsController} from './getBreadcrumbs';
-import {getCollectionsListByIdsController} from './getCollectionsListByIds';
-import {getCollectionContentController} from './getContent';
-import {getRootCollectionPermissionsController} from './getRootPermissions';
-import {moveCollectionController} from './move';
-import {moveCollectionsListController} from './moveList';
-import {updateCollectionController} from './update';
+import {createCollection} from './create-collection';
+import {deleteCollection} from './delete-collection';
+import {deleteCollectionsList} from './delete-collections-list';
+import {getCollection} from './get-collection';
+import {getCollectionBreadcrumbs} from './get-collection-breadcrumbs';
+import {getCollectionContent} from './get-collection-content';
+import {getCollectionsListByIds} from './get-collections-list-by-ids';
+import {getRootPermissions} from './get-root-permissions';
+import {moveCollection} from './move-collection';
+import {moveCollectionsList} from './move-collections-list';
+import {updateCollection} from './update-collection';
 
 export default {
-    create: createCollectionController,
-
-    get: getCollectionController,
-
-    getCollectionsListByIds: getCollectionsListByIdsController,
-
-    /**
-     * @deprecated for structureItemsController.getStructureItems,
-     * @todo remove, after successful deploy with UI.
-     * Exists for reverse compatibility.
-     */
-    getContent: getCollectionContentController,
-
-    getRootPermissions: getRootCollectionPermissionsController,
-
-    getBreadcrumbs: getCollectionBreadcrumbsController,
-
-    delete: deleteCollectionController,
-
-    deleteList: deleteListController,
-
-    move: moveCollectionController,
-
-    moveList: moveCollectionsListController,
-
-    update: updateCollectionController,
+    createCollection,
+    getCollection,
+    updateCollection,
+    getCollectionsListByIds,
+    getCollectionContent,
+    getRootPermissions,
+    getCollectionBreadcrumbs,
+    deleteCollection,
+    deleteCollectionsList,
+    moveCollection,
+    moveCollectionsList,
 };
