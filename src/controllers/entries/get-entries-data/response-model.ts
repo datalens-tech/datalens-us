@@ -35,50 +35,53 @@ export type GetEntriesDataResponseBody = z.infer<typeof schema>;
 
 const format = ({
     result,
+    entryIds,
     fields,
 }: {
     result: GetJoinedEntriesRevisionsByIdsResult;
+    entryIds: string[];
     fields: string[];
 }): GetEntriesDataResponseBody => {
-    const {entries, notFoundEntryIds, accessDeniedEntryIds} = result;
+    const {entries, accessDeniedEntryIds} = result;
 
     const formattedResult: GetEntriesDataResponseBody = [];
 
-    entries.forEach(({entryId, scope, type, data}) => {
-        let responseData: ResponseItemResult['data'];
+    entryIds.forEach((entryId) => {
+        const entry = entries[entryId];
 
-        if (data) {
-            responseData = fields.reduce<ResponseItemResult['data']>((acc, fieldPath) => {
-                acc[fieldPath] = _.get(data, fieldPath);
+        if (entry) {
+            let responseData: ResponseItemResult['data'];
+            const {data, scope, type} = entry;
 
-                return acc;
-            }, {});
+            if (data) {
+                responseData = fields.reduce<ResponseItemResult['data']>((acc, fieldPath) => {
+                    acc[fieldPath] = _.get(data, fieldPath);
+
+                    return acc;
+                }, {});
+            } else {
+                responseData = {};
+            }
+
+            formattedResult.push({
+                entryId: Utils.encodeId(entryId),
+                result: {
+                    scope,
+                    type,
+                    data: responseData,
+                },
+            });
+        } else if (accessDeniedEntryIds[entryId]) {
+            formattedResult.push({
+                entryId: Utils.encodeId(entryId),
+                error: {code: ACCESS_DENIED_ERROR_CODE},
+            });
         } else {
-            responseData = {};
+            formattedResult.push({
+                entryId: Utils.encodeId(entryId),
+                error: {code: NOT_FOUND_ERROR_CODE},
+            });
         }
-
-        formattedResult.push({
-            entryId: Utils.encodeId(entryId),
-            result: {
-                scope,
-                type,
-                data: responseData,
-            },
-        });
-    });
-
-    notFoundEntryIds.forEach((entryId) => {
-        formattedResult.push({
-            entryId: Utils.encodeId(entryId),
-            error: {code: NOT_FOUND_ERROR_CODE},
-        });
-    });
-
-    accessDeniedEntryIds.forEach((entryId) => {
-        formattedResult.push({
-            entryId: Utils.encodeId(entryId),
-            error: {code: ACCESS_DENIED_ERROR_CODE},
-        });
     });
 
     return formattedResult;

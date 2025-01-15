@@ -37,7 +37,7 @@ const controller: AppRouteHandler = async (
         },
     );
 
-    const response = entriesData.format({result, fields: body.fields});
+    const response = entriesData.format({result, entryIds: body.entryIds, fields: body.fields});
 
     res.status(200).send(response);
 };
