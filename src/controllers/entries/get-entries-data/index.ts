@@ -28,6 +28,10 @@ const controller: AppRouteHandler = async (
 ) => {
     const {body} = await parseReq(req);
 
+    req.ctx.log('GET_ENTRIES_DATA_REQUEST', {
+        fields: body.fields,
+    });
+
     const result = await getJoinedEntriesRevisionsByIds(
         {ctx: req.ctx},
         {
