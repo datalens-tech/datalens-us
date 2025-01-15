@@ -11,7 +11,6 @@ export const COLLECTIONS_DEFAULT_FIELDS = {
     updatedBy: expect.any(String),
     meta: {},
     tenantId: testTenantId,
-    projectId: null,
 };
 
 export const COLLECTIONS_DEFAULT_PERMISSIONS = {

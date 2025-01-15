@@ -27,7 +27,7 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
         includePermissionsInfo,
     });
 
-    const {tenantId, projectId, isPrivateRoute} = ctx.get('info');
+    const {tenantId, isPrivateRoute} = ctx.get('info');
 
     const targetTrx = getReplica(trx);
 
@@ -40,7 +40,6 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
                 ? {}
                 : {
                       [CollectionModelColumn.TenantId]: tenantId,
-                      [CollectionModelColumn.ProjectId]: projectId,
                   }),
         })
         .first()
