@@ -54,7 +54,6 @@ export const createWorkbook = async (
     const {
         user: {userId},
         tenantId,
-        projectId,
         isPrivateRoute,
     } = ctx.get('info');
     const registry = ctx.get('registry');
@@ -107,7 +106,6 @@ export const createWorkbook = async (
                 [WorkbookModelColumn.TitleLower]: title.toLowerCase(),
                 [WorkbookModelColumn.Description]: description ?? null,
                 [WorkbookModelColumn.TenantId]: tenantId,
-                [WorkbookModelColumn.ProjectId]: projectId,
                 [WorkbookModelColumn.CollectionId]: collectionId,
                 [WorkbookModelColumn.CreatedBy]: userId,
                 [WorkbookModelColumn.UpdatedBy]: userId,

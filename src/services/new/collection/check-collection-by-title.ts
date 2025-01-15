@@ -30,7 +30,7 @@ export const checkCollectionByTitle = async (
 ) => {
     const {parentId, title} = args;
 
-    const {tenantId, projectId} = ctx.get('info');
+    const {tenantId} = ctx.get('info');
 
     ctx.log('CHECK_COLLECTION_BY_TITLE_START', {
         parentId: Utils.encodeId(parentId),
@@ -54,7 +54,6 @@ export const checkCollectionByTitle = async (
         .select()
         .where({
             [CollectionModelColumn.TenantId]: tenantId,
-            [CollectionModelColumn.ProjectId]: projectId,
             [CollectionModelColumn.DeletedAt]: null,
             [CollectionModelColumn.ParentId]: parentId,
             [CollectionModelColumn.TitleLower]: title.toLowerCase(),

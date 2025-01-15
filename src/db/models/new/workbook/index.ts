@@ -8,7 +8,6 @@ export const WorkbookModelColumn = {
     TitleLower: 'titleLower',
     Description: 'description',
     TenantId: 'tenantId',
-    ProjectId: 'projectId',
     Meta: 'meta',
     CreatedBy: 'createdBy',
     CreatedAt: 'createdAt',
@@ -48,7 +47,6 @@ export class WorkbookModel extends Model {
     [WorkbookModelColumn.TitleLower]!: string;
     [WorkbookModelColumn.Description]!: Nullable<string>;
     [WorkbookModelColumn.TenantId]!: string;
-    [WorkbookModelColumn.ProjectId]!: Nullable<string>;
     [WorkbookModelColumn.Meta]!: Record<string, unknown>;
     [WorkbookModelColumn.CreatedBy]!: string;
     [WorkbookModelColumn.CreatedAt]!: string;
