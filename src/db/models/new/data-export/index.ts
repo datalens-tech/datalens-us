@@ -14,11 +14,11 @@ export class DataExport extends Model {
     tenantId!: string;
     chartId!: string;
     chartRevId!: string;
-    datasetId!: Nullable<string>;
-    datasetRevId!: Nullable<string>;
+    datasetId!: Optional<string>;
+    datasetRevId!: Optional<string>;
     connectionId!: string;
     connectionRevId!: string;
-    params!: Record<string, unknown>;
+    params!: Nullable<Record<string, unknown>>;
     createdBy!: string;
     createdAt!: string;
     expiredAt!: string;
