@@ -93,7 +93,7 @@ export const deleteWorkbooks = async (
 
     const result = await transaction(targetTrx, async (transactionTrx) => {
         const deletedWorkbooks = await markWorkbooksAsDeleted(
-            {ctx, trx, skipCheckPermissions: true},
+            {ctx, trx: transactionTrx, skipCheckPermissions: true},
             {workbooksMap},
         );
 
