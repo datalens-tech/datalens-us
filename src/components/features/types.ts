@@ -3,7 +3,6 @@ export enum Feature {
     CollectionsEnabled = 'CollectionsEnabled',
     ColorPalettesEnabled = 'ColorPalettesEnabled',
     UseIpV6 = 'UseIpV6',
-    ProjectsEnabled = 'ProjectsEnabled',
     WorkbookIsolationEnabled = 'WorkbookIsolationEnabled',
 }
 

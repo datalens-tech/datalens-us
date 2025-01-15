@@ -2,7 +2,7 @@ import {registry} from '../index';
 import {getZitadelUserRole} from '../zitadel/utils';
 
 import {DLS} from './components/dls/dls';
-import {checkOrganizationPermission, checkProjectPermission} from './components/iam/utils';
+import {checkOrganizationPermission} from './components/iam/utils';
 import {Collection} from './entities/collection/collection';
 import {bulkFetchCollectionsAllPermissions} from './entities/collection/utils';
 import {bulkFetchWorkbooksAllPermissions} from './entities/workbook/utils';
@@ -28,7 +28,6 @@ export const registerCommonPlugins = () => {
         bulkFetchWorkbooksAllPermissions,
         bulkFetchCollectionsAllPermissions,
         checkOrganizationPermission,
-        checkProjectPermission,
         isNeedBypassEntryByKey,
         colorPalettesAdminValidator,
         getZitadelUserRole,

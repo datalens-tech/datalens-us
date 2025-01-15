@@ -13,7 +13,6 @@ export const ctx = async (req: Request, res: Response, next: NextFunction) => {
         isPrivateRoute = false,
         dlContext,
         onlyPublic,
-        projectId,
         serviceUser,
         zitadelUserRole,
     } = res.locals;
@@ -34,14 +33,12 @@ export const ctx = async (req: Request, res: Response, next: NextFunction) => {
         dlContext,
         onlyPublic,
         privatePermissions,
-        projectId: projectId || null,
         serviceUser,
         zitadelUserRole,
     });
 
     req.ctx.log('REQUEST_INFO', {
         ctxTenantId: tenantId,
-        ctxProjectId: projectId,
         requestedBy: user,
         dlContext,
     });

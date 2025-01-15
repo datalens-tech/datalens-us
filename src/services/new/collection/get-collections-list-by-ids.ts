@@ -23,14 +23,13 @@ export const getCollectionsListByIds = async (
         includePermissionsInfo,
     });
 
-    const {tenantId, projectId} = ctx.get('info');
+    const {tenantId} = ctx.get('info');
     const registry = ctx.get('registry');
 
     const models = await CollectionModel.query(getReplica(trx))
         .where({
             [CollectionModelColumn.DeletedAt]: null,
             [CollectionModelColumn.TenantId]: tenantId,
-            [CollectionModelColumn.ProjectId]: projectId,
         })
         .whereIn(CollectionModelColumn.CollectionId, collectionIds)
         .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);

@@ -94,7 +94,6 @@ export const getWorkbooksList = async (
 
     const {
         tenantId,
-        projectId,
         user: {userId},
     } = ctx.get('info');
 
@@ -132,7 +131,6 @@ export const getWorkbooksList = async (
         .select()
         .where({
             [WorkbookModelColumn.TenantId]: tenantId,
-            [WorkbookModelColumn.ProjectId]: projectId,
             [WorkbookModelColumn.CollectionId]: collectionId,
             [WorkbookModelColumn.DeletedAt]: null,
         })
