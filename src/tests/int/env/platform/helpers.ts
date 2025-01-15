@@ -33,7 +33,7 @@ type CreateMockWorkbookEntryArgs = {
     type?: string;
     workbookId: string;
     meta?: Record<string, string>;
-    data?: Record<string, string | boolean>;
+    data?: Record<string, unknown>;
     mode?: 'save' | 'publish';
 };
 
@@ -222,4 +222,40 @@ export const deleteMockWorkbook = (
             ...(options?.authArgs?.accessBindings ?? []),
         ],
     }).expect(200);
+};
+
+export const mockEntry = {
+    key: 'Entry Name',
+    scope: 'widget',
+    type: 'graph_wizard_node',
+    data: null,
+    meta: null,
+    links: null,
+    mode: undefined,
+};
+
+type CreateMockEntryArgs = {
+    key?: string;
+    scope?: string;
+    type?: string;
+    meta?: Record<string, string>;
+    data?: Record<string, unknown>;
+    links?: Record<string, string>;
+    mode?: 'save' | 'publish';
+};
+
+export const createMockEntry = async (args: CreateMockEntryArgs = {}, options?: OptionsArgs) => {
+    const key = args.key ?? mockEntry.key;
+    const scope = args.scope ?? mockEntry.scope;
+    const type = args.type ?? mockEntry.type;
+    const data = args.data ?? mockEntry.data;
+    const meta = args.meta ?? mockEntry.meta;
+    const mode = args.mode ?? mockEntry.mode;
+    const links = args.links ?? mockEntry.links;
+
+    const response = await auth(request(app).post(routes.entries), options?.authArgs)
+        .send({key, scope, type, data, meta, mode, ...(links ? {links} : {})})
+        .expect(200);
+
+    return response.body;
 };
