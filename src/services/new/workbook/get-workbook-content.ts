@@ -177,7 +177,6 @@ export const getWorkbookContent = async (
 
         if (includePermissionsInfo) {
             permissions = getEntryPermissionsByWorkbook({
-                ctx,
                 workbook,
                 scope: entry.scope,
             });
