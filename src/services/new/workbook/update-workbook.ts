@@ -1,7 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../entities/workbook';
@@ -13,22 +12,6 @@ import {getPrimary} from '../utils';
 import {checkWorkbookByTitle} from './check-workbook-by-title';
 import {getWorkbook} from './get-workbook';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['workbookId'],
-    properties: {
-        workbookId: {
-            type: 'string',
-        },
-        title: {
-            type: 'string',
-        },
-        description: {
-            type: 'string',
-        },
-    },
-});
-
 export interface UpdateWorkbookArgs {
     workbookId: string;
     title?: string;
@@ -36,7 +19,7 @@ export interface UpdateWorkbookArgs {
 }
 
 export const updateWorkbook = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: UpdateWorkbookArgs,
 ) => {
     const {workbookId, title: newTitle, description: newDescription} = args;
@@ -46,10 +29,6 @@ export const updateWorkbook = async (
         newTitle,
         newDescription,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const {accessServiceEnabled} = ctx.config;
 

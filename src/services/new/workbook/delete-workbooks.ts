@@ -1,7 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
 import Lock from '../../../db/models/lock';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
@@ -16,25 +15,12 @@ import {getPrimary} from '../utils';
 import {getWorkbooksListByIds} from './get-workbooks-list-by-ids';
 import {markWorkbooksAsDeleted} from './utils';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['workbookIds'],
-    properties: {
-        workbookIds: {
-            type: 'array',
-            items: {
-                type: 'string',
-            },
-        },
-    },
-});
-
 export interface DeleteWorkbooksArgs {
     workbookIds: string[];
 }
 
 export const deleteWorkbooks = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: DeleteWorkbooksArgs,
 ) => {
     const {workbookIds} = args;
@@ -42,10 +28,6 @@ export const deleteWorkbooks = async (
     ctx.log('DELETE_WORKBOOKS_START', {
         workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.encodeId(id)),
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const {accessServiceEnabled} = ctx.config;
 
