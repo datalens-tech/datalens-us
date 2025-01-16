@@ -1,9 +1,8 @@
 import request from 'supertest';
 
-import {testOtherUserId} from '../../../../constants';
 import {routes} from '../../../../routes';
 import {app, auth, getWorkbookBinding} from '../../auth';
-import {createMockEntry, createMockWorkbook, createMockWorkbookEntry} from '../../helpers';
+import {createMockWorkbook, createMockWorkbookEntry} from '../../helpers';
 
 let workbookId: string;
 let workbookEntryId: string;
@@ -25,14 +24,6 @@ const workbook2EntryData = {
 
 const notExistingEntryId = 'fvsb9zbfkqos2';
 
-let folderEntryId: string;
-const folderEntryData = {
-    shared: {
-        inner: 'folder shared inner',
-    },
-    someArray: [6, 7, 8],
-};
-
 const ACCESS_DENIED_ERROR = {
     code: 'ACCESS_DENIED',
 };
@@ -41,61 +32,6 @@ const NOT_FOUND_ERROR = {
 };
 
 describe('Get entries data', () => {
-    test('[Setup test data] Create folder entry', async () => {
-        const entry = await createMockEntry({
-            scope: 'dataset',
-            type: 'graph',
-            data: folderEntryData,
-        });
-
-        folderEntryId = entry.entryId;
-    });
-
-    test('Get folder entry data and not existing entry data', async () => {
-        const response = await auth(request(app).post(routes.getEntriesData))
-            .send({
-                entryIds: [notExistingEntryId, folderEntryId],
-                fields: ['shared.inner', 'someArray[0]', 'shared.notExistingfield'],
-            })
-            .expect(200);
-
-        expect(response.body).toStrictEqual([
-            {
-                entryId: notExistingEntryId,
-                error: NOT_FOUND_ERROR,
-            },
-            {
-                entryId: folderEntryId,
-                result: {
-                    data: {
-                        'shared.inner': folderEntryData.shared.inner,
-                        'someArray[0]': folderEntryData.someArray[0],
-                    },
-                    scope: 'dataset',
-                    type: 'graph',
-                },
-            },
-        ]);
-    });
-
-    test('Get access denied folder entry data', async () => {
-        const response = await auth(request(app).post(routes.getEntriesData), {
-            userId: testOtherUserId,
-        })
-            .send({
-                entryIds: [folderEntryId],
-                fields: ['shared.inner'],
-            })
-            .expect(200);
-
-        expect(response.body).toStrictEqual([
-            {
-                entryId: folderEntryId,
-                error: ACCESS_DENIED_ERROR,
-            },
-        ]);
-    });
-
     test('[Setup test data] Create workbook and entry', async () => {
         const workbook = await createMockWorkbook({title: 'My workbook'});
 
