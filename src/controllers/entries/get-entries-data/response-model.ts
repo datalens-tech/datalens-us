@@ -48,6 +48,7 @@ const format = ({
 
     entryIds.forEach((entryId) => {
         const entry = entries[entryId];
+        const encodedEntryId = Utils.encodeId(entryId);
 
         if (entry) {
             let responseData: ResponseItemResult['data'];
@@ -64,7 +65,7 @@ const format = ({
             }
 
             formattedResult.push({
-                entryId: Utils.encodeId(entryId),
+                entryId: encodedEntryId,
                 result: {
                     scope,
                     type,
@@ -73,12 +74,12 @@ const format = ({
             });
         } else if (accessDeniedEntryIds[entryId]) {
             formattedResult.push({
-                entryId: Utils.encodeId(entryId),
+                entryId: encodedEntryId,
                 error: {code: ACCESS_DENIED_ERROR_CODE},
             });
         } else {
             formattedResult.push({
-                entryId: Utils.encodeId(entryId),
+                entryId: encodedEntryId,
                 error: {code: NOT_FOUND_ERROR_CODE},
             });
         }

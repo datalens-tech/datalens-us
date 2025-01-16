@@ -245,13 +245,15 @@ type CreateMockEntryArgs = {
 };
 
 export const createMockEntry = async (args: CreateMockEntryArgs = {}, options?: OptionsArgs) => {
-    const key = args.key ?? mockEntry.key;
-    const scope = args.scope ?? mockEntry.scope;
-    const type = args.type ?? mockEntry.type;
-    const data = args.data ?? mockEntry.data;
-    const meta = args.meta ?? mockEntry.meta;
-    const mode = args.mode ?? mockEntry.mode;
-    const links = args.links ?? mockEntry.links;
+    const {
+        key = mockEntry.key,
+        scope = mockEntry.scope,
+        type = mockEntry.type,
+        data = mockEntry.data,
+        meta = mockEntry.meta,
+        mode = mockEntry.mode,
+        links = mockEntry.links,
+    } = args;
 
     const response = await auth(request(app).post(routes.entries), options?.authArgs)
         .send({key, scope, type, data, meta, mode, ...(links ? {links} : {})})
