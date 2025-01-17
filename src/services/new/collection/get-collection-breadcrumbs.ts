@@ -1,6 +1,5 @@
 import {AppError} from '@gravity-ui/nodekit';
 
-import {Feature, isEnabledFeature} from '../../../components/features';
 import {US_ERRORS} from '../../../const';
 import {CollectionPermission} from '../../../entities/collection';
 import Utils from '../../../utils';
@@ -59,9 +58,7 @@ export const getCollectionBreadcrumbs = async (
 
                 await collectionInstance.checkPermission({
                     parentIds,
-                    permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                        ? CollectionPermission.LimitedView
-                        : CollectionPermission.View,
+                    permission: CollectionPermission.LimitedView,
                 });
 
                 if (includePermissionsInfo) {
