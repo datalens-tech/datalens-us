@@ -13,9 +13,9 @@ import {
     WorkbookColumns,
 } from './models';
 
-export interface ServiceResponse {
+export interface ServiceResponse<T extends any = any> {
     code: number;
-    response: any;
+    response: T;
 }
 
 export interface StdServiceParams {

@@ -33,7 +33,7 @@ type CreateMockWorkbookEntryArgs = {
     type?: string;
     workbookId: string;
     meta?: Record<string, string>;
-    data?: Record<string, string | boolean>;
+    data?: Record<string, unknown>;
     mode?: 'save' | 'publish';
 };
 
