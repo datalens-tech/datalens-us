@@ -147,7 +147,6 @@ export const getEntry = async (
 
                 if (includePermissionsInfo) {
                     iamPermissions = getEntryPermissionsByWorkbook({
-                        ctx,
                         workbook,
                         scope: joinedEntryRevisionFavorite[EntryColumn.Scope],
                     });

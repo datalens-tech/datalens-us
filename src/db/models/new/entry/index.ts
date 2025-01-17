@@ -110,7 +110,7 @@ export class Entry extends Model {
         };
     }
 
-    [EntryColumn.Scope]!: Nullable<EntryScope>;
+    [EntryColumn.Scope]!: EntryScope;
     [EntryColumn.Type]!: string;
     [EntryColumn.Key]!: Nullable<string>;
     [EntryColumn.InnerMeta]!: Nullable<Record<string, unknown>>;

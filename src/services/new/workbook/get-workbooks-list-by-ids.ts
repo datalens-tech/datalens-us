@@ -1,4 +1,3 @@
-import {Feature, isEnabledFeature} from '../../../components/features';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../entities/workbook';
@@ -82,9 +81,7 @@ export const getWorkbooksListByIds = async (
         const promise = workbook
             .checkPermission({
                 parentIds,
-                permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                    ? WorkbookPermission.LimitedView
-                    : WorkbookPermission.View,
+                permission: WorkbookPermission.LimitedView,
             })
             .then(() => {
                 acceptedWorkbooksMap.set(workbook.model, parentIds);
