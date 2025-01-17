@@ -1,11 +1,14 @@
-import {AppRouteHandler} from '@gravity-ui/expresskit';
+import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {createWorkbook} from '../../services/new/workbook';
 
-import {workbookInstanceWithOperation} from './response-models';
+import {
+    WorkbookInstanceWithOperationResponseModel,
+    workbookInstanceWithOperation,
+} from './response-models';
 
 const requestSchema = {
     body: z.object({
@@ -17,7 +20,10 @@ const requestSchema = {
 
 const parseReq = makeReqParser(requestSchema);
 
-const controller: AppRouteHandler = async (req, res) => {
+const controller: AppRouteHandler = async (
+    req,
+    res: Response<WorkbookInstanceWithOperationResponseModel>,
+) => {
     const {body} = await parseReq(req);
 
     const result = await createWorkbook(

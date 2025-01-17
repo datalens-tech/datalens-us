@@ -10,7 +10,11 @@ const schema = z
     })
     .describe('Workbook model array in object');
 
-const format = async (data: {workbooks: WorkbookModel[]}): Promise<z.infer<typeof schema>> => {
+export type WorkbookModelArrayInObjectResponseModel = z.infer<typeof schema>;
+
+const format = async (data: {
+    workbooks: WorkbookModel[];
+}): Promise<WorkbookModelArrayInObjectResponseModel> => {
     return {
         workbooks: await Utils.macrotasksMap(data.workbooks, workbookModel.format),
     };
