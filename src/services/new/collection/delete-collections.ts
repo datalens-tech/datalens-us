@@ -1,7 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
@@ -15,23 +14,12 @@ import {getCollectionsListByIds} from './get-collections-list-by-ids';
 import {checkAndSetCollectionPermission, makeCollectionsWithParentsMap} from './utils';
 import {markCollectionsAsDeleted} from './utils/mark-collections-as-deleted';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['collectionIds'],
-    properties: {
-        collectionIds: {
-            type: 'array',
-            items: {type: 'string'},
-        },
-    },
-});
-
 export interface DeleteCollectionArgs {
     collectionIds: string[];
 }
 
 export const deleteCollections = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: DeleteCollectionArgs,
 ) => {
     const {collectionIds} = args;
@@ -42,14 +30,10 @@ export const deleteCollections = async (
         collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),
     });
 
-    if (!skipValidation) {
-        validateArgs(args);
-    }
-
     const targetTrx = getPrimary(trx);
 
     const collectionsInstances = await getCollectionsListByIds(
-        {ctx, trx: getReplica(trx), skipValidation, skipCheckPermissions: true},
+        {ctx, trx: getReplica(trx), skipCheckPermissions: true},
         {collectionIds},
     );
 
