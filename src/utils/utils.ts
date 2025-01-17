@@ -473,7 +473,7 @@ export class Utils {
             .join('');
     }
 
-    static isFileConnection(entry: {scope: Nullable<EntryScope>; type: string}) {
+    static isFileConnection(entry: {scope: EntryScope; type: string}) {
         const fileConnectionTypes: string[] = [
             EntryType.File,
             EntryType.GsheetsV2,
@@ -485,7 +485,7 @@ export class Utils {
         );
     }
 
-    static checkFileConnectionsExistence(entries: {scope: Nullable<EntryScope>; type: string}[]) {
+    static checkFileConnectionsExistence(entries: {scope: EntryScope; type: string}[]) {
         return entries.some((entry) => {
             return Utils.isFileConnection(entry);
         });

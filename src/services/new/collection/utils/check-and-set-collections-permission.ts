@@ -1,4 +1,3 @@
-import {Feature, isEnabledFeature} from '../../../../components/features';
 import {CollectionPermission} from '../../../../entities/collection';
 import {CollectionInstance} from '../../../../registry/common/entities/collection/types';
 import {ServiceArgs} from '../../types';
@@ -38,10 +37,8 @@ export const checkAndSetCollectionPermission = async (
 
         if (permission) {
             localPermission = permission;
-        } else if (isEnabledFeature(ctx, Feature.UseLimitedView)) {
-            localPermission = CollectionPermission.LimitedView;
         } else {
-            localPermission = CollectionPermission.View;
+            localPermission = CollectionPermission.LimitedView;
         }
 
         if (collectionInstance.model.parentId !== null) {
