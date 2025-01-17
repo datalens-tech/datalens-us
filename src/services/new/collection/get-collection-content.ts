@@ -1,6 +1,5 @@
 import {AppError} from '@gravity-ui/nodekit';
 
-import {Feature, isEnabledFeature} from '../../../components/features';
 import {US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
@@ -93,9 +92,7 @@ export const getCollectionContent = async (
 
             await collection.checkPermission({
                 parentIds,
-                permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                    ? CollectionPermission.LimitedView
-                    : CollectionPermission.View,
+                permission: CollectionPermission.LimitedView,
             });
         }
     }
@@ -149,9 +146,7 @@ export const getCollectionContent = async (
                         try {
                             await collection.checkPermission({
                                 parentIds: contentParentIds,
-                                permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                                    ? CollectionPermission.LimitedView
-                                    : CollectionPermission.View,
+                                permission: CollectionPermission.LimitedView,
                             });
 
                             return collection;

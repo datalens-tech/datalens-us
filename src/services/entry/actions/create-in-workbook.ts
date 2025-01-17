@@ -201,7 +201,6 @@ export async function createEntryInWorkbook(
 
     if (includePermissionsInfo) {
         permissions = getEntryPermissionsByWorkbook({
-            ctx,
             workbook,
             scope: resultEntry.scope,
         });

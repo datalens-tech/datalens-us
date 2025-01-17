@@ -1,4 +1,3 @@
-import {Feature, isEnabledFeature} from '../../../components/features';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CollectionModel} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
@@ -118,9 +117,7 @@ export const getStructureItems = async (
 
             await collection.checkPermission({
                 parentIds,
-                permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                    ? CollectionPermission.LimitedView
-                    : CollectionPermission.View,
+                permission: CollectionPermission.LimitedView,
             });
         }
     }
