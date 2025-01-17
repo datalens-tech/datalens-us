@@ -15,7 +15,7 @@ const errorSchema = z.object({
 
 const resultSchema = z.object({
     result: z.object({
-        scope: z.nativeEnum(EntryScope).nullable(),
+        scope: z.nativeEnum(EntryScope),
         type: z.string(),
         data: z.record(z.unknown()),
     }),
@@ -72,7 +72,7 @@ const format = ({
                     data: responseData,
                 },
             });
-        } else if (accessDeniedEntryIds[entryId]) {
+        } else if (accessDeniedEntryIds.includes(entryId)) {
             formattedResult.push({
                 entryId: encodedEntryId,
                 error: {code: ACCESS_DENIED_ERROR_CODE},

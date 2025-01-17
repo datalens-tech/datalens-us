@@ -1,7 +1,6 @@
 import {AppContext} from '@gravity-ui/nodekit';
 import _ from 'lodash';
 
-import {Feature, isEnabledFeature} from '../../../components/features';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import {
@@ -33,10 +32,6 @@ const checkWorkbookEntriesPermissions = async ({
         return {permittedWorkbookEntries: entries, accessDeniedWorkbookEntryIds: []};
     }
 
-    const permission = isEnabledFeature(ctx, Feature.UseLimitedView)
-        ? WorkbookPermission.LimitedView
-        : WorkbookPermission.View;
-
     const workbookPermissionMapping = new Map(
         await Promise.all(
             workbookIds.map(async (workbookId): Promise<[string, boolean]> => {
@@ -44,7 +39,7 @@ const checkWorkbookEntriesPermissions = async ({
                     await checkWorkbookPermissionById({
                         ctx,
                         workbookId,
-                        permission,
+                        permission: WorkbookPermission.LimitedView,
                     });
                     return [workbookId, true];
                 } catch {
@@ -124,9 +119,8 @@ export type GetJoinedEntriesRevisionsByIdsArgs = {
 };
 
 export type GetJoinedEntriesRevisionsByIdsResult = {
-    entries: Record<string, JoinedEntryRevisionColumns | undefined>;
-    accessDeniedEntryIds: Record<string, string | undefined>;
-    notFoundEntryIds: Record<string, string | undefined>;
+    entries: Record<string, JoinedEntryRevisionColumns>;
+    accessDeniedEntryIds: string[];
 };
 
 export const getJoinedEntriesRevisionsByIds = async (
@@ -194,24 +188,10 @@ export const getJoinedEntriesRevisionsByIds = async (
         (item) => item.entryId,
     );
 
-    const accessDeniedEntryIdsMap = _.keyBy<string>([
-        ...accessDeniedWorkbookEntryIds,
-        ...accessDeniedFolderEntryIds,
-    ]);
-
-    const notFoundEntryIdsMap = entryIds.reduce<Record<string, string>>((acc, id) => {
-        if (!entriesMap[id] && !accessDeniedEntryIdsMap[id]) {
-            acc[id] = id;
-        }
-
-        return acc;
-    }, {});
-
     ctx.log('GET_JOINED_ENTRIES_REVISIONS_BY_IDS_SUCCESS');
 
     return {
         entries: entriesMap,
-        accessDeniedEntryIds: accessDeniedEntryIdsMap,
-        notFoundEntryIds: notFoundEntryIdsMap,
+        accessDeniedEntryIds: [...accessDeniedWorkbookEntryIds, ...accessDeniedFolderEntryIds],
     };
 };
