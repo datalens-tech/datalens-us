@@ -12,7 +12,7 @@ export interface MoveListCollectionsArgs {
 }
 
 export const moveCollectionsList = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: MoveListCollectionsArgs,
 ) => {
     const {collectionIds, parentId} = args;
@@ -32,7 +32,6 @@ export const moveCollectionsList = async (
                         {
                             ctx,
                             trx: transactionTrx,
-                            skipValidation,
                             skipCheckPermissions,
                         },
                         {

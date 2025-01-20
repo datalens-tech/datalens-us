@@ -16,6 +16,7 @@ import {
     getEntryBeforeDbRequestHook,
     isNeedBypassEntryByKey,
 } from './utils/entry/utils';
+import {logEvent} from './utils/log-event/utils';
 
 export const registerCommonPlugins = () => {
     registry.common.classes.register({
@@ -36,5 +37,6 @@ export const registerCommonPlugins = () => {
         checkEmbedding,
         checkCreateEntryAvailability,
         checkUpdateEntryAvailability,
+        logEvent,
     });
 };
