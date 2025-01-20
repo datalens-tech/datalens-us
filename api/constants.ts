@@ -22,4 +22,5 @@ export {
     ALLOWED_ENTRIES_SCOPE,
     AUTHORIZATION_HEADER,
     DL_AUTH_HEADER_KEY,
+    CONTENT_TYPE_JSON,
 } from '../src/const';

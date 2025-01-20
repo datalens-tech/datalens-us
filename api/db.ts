@@ -28,7 +28,7 @@ export {Lock} from '../src/db/models/new/lock';
 export {Favorite} from '../src/db/models/new/favorite';
 export {UserSettings} from '../src/db/models/new/user-settings';
 export {Comment, CommentType} from '../src/db/models/new/comment';
-
+export {DataExport} from '../src/db/models/new/data-export';
 export {EmbedModel, EmbedModelColumn} from '../src/db/models/new/embed';
 export {
     EmbeddingSecretModel,
