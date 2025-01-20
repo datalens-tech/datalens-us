@@ -16,7 +16,6 @@ const appPath = path.join(__dirname, '..');
 const templateFilePath = path.join(appPath, `dev/env/${templateName}`);
 
 let templateContent = readFileSync(templateFilePath).toString();
-const secretsSection = `${SECRETS_SECTION_START}\n${templateContent}\n${SECRETS_SECTION_END}`;
 
 if (envName === 'development') {
     try {
@@ -29,6 +28,8 @@ if (envName === 'development') {
     }
 }
 
+const templateSection = `${SECRETS_SECTION_START}\n${templateContent}\n${SECRETS_SECTION_END}`;
+
 let currentEnv;
 
 try {
@@ -39,4 +40,4 @@ try {
     currentEnv = `${SECRETS_SECTION_START}\n${SECRETS_SECTION_END}`;
 }
 
-writeFileSync(path.join(appPath, '.env'), currentEnv.replace(REPLACE_REGEXP, secretsSection));
+writeFileSync(path.join(appPath, '.env'), currentEnv.replace(REPLACE_REGEXP, templateSection));

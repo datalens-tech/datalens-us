@@ -4,7 +4,7 @@ import {prepareResponseAsync} from '../components/response-presenter';
 import Entry from '../db/models/entry';
 import FavoriteService from '../services/favorite.service';
 import * as ST from '../types/services.types';
-import Utils from '../utils';
+import {isTrueArg} from '../utils/env-utils';
 
 export default {
     getFavorites: async (req: Request, res: Response) => {
@@ -16,8 +16,8 @@ export default {
             page: query.page && Number(query.page),
             pageSize: query.pageSize && Number(query.pageSize),
             scope: query.scope,
-            includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
-            ignoreWorkbookEntries: Utils.isTrueArg(query.ignoreWorkbookEntries),
+            includePermissionsInfo: isTrueArg(query.includePermissionsInfo),
+            ignoreWorkbookEntries: isTrueArg(query.ignoreWorkbookEntries),
             ctx: req.ctx,
         });
 

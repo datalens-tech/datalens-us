@@ -13,3 +13,5 @@ export {default as axiosInstance} from '../src/utils/axios';
 export {objectKeys} from '../src/utils/utility-types';
 
 export {whereBuilderInterTenantGetEntries} from '../src/db/models/navigation/utils';
+
+export {getEnvCert, getEnvVariable, getEnvTokenVariable, isTrueArg} from '../src/utils/env-utils';

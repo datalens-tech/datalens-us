@@ -1,6 +1,7 @@
 import type {AppContext} from '@gravity-ui/nodekit';
 import {AppError} from '@gravity-ui/nodekit';
 
+import {UserRole} from '../../../../components/auth/constants/role';
 import {US_ERRORS} from '../../../../const';
 import type {WorkbookModel} from '../../../../db/models/new/workbook';
 import {getMockedOperation} from '../../../../entities/utils';
@@ -78,8 +79,15 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
     }
 
     private isEditorOrAdmin() {
-        const {zitadelUserRole: role} = this.ctx.get('info');
-        return role === ZitadelUserRole.Editor || role === ZitadelUserRole.Admin;
+        const {isAuthEnabled} = this.ctx.config;
+        const user = this.ctx.get('user');
+        const {zitadelUserRole} = this.ctx.get('info');
+        return isAuthEnabled
+            ? (user?.roles || []).some(
+                  (role) => role === UserRole.Editor || role === UserRole.Admin,
+              )
+            : zitadelUserRole === ZitadelUserRole.Editor ||
+                  zitadelUserRole === ZitadelUserRole.Admin;
     }
 
     private getAllPermissions() {

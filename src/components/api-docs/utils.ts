@@ -18,7 +18,7 @@ export const getAdditionalHeaders = (
         config.appAuthPolicy === AuthPolicy.disabled ||
         routeDescription.authPolicy === AuthPolicy.disabled;
 
-    if (!authDisabled && config.zitadelEnabled) {
+    if (!authDisabled && (config.zitadelEnabled || config.isAuthEnabled)) {
         headers.push(
             z.strictObject({
                 [AUTHORIZATION_HEADER]: z.string(),

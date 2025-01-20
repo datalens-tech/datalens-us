@@ -6,6 +6,7 @@ import {initDB as initPosgresDB} from '@gravity-ui/postgreskit';
 import {AppEnv, DEFAULT_QUERY_TIMEOUT} from '../const';
 import {getTestDsnList} from '../tests/int/db';
 import Utils from '../utils';
+import {isTrueArg} from '../utils/env-utils';
 
 interface OrigImplFunction {
     (snakeCaseFormat: string): string;
@@ -61,7 +62,7 @@ export const getKnexOptions = () => ({
 
         return origImpl(snakeCaseFormat);
     },
-    debug: Utils.isTrueArg(process.env.SQL_DEBUG),
+    debug: isTrueArg(process.env.SQL_DEBUG),
 });
 
 export function initDB(nodekit: NodeKit) {
@@ -72,7 +73,7 @@ export function initDB(nodekit: NodeKit) {
         dsnList = Utils.getDsnList();
     }
 
-    const suppressStatusLogs = Utils.isTrueArg(process.env.US_SURPRESS_DB_STATUS_LOGS);
+    const suppressStatusLogs = isTrueArg(process.env.US_SURPRESS_DB_STATUS_LOGS);
 
     const dispatcherOptions = {
         healthcheckInterval: 5000,
