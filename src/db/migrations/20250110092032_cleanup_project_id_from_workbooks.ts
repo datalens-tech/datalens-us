@@ -20,7 +20,7 @@ export async function down(knex: Knex): Promise<void> {
     return knex.raw(`
         DROP INDEX workbooks_uniq_title_idx;
 
-        ALTER TABLE workbooks ADD COLUMN project_id TEXT;
+        ALTER TABLE workbooks ADD COLUMN project_id TEXT DEFAULT NULL;
         CREATE INDEX workbooks_project_id_idx ON workbooks USING BTREE (project_id);
 
         CREATE UNIQUE INDEX workbooks_uniq_title_idx
