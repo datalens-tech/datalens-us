@@ -20,7 +20,9 @@ export class DataExport extends Model {
     connectionRevId!: string;
     params!: Nullable<Record<string, unknown>>;
     createdBy!: string;
+    updatedBy!: Nullable<string>;
     createdAt!: string;
+    updatedAt!: Nullable<string>;
     expiredAt!: string;
     jobId!: string;
     resultLink!: Nullable<string>;
