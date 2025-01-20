@@ -1,4 +1,4 @@
-import type {RouteConfig as ZodOpenApiRouteConifg} from '@asteasolutions/zod-to-openapi';
+import type {RouteConfig as ZodOpenApiRouteConfig} from '@asteasolutions/zod-to-openapi';
 
 import {FeaturesConfig} from '../src/components/features/types';
 import type {Registry} from '../src/registry';
@@ -46,8 +46,8 @@ declare module '@gravity-ui/expresskit' {
     }
 
     interface AppRouteHandler {
-        api?: Omit<ZodOpenApiRouteConifg, 'method' | 'path' | 'responses'> & {
-            responses?: ZodOpenApiRouteConifg['responses'];
+        api?: Omit<ZodOpenApiRouteConfig, 'method' | 'path' | 'responses'> & {
+            responses?: ZodOpenApiRouteConfig['responses'];
         };
         manualDecodeId?: boolean;
     }

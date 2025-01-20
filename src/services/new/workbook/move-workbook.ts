@@ -2,7 +2,6 @@ import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
 import {OrganizationPermission} from '../../../components/iam';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {CollectionPermission} from '../../../entities/collection';
@@ -16,22 +15,6 @@ import {getPrimary} from '../utils';
 import {checkWorkbookByTitle} from './check-workbook-by-title';
 import {getWorkbook} from './get-workbook';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['workbookId', 'collectionId'],
-    properties: {
-        workbookId: {
-            type: 'string',
-        },
-        collectionId: {
-            type: ['string', 'null'],
-        },
-        title: {
-            type: 'string',
-        },
-    },
-});
-
 export interface MoveWorkbookArgs {
     workbookId: string;
     collectionId: Nullable<string>;
@@ -39,7 +22,7 @@ export interface MoveWorkbookArgs {
 }
 
 export const moveWorkbook = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: MoveWorkbookArgs,
 ) => {
     const {workbookId, collectionId: newCollectionId, title: newTitle} = args;
@@ -49,10 +32,6 @@ export const moveWorkbook = async (
         newCollectionId: newCollectionId ? Utils.encodeId(newCollectionId) : null,
         newTitle,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const {accessServiceEnabled} = ctx.config;
 

@@ -66,7 +66,7 @@ export const copyWorkbookTemplate = async (
     }
 
     const {workbook: newWorkbook, operation} = await copyWorkbook(
-        {ctx, trx, skipValidation, skipCheckPermissions},
+        {ctx, trx, skipCheckPermissions},
         {
             workbookId,
             title: newTitle,

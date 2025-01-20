@@ -1,7 +1,6 @@
 import {AppContext, AppError} from '@gravity-ui/nodekit';
 import {TransactionOrKnex, transaction} from 'objection';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
 import Link from '../../../db/models/links';
 import {Entry} from '../../../db/models/new/entry';
@@ -16,38 +15,15 @@ import {getParentIds} from '../collection/utils/get-parents';
 import {ServiceArgs} from '../types';
 import {getPrimary, getReplica} from '../utils';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['workbookId', 'collectionId', 'title'],
-    properties: {
-        workbookId: {
-            type: 'string',
-        },
-        collectionId: {
-            type: ['string', 'null'],
-        },
-        title: {
-            type: 'string',
-        },
-        tenantIdOverride: {
-            type: 'string',
-        },
-        accessBindingsServiceEnabled: {
-            type: 'boolean',
-        },
-    },
-});
-
 export interface CopyWorkbookArgs {
     workbookId: string;
     collectionId: Nullable<string>;
     title: string;
     tenantIdOverride?: string;
-    accessBindingsServiceEnabled?: boolean;
 }
 
 export const copyWorkbook = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: CopyWorkbookArgs,
 ) => {
     const {workbookId, collectionId: newCollectionId, title: newTitle, tenantIdOverride} = args;
@@ -58,10 +34,6 @@ export const copyWorkbook = async (
         newTitle,
         tenantIdOverride,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const {accessServiceEnabled, accessBindingsServiceEnabled} = ctx.config;
 
