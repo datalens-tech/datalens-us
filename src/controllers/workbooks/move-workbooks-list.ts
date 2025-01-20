@@ -12,7 +12,7 @@ import {
 
 const requestSchema = {
     body: z.object({
-        workbookIds: zc.encodedIdArray({}),
+        workbookIds: zc.encodedIdArray({min: 1, max: 1000}),
         collectionId: zc.encodedId().nullable(),
     }),
 };

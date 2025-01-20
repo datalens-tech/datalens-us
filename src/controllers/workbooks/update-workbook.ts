@@ -11,10 +11,19 @@ const requestSchema = {
     params: z.object({
         workbookId: zc.encodedId(),
     }),
-    body: z.object({
-        title: z.string().optional(),
-        description: z.string().optional(),
-    }),
+    body: z
+        .object({
+            title: z.string().optional(),
+            description: z.string().optional(),
+        })
+        .refine(
+            ({title, description}) => {
+                return typeof title === 'string' || typeof description === 'string';
+            },
+            {
+                message: `The request body must contain either "title" or "description".`,
+            },
+        ),
 };
 
 const parseReq = makeReqParser(requestSchema);
