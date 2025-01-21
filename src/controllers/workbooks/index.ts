@@ -23,7 +23,7 @@ import {
     formatWorkbooksList,
 } from '../../services/new/workbook/formatters';
 import {getWorkbooksListByIds} from '../../services/new/workbook/get-workbooks-list-by-ids';
-import Utils from '../../utils';
+import {isTrueArg} from '../../utils/env-utils';
 
 import {copyWorkbook} from './copy-workbook';
 import {createWorkbook} from './create-workbook';
@@ -51,7 +51,7 @@ export default {
             },
             {
                 workbookId: params.workbookId,
-                includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
+                includePermissionsInfo: isTrueArg(query.includePermissionsInfo),
             },
         );
 
@@ -67,7 +67,7 @@ export default {
             {ctx: req.ctx},
             {
                 workbookId: params.workbookId,
-                includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
+                includePermissionsInfo: isTrueArg(query.includePermissionsInfo),
                 page: (query.page && Number(query.page)) as number | undefined,
                 pageSize: (query.pageSize && Number(query.pageSize)) as number | undefined,
                 createdBy: query.createdBy as any,
@@ -89,13 +89,13 @@ export default {
             {ctx: req.ctx},
             {
                 collectionId: (query.collectionId as Optional<string>) ?? null,
-                includePermissionsInfo: Utils.isTrueArg(query.includePermissionsInfo),
+                includePermissionsInfo: isTrueArg(query.includePermissionsInfo),
                 filterString: query.filterString as Optional<string>,
                 page: (query.page && Number(query.page)) as number | undefined,
                 pageSize: (query.pageSize && Number(query.pageSize)) as number | undefined,
                 orderField: query.orderField as Optional<OrderField>,
                 orderDirection: query.orderDirection as Optional<OrderDirection>,
-                onlyMy: Utils.isTrueArg(query.onlyMy),
+                onlyMy: isTrueArg(query.onlyMy),
             },
         );
 
