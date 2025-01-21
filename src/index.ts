@@ -15,6 +15,7 @@ import {
     setCiEnv,
     waitDatabase,
 } from './components/middlewares';
+import {appAuth} from './components/auth/middlewares/app-auth';
 import {AppEnv} from './const';
 import {registry} from './registry';
 import {getRoutes} from './routes';
@@ -54,6 +55,10 @@ afterAuth.push(
 
 if (nodekit.config.zitadelEnabled) {
     nodekit.config.appAuthHandler = authZitadel;
+}
+
+if (nodekit.config.isAuthEnabled) {
+    nodekit.config.appAuthHandler = appAuth;
 }
 
 nodekit.config.appFinalErrorHandler = finalRequestHandler;
