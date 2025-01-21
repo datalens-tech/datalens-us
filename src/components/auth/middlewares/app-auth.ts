@@ -5,7 +5,7 @@ import {AUTHORIZATION_HEADER, DL_AUTH_HEADER_KEY} from '../../../const/common';
 import {AUTH_ERRORS} from '../constants/error-constants';
 import type {AccessTokenPayload} from '../types/token';
 
-const ALGORITHMS: Algorithm[] = ['RS256'];
+const ALGORITHMS: Algorithm[] = ['PS256'];
 
 export const appAuth = async (req: Request, res: Response, next: NextFunction) => {
     req.ctx.log('AUTH');
