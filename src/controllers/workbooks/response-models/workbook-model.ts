@@ -8,7 +8,6 @@ const schema = z
         collectionId: z.string().nullable(),
         title: z.string(),
         description: z.string().nullable(),
-        projectId: z.string().nullable(),
         tenantId: z.string(),
         meta: z.object({}),
         createdBy: z.string(),
@@ -18,13 +17,14 @@ const schema = z
     })
     .describe('Workbook model');
 
-const format = (data: WorkbookModel): z.infer<typeof schema> => {
+export type WorkbookResponseModel = z.infer<typeof schema>;
+
+const format = (data: WorkbookModel): WorkbookResponseModel => {
     return {
         workbookId: Utils.encodeId(data.workbookId),
         collectionId: data.collectionId ? Utils.encodeId(data.collectionId) : null,
         title: data.title,
         description: data.description,
-        projectId: data.projectId,
         tenantId: data.tenantId,
         meta: data.meta,
         createdBy: data.createdBy,

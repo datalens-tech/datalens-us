@@ -1,7 +1,6 @@
 import {AppContext, AppError} from '@gravity-ui/nodekit';
 import {TransactionOrKnex, transaction} from 'objection';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
 import Link from '../../../db/models/links';
 import {Entry} from '../../../db/models/new/entry';
@@ -16,69 +15,30 @@ import {getParentIds} from '../collection/utils/get-parents';
 import {ServiceArgs} from '../types';
 import {getPrimary, getReplica} from '../utils';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['workbookId', 'collectionId', 'title'],
-    properties: {
-        workbookId: {
-            type: 'string',
-        },
-        collectionId: {
-            type: ['string', 'null'],
-        },
-        title: {
-            type: 'string',
-        },
-        projectIdOverride: {
-            type: ['string', 'null'],
-        },
-        tenantIdOverride: {
-            type: 'string',
-        },
-        accessBindingsServiceEnabled: {
-            type: 'boolean',
-        },
-    },
-});
-
 export interface CopyWorkbookArgs {
     workbookId: string;
     collectionId: Nullable<string>;
     title: string;
-    projectIdOverride?: Nullable<string>;
     tenantIdOverride?: string;
-    accessBindingsServiceEnabled?: boolean;
 }
 
 export const copyWorkbook = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: CopyWorkbookArgs,
 ) => {
-    const {
-        workbookId,
-        collectionId: newCollectionId,
-        title: newTitle,
-        projectIdOverride,
-        tenantIdOverride,
-    } = args;
+    const {workbookId, collectionId: newCollectionId, title: newTitle, tenantIdOverride} = args;
 
     ctx.log('COPY_WORKBOOK_START', {
         workbookId: Utils.encodeId(workbookId),
         newCollectionId,
         newTitle,
-        projectIdOverride,
         tenantIdOverride,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const {accessServiceEnabled, accessBindingsServiceEnabled} = ctx.config;
 
     const {
         tenantId,
-        projectId,
         user: {userId},
     } = ctx.get('info');
 
@@ -105,20 +65,8 @@ export const copyWorkbook = async (
         });
     }
 
-    if (
-        projectIdOverride === undefined &&
-        projectId &&
-        originWorkbookModel.projectId !== projectId
-    ) {
-        throw new AppError(US_ERRORS.WORKBOOK_NOT_EXISTS, {
-            code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-        });
-    }
-
     const originTenantId = originWorkbookModel.tenantId;
     const targetTenantId = tenantIdOverride ?? tenantId;
-
-    const targetProjectId = projectIdOverride ?? projectId;
 
     const originWorkbook = new Workbook({
         ctx,
@@ -132,12 +80,7 @@ export const copyWorkbook = async (
         );
     }
 
-    if (
-        accessServiceEnabled &&
-        !skipCheckPermissions &&
-        tenantIdOverride === undefined &&
-        projectIdOverride === undefined
-    ) {
+    if (accessServiceEnabled && !skipCheckPermissions && tenantIdOverride === undefined) {
         let originWorkbookParentIds: string[] = [];
 
         if (originWorkbook.model.collectionId !== null) {
@@ -175,7 +118,6 @@ export const copyWorkbook = async (
         const correctedNewTitle = await getUniqWorkbookTitle({
             newTitle,
             tenantId: targetTenantId,
-            projectId: targetProjectId,
             collectionId: newCollectionId,
             trx: transactionTrx,
         });
@@ -186,7 +128,6 @@ export const copyWorkbook = async (
                 [WorkbookModelColumn.TitleLower]: correctedNewTitle.toLowerCase(),
                 [WorkbookModelColumn.Description]: originWorkbookModel.description,
                 [WorkbookModelColumn.TenantId]: targetTenantId,
-                [WorkbookModelColumn.ProjectId]: targetProjectId,
                 [WorkbookModelColumn.CollectionId]: newCollectionId,
                 [WorkbookModelColumn.Meta]: originWorkbookModel.meta,
                 [WorkbookModelColumn.CreatedBy]: userId,
@@ -254,13 +195,11 @@ export const copyWorkbook = async (
 
 async function getUniqWorkbookTitle({
     newTitle,
-    projectId,
     tenantId,
     collectionId,
     trx,
 }: {
     newTitle: WorkbookModel['title'];
-    projectId: WorkbookModel['projectId'];
     tenantId: WorkbookModel['tenantId'];
     collectionId: WorkbookModel['collectionId'];
     trx: TransactionOrKnex;
@@ -275,7 +214,6 @@ async function getUniqWorkbookTitle({
     const equalWorkbooksByTitleLower = await WorkbookModel.query(trx)
         .where({
             [WorkbookModelColumn.TenantId]: tenantId,
-            [WorkbookModelColumn.ProjectId]: projectId,
             [WorkbookModelColumn.CollectionId]: collectionId,
             [WorkbookModelColumn.DeletedAt]: null,
         })

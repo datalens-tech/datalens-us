@@ -1,6 +1,5 @@
 import {AppError} from '@gravity-ui/nodekit';
 
-import {Feature, isEnabledFeature} from '../../../components/features';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE, US_ERRORS} from '../../../const';
 import {CollectionModel} from '../../../db/models/new/collection';
@@ -95,7 +94,6 @@ export const getWorkbooksList = async (
 
     const {
         tenantId,
-        projectId,
         user: {userId},
     } = ctx.get('info');
 
@@ -124,9 +122,7 @@ export const getWorkbooksList = async (
 
             await collection.checkPermission({
                 parentIds: parents.slice(1).map((model) => model.collectionId),
-                permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                    ? CollectionPermission.LimitedView
-                    : CollectionPermission.View,
+                permission: CollectionPermission.LimitedView,
             });
         }
     }
@@ -135,7 +131,6 @@ export const getWorkbooksList = async (
         .select()
         .where({
             [WorkbookModelColumn.TenantId]: tenantId,
-            [WorkbookModelColumn.ProjectId]: projectId,
             [WorkbookModelColumn.CollectionId]: collectionId,
             [WorkbookModelColumn.DeletedAt]: null,
         })
@@ -179,9 +174,7 @@ export const getWorkbooksList = async (
                     try {
                         await workbook.checkPermission({
                             parentIds,
-                            permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                                ? WorkbookPermission.LimitedView
-                                : WorkbookPermission.View,
+                            permission: WorkbookPermission.LimitedView,
                         });
 
                         return workbook;

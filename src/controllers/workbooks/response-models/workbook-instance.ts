@@ -24,7 +24,9 @@ const schema = workbookModel.schema
     )
     .describe('Workbook instance');
 
-const format = (data: WorkbookInstance): z.infer<typeof schema> => {
+export type WorkbookInstanceResponseModel = z.infer<typeof schema>;
+
+const format = (data: WorkbookInstance): WorkbookInstanceResponseModel => {
     const {model} = data;
 
     return {

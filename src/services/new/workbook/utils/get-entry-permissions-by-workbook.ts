@@ -1,25 +1,18 @@
-import {AppContext} from '@gravity-ui/nodekit';
-
-import {Feature, isEnabledFeature} from '../../../../components/features';
 import {EntryScope} from '../../../../db/models/new/entry/types';
 import {Permissions} from '../../../../entities/workbook';
 import type {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
 import type {EntryScope as EntryScopeType} from '../../../../types/models';
 
 export const getEntryPermissionsByWorkbook = ({
-    ctx,
     workbook,
     scope,
 }: {
-    ctx: AppContext;
     workbook: WorkbookInstance;
     scope?: EntryScopeType | null;
 }) => {
     const permissions = workbook.permissions as Permissions;
 
-    const view = isEnabledFeature(ctx, Feature.UseLimitedView)
-        ? permissions.limitedView
-        : permissions.view;
+    const view = permissions.limitedView;
 
     const mappedPermission = {
         execute: view,

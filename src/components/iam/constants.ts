@@ -4,8 +4,3 @@ export enum OrganizationPermission {
     CreateCollectionInRoot = 'createCollectionInRoot',
     CreateWorkbookInRoot = 'createWorkbookInRoot',
 }
-
-export enum ProjectPermission {
-    CreateCollectionInRoot = 'createCollectionInRoot',
-    CreateWorkbookInRoot = 'createWorkbookInRoot',
-}

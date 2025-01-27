@@ -47,7 +47,7 @@ export const copyWorkbookTemplate = async (
         validateArgs(args);
     }
 
-    const {tenantId, projectId} = ctx.get('info');
+    const {tenantId} = ctx.get('info');
 
     const workbookModel = await WorkbookModel.query(getReplica(trx))
         .findById(workbookId)
@@ -66,12 +66,11 @@ export const copyWorkbookTemplate = async (
     }
 
     const {workbook: newWorkbook, operation} = await copyWorkbook(
-        {ctx, trx, skipValidation, skipCheckPermissions},
+        {ctx, trx, skipCheckPermissions},
         {
             workbookId,
             title: newTitle,
             collectionId: newCollectionId,
-            projectIdOverride: projectId,
             tenantIdOverride: tenantId,
         },
     );

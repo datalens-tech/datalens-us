@@ -141,7 +141,6 @@ export async function getEntryRelations(
                 return {
                     ...item,
                     permissions: getEntryPermissionsByWorkbook({
-                        ctx,
                         workbook,
                         scope: item.scope,
                     }),

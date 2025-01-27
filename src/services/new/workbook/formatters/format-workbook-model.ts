@@ -6,7 +6,6 @@ export const formatWorkbookModel = (workbookModel: WorkbookModel) => {
         collectionId: workbookModel.collectionId,
         title: workbookModel.title,
         description: workbookModel.description,
-        projectId: workbookModel.projectId,
         tenantId: workbookModel.tenantId,
         meta: workbookModel.meta,
         createdBy: workbookModel.createdBy,

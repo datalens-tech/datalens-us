@@ -104,7 +104,6 @@ export const filterEntriesByPermission = async <T extends PartialEntry>(
 
                     if (workbook) {
                         const permissions = getEntryPermissionsByWorkbook({
-                            ctx,
                             workbook,
                             scope: entry.scope,
                         });

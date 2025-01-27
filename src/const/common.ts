@@ -108,24 +108,13 @@ export const RETURN_WORKBOOK_COLUMNS = [
     'workbookId',
     'title',
     'description',
-    'projectId',
     'tenantId',
     'meta',
     'createdBy',
     'createdAt',
 ];
 
-export const ALLOWED_SCOPE_VALUES = [
-    'dataset',
-    'pdf',
-    'folder',
-    'dash',
-    'connection',
-    'widget',
-    'config',
-    'presentation',
-    'report',
-];
+export const ALLOWED_SCOPE_VALUES = Object.values(EntryScope);
 
 export const ID_VARIABLES = [
     'ids',

@@ -1,4 +1,3 @@
-import {Feature, isEnabledFeature} from '../../../components/features';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../entities/workbook';
@@ -40,7 +39,7 @@ export const getWorkbooksListByIds = async (
         includePermissionsInfo,
     });
 
-    const {tenantId, isPrivateRoute, projectId} = ctx.get('info');
+    const {tenantId, isPrivateRoute} = ctx.get('info');
     const registry = ctx.get('registry');
 
     if (!skipValidation) {
@@ -53,7 +52,6 @@ export const getWorkbooksListByIds = async (
         .where({
             [WorkbookModelColumn.DeletedAt]: null,
             [WorkbookModelColumn.TenantId]: tenantId,
-            [WorkbookModelColumn.ProjectId]: projectId,
         })
         .whereIn([WorkbookModelColumn.WorkbookId], workbookIds)
         .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
@@ -83,9 +81,7 @@ export const getWorkbooksListByIds = async (
         const promise = workbook
             .checkPermission({
                 parentIds,
-                permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                    ? WorkbookPermission.LimitedView
-                    : WorkbookPermission.View,
+                permission: WorkbookPermission.LimitedView,
             })
             .then(() => {
                 acceptedWorkbooksMap.set(workbook.model, parentIds);

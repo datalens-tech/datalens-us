@@ -1,7 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import Utils from '../../../utils';
@@ -11,22 +10,6 @@ import {getPrimary} from '../utils';
 
 import {checkWorkbookByTitle} from './check-workbook-by-title';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['collectionId', 'title'],
-    properties: {
-        collectionId: {
-            type: ['string', 'null'],
-        },
-        title: {
-            type: 'string',
-        },
-        description: {
-            type: 'string',
-        },
-    },
-});
-
 export interface CreateWorkbookArgs {
     collectionId: Nullable<string>;
     title: string;
@@ -34,7 +17,7 @@ export interface CreateWorkbookArgs {
 }
 
 export const createWorkbook = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: CreateWorkbookArgs,
 ) => {
     const {title, description, collectionId} = args;
@@ -45,16 +28,11 @@ export const createWorkbook = async (
         collectionId: collectionId ? Utils.encodeId(collectionId) : null,
     });
 
-    if (!skipValidation) {
-        validateArgs(args);
-    }
-
     const {accessServiceEnabled, accessBindingsServiceEnabled} = ctx.config;
 
     const {
         user: {userId},
         tenantId,
-        projectId,
         isPrivateRoute,
     } = ctx.get('info');
     const registry = ctx.get('registry');
@@ -107,7 +85,6 @@ export const createWorkbook = async (
                 [WorkbookModelColumn.TitleLower]: title.toLowerCase(),
                 [WorkbookModelColumn.Description]: description ?? null,
                 [WorkbookModelColumn.TenantId]: tenantId,
-                [WorkbookModelColumn.ProjectId]: projectId,
                 [WorkbookModelColumn.CollectionId]: collectionId,
                 [WorkbookModelColumn.CreatedBy]: userId,
                 [WorkbookModelColumn.UpdatedBy]: userId,

@@ -6,7 +6,7 @@ export {
     KEY_REG,
 } from '../src/components/validation-schema-compiler';
 
-export {OrganizationPermission, ProjectPermission} from '../src/components/iam';
+export {OrganizationPermission} from '../src/components/iam';
 
 export {
     default as prepareResponse,
@@ -23,7 +23,7 @@ export {resolvePrivatePermissions} from '../src/components/private-permissions';
 
 export {setRegistryToContext} from '../src/components/app-context';
 
-export {registerApiRoute, initSwagger} from '../src/components/api-docs';
+export {registerApiRoute, initSwagger, ApiTag} from '../src/components/api-docs';
 export {
     makeParser,
     makeParserSync,

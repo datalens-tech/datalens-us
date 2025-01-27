@@ -1,4 +1,3 @@
-import {Feature, isEnabledFeature} from '../../../components/features';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
 import {CollectionInstance} from '../../../registry/common/entities/collection/types';
@@ -24,14 +23,13 @@ export const getCollectionsListByIds = async (
         includePermissionsInfo,
     });
 
-    const {tenantId, projectId} = ctx.get('info');
+    const {tenantId} = ctx.get('info');
     const registry = ctx.get('registry');
 
     const models = await CollectionModel.query(getReplica(trx))
         .where({
             [CollectionModelColumn.DeletedAt]: null,
             [CollectionModelColumn.TenantId]: tenantId,
-            [CollectionModelColumn.ProjectId]: projectId,
         })
         .whereIn(CollectionModelColumn.CollectionId, collectionIds)
         .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
@@ -61,9 +59,7 @@ export const getCollectionsListByIds = async (
         const promise = collection
             .checkPermission({
                 parentIds,
-                permission: isEnabledFeature(ctx, Feature.UseLimitedView)
-                    ? CollectionPermission.LimitedView
-                    : CollectionPermission.View,
+                permission: CollectionPermission.LimitedView,
             })
             .then(() => {
                 acceptedCollectionsMap.set(collection.model, parentIds);

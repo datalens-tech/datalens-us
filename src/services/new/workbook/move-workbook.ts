@@ -1,9 +1,7 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
-import {Feature, isEnabledFeature} from '../../../components/features';
-import {OrganizationPermission, ProjectPermission} from '../../../components/iam';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {OrganizationPermission} from '../../../components/iam';
 import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {CollectionPermission} from '../../../entities/collection';
@@ -17,22 +15,6 @@ import {getPrimary} from '../utils';
 import {checkWorkbookByTitle} from './check-workbook-by-title';
 import {getWorkbook} from './get-workbook';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['workbookId', 'collectionId'],
-    properties: {
-        workbookId: {
-            type: 'string',
-        },
-        collectionId: {
-            type: ['string', 'null'],
-        },
-        title: {
-            type: 'string',
-        },
-    },
-});
-
 export interface MoveWorkbookArgs {
     workbookId: string;
     collectionId: Nullable<string>;
@@ -40,7 +22,7 @@ export interface MoveWorkbookArgs {
 }
 
 export const moveWorkbook = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: MoveWorkbookArgs,
 ) => {
     const {workbookId, collectionId: newCollectionId, title: newTitle} = args;
@@ -51,10 +33,6 @@ export const moveWorkbook = async (
         newTitle,
     });
 
-    if (!skipValidation) {
-        validateArgs(args);
-    }
-
     const {accessServiceEnabled} = ctx.config;
 
     const {
@@ -64,7 +42,7 @@ export const moveWorkbook = async (
 
     const targetTrx = getPrimary(trx);
 
-    const {checkOrganizationPermission, checkProjectPermission} = registry.common.functions.get();
+    const {checkOrganizationPermission} = registry.common.functions.get();
 
     const workbook = await getWorkbook(
         {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions: true},
@@ -106,11 +84,6 @@ export const moveWorkbook = async (
             await newCollection.checkPermission({
                 parentIds: newCollectionParentIds,
                 permission: CollectionPermission.CreateWorkbook,
-            });
-        } else if (isEnabledFeature(ctx, Feature.ProjectsEnabled)) {
-            await checkProjectPermission({
-                ctx,
-                permission: ProjectPermission.CreateWorkbookInRoot,
             });
         } else {
             await checkOrganizationPermission({

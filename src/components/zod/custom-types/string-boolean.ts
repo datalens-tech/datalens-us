@@ -1,6 +1,5 @@
 import {z} from 'zod';
 
-import Utils from '../../../utils';
+import {isTrueArg} from '../../../utils/env-utils';
 
-export const stringBoolean = () =>
-    z.string().toLowerCase().transform(Utils.isTrueArg).pipe(z.boolean());
+export const stringBoolean = () => z.string().toLowerCase().transform(isTrueArg).pipe(z.boolean());

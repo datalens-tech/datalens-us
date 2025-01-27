@@ -39,7 +39,7 @@ export const validateCreateEntryInWorkbook = makeSchemaValidator({
         },
         scope: {
             type: 'string',
-            enum: ['connection', 'dataset', 'dash', 'widget', 'presentation', 'report'],
+            enum: ['connection', 'dataset', 'dash', 'widget', 'report'],
         },
         type: {
             type: 'string',
@@ -201,7 +201,6 @@ export async function createEntryInWorkbook(
 
     if (includePermissionsInfo) {
         permissions = getEntryPermissionsByWorkbook({
-            ctx,
             workbook,
             scope: resultEntry.scope,
         });
