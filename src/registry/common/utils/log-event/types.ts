@@ -12,7 +12,24 @@ import type {
     UpdateCollectionReqBody,
     UpdateCollectionReqParams,
 } from '../../../../controllers/collections/update-collection';
+import type {
+    CopyWorkbookReqBody,
+    CopyWorkbookReqParams,
+} from '../../../../controllers/workbooks/copy-workbook';
+import type {CreateWorkbookReqBody} from '../../../../controllers/workbooks/create-workbook';
+import type {DeleteWorkbookReqParams} from '../../../../controllers/workbooks/delete-workbook';
+import type {DeleteWorkbooksListReqBody} from '../../../../controllers/workbooks/delete-workbooks-list';
+import type {
+    MoveWorkbookReqBody,
+    MoveWorkbookReqParams,
+} from '../../../../controllers/workbooks/move-workbook';
+import type {MoveWorkbooksListReqBody} from '../../../../controllers/workbooks/move-workbooks-list';
+import type {
+    UpdateWorkbookReqBody,
+    UpdateWorkbookReqParams,
+} from '../../../../controllers/workbooks/update-workbook';
 import type {CollectionModel} from '../../../../db/models/new/collection';
+import type {WorkbookModel} from '../../../../db/models/new/workbook';
 
 export enum LogEventType {
     CreateCollectionSuccess = 'createCollectionSuccess',
@@ -32,6 +49,27 @@ export enum LogEventType {
 
     DeleteCollectionsListSuccess = 'deleteCollectionsListSuccess',
     DeleteCollectionsListFail = 'deleteCollectionsListFail',
+
+    CreateWorkbookSuccess = 'createWorkbookSuccess',
+    CreateWorkbookFail = 'createWorkbookFail',
+
+    UpdateWorkbookSuccess = 'updateWorkbookSuccess',
+    UpdateWorkbookFail = 'updateWorkbookFail',
+
+    CopyWorkbookSuccess = 'copyWorkbookSuccess',
+    CopyWorkbookFail = 'copyWorkbookFail',
+
+    DeleteWorkbookSuccess = 'deleteWorkbookSuccess',
+    DeleteWorkbookFail = 'deleteWorkbookFail',
+
+    DeleteWorkbooksListSuccess = 'deleteWorkbooksListSuccess',
+    DeleteWorkbooksListFail = 'deleteWorkbooksListFail',
+
+    MoveWorkbookSuccess = 'moveWorkbookSuccess',
+    MoveWorkbookFail = 'moveWorkbookFail',
+
+    MoveWorkbooksListSuccess = 'moveWorkbooksListSuccess',
+    MoveWorkbooksListFail = 'moveWorkbooksListFail',
 }
 
 interface EventParams {
@@ -127,6 +165,110 @@ export interface LogEventDeleteCollectionsListFailParams extends EventParams {
     error: unknown;
 }
 
+export interface LogEventCreateWorkbookSuccessParams extends EventParams {
+    type: LogEventType.CreateWorkbookSuccess;
+
+    reqBody: CreateWorkbookReqBody;
+    workbook: WorkbookModel;
+}
+
+export interface LogEventCreateWorkbookFailParams extends EventParams {
+    type: LogEventType.CreateWorkbookFail;
+
+    reqBody: CreateWorkbookReqBody;
+    error: unknown;
+}
+
+export interface LogEventUpdateWorkbookSuccessParams extends EventParams {
+    type: LogEventType.UpdateWorkbookSuccess;
+
+    reqBody: UpdateWorkbookReqBody;
+    reqParams: UpdateWorkbookReqParams;
+    workbook: WorkbookModel;
+}
+
+export interface LogEventUpdateWorkbookFailParams extends EventParams {
+    type: LogEventType.UpdateWorkbookFail;
+
+    reqBody: UpdateWorkbookReqBody;
+    reqParams: UpdateWorkbookReqParams;
+    error: unknown;
+}
+
+export interface LogEventCopyWorkbookSuccessParams extends EventParams {
+    type: LogEventType.CopyWorkbookSuccess;
+
+    reqBody: CopyWorkbookReqBody;
+    reqParams: CopyWorkbookReqParams;
+    workbook: WorkbookModel;
+}
+
+export interface LogEventCopyWorkbookFailParams extends EventParams {
+    type: LogEventType.CopyWorkbookFail;
+
+    reqBody: CopyWorkbookReqBody;
+    reqParams: CopyWorkbookReqParams;
+    error: unknown;
+}
+
+export interface LogEventMoveWorkbookSuccessParams extends EventParams {
+    type: LogEventType.MoveWorkbookSuccess;
+
+    reqBody: MoveWorkbookReqBody;
+    reqParams: MoveWorkbookReqParams;
+    workbook: WorkbookModel;
+}
+
+export interface LogEventMoveWorkbookFailParams extends EventParams {
+    type: LogEventType.MoveWorkbookFail;
+
+    reqBody: MoveWorkbookReqBody;
+    reqParams: MoveWorkbookReqParams;
+    error: unknown;
+}
+
+export interface LogEventDeleteWorkbookSuccessParams extends EventParams {
+    type: LogEventType.DeleteWorkbookSuccess;
+
+    reqParams: DeleteWorkbookReqParams;
+    workbooks: WorkbookModel[];
+}
+
+export interface LogEventDeleteWorkbookFailParams extends EventParams {
+    type: LogEventType.DeleteWorkbookFail;
+
+    reqParams: DeleteWorkbookReqParams;
+    error: unknown;
+}
+
+export interface LogEventDeleteWorkbooksListSuccessParams extends EventParams {
+    type: LogEventType.DeleteWorkbooksListSuccess;
+
+    reqBody: DeleteWorkbooksListReqBody;
+    workbooks: WorkbookModel[];
+}
+
+export interface LogEventDeleteWorkbooksListFailParams extends EventParams {
+    type: LogEventType.DeleteWorkbooksListFail;
+
+    reqBody: DeleteWorkbooksListReqBody;
+    error: unknown;
+}
+
+export interface LogEventMoveWorkbooksListSuccessParams extends EventParams {
+    type: LogEventType.MoveWorkbooksListSuccess;
+
+    reqBody: MoveWorkbooksListReqBody;
+    workbooks: WorkbookModel[];
+}
+
+export interface LogEventMoveWorkbooksListFailParams extends EventParams {
+    type: LogEventType.MoveWorkbooksListFail;
+
+    reqBody: MoveWorkbooksListReqBody;
+    error: unknown;
+}
+
 export type LogEventParams =
     | LogEventCreateCollectionSuccessParams
     | LogEventCreateCollectionFailParams
@@ -139,6 +281,20 @@ export type LogEventParams =
     | LogEventDeleteCollectionSuccessParams
     | LogEventDeleteCollectionFailParams
     | LogEventDeleteCollectionsListSuccessParams
-    | LogEventDeleteCollectionsListFailParams;
+    | LogEventDeleteCollectionsListFailParams
+    | LogEventCreateWorkbookSuccessParams
+    | LogEventCreateWorkbookFailParams
+    | LogEventUpdateWorkbookSuccessParams
+    | LogEventUpdateWorkbookFailParams
+    | LogEventCopyWorkbookSuccessParams
+    | LogEventCopyWorkbookFailParams
+    | LogEventMoveWorkbookSuccessParams
+    | LogEventMoveWorkbookFailParams
+    | LogEventDeleteWorkbookSuccessParams
+    | LogEventDeleteWorkbookFailParams
+    | LogEventDeleteWorkbooksListSuccessParams
+    | LogEventDeleteWorkbooksListFailParams
+    | LogEventMoveWorkbooksListSuccessParams
+    | LogEventMoveWorkbooksListFailParams;
 
 export type LogEvent = (params: LogEventParams) => void;
