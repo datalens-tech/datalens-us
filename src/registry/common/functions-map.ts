@@ -13,6 +13,7 @@ import type {
     GetEntryBeforeDbRequestHook,
     IsNeedBypassEntryByKey,
 } from './utils/entry/types';
+import type {LogEvent} from './utils/log-event/types';
 
 export const commonFunctionsMap = {
     bulkFetchWorkbooksAllPermissions: makeFunctionTemplate<BulkFetchWorkbooksAllPermissions>(),
@@ -26,4 +27,5 @@ export const commonFunctionsMap = {
     checkEmbedding: makeFunctionTemplate<CheckEmbedding>(),
     checkCreateEntryAvailability: makeFunctionTemplate<CheckCreateEntryAvailability>(),
     checkUpdateEntryAvailability: makeFunctionTemplate<CheckUpdateEntryAvailability>(),
+    logEvent: makeFunctionTemplate<LogEvent>(),
 } as const;
