@@ -3,6 +3,7 @@ import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
+import {LogEventType} from '../../registry/common/utils/log-event/types';
 import {moveWorkbook} from '../../services/new/workbook';
 
 import {WorkbookResponseModel, workbookModel} from './response-models';
@@ -17,24 +18,51 @@ const requestSchema = {
     }),
 };
 
+export type MoveWorkbookReqParams = z.infer<typeof requestSchema.params>;
+
+export type MoveWorkbookReqBody = z.infer<typeof requestSchema.body>;
+
 const parseReq = makeReqParser(requestSchema);
 
 const controller: AppRouteHandler = async (req, res: Response<WorkbookResponseModel>) => {
     const {params, body} = await parseReq(req);
 
-    const result = await moveWorkbook(
-        {
-            ctx: req.ctx,
-            skipValidation: true,
-        },
-        {
-            workbookId: params.workbookId,
-            collectionId: body.collectionId,
-            title: body.title,
-        },
-    );
+    const registry = req.ctx.get('registry');
+    const {logEvent} = registry.common.functions.get();
 
-    res.status(200).send(workbookModel.format(result));
+    try {
+        const result = await moveWorkbook(
+            {
+                ctx: req.ctx,
+                skipValidation: true,
+            },
+            {
+                workbookId: params.workbookId,
+                collectionId: body.collectionId,
+                title: body.title,
+            },
+        );
+
+        logEvent({
+            type: LogEventType.MoveWorkbookSuccess,
+            ctx: req.ctx,
+            reqBody: body,
+            reqParams: params,
+            workbook: result,
+        });
+
+        res.status(200).send(workbookModel.format(result));
+    } catch (error) {
+        logEvent({
+            type: LogEventType.MoveWorkbookFail,
+            ctx: req.ctx,
+            reqBody: body,
+            reqParams: params,
+            error,
+        });
+
+        throw error;
+    }
 };
 
 controller.api = {
