@@ -8,7 +8,7 @@ const schema = z
     .object({
         collections: collectionModel.schema.array(),
     })
-    .describe('Deleted collections');
+    .describe('Collection model array in object');
 
 const format = async (data: {collections: CollectionModel[]}): Promise<z.infer<typeof schema>> => {
     return {

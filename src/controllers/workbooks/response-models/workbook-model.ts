@@ -17,7 +17,9 @@ const schema = z
     })
     .describe('Workbook model');
 
-const format = (data: WorkbookModel): z.infer<typeof schema> => {
+export type WorkbookResponseModel = z.infer<typeof schema>;
+
+const format = (data: WorkbookModel): WorkbookResponseModel => {
     return {
         workbookId: Utils.encodeId(data.workbookId),
         collectionId: data.collectionId ? Utils.encodeId(data.collectionId) : null,
