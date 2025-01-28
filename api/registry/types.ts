@@ -14,6 +14,20 @@ export type {
     LogEventDeleteCollectionFailParams,
     LogEventDeleteCollectionsListSuccessParams,
     LogEventDeleteCollectionsListFailParams,
+    LogEventCopyWorkbookFailParams,
+    LogEventCopyWorkbookSuccessParams,
+    LogEventCreateWorkbookFailParams,
+    LogEventCreateWorkbookSuccessParams,
+    LogEventDeleteWorkbookFailParams,
+    LogEventDeleteWorkbookSuccessParams,
+    LogEventDeleteWorkbooksListFailParams,
+    LogEventDeleteWorkbooksListSuccessParams,
+    LogEventMoveWorkbookFailParams,
+    LogEventMoveWorkbookSuccessParams,
+    LogEventMoveWorkbooksListFailParams,
+    LogEventMoveWorkbooksListSuccessParams,
+    LogEventUpdateWorkbookFailParams,
+    LogEventUpdateWorkbookSuccessParams,
 } from '../../src/registry/common/utils/log-event/types';
 export {LogEventType} from '../../src/registry/common/utils/log-event/types';
 export type {GatewayApi} from '../../src/registry';
