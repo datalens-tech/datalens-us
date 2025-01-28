@@ -3,6 +3,7 @@ import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
+import {LogEventType} from '../../registry/common/utils/log-event/types';
 import {moveWorkbooksList} from '../../services/new/workbook';
 
 import {
@@ -17,6 +18,8 @@ const requestSchema = {
     }),
 };
 
+export type MoveWorkbooksListReqBody = z.infer<typeof requestSchema.body>;
+
 const parseReq = makeReqParser(requestSchema);
 
 const controller: AppRouteHandler = async (
@@ -25,17 +28,38 @@ const controller: AppRouteHandler = async (
 ) => {
     const {body} = await parseReq(req);
 
-    const result = await moveWorkbooksList(
-        {
-            ctx: req.ctx,
-        },
-        {
-            workbookIds: body.workbookIds,
-            collectionId: body.collectionId,
-        },
-    );
+    const registry = req.ctx.get('registry');
+    const {logEvent} = registry.common.functions.get();
 
-    res.status(200).send(await workbookModelArrayInObject.format(result));
+    try {
+        const result = await moveWorkbooksList(
+            {
+                ctx: req.ctx,
+            },
+            {
+                workbookIds: body.workbookIds,
+                collectionId: body.collectionId,
+            },
+        );
+
+        logEvent({
+            type: LogEventType.MoveWorkbooksListSuccess,
+            ctx: req.ctx,
+            reqBody: body,
+            workbooks: result.workbooks,
+        });
+
+        res.status(200).send(await workbookModelArrayInObject.format(result));
+    } catch (error) {
+        logEvent({
+            type: LogEventType.MoveWorkbooksListFail,
+            ctx: req.ctx,
+            reqBody: body,
+            error,
+        });
+
+        throw error;
+    }
 };
 
 controller.api = {

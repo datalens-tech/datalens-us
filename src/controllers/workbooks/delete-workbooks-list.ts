@@ -3,6 +3,7 @@ import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
+import {LogEventType} from '../../registry/common/utils/log-event/types';
 import {deleteWorkbooks} from '../../services/new/workbook';
 
 import {
@@ -16,6 +17,8 @@ const requestSchema = {
     }),
 };
 
+export type DeleteWorkbooksListReqBody = z.infer<typeof requestSchema.body>;
+
 const parseReq = makeReqParser(requestSchema);
 
 const controller: AppRouteHandler = async (
@@ -24,16 +27,37 @@ const controller: AppRouteHandler = async (
 ) => {
     const {body} = await parseReq(req);
 
-    const result = await deleteWorkbooks(
-        {
-            ctx: req.ctx,
-        },
-        {
-            workbookIds: body.workbookIds,
-        },
-    );
+    const registry = req.ctx.get('registry');
+    const {logEvent} = registry.common.functions.get();
 
-    res.status(200).send(await workbookModelArrayInObject.format(result));
+    try {
+        const result = await deleteWorkbooks(
+            {
+                ctx: req.ctx,
+            },
+            {
+                workbookIds: body.workbookIds,
+            },
+        );
+
+        logEvent({
+            type: LogEventType.DeleteWorkbooksListSuccess,
+            ctx: req.ctx,
+            reqBody: body,
+            workbooks: result.workbooks,
+        });
+
+        res.status(200).send(await workbookModelArrayInObject.format(result));
+    } catch (error) {
+        logEvent({
+            type: LogEventType.DeleteWorkbooksListFail,
+            ctx: req.ctx,
+            reqBody: body,
+            error,
+        });
+
+        throw error;
+    }
 };
 
 controller.api = {
