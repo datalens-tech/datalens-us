@@ -8,7 +8,7 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-    return knex.raw(`DROP INDEX IF EXISTS entries_tenant_id_scope_idx;`);
+    return knex.raw(`DROP INDEX entries_tenant_id_scope_idx;`);
 }
 
 export const config = {
