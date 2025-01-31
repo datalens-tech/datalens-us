@@ -1,15 +1,6 @@
-import {AppError} from '@gravity-ui/nodekit';
-
 import {Model} from '../../..';
-import {US_ERRORS} from '../../../../const';
 
 export class DataExport extends Model {
-    static createNotFoundError() {
-        return new AppError(US_ERRORS.NOT_FOUND_DATA_EXPORT, {
-            code: US_ERRORS.NOT_FOUND_DATA_EXPORT,
-        });
-    }
-
     static get tableName() {
         return 'data_exports';
     }
