@@ -6,8 +6,7 @@ console.log('Checking migration timestamp consistency...');
 try {
     execSync('git fetch origin main');
 } catch (error) {
-    console.error('Failed to fetch main:');
-    console.error(error.message);
+    console.error('Failed to fetch main:', error.message);
     process.exit(1);
 }
 
@@ -28,7 +27,7 @@ const getNewMigrationFiles = (migrationsFolder) => {
         return addedFiles;
     } catch (err) {
         console.error('Error while getting added migrations:', err.message);
-        return [];
+        process.exit(1);
     }
 };
 
