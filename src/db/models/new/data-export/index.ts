@@ -25,6 +25,7 @@ export class DataExport extends Model {
     updatedAt!: Nullable<string>;
     expiredAt!: string;
     jobId!: string;
-    resultLink!: Nullable<string>;
+    s3Key!: Nullable<string>;
+    uploadId!: Nullable<string>;
     error!: Nullable<Record<string, unknown>>;
 }
