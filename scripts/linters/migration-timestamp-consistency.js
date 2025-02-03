@@ -34,7 +34,7 @@ const getNewMigrationFiles = (migrationsFolder) => {
 const extractTimestamp = (file) => {
     const baseName = path.basename(file);
 
-    const timestamp = parseInt(baseName.split('/').at(0), 10);
+    const timestamp = parseInt(baseName.split('_').at(0), 10);
 
     return timestamp;
 };
