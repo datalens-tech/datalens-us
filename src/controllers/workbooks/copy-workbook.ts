@@ -15,11 +15,10 @@ const requestSchema = {
     params: z.object({
         workbookId: zc.encodedId(),
     }),
-    body: z
-        .object({
-            collectionId: zc.encodedId().optional().nullable(),
-        })
-        .and(z.union([z.object({title: z.string()}), z.object({newTitle: z.string()})])),
+    body: z.object({
+        collectionId: zc.encodedId().optional().nullable(),
+        title: z.string(),
+    }),
 };
 
 export type CopyWorkbookReqParams = z.infer<typeof requestSchema.params>;
@@ -45,8 +44,7 @@ const controller: AppRouteHandler = async (
             {
                 workbookId: params.workbookId,
                 collectionId: body.collectionId ?? null,
-                // newTitle for compatibility
-                title: 'title' in body ? body.title : body.newTitle,
+                title: body.title,
             },
         );
 
