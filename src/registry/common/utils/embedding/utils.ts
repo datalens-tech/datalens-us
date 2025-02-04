@@ -1,5 +1,3 @@
-import type {CheckEmbedding, CheckEmbeddingAvailability} from './types';
+import type {CheckEmbedding} from './types';
 
 export const checkEmbedding: CheckEmbedding = () => false;
-
-export const checkEmbeddingAvailability: CheckEmbeddingAvailability = () => Promise.resolve();
