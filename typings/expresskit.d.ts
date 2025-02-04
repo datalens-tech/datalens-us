@@ -1,4 +1,4 @@
-import type {PlatformAppRouteHandler, PlatformAppRouteParams} from './types';
+import type {PlatformAppRouteHandler, PlatformAppRouteParams} from '../../src/types/expresskit';
 
 declare module '@gravity-ui/expresskit' {
     interface AppRouteParams extends PlatformAppRouteParams {}

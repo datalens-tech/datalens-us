@@ -1,7 +1,8 @@
-import type {CtxUser} from '../../src/components/auth/types/user';
-import {FeaturesConfig} from '../../src/components/features/types';
-import type {Registry} from '../../src/registry';
-import {CtxInfo} from '../../src/types/ctx';
+import type {CtxUser} from '../components/auth/types/user';
+import {FeaturesConfig} from '../components/features/types';
+import type {Registry} from '../registry';
+
+import {CtxInfo} from './ctx';
 
 export interface PlatformAppConfig {
     features: FeaturesConfig;
