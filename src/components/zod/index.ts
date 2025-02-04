@@ -2,7 +2,7 @@ import {extendZodWithOpenApi} from '@asteasolutions/zod-to-openapi';
 import {AppError} from '@gravity-ui/nodekit';
 import {ZodError, ZodTypeAny, z} from 'zod';
 
-import US_ERRORS from '../../const/us-error-constants';
+import {US_ERRORS} from '../../const/errors';
 
 import * as zc from './custom-types';
 

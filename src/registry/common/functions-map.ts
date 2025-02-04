@@ -4,8 +4,9 @@ import type {GetZitadelUserRole} from '../zitadel/types';
 import type {CheckOrganizationPermission} from './components/iam/types';
 import type {BulkFetchCollectionsAllPermissions} from './entities/collection/types';
 import type {BulkFetchWorkbooksAllPermissions} from './entities/workbook/types';
+import type {CheckBrandingAvailability} from './utils/branding/types';
 import type {ColorPalettesAdminValidator} from './utils/color-palettes/types';
-import type {CheckEmbedding} from './utils/embedding/types';
+import type {CheckEmbedding, CheckEmbeddingAvailability} from './utils/embedding/types';
 import type {
     CheckCreateEntryAvailability,
     CheckUpdateEntryAvailability,
@@ -25,6 +26,8 @@ export const commonFunctionsMap = {
     getEntryBeforeDbRequestHook: makeFunctionTemplate<GetEntryBeforeDbRequestHook>(),
     getEntryAddFormattedFieldsHook: makeFunctionTemplate<GetEntryAddFormattedFieldsHook>(),
     checkEmbedding: makeFunctionTemplate<CheckEmbedding>(),
+    checkEmbeddingAvailability: makeFunctionTemplate<CheckEmbeddingAvailability>(),
+    checkBrandingAvailability: makeFunctionTemplate<CheckBrandingAvailability>(),
     checkCreateEntryAvailability: makeFunctionTemplate<CheckCreateEntryAvailability>(),
     checkUpdateEntryAvailability: makeFunctionTemplate<CheckUpdateEntryAvailability>(),
     logEvent: makeFunctionTemplate<LogEvent>(),

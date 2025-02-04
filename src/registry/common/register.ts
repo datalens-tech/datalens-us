@@ -7,8 +7,9 @@ import {Collection} from './entities/collection/collection';
 import {bulkFetchCollectionsAllPermissions} from './entities/collection/utils';
 import {bulkFetchWorkbooksAllPermissions} from './entities/workbook/utils';
 import {Workbook} from './entities/workbook/workbook';
+import {checkBrandingAvailability} from './utils/branding/utils';
 import {colorPalettesAdminValidator} from './utils/color-palettes/utils';
-import {checkEmbedding} from './utils/embedding/utils';
+import {checkEmbedding, checkEmbeddingAvailability} from './utils/embedding/utils';
 import {
     checkCreateEntryAvailability,
     checkUpdateEntryAvailability,
@@ -35,6 +36,8 @@ export const registerCommonPlugins = () => {
         getEntryBeforeDbRequestHook,
         getEntryAddFormattedFieldsHook,
         checkEmbedding,
+        checkEmbeddingAvailability,
+        checkBrandingAvailability,
         checkCreateEntryAvailability,
         checkUpdateEntryAvailability,
         logEvent,

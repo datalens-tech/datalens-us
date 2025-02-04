@@ -5,7 +5,7 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {DBError} from 'db-errors';
 
-import US_ERRORS from '../const/us-error-constants';
+import {US_ERRORS} from '../const/errors';
 
 const PG_ERRORS = require('pg-error-constants');
 

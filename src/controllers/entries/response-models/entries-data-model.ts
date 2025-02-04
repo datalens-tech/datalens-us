@@ -4,8 +4,7 @@ import {z, zc} from '../../../components/zod';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import type {GetJoinedEntriesRevisionsByIdsResult} from '../../../services/new/entry';
 import Utils from '../../../utils';
-
-import {ACCESS_DENIED_ERROR_CODE, NOT_FOUND_ERROR_CODE} from './constants';
+import {ACCESS_DENIED_ERROR_CODE, NOT_FOUND_ERROR_CODE} from '../get-entries-data/constants';
 
 const errorSchema = z.object({
     error: z.object({
@@ -88,7 +87,7 @@ const format = ({
     return formattedResult;
 };
 
-export const entriesData = {
+export const entriesDataModel = {
     schema,
     format,
 };
