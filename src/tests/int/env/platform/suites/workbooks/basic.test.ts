@@ -440,7 +440,7 @@ describe('Entries in workboooks managment', () => {
                 accessBindings: [getWorkbookBinding(testWorkbookId, 'copy')],
             },
         ).send({
-            newTitle: testNewTitle,
+            title: testNewTitle,
         });
 
         const {body} = response;
