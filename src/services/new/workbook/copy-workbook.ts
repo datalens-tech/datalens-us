@@ -274,6 +274,8 @@ export async function crossSyncCopiedJoinedEntryRevisions({
     ctx: AppContext;
     trx: TransactionOrKnex;
 }) {
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_START');
+
     const newByOldEntryIdMap = new Map<string, string>();
 
     const arCopiedJoinedEntryRevisions = copiedJoinedEntryRevisions.map(
@@ -311,6 +313,8 @@ export async function crossSyncCopiedJoinedEntryRevisions({
             return crossSyncCopiedJoinedEntryRevision({copiedJoinedEntryRevision, ctx, trx});
         }),
     );
+
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_FINISH');
 }
 
 async function crossSyncCopiedJoinedEntryRevision({
@@ -322,6 +326,10 @@ async function crossSyncCopiedJoinedEntryRevision({
     ctx: AppContext;
     trx: TransactionOrKnex;
 }) {
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISION_START', {
+        entryId: Utils.encodeId(copiedJoinedEntryRevision.entryId),
+    });
+
     const syncedLinksWithReplacedIds = copiedJoinedEntryRevision.links as Nullable<
         Record<string, string>
     >;
@@ -343,4 +351,6 @@ async function crossSyncCopiedJoinedEntryRevision({
             links: syncedLinksWithReplacedIds,
         })
         .timeout(RevisionModel.DEFAULT_QUERY_TIMEOUT);
+
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISION_FINISH');
 }
