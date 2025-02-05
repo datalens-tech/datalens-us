@@ -8,8 +8,6 @@ const {getKnexOptions} = require('../../dist/server/db/init-db');
 const {getTestDsnList} = require('../../dist/server/tests/int/db');
 const {truncateTables, tableExists} = require('../../dist/server/tests/int/utils');
 
-const {truncateTables, tableExists} = require('./helpers');
-
 const prepareTestUsDb = async ({dsnList}) => {
     const knexOptions = _.merge({}, getKnexOptions(), {
         connection: dsnList,
