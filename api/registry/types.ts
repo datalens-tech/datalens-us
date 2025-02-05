@@ -28,6 +28,12 @@ export type {
     LogEventMoveWorkbooksListSuccessParams,
     LogEventUpdateWorkbookFailParams,
     LogEventUpdateWorkbookSuccessParams,
+    LogEventCreateColorPaletteFailParams,
+    LogEventCreateColorPaletteSuccessParams,
+    LogEventDeleteColorPaletteFailParams,
+    LogEventDeleteColorPaletteSuccessParams,
+    LogEventUpdateColorPaletteFailParams,
+    LogEventUpdateColorPaletteSuccessParams,
 } from '../../src/registry/common/utils/log-event/types';
 export {LogEventType} from '../../src/registry/common/utils/log-event/types';
 export type {GatewayApi} from '../../src/registry';

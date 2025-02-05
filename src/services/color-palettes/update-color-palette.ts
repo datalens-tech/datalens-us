@@ -1,39 +1,12 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {makeSchemaValidator} from '../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../const';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
 import {WorkbookModel} from '../../db/models/new/workbook';
 import {ServiceArgs} from '../../services/new/types';
 import {getPrimary} from '../../services/new/utils';
 import Utils from '../../utils';
-
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['colorPaletteId', 'displayName', 'colors', 'isGradient', 'isDefault'],
-    properties: {
-        colorPaletteId: {
-            type: 'string',
-        },
-        displayName: {
-            type: 'string',
-        },
-        colors: {
-            type: 'array',
-            items: {
-                type: 'string',
-                pattern: '^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$',
-            },
-        },
-        isGradient: {
-            type: 'boolean',
-        },
-        isDefault: {
-            type: 'boolean',
-        },
-    },
-});
 
 export interface UpdateColorPaletteArgs {
     colorPaletteId: string;
@@ -43,10 +16,7 @@ export interface UpdateColorPaletteArgs {
     isDefault: boolean;
 }
 
-export const updateColorPalette = async (
-    {ctx, trx, skipValidation = false}: ServiceArgs,
-    args: UpdateColorPaletteArgs,
-) => {
+export const updateColorPalette = async ({ctx, trx}: ServiceArgs, args: UpdateColorPaletteArgs) => {
     const {colorPaletteId, displayName, colors, isGradient, isDefault} = args;
 
     ctx.log('UPDATE_COLOR_PALETTE_START', {
@@ -56,11 +26,6 @@ export const updateColorPalette = async (
         isGradient,
         isDefault,
     });
-
-    if (!skipValidation) {
-        // Is `colorPalettesAdminValidator(ctx)` needed here?
-        validateArgs(args);
-    }
 
     const {tenantId} = ctx.get('info');
 

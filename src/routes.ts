@@ -497,19 +497,19 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
         }),
         createColorPalette: makeRoute({
             route: 'POST /v1/color-palettes',
-            handler: colorPalettesController.create,
+            handler: colorPalettesController.createColorPalette,
             write: true,
             features: [Feature.ColorPalettesEnabled],
         }),
         updateColorPalette: makeRoute({
             route: 'POST /v1/color-palettes/:colorPaletteId/update',
-            handler: colorPalettesController.update,
+            handler: colorPalettesController.updateColorPalette,
             write: true,
             features: [Feature.ColorPalettesEnabled],
         }),
         deleteColorPalette: makeRoute({
             route: 'DELETE /v1/color-palettes/:colorPaletteId',
-            handler: colorPalettesController.delete,
+            handler: colorPalettesController.deleteColorPalette,
             write: true,
             features: [Feature.ColorPalettesEnabled],
         }),
