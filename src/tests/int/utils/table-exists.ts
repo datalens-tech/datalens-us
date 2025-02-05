@@ -1,4 +1,6 @@
-module.exports = async (knex, table = 'migrations') => {
+import type {Knex} from 'knex';
+
+export const tableExists = async (knex: Knex, table = 'migrations') => {
     const result = await knex.raw(
         `
             SELECT EXISTS (
