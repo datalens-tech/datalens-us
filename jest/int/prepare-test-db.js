@@ -1,3 +1,5 @@
+const path = require('path');
+
 const DSNParser = require('dsn-parser');
 const knexBuilder = require('knex');
 const _ = require('lodash');
@@ -5,50 +7,24 @@ const _ = require('lodash');
 const {getKnexOptions} = require('../../dist/server/db/init-db');
 const {getTestDsnList} = require('../../dist/server/tests/int/db');
 
-const tableExists = async (knex, table) => {
-    const nodesExistsResult = await knex.raw(
-        `
-            SELECT EXISTS (
-                SELECT FROM information_schema.tables
-                WHERE table_schema = 'public'
-                AND table_name = ?
-            );
-        `,
-        [table],
-    );
-
-    return nodesExistsResult.rows[0].exists;
-};
-
-async function truncateTables(knex) {
-    const tables = await knex
-        .select('table_name')
-        .from('information_schema.tables')
-        .where({
-            table_schema: 'public',
-            table_type: 'BASE TABLE',
-        })
-        .whereNotIn('table_name', ['migrations', 'migrations_lock', 'tenants']);
-
-    for (const table of tables) {
-        await knex.raw(`TRUNCATE TABLE "${table.tableName}" RESTART IDENTITY CASCADE`);
-    }
-}
+const {truncateTables, tableExists} = require('./helpers');
 
 const prepareTestUsDb = async ({dsnList}) => {
     const knexOptions = _.merge({}, getKnexOptions(), {
         connection: dsnList,
+        seeds: {
+            directory: path.resolve(__dirname, '../../dist/server/tests/int/seeds'),
+        },
     });
 
     const knexInstance = knexBuilder(knexOptions);
 
-    const exists = await tableExists(knexInstance, 'entries');
+    const exists = await tableExists(knexInstance);
 
     if (exists) {
         await truncateTables(knexInstance);
     } else {
         await knexInstance.raw(`
-            CREATE SCHEMA IF NOT EXISTS public;
             CREATE EXTENSION IF NOT EXISTS pg_trgm;
             CREATE EXTENSION IF NOT EXISTS btree_gin;
             CREATE EXTENSION IF NOT EXISTS btree_gist;
@@ -56,6 +32,8 @@ const prepareTestUsDb = async ({dsnList}) => {
         `);
         await knexInstance.migrate.latest();
     }
+
+    await knexInstance.seed.run();
 
     await knexInstance.destroy();
 };
