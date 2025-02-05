@@ -73,6 +73,7 @@ controller.api = {
     summary: 'Update color palette',
     tags: [ApiTag.ColorPalettes],
     request: {
+        params: requestSchema.params,
         body: {
             content: {
                 [CONTENT_TYPE_JSON]: {
