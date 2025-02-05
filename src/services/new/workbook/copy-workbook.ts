@@ -274,6 +274,8 @@ export async function crossSyncCopiedJoinedEntryRevisions({
     ctx: AppContext;
     trx: TransactionOrKnex;
 }) {
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_START');
+
     const newByOldEntryIdMap = new Map<string, string>();
 
     const arCopiedJoinedEntryRevisions = copiedJoinedEntryRevisions.map(
@@ -291,26 +293,39 @@ export async function crossSyncCopiedJoinedEntryRevisions({
     }
 
     await Utils.waitNextMacrotask();
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_JSON_STRINGIFY_START');
+
     let strCopiedJoinedEntryRevisions = JSON.stringify(arCopiedJoinedEntryRevisions);
+
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_JSON_STRINGIFY_FINISH');
 
     for (const [key, value] of newByOldEntryIdMap) {
         await Utils.waitNextMacrotask();
+        ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_REPLACE_START');
         strCopiedJoinedEntryRevisions = strCopiedJoinedEntryRevisions.replace(
             new RegExp(value, 'g'),
             key,
         );
+        ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_REPLACE_FINISH');
     }
 
     await Utils.waitNextMacrotask();
+
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_PARSE_START');
+
     const arCopiedJoinedEntryRevisionsWithReplacedIds = JSON.parse(
         strCopiedJoinedEntryRevisions,
     ) as JoinedEntryRevisionColumns[];
+
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_PARSE_FINISH');
 
     await Promise.all(
         arCopiedJoinedEntryRevisionsWithReplacedIds.map((copiedJoinedEntryRevision) => {
             return crossSyncCopiedJoinedEntryRevision({copiedJoinedEntryRevision, ctx, trx});
         }),
     );
+
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_FINISH');
 }
 
 async function crossSyncCopiedJoinedEntryRevision({
@@ -322,6 +337,10 @@ async function crossSyncCopiedJoinedEntryRevision({
     ctx: AppContext;
     trx: TransactionOrKnex;
 }) {
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISION_START', {
+        entryId: copiedJoinedEntryRevision.entryId,
+    });
+
     const syncedLinksWithReplacedIds = copiedJoinedEntryRevision.links as Nullable<
         Record<string, string>
     >;
@@ -343,4 +362,6 @@ async function crossSyncCopiedJoinedEntryRevision({
             links: syncedLinksWithReplacedIds,
         })
         .timeout(RevisionModel.DEFAULT_QUERY_TIMEOUT);
+
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISION_FINISH');
 }
