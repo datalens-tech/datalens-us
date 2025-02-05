@@ -60,13 +60,14 @@ const getMaxTimestampInMain = (migrationsFolder) => {
 };
 
 const newMigrationFiles = getNewMigrationFiles(migrationsFolder);
-const latestMainTimestamp = getMaxTimestampInMain(migrationsFolder);
 
 if (newMigrationFiles.length === 0) {
     console.log('OK. No migrations added.');
 
     process.exit(0);
 }
+
+const latestMainTimestamp = getMaxTimestampInMain(migrationsFolder);
 
 const invalidFiles = [];
 newMigrationFiles.forEach((file) => {

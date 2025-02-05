@@ -404,7 +404,7 @@ describe('Entries in workboooks managment', () => {
                 role: OpensourceRole.Editor,
             },
         ).send({
-            newTitle: testNewTitle,
+            title: testNewTitle,
         });
 
         const {body} = response;
