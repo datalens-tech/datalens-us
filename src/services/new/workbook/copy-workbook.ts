@@ -311,13 +311,13 @@ export async function crossSyncCopiedJoinedEntryRevisions({
 
     await Utils.waitNextMacrotask();
 
-    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_PARSE_START');
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_JSON_PARSE_START');
 
     const arCopiedJoinedEntryRevisionsWithReplacedIds = JSON.parse(
         strCopiedJoinedEntryRevisions,
     ) as JoinedEntryRevisionColumns[];
 
-    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_PARSE_FINISH');
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_JSON_PARSE_FINISH');
 
     await Promise.all(
         arCopiedJoinedEntryRevisionsWithReplacedIds.map((copiedJoinedEntryRevision) => {
