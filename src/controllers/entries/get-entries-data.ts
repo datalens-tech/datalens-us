@@ -1,12 +1,13 @@
 import {AppRouteHandler, Request, Response} from '@gravity-ui/expresskit';
 
-import {ApiTag} from '../../../components/api-docs';
-import {makeReqParser, z, zc} from '../../../components/zod';
-import {CONTENT_TYPE_JSON} from '../../../const';
-import {EntryScope} from '../../../db/models/new/entry/types';
-import {getJoinedEntriesRevisionsByIds} from '../../../services/new/entry';
-import {entriesDataModel} from '../response-models';
-import type {GetEntriesDataResponseBody} from '../response-models';
+import {ApiTag} from '../../components/api-docs';
+import {makeReqParser, z, zc} from '../../components/zod';
+import {CONTENT_TYPE_JSON} from '../../const';
+import {EntryScope} from '../../db/models/new/entry/types';
+import {getJoinedEntriesRevisionsByIds} from '../../services/new/entry';
+
+import {entriesDataModel} from './response-models';
+import type {GetEntriesDataResponseBody} from './response-models';
 
 const requestSchema = {
     body: z.object({
