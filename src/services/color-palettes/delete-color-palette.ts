@@ -1,16 +1,8 @@
-import {makeSchemaValidator} from '../../components/validation-schema-compiler';
+import {AppError} from '@gravity-ui/nodekit';
+
+import {US_ERRORS} from '../../const';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
 import {ServiceArgs} from '../../services/new/types';
-
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['colorPaletteId'],
-    properties: {
-        colorPaletteId: {
-            type: 'string',
-        },
-    },
-});
 
 export interface DeleteColorPaletteArgs {
     colorPaletteId: string;
@@ -19,7 +11,7 @@ export interface DeleteColorPaletteArgs {
 export const deleteColorPalette = async (
     {ctx, skipValidation = false}: ServiceArgs,
     args: DeleteColorPaletteArgs,
-) => {
+): Promise<ColorPaletteModel> => {
     const {colorPaletteId} = args;
 
     ctx.log('DELETE_COLOR_PALETTE_START', {
@@ -31,20 +23,29 @@ export const deleteColorPalette = async (
 
     if (!skipValidation) {
         colorPalettesAdminValidator(ctx);
-        validateArgs(args);
     }
 
     const {tenantId} = ctx.get('info');
 
-    await ColorPaletteModel.query(ColorPaletteModel.primary)
+    const result = await ColorPaletteModel.query(ColorPaletteModel.primary)
         .where({
             [ColorPaletteModelColumn.ColorPaletteId]: colorPaletteId,
             [ColorPaletteModelColumn.TenantId]: tenantId,
         })
         .delete()
+        .returning('*')
+        .first()
         .timeout(ColorPaletteModel.DEFAULT_QUERY_TIMEOUT);
+
+    if (!result) {
+        throw new AppError(US_ERRORS.COLOR_PALETTE_NOT_EXISTS, {
+            code: US_ERRORS.COLOR_PALETTE_NOT_EXISTS,
+        });
+    }
 
     ctx.log('DELETE_COLOR_PALETTE_FINISH', {
         colorPaletteId,
     });
+
+    return result;
 };

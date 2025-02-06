@@ -1,7 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {makeSchemaValidator} from '../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../const';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
 import {ServiceArgs} from '../../services/new/types';
@@ -10,29 +9,6 @@ import Utils from '../../utils';
 import {getColorPalettesCount} from './get-color-palettes-count';
 
 const MAX_PALETTES_COUNT = 50;
-
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['displayName', 'colors', 'isGradient', 'isDefault'],
-    properties: {
-        displayName: {
-            type: 'string',
-        },
-        colors: {
-            type: 'array',
-            items: {
-                type: 'string',
-                pattern: '^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$',
-            },
-        },
-        isGradient: {
-            type: 'boolean',
-        },
-        isDefault: {
-            type: 'boolean',
-        },
-    },
-});
 
 export interface CreateColorPaletteArgs {
     displayName: string;
@@ -59,7 +35,6 @@ export const createColorPalette = async (
 
     if (!skipValidation) {
         colorPalettesAdminValidator(ctx);
-        validateArgs(args);
     }
 
     const colorPalettesCount = await getColorPalettesCount(

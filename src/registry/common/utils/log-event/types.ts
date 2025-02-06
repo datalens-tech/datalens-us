@@ -12,6 +12,12 @@ import type {
     UpdateCollectionReqBody,
     UpdateCollectionReqParams,
 } from '../../../../controllers/collections/update-collection';
+import type {CreateColorPaletteReqBody} from '../../../../controllers/color-palettes/create-color-palette';
+import type {DeleteColorPaletteReqParams} from '../../../../controllers/color-palettes/delete-color-palette';
+import type {
+    UpdateColorPaletteReqBody,
+    UpdateColorPaletteReqParams,
+} from '../../../../controllers/color-palettes/update-color-palette';
 import type {
     CopyWorkbookReqBody,
     CopyWorkbookReqParams,
@@ -29,6 +35,7 @@ import type {
     UpdateWorkbookReqParams,
 } from '../../../../controllers/workbooks/update-workbook';
 import type {CollectionModel} from '../../../../db/models/new/collection';
+import {ColorPaletteModel} from '../../../../db/models/new/color-palette';
 import type {WorkbookModel} from '../../../../db/models/new/workbook';
 
 export enum LogEventType {
@@ -70,6 +77,15 @@ export enum LogEventType {
 
     MoveWorkbooksListSuccess = 'moveWorkbooksListSuccess',
     MoveWorkbooksListFail = 'moveWorkbooksListFail',
+
+    CreateColorPaletteSuccess = 'createColorPaletteSuccess',
+    CreateColorPaletteFail = 'createColorPaletteFail',
+
+    UpdateColorPaletteSuccess = 'updateColorPaletteSuccess',
+    UpdateColorPaletteFail = 'updateColorPaletteFail',
+
+    DeleteColorPaletteSuccess = 'deleteColorPaletteSuccess',
+    DeleteColorPaletteFail = 'deleteColorPaletteFail',
 }
 
 interface EventParams {
@@ -269,6 +285,50 @@ export interface LogEventMoveWorkbooksListFailParams extends EventParams {
     error: unknown;
 }
 
+export interface LogEventCreateColorPaletteSuccessParams extends EventParams {
+    type: LogEventType.CreateColorPaletteSuccess;
+
+    reqBody: CreateColorPaletteReqBody;
+    colorPalette: ColorPaletteModel;
+}
+
+export interface LogEventCreateColorPaletteFailParams extends EventParams {
+    type: LogEventType.CreateColorPaletteFail;
+
+    reqBody: CreateColorPaletteReqBody;
+    error: unknown;
+}
+
+export interface LogEventUpdateColorPaletteSuccessParams extends EventParams {
+    type: LogEventType.UpdateColorPaletteSuccess;
+
+    reqParams: UpdateColorPaletteReqParams;
+    reqBody: UpdateColorPaletteReqBody;
+    colorPalette: ColorPaletteModel;
+}
+
+export interface LogEventUpdateColorPaletteFailParams extends EventParams {
+    type: LogEventType.UpdateColorPaletteFail;
+
+    reqParams: UpdateColorPaletteReqParams;
+    reqBody: UpdateColorPaletteReqBody;
+    error: unknown;
+}
+
+export interface LogEventDeleteColorPaletteSuccessParams extends EventParams {
+    type: LogEventType.DeleteColorPaletteSuccess;
+
+    reqParams: DeleteColorPaletteReqParams;
+    colorPalette: ColorPaletteModel;
+}
+
+export interface LogEventDeleteColorPaletteFailParams extends EventParams {
+    type: LogEventType.DeleteColorPaletteFail;
+
+    reqParams: DeleteColorPaletteReqParams;
+    error: unknown;
+}
+
 export type LogEventParams =
     | LogEventCreateCollectionSuccessParams
     | LogEventCreateCollectionFailParams
@@ -295,6 +355,12 @@ export type LogEventParams =
     | LogEventDeleteWorkbooksListSuccessParams
     | LogEventDeleteWorkbooksListFailParams
     | LogEventMoveWorkbooksListSuccessParams
-    | LogEventMoveWorkbooksListFailParams;
+    | LogEventMoveWorkbooksListFailParams
+    | LogEventCreateColorPaletteSuccessParams
+    | LogEventCreateColorPaletteFailParams
+    | LogEventUpdateColorPaletteSuccessParams
+    | LogEventUpdateColorPaletteFailParams
+    | LogEventDeleteColorPaletteSuccessParams
+    | LogEventDeleteColorPaletteFailParams;
 
 export type LogEvent = (params: LogEventParams) => void;

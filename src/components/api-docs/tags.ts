@@ -3,4 +3,5 @@ export enum ApiTag {
     Workbooks = 'Workbooks',
     Entries = 'Entries',
     Templates = 'Templates',
+    ColorPalettes = 'ColorPalettes',
 }
