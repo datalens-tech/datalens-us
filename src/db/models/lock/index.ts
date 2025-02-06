@@ -5,7 +5,7 @@ import PG_ERRORS from 'pg-error-constants';
 
 import {Model} from '../..';
 import {CURRENT_TIMESTAMP} from '../../../const';
-import US_ERRORS from '../../../const/us-error-constants';
+import {US_ERRORS} from '../../../const/errors';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {getWorkbook} from '../../../services/new/workbook';
 import {checkWorkbookPermission} from '../../../services/new/workbook/utils/check-workbook-permission';

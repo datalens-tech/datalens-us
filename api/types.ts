@@ -1,3 +1,11 @@
+export type {
+    PlatformAppConfig,
+    PlatformAppContextParams,
+    PlatformAppDynamicConfig,
+} from '../src/types/nodekit';
+
+export type {PlatformAppRouteHandler, PlatformAppRouteParams} from '../src/types/expresskit';
+
 export {UserCtxInfo, CtxInfo} from '../src/types/ctx';
 export {CTX} from '../src/types/models/core';
 

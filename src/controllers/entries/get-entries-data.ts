@@ -1,13 +1,13 @@
 import {AppRouteHandler, Request, Response} from '@gravity-ui/expresskit';
 
-import {ApiTag} from '../../../components/api-docs';
-import {makeReqParser, z, zc} from '../../../components/zod';
-import {CONTENT_TYPE_JSON} from '../../../const';
-import {EntryScope} from '../../../db/models/new/entry/types';
-import {getJoinedEntriesRevisionsByIds} from '../../../services/new/entry';
+import {ApiTag} from '../../components/api-docs';
+import {makeReqParser, z, zc} from '../../components/zod';
+import {CONTENT_TYPE_JSON} from '../../const';
+import {EntryScope} from '../../db/models/new/entry/types';
+import {getJoinedEntriesRevisionsByIds} from '../../services/new/entry';
 
-import type {GetEntriesDataResponseBody} from './response-model';
-import {entriesData} from './response-model';
+import {entriesDataModel} from './response-models';
+import type {GetEntriesDataResponseBody} from './response-models';
 
 const requestSchema = {
     body: z.object({
@@ -41,7 +41,11 @@ const controller: AppRouteHandler = async (
         fields: body.fields,
     });
 
-    const response = entriesData.format({result, entryIds: body.entryIds, fields: body.fields});
+    const response = entriesDataModel.format({
+        result,
+        entryIds: body.entryIds,
+        fields: body.fields,
+    });
 
     res.status(200).send(response);
 };
@@ -60,10 +64,10 @@ controller.api = {
     },
     responses: {
         200: {
-            description: entriesData.schema.description ?? '',
+            description: `${entriesDataModel.schema.description}`,
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: entriesData.schema,
+                    schema: entriesDataModel.schema,
                 },
             },
         },

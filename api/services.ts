@@ -15,7 +15,10 @@ export {
 } from '../src/services/new/collection/utils/get-parents';
 
 export {getWorkbook, createWorkbook, setWorkbookIsTemplate} from '../src/services/new/workbook';
-export {checkWorkbookPermission} from '../src/services/new/workbook/utils/check-workbook-permission';
+export {
+    checkWorkbookPermission,
+    checkWorkbookPermissionById,
+} from '../src/services/new/workbook/utils/check-workbook-permission';
 export {copyEntriesToWorkbook} from '../src/services/new/entry';
 
 export {formatOperation} from '../src/services/new/formatters';

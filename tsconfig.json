@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "dist/server",
     "noUnusedParameters": false,
+    "noUnusedLocals": false,
     "sourceMap": true
   },
   "include": ["typings", "src"],

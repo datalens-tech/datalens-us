@@ -9,7 +9,7 @@ import {
     MAX_PRESET_DATA_OBJECT_SYMBOLS,
     MAX_UNVERSIONED_DATA_OBJECT_SYMBOLS,
 } from '../const';
-import US_ERRORS from '../const/us-error-constants';
+import {US_ERRORS} from '../const/errors';
 
 const ajv = new Ajv({
     allErrors: true,

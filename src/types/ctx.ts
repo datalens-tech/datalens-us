@@ -1,12 +1,12 @@
 import {PrivatePermissions} from './models';
 import {ZitadelServiceUser, ZitadelUserRole} from './zitadel';
 
-export type UserCtxInfo = {
+export interface UserCtxInfo {
     userId: string;
     login: string;
-};
+}
 
-export type CtxInfo = {
+export interface CtxInfo {
     requestId: string;
     tenantId: string;
     workbookId?: string;
@@ -19,4 +19,4 @@ export type CtxInfo = {
     privatePermissions: PrivatePermissions;
     serviceUser?: ZitadelServiceUser;
     zitadelUserRole?: ZitadelUserRole;
-};
+}
