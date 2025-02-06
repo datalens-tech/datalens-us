@@ -1,4 +1,4 @@
 export * from './common';
-export * from './us-error-constants';
-export {default as US_ERRORS} from './us-error-constants';
+export * from './errors';
+export {US_ERRORS} from './errors';
 export * from './user';
