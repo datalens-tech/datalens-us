@@ -292,14 +292,12 @@ export async function crossSyncCopiedJoinedEntryRevisions({
         oldByNewEntryIdMap.set(encodedTemplateConnectionId, encodedTargetConnectionId);
     }
 
-    await Utils.waitNextMacrotask();
-
     ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_REPLACE_IDS_START');
 
-    const arCopiedJoinedEntryRevisionsWithReplacedIds = Utils.replaceIds(
+    const arCopiedJoinedEntryRevisionsWithReplacedIds = (await Utils.replaceIds(
         oldByNewEntryIdMap,
         arCopiedJoinedEntryRevisions,
-    ) as JoinedEntryRevisionColumns[];
+    )) as JoinedEntryRevisionColumns[];
 
     ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_REPLACE_IDS_FINISH');
 

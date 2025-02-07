@@ -92,37 +92,37 @@ describe('Utils', () => {
     });
 
     describe('replaceIds', () => {
-        test('should return empty array string for empty input array', () => {
+        test('should return empty array string for empty input array', async () => {
             const idMap = new Map([['old1', 'new1']]);
 
-            const result = Utils.replaceIds(idMap, []);
+            const result = await Utils.replaceIds(idMap, []);
 
             expect(result).toEqual([]);
         });
 
-        test('should not modify string when idMap is empty', () => {
+        test('should not modify string when idMap is empty', async () => {
             const idMap = new Map();
 
             const input = [{id: 'old1'}];
 
-            const result = Utils.replaceIds(idMap, input);
+            const result = await Utils.replaceIds(idMap, input);
 
             expect(result).toEqual(input);
         });
 
-        test('should replace single id in flat structure', () => {
+        test('should replace single id in flat structure', async () => {
             const idMap = new Map([['old1', 'new1']]);
 
             const input = [{id: 'old1'}];
 
             const expected = [{id: 'new1'}];
 
-            const result = Utils.replaceIds(idMap, input);
+            const result = await Utils.replaceIds(idMap, input);
 
             expect(result).toEqual(expected);
         });
 
-        test('should replace multiple ids in nested structures', () => {
+        test('should replace multiple ids in nested structures', async () => {
             const idMap = new Map([
                 ['old1', 'new1'],
                 ['old2', 'new2'],
@@ -146,24 +146,24 @@ describe('Utils', () => {
                 },
             ];
 
-            const result = Utils.replaceIds(idMap, input);
+            const result = await Utils.replaceIds(idMap, input);
 
             expect(result).toEqual(expected);
         });
 
-        test('should leave unmatched ids unchanged', () => {
+        test('should leave unmatched ids unchanged', async () => {
             const idMap = new Map([['old1', 'new1']]);
 
             const input = [{id: 'old2'}, {value: 'old1'}];
 
             const expected = [{id: 'old2'}, {value: 'new1'}];
 
-            const result = Utils.replaceIds(idMap, input);
+            const result = await Utils.replaceIds(idMap, input);
 
             expect(result).toEqual(expected);
         });
 
-        test('should replace ids in correct order when they are substrings', () => {
+        test('should replace ids in correct order when they are substrings', async () => {
             const idMap = new Map([
                 ['oldLong', 'newLong'],
                 ['old', 'newShort'],
@@ -173,7 +173,7 @@ describe('Utils', () => {
 
             const expected = [{id: 'newLong'}, {id: 'newShort'}];
 
-            const result = Utils.replaceIds(idMap, input);
+            const result = await Utils.replaceIds(idMap, input);
 
             expect(result).toEqual(expected);
         });
