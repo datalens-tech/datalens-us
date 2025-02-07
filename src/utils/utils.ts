@@ -502,19 +502,22 @@ export class Utils {
         return limit ? Math.min(Math.abs(limit), maxPageLimit) : maxPageLimit;
     };
 
-    static replaceIds = (idMap: Map<string, string>, array: Record<string, unknown>[]) => {
-        if (array.length === 0 || idMap.size === 0) {
+    static replaceIds = (
+        oldByNewEntryIdMap: Map<string, string>,
+        array: Record<string, unknown>[],
+    ) => {
+        if (array.length === 0 || oldByNewEntryIdMap.size === 0) {
             return array;
         }
 
         let strCopiedJoinedEntryRevisions = JSON.stringify(array);
 
-        const oldIds = Array.from(idMap.keys());
+        const oldIds = Array.from(oldByNewEntryIdMap.keys());
 
         const regex = new RegExp(`(${oldIds.join('|')})`, 'g');
 
         strCopiedJoinedEntryRevisions = strCopiedJoinedEntryRevisions.replace(regex, (match) => {
-            return idMap.get(match) || match;
+            return oldByNewEntryIdMap.get(match) || match;
         });
 
         return JSON.parse(strCopiedJoinedEntryRevisions);
