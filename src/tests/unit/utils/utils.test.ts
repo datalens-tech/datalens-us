@@ -90,4 +90,92 @@ describe('Utils', () => {
             expect(parentFolderKeys).toEqual([]);
         });
     });
+
+    describe('replaceIds', () => {
+        test('should return empty array string for empty input array', () => {
+            const idMap = new Map([['old1', 'new1']]);
+
+            const result = Utils.replaceIds(idMap, []);
+
+            expect(result).toEqual([]);
+        });
+
+        test('should not modify string when idMap is empty', () => {
+            const idMap = new Map();
+
+            const input = [{id: 'old1'}];
+
+            const result = Utils.replaceIds(idMap, input);
+
+            expect(result).toEqual(input);
+        });
+
+        test('should replace single id in flat structure', () => {
+            const idMap = new Map([['old1', 'new1']]);
+
+            const input = [{id: 'old1'}];
+
+            const expected = [{id: 'new1'}];
+
+            const result = Utils.replaceIds(idMap, input);
+
+            expect(result).toEqual(expected);
+        });
+
+        test('should replace multiple ids in nested structures', () => {
+            const idMap = new Map([
+                ['old1', 'new1'],
+                ['old2', 'new2'],
+            ]);
+
+            const input = [
+                {
+                    id: 'old1',
+                    data: {
+                        children: [{ref: 'old2'}],
+                    },
+                },
+            ];
+
+            const expected = [
+                {
+                    id: 'new1',
+                    data: {
+                        children: [{ref: 'new2'}],
+                    },
+                },
+            ];
+
+            const result = Utils.replaceIds(idMap, input);
+
+            expect(result).toEqual(expected);
+        });
+
+        test('should leave unmatched ids unchanged', () => {
+            const idMap = new Map([['old1', 'new1']]);
+
+            const input = [{id: 'old2'}, {value: 'old1'}];
+
+            const expected = [{id: 'old2'}, {value: 'new1'}];
+
+            const result = Utils.replaceIds(idMap, input);
+
+            expect(result).toEqual(expected);
+        });
+
+        test('should replace ids in correct order when they are substrings', () => {
+            const idMap = new Map([
+                ['oldLong', 'newLong'],
+                ['old', 'newShort'],
+            ]);
+
+            const input = [{id: 'oldLong'}, {id: 'old'}];
+
+            const expected = [{id: 'newLong'}, {id: 'newShort'}];
+
+            const result = Utils.replaceIds(idMap, input);
+
+            expect(result).toEqual(expected);
+        });
+    });
 });
