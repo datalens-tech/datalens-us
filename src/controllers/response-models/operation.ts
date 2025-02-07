@@ -1,6 +1,19 @@
 import {z} from '../../components/zod';
 import type {Operation} from '../../entities/types';
 
+const resultErrorSchema = z.object({
+    error: z
+        .object({
+            code: z.number(),
+            message: z.string(),
+        })
+        .optional(),
+});
+const resultResponseSchema = z.object({
+    response: z.unknown().optional(),
+});
+const resultSchema = z.union([resultErrorSchema, resultResponseSchema]);
+
 const schema = z
     .object({
         id: z.string(),
@@ -16,6 +29,7 @@ const schema = z
         }),
         metadata: z.object({}),
         done: z.boolean(),
+        result: resultSchema.optional(),
     })
     .describe('Operation');
 
@@ -30,6 +44,7 @@ const format = (operation: Operation): OperationResponseModel => {
         modifiedAt: operation.modifiedAt,
         metadata: {},
         done: operation.done,
+        ...(operation.result ? {result: operation.result} : {}),
     };
 };
 
