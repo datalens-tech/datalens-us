@@ -276,48 +276,30 @@ export async function crossSyncCopiedJoinedEntryRevisions({
 }) {
     ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_START');
 
-    const newByOldEntryIdMap = new Map<string, string>();
+    const oldByNewEntryIdMap = new Map<string, string>();
 
     const arCopiedJoinedEntryRevisions = copiedJoinedEntryRevisions.map(
         ({newJoinedEntryRevision, oldEntryId}) => {
             const newEntryIdEncoded = Utils.encodeId(newJoinedEntryRevision.entryId);
             const oldEntryIdEncoded = Utils.encodeId(oldEntryId);
-            newByOldEntryIdMap.set(newEntryIdEncoded, oldEntryIdEncoded);
+            oldByNewEntryIdMap.set(oldEntryIdEncoded, newEntryIdEncoded);
 
             return newJoinedEntryRevision;
         },
     );
 
     if (encodedTemplateConnectionId && encodedTargetConnectionId) {
-        newByOldEntryIdMap.set(encodedTargetConnectionId, encodedTemplateConnectionId);
+        oldByNewEntryIdMap.set(encodedTemplateConnectionId, encodedTargetConnectionId);
     }
 
-    await Utils.waitNextMacrotask();
-    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_JSON_STRINGIFY_START');
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_REPLACE_IDS_START');
 
-    let strCopiedJoinedEntryRevisions = JSON.stringify(arCopiedJoinedEntryRevisions);
+    const arCopiedJoinedEntryRevisionsWithReplacedIds = (await Utils.replaceIds(
+        oldByNewEntryIdMap,
+        arCopiedJoinedEntryRevisions,
+    )) as JoinedEntryRevisionColumns[];
 
-    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_JSON_STRINGIFY_FINISH');
-
-    for (const [key, value] of newByOldEntryIdMap) {
-        await Utils.waitNextMacrotask();
-        ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_REPLACE_START');
-        strCopiedJoinedEntryRevisions = strCopiedJoinedEntryRevisions.replace(
-            new RegExp(value, 'g'),
-            key,
-        );
-        ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_REPLACE_FINISH');
-    }
-
-    await Utils.waitNextMacrotask();
-
-    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_PARSE_START');
-
-    const arCopiedJoinedEntryRevisionsWithReplacedIds = JSON.parse(
-        strCopiedJoinedEntryRevisions,
-    ) as JoinedEntryRevisionColumns[];
-
-    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_PARSE_FINISH');
+    ctx.log('SYNC_COPIED_JOINED_ENTRY_REVISIONS_REPLACE_IDS_FINISH');
 
     await Promise.all(
         arCopiedJoinedEntryRevisionsWithReplacedIds.map((copiedJoinedEntryRevision) => {
