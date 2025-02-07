@@ -501,4 +501,22 @@ export class Utils {
     static getCorrectedPageLimit = (limit?: number, maxPageLimit = MAX_PAGE_LIMIT) => {
         return limit ? Math.min(Math.abs(limit), maxPageLimit) : maxPageLimit;
     };
+
+    static replaceIds = (idMap: Map<string, string>, array: Record<string, unknown>[]) => {
+        if (array.length === 0 || idMap.size === 0) {
+            return array;
+        }
+
+        let strCopiedJoinedEntryRevisions = JSON.stringify(array);
+
+        const oldIds = Array.from(idMap.keys());
+
+        const regex = new RegExp(`(${oldIds.join('|')})`, 'g');
+
+        strCopiedJoinedEntryRevisions = strCopiedJoinedEntryRevisions.replace(regex, (match) => {
+            return idMap.get(match) || match;
+        });
+
+        return JSON.parse(strCopiedJoinedEntryRevisions);
+    };
 }
