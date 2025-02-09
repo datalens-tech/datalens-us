@@ -1,5 +1,5 @@
 import {OpenAPIRegistry, OpenApiGeneratorV31} from '@asteasolutions/zod-to-openapi';
-import {ExpressKit, AuthPolicy} from '@gravity-ui/expresskit';
+import {AuthPolicy, ExpressKit} from '@gravity-ui/expresskit';
 import swaggerUi from 'swagger-ui-express';
 import {ZodType, z} from 'zod';
 
