@@ -15,7 +15,6 @@ const requestSchema = {
 };
 
 export type DeleteEntryReqParams = z.infer<typeof requestSchema.params>;
-export type DeleteEntryReqQuery = z.infer<typeof requestSchema.query>;
 
 const parseReq = makeReqParser(requestSchema);
 
@@ -38,7 +37,6 @@ const controller: AppRouteHandler = async (req, res) => {
             type: LogEventType.DeleteEntrySuccess,
             ctx: req.ctx,
             reqParams: params,
-            reqQuery: query,
             entry: result,
         });
 
@@ -49,7 +47,6 @@ const controller: AppRouteHandler = async (req, res) => {
             type: LogEventType.DeleteEntryFail,
             ctx: req.ctx,
             reqParams: params,
-            reqQuery: query,
             error,
         });
 

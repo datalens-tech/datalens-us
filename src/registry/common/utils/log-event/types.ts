@@ -19,10 +19,7 @@ import type {
     UpdateColorPaletteReqParams,
 } from '../../../../controllers/color-palettes/update-color-palette';
 import type {CopyEntriesToWorkbookReqBody} from '../../../../controllers/entries/copy-entries-to-workbook';
-import type {
-    DeleteEntryReqParams,
-    DeleteEntryReqQuery,
-} from '../../../../controllers/entries/delete-entry';
+import type {DeleteEntryReqParams} from '../../../../controllers/entries/delete-entry';
 import type {
     CopyWorkbookReqBody,
     CopyWorkbookReqParams,
@@ -378,7 +375,6 @@ export interface LogEventDeleteEntrySuccessParams extends EventParams {
     type: LogEventType.DeleteEntrySuccess;
 
     reqParams: DeleteEntryReqParams;
-    reqQuery: DeleteEntryReqQuery;
     entry: OldEntry | undefined;
 }
 
@@ -386,7 +382,6 @@ export interface LogEventDeleteEntryFailParams extends EventParams {
     type: LogEventType.DeleteEntryFail;
 
     reqParams: DeleteEntryReqParams;
-    reqQuery: DeleteEntryReqQuery;
     error: unknown;
 }
 
