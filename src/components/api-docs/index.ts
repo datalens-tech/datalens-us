@@ -1,5 +1,5 @@
 import {OpenAPIRegistry, OpenApiGeneratorV31} from '@asteasolutions/zod-to-openapi';
-import {ExpressKit} from '@gravity-ui/expresskit';
+import {AuthPolicy, ExpressKit} from '@gravity-ui/expresskit';
 import swaggerUi from 'swagger-ui-express';
 import {ZodType, z} from 'zod';
 
@@ -15,7 +15,10 @@ const openApiRegistry = new OpenAPIRegistry();
 
 export const registerApiRoute = (
     routeDescription: ExtendedAppRouteDescription<unknown>,
-    additionalHeaders?: ZodType<unknown>[],
+    {
+        headers: additionalHeaders,
+        security: additionalSecurity,
+    }: {headers: ZodType<unknown>[]; security: {[key: string]: any}[]},
 ) => {
     const {route, handler} = routeDescription;
     const {api} = handler;
@@ -72,6 +75,7 @@ export const registerApiRoute = (
                 headers: [...headers],
             },
             responses: api.responses ?? {},
+            security: [...additionalSecurity],
         });
     }
 };
@@ -84,6 +88,16 @@ export const initSwagger = (app: ExpressKit) => {
     const descriptionText = `<br />Storage for DataLens entities.`;
 
     setImmediate(() => {
+        const authDisabled = config.appAuthPolicy === AuthPolicy.disabled;
+
+        if (!authDisabled && (config.zitadelEnabled || config.isAuthEnabled)) {
+            openApiRegistry.registerComponent('securitySchemes', 'bearerAuth', {
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JWT',
+            });
+        }
+
         app.express.use(
             '/api-docs',
             swaggerUi.serve,
