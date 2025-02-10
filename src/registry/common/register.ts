@@ -11,6 +11,7 @@ import {colorPalettesAdminValidator} from './utils/color-palettes/utils';
 import {checkEmbedding} from './utils/embedding/utils';
 import {
     checkCreateEntryAvailability,
+    checkServicePlanAvailability,
     checkUpdateEntryAvailability,
     getEntryAddFormattedFieldsHook,
     getEntryBeforeDbRequestHook,
@@ -38,5 +39,6 @@ export const registerCommonPlugins = () => {
         checkCreateEntryAvailability,
         checkUpdateEntryAvailability,
         logEvent,
+        checkServicePlanAvailability,
     });
 };

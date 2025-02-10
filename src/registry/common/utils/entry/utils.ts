@@ -1,5 +1,6 @@
 import type {
     CheckCreateEntryAvailability,
+    CheckServicePlanAvailability,
     CheckUpdateEntryAvailability,
     GetEntryAddFormattedFieldsHook,
     GetEntryBeforeDbRequestHook,
@@ -16,3 +17,5 @@ export const getEntryAddFormattedFieldsHook: GetEntryAddFormattedFieldsHook = ()
 export const checkCreateEntryAvailability: CheckCreateEntryAvailability = () => Promise.resolve();
 
 export const checkUpdateEntryAvailability: CheckUpdateEntryAvailability = () => Promise.resolve();
+
+export const checkServicePlanAvailability: CheckServicePlanAvailability = () => Promise.resolve();
