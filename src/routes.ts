@@ -101,7 +101,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
         }),
         privateCreateEntryAlt: makeRoute({
             route: 'POST /private/createEntry',
-            handler: entriesController._createEntry,
+            handler: entriesController.createEntryAlt,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,

@@ -4,29 +4,21 @@ import {prepareResponseAsync} from '../../components/response-presenter';
 import {US_MASTER_TOKEN_HEADER} from '../../const';
 import {EntryScope} from '../../db/models/new/entry/types';
 import {
-    DeleteEntryData,
     GetEntryRevisionsData,
     RelationDirection,
-    deleteEntry,
     getEntryRelations,
     getEntryRevisions,
-    renameEntry,
     switchRevisionEntry,
-    updateEntry,
 } from '../../services/entry';
-import EntryService from '../../services/entry.service';
 import NavigationService from '../../services/navigation.service';
 import {
     GetEntryArgs,
     GetEntryMetaPrivateArgs,
-    copyEntriesToWorkbook,
-    copyEntryToWorkbook,
     getEntry,
     getEntryMeta,
     getEntryMetaPrivate,
 } from '../../services/new/entry';
 import {
-    formatEntryModel,
     formatGetEntryMetaPrivateResponse,
     formatGetEntryMetaResponse,
     formatGetEntryResponse,
@@ -34,9 +26,25 @@ import {
 import * as ST from '../../types/services.types';
 import {isTrueArg} from '../../utils/env-utils';
 
+import {copyEntriesToWorkbook} from './copy-entries-to-workbook';
+import {copyEntryToWorkbook} from './copy-entry-to-workbook';
+import {createEntry} from './create-entry';
+import {createEntryAlt} from './create-entry-alt';
+import {deleteEntry} from './delete-entry';
 import {getEntriesData} from './get-entries-data';
+import {renameEntry} from './rename-entry';
+import {updateEntry} from './update-entry';
 
 export default {
+    getEntriesData,
+    deleteEntry,
+    copyEntryToWorkbook,
+    copyEntriesToWorkbook,
+    renameEntry,
+    updateEntry,
+    createEntry,
+    createEntryAlt,
+
     getEntry: async (req: Request, res: Response) => {
         const {query, params} = req;
 
@@ -115,87 +123,6 @@ export default {
         res.status(code).send(response);
     },
 
-    createEntry: async (req: Request, res: Response) => {
-        const {body} = req;
-
-        const result = await EntryService.create({
-            workbookId: body.workbookId,
-            name: body.name,
-            scope: body.scope,
-            type: body.type,
-            key: body.key,
-            meta: body.meta,
-            recursion: body.recursion,
-            hidden: body.hidden,
-            mirrored: body.mirrored,
-            mode: body.mode,
-            data: body.data,
-            unversionedData: body.unversionedData,
-            links: body.links,
-            permissionsMode: body.permissionsMode,
-            includePermissionsInfo: isTrueArg(body.includePermissionsInfo),
-            initialPermissions: body.initialPermissions,
-            initialParentId: body.initialParentId,
-            ctx: req.ctx,
-        });
-
-        const {code, response} = await prepareResponseAsync({data: result});
-
-        res.status(code).send(response);
-    },
-
-    _createEntry: async (req: Request, res: Response) => {
-        const {body} = req;
-
-        const result = await EntryService._create({
-            workbookId: body.workbookId,
-            name: body.name,
-            scope: body.scope,
-            type: body.type,
-            key: body.key,
-            meta: body.meta,
-            recursion: body.recursion,
-            hidden: body.hidden,
-            mirrored: body.mirrored,
-            mode: body.mode,
-            data: body.data,
-            unversionedData: body.unversionedData,
-            links: body.links,
-            permissionsMode: body.permissionsMode,
-            initialPermissions: body.initialPermissions,
-            initialParentId: body.initialParentId,
-            ctx: req.ctx,
-        });
-
-        const {code, response} = await prepareResponseAsync({data: result});
-
-        res.status(code).send(response);
-    },
-
-    updateEntry: async (req: Request, res: Response) => {
-        const {params, body} = req;
-
-        const result = await updateEntry(req.ctx, {
-            entryId: params.entryId,
-            meta: body.meta,
-            data: body.data,
-            unversionedData: body.unversionedData,
-            links: body.links,
-            mode: body.mode,
-            type: body.type,
-            hidden: body.hidden,
-            mirrored: body.mirrored,
-            revId: body.revId,
-            lockToken: body.lockToken,
-            skipSyncLinks: body.skipSyncLinks,
-            updateRevision: body.updateRevision,
-        });
-
-        const {code, response} = await prepareResponseAsync({data: result});
-
-        res.status(code).send(response);
-    },
-
     switchRevisionEntry: async (req: Request, res: Response) => {
         const {params, body} = req;
 
@@ -209,32 +136,6 @@ export default {
 
         const {code, response} = await prepareResponseAsync({data: result});
 
-        res.status(code).send(response);
-    },
-
-    renameEntry: async (req: Request, res: Response) => {
-        const {params, body} = req;
-
-        const result = await renameEntry(req.ctx, {
-            entryId: params.entryId,
-            name: body.name,
-        });
-
-        const {code, response} = await prepareResponseAsync({data: result});
-
-        res.status(code).send(response);
-    },
-
-    deleteEntry: async (req: Request, res: Response) => {
-        const result = await deleteEntry(
-            {ctx: req.ctx},
-            {
-                entryId: req.params.entryId,
-                lockToken: req.query.lockToken as DeleteEntryData['lockToken'],
-            },
-        );
-
-        const {code, response} = await prepareResponseAsync({data: result});
         res.status(code).send(response);
     },
 
@@ -264,39 +165,6 @@ export default {
         res.status(code).send(response);
     },
 
-    copyEntryToWorkbook: async (req: Request, res: Response) => {
-        const {params, body} = req;
-
-        const result = await copyEntryToWorkbook(
-            {ctx: req.ctx},
-            {
-                entryId: params.entryId,
-                workbookId: body.workbookId,
-                name: body.name,
-            },
-        );
-
-        const formattedResponse = formatEntryModel(result);
-
-        const {code, response} = await prepareResponseAsync({data: formattedResponse});
-        res.status(code).send(response);
-    },
-
-    copyEntriesToWorkbook: async (req: Request, res: Response) => {
-        const {body} = req;
-
-        const result = await copyEntriesToWorkbook(
-            {ctx: req.ctx},
-            {
-                entryIds: body.entryIds,
-                workbookId: body.workbookId,
-            },
-        );
-
-        const {code, response} = await prepareResponseAsync({data: result});
-        res.status(code).send(response);
-    },
-
     getEntries: async (req: Request, res: Response) => {
         const query = req.query as unknown as ST.GetEntries;
 
@@ -322,6 +190,4 @@ export default {
 
         res.status(code).send(response);
     },
-
-    getEntriesData,
 };
