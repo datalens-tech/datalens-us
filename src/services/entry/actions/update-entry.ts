@@ -164,7 +164,6 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
 
         await Promise.all([
             checkEntryPromise,
-            Lock.checkLock({entryId, lockToken}, ctx),
             checkUpdateEntryAvailability({
                 ctx,
                 tenantId: entry.tenantId,
@@ -177,6 +176,8 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                 checkServicePlan,
             }),
         ]);
+
+        await Lock.checkLock({entryId, lockToken}, ctx);
     } else {
         throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
             code: US_ERRORS.NOT_EXIST_ENTRY,
