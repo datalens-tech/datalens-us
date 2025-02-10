@@ -2,7 +2,7 @@ import {AuthPolicy} from '@gravity-ui/expresskit';
 import {NodeKit} from '@gravity-ui/nodekit';
 import {ZodType} from 'zod';
 
-import {AUTHORIZATION_HEADER} from '../../const';
+import {DL_SERVICE_USER_ACCESS_TOKEN} from '../../const';
 import type {ExtendedAppRouteDescription} from '../../routes';
 import {z} from '../zod';
 
@@ -11,6 +11,7 @@ export const getAdditionalHeaders = (
     nodekit: NodeKit,
 ) => {
     const headers: ZodType<unknown>[] = [];
+    const security: {[key: string]: unknown}[] = [];
 
     const {config} = nodekit;
 
@@ -19,12 +20,16 @@ export const getAdditionalHeaders = (
         routeDescription.authPolicy === AuthPolicy.disabled;
 
     if (!authDisabled && (config.zitadelEnabled || config.isAuthEnabled)) {
-        headers.push(
-            z.strictObject({
-                [AUTHORIZATION_HEADER]: z.string(),
-            }),
-        );
+        security.push({bearerAuth: []});
+
+        if (config.zitadelEnabled) {
+            headers.push(
+                z.strictObject({
+                    ...(config.zitadelEnabled ? {[DL_SERVICE_USER_ACCESS_TOKEN]: z.string()} : {}),
+                }),
+            );
+        }
     }
 
-    return headers;
+    return {headers, security};
 };
