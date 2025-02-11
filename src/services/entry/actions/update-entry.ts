@@ -79,6 +79,9 @@ const validateUpdateEntry = makeSchemaValidator({
         useLegacyLogin: {
             type: 'boolean',
         },
+        checkServicePlan: {
+            type: 'string',
+        },
     },
 });
 
@@ -97,6 +100,7 @@ type UpdateEntryData = {
     skipSyncLinks?: boolean;
     useLegacyLogin?: boolean;
     updateRevision?: boolean;
+    checkServicePlan?: string;
 };
 
 export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
@@ -117,6 +121,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         skipSyncLinks,
         useLegacyLogin = false,
         updateRevision = false,
+        checkServicePlan,
     } = updateData;
 
     ctx.log('UPDATE_ENTRY_REQUEST', {
@@ -131,6 +136,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         lockToken,
         skipSyncLinks,
         updateRevision,
+        checkServicePlan,
     });
 
     const registry = ctx.get('registry');
@@ -147,24 +153,28 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         .timeout(DEFAULT_QUERY_TIMEOUT);
 
     if (entry) {
-        let checkEntryPromise;
-
         if (!isPrivateRoute && !entry.workbookId) {
-            checkEntryPromise = checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
+            await checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
         }
 
-        const {checkUpdateEntryAvailability} = registry.common.functions.get();
+        const {checkUpdateEntryAvailability, checkServicePlanAvailability} =
+            registry.common.functions.get();
 
         await Promise.all([
-            checkEntryPromise,
-            Lock.checkLock({entryId, lockToken}, ctx),
             checkUpdateEntryAvailability({
                 ctx,
                 tenantId: entry.tenantId,
                 scope: entry.scope,
                 type: entry.type,
             }),
+            checkServicePlanAvailability({
+                ctx,
+                tenantId: entry.tenantId,
+                checkServicePlan,
+            }),
         ]);
+
+        await Lock.checkLock({entryId, lockToken}, ctx);
     } else {
         throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
             code: US_ERRORS.NOT_EXIST_ENTRY,

@@ -39,6 +39,9 @@ const validateArgs = makeSchemaValidator({
         includeLinks: {
             type: 'boolean',
         },
+        checkServicePlan: {
+            type: 'string',
+        },
     },
 });
 
@@ -48,6 +51,7 @@ export interface GetEntryArgs {
     branch?: 'saved' | 'published';
     includePermissionsInfo: boolean;
     includeLinks: boolean;
+    checkServicePlan?: string;
 }
 
 export type GetEntryResult = {
@@ -62,7 +66,14 @@ export const getEntry = async (
     {ctx, trx, skipValidation = false}: ServiceArgs,
     args: GetEntryArgs,
 ): Promise<GetEntryResult> => {
-    const {entryId, revId, branch = 'saved', includePermissionsInfo, includeLinks} = args;
+    const {
+        entryId,
+        revId,
+        branch = 'saved',
+        includePermissionsInfo,
+        includeLinks,
+        checkServicePlan,
+    } = args;
 
     ctx.log('GET_ENTRY_REQUEST', {
         entryId: Utils.encodeId(entryId),
@@ -70,6 +81,7 @@ export const getEntry = async (
         branch,
         includePermissionsInfo,
         includeLinks,
+        checkServicePlan,
     });
 
     const registry = ctx.get('registry');
@@ -115,7 +127,8 @@ export const getEntry = async (
     });
 
     if (joinedEntryRevisionFavorite) {
-        const {isNeedBypassEntryByKey} = registry.common.functions.get();
+        const {isNeedBypassEntryByKey, checkServicePlanAvailability} =
+            registry.common.functions.get();
 
         const dlsBypassByKeyEnabled = isNeedBypassEntryByKey(
             ctx,
@@ -184,6 +197,14 @@ export const getEntry = async (
 
                 await checkFetchedEntry(ctx, joinedEntryRevisionFavorite, getReplica(trx));
             }
+        }
+
+        if (joinedEntryRevisionFavorite.tenantId) {
+            await checkServicePlanAvailability({
+                ctx,
+                tenantId: joinedEntryRevisionFavorite.tenantId,
+                checkServicePlan,
+            });
         }
 
         let permissions: EntryPermissions = {};

@@ -48,6 +48,7 @@ export default {
                 revId: query.revId as GetEntryArgs['revId'],
                 includePermissionsInfo: isTrueArg(query.includePermissionsInfo),
                 includeLinks: isTrueArg(query.includeLinks),
+                checkServicePlan: query.checkServicePlan as GetEntryArgs['checkServicePlan'],
             },
         );
         const formattedResponse = await formatGetEntryResponse(req.ctx, result);
@@ -136,6 +137,7 @@ export default {
             includePermissionsInfo: isTrueArg(body.includePermissionsInfo),
             initialPermissions: body.initialPermissions,
             initialParentId: body.initialParentId,
+            checkServicePlan: body.checkServicePlan,
             ctx: req.ctx,
         });
 
@@ -164,6 +166,7 @@ export default {
             permissionsMode: body.permissionsMode,
             initialPermissions: body.initialPermissions,
             initialParentId: body.initialParentId,
+            checkServicePlan: body.checkServicePlan,
             ctx: req.ctx,
         });
 
@@ -189,6 +192,7 @@ export default {
             lockToken: body.lockToken,
             skipSyncLinks: body.skipSyncLinks,
             updateRevision: body.updateRevision,
+            checkServicePlan: body.checkServicePlan,
         });
 
         const {code, response} = await prepareResponseAsync({data: result});
