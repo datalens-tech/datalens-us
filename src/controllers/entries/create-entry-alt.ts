@@ -36,6 +36,7 @@ const controller: AppRouteHandler = async (req, res) => {
             permissionsMode: body.permissionsMode,
             initialPermissions: body.initialPermissions,
             initialParentId: body.initialParentId,
+            checkServicePlan: body.checkServicePlan,
             ctx: req.ctx,
         });
 

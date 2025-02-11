@@ -8,6 +8,7 @@ import type {ColorPalettesAdminValidator} from './utils/color-palettes/types';
 import type {CheckEmbedding} from './utils/embedding/types';
 import type {
     CheckCreateEntryAvailability,
+    CheckServicePlanAvailability,
     CheckUpdateEntryAvailability,
     GetEntryAddFormattedFieldsHook,
     GetEntryBeforeDbRequestHook,
@@ -28,4 +29,5 @@ export const commonFunctionsMap = {
     checkCreateEntryAvailability: makeFunctionTemplate<CheckCreateEntryAvailability>(),
     checkUpdateEntryAvailability: makeFunctionTemplate<CheckUpdateEntryAvailability>(),
     logEvent: makeFunctionTemplate<LogEvent>(),
+    checkServicePlanAvailability: makeFunctionTemplate<CheckServicePlanAvailability>(),
 } as const;

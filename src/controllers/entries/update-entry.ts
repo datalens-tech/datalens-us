@@ -27,6 +27,7 @@ const controller: AppRouteHandler = async (req, res) => {
             lockToken: body.lockToken,
             skipSyncLinks: body.skipSyncLinks,
             updateRevision: body.updateRevision,
+            checkServicePlan: body.checkServicePlan,
         });
 
         logEvent({

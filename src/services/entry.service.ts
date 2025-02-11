@@ -39,14 +39,19 @@ export default class EntryService {
         includePermissionsInfo,
         initialPermissions,
         initialParentId,
+        checkServicePlan,
         ctx,
     }: ST.CreateEntry) {
         const {requestId, tenantId, user, dlContext, isPrivateRoute} = ctx.get('info');
 
         const registry = ctx.get('registry');
-        const {checkCreateEntryAvailability} = registry.common.functions.get();
+        const {checkCreateEntryAvailability, checkServicePlanAvailability} =
+            registry.common.functions.get();
 
-        await checkCreateEntryAvailability({ctx, tenantId, scope, type});
+        await Promise.all([
+            checkCreateEntryAvailability({ctx, tenantId, scope, type}),
+            checkServicePlanAvailability({ctx, tenantId, checkServicePlan}),
+        ]);
 
         if (workbookId) {
             return await createEntryInWorkbook(ctx, {
@@ -109,6 +114,7 @@ export default class EntryService {
         permissionsMode,
         initialPermissions,
         initialParentId,
+        checkServicePlan,
         ctx,
     }: ST.CreateEntry) {
         const {
@@ -119,9 +125,13 @@ export default class EntryService {
         } = ctx.get('info');
 
         const registry = ctx.get('registry');
-        const {checkCreateEntryAvailability} = registry.common.functions.get();
+        const {checkCreateEntryAvailability, checkServicePlanAvailability} =
+            registry.common.functions.get();
 
-        await checkCreateEntryAvailability({ctx, tenantId, scope, type});
+        await Promise.all([
+            checkCreateEntryAvailability({ctx, tenantId, scope, type}),
+            checkServicePlanAvailability({ctx, tenantId, checkServicePlan}),
+        ]);
 
         if (workbookId) {
             return await createEntryInWorkbook(ctx, {

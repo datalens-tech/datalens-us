@@ -56,6 +56,7 @@ export default {
                 revId: query.revId as GetEntryArgs['revId'],
                 includePermissionsInfo: isTrueArg(query.includePermissionsInfo),
                 includeLinks: isTrueArg(query.includeLinks),
+                checkServicePlan: query.checkServicePlan as GetEntryArgs['checkServicePlan'],
             },
         );
         const formattedResponse = await formatGetEntryResponse(req.ctx, result);

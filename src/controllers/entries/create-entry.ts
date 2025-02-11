@@ -38,6 +38,7 @@ const controller: AppRouteHandler = async (req, res) => {
             includePermissionsInfo: isTrueArg(body.includePermissionsInfo),
             initialPermissions: body.initialPermissions,
             initialParentId: body.initialParentId,
+            checkServicePlan: body.checkServicePlan,
             ctx: req.ctx,
         });
 
