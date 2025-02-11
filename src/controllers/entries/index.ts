@@ -137,6 +137,7 @@ export default {
             includePermissionsInfo: isTrueArg(body.includePermissionsInfo),
             initialPermissions: body.initialPermissions,
             initialParentId: body.initialParentId,
+            checkServicePlan: body.checkServicePlan,
             ctx: req.ctx,
         });
 
@@ -165,6 +166,7 @@ export default {
             permissionsMode: body.permissionsMode,
             initialPermissions: body.initialPermissions,
             initialParentId: body.initialParentId,
+            checkServicePlan: body.checkServicePlan,
             ctx: req.ctx,
         });
 
