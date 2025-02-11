@@ -1,7 +1,7 @@
 {
   "name": "@datalens-tech/datalens-us",
   "description": "United Storage",
-  "version": "0.0.0",
+  "version": "0.312.0",
   "private": true,
   "author": "DataLens Team <https://github.com/datalens-tech>",
   "license": "Apache-2.0",
