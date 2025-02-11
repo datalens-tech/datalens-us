@@ -130,14 +130,6 @@ export const getEntry = async (
         const {isNeedBypassEntryByKey, checkServicePlanAvailability} =
             registry.common.functions.get();
 
-        if (joinedEntryRevisionFavorite.tenantId) {
-            await checkServicePlanAvailability({
-                ctx,
-                tenantId: joinedEntryRevisionFavorite.tenantId,
-                checkServicePlan,
-            });
-        }
-
         const dlsBypassByKeyEnabled = isNeedBypassEntryByKey(
             ctx,
             joinedEntryRevisionFavorite.key as string,
@@ -205,6 +197,14 @@ export const getEntry = async (
 
                 await checkFetchedEntry(ctx, joinedEntryRevisionFavorite, getReplica(trx));
             }
+        }
+
+        if (joinedEntryRevisionFavorite.tenantId) {
+            await checkServicePlanAvailability({
+                ctx,
+                tenantId: joinedEntryRevisionFavorite.tenantId,
+                checkServicePlan,
+            });
         }
 
         let permissions: EntryPermissions = {};

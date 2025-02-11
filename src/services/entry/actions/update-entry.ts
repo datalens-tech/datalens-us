@@ -153,17 +153,14 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         .timeout(DEFAULT_QUERY_TIMEOUT);
 
     if (entry) {
-        let checkEntryPromise;
-
         if (!isPrivateRoute && !entry.workbookId) {
-            checkEntryPromise = checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
+            await checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
         }
 
         const {checkUpdateEntryAvailability, checkServicePlanAvailability} =
             registry.common.functions.get();
 
         await Promise.all([
-            checkEntryPromise,
             checkUpdateEntryAvailability({
                 ctx,
                 tenantId: entry.tenantId,
