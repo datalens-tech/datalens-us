@@ -132,7 +132,7 @@ describe('Deleting root collection with content', () => {
         ).expect(200);
 
         expect(response.body).toStrictEqual({
-            collections: expect.arrayContaining([
+            collections: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
                     collectionId: nestedCollection.collectionId,

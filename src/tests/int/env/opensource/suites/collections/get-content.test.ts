@@ -90,7 +90,7 @@ describe('Getting root content', () => {
 
         expect(response.body).toStrictEqual({
             ...GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
-            workbooks: expect.arrayContaining([
+            workbooks: expect.toIncludeSameMembers([
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
                     workbookId: rootWorkbook.workbookId,
@@ -102,7 +102,7 @@ describe('Getting root content', () => {
                     collectionId: null,
                 },
             ]),
-            collections: expect.arrayContaining([
+            collections: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
                     collectionId: rootCollection.collectionId,

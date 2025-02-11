@@ -115,7 +115,7 @@ describe('Moving workbooks', () => {
             .expect(200);
 
         expect(response.body).toStrictEqual({
-            workbooks: expect.arrayContaining([
+            workbooks: expect.toIncludeSameMembers([
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
                     workbookId: targetWorkbook.workbookId,
@@ -191,7 +191,7 @@ describe('Moving workbooks', () => {
             .expect(200);
 
         expect(response.body).toStrictEqual({
-            workbooks: expect.arrayContaining([
+            workbooks: expect.toIncludeSameMembers([
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
                     workbookId: targetWorkbook.workbookId,

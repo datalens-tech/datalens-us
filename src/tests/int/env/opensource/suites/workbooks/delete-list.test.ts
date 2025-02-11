@@ -131,7 +131,7 @@ describe('Deleting empty workbooks in the root', () => {
             .expect(200);
 
         expect(response.body).toStrictEqual({
-            workbooks: expect.arrayContaining([
+            workbooks: expect.toIncludeSameMembers([
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
                     collectionId: null,
@@ -184,7 +184,7 @@ describe('Deleting workbooks within collection and with content', () => {
             .expect(200);
 
         expect(response.body).toStrictEqual({
-            workbooks: expect.arrayContaining([
+            workbooks: expect.toIncludeSameMembers([
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
                     collectionId: rootCollectionWithContent.collectionId,

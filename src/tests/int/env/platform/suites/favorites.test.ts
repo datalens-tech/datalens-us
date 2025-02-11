@@ -66,7 +66,7 @@ describe('Favorites', () => {
         const {body} = response;
 
         expect(body).toStrictEqual({
-            entries: expect.arrayContaining([
+            entries: expect.toIncludeSameMembers([
                 {
                     ...GET_FAVORITES_ENTRY_DEFAULT_FIELDS,
                     entryId: entryId,
@@ -120,7 +120,7 @@ describe('Favorites', () => {
         const {body: bodyWithParialPermissions} = responseWithParialPermissions;
 
         expect(bodyWithParialPermissions).toStrictEqual({
-            entries: expect.arrayContaining([
+            entries: expect.toIncludeSameMembers([
                 {
                     ...GET_FAVORITES_ENTRY_DEFAULT_FIELDS,
                     entryId: entryId,
