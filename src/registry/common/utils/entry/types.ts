@@ -28,3 +28,9 @@ export type CheckUpdateEntryAvailability = (args: {
     scope: EntryScope;
     type: string | undefined;
 }) => Promise<void>;
+
+export type CheckServicePlanAvailability = (args: {
+    ctx: AppContext;
+    tenantId: string;
+    checkServicePlan?: string;
+}) => Promise<void>;
