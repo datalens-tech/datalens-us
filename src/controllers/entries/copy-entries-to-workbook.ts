@@ -53,4 +53,6 @@ const controller: AppRouteHandler = async (req, res) => {
     }
 };
 
+controller.manualDecodeId = true;
+
 export {controller as copyEntriesToWorkbook};
