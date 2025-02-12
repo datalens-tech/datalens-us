@@ -20,7 +20,9 @@ env:
 jobs:
   build:
     name: datalens-us
-    runs-on: ubuntu-latest
+    # old ubuntu for fix QEMU build for arm64
+    # https://github.com/docker/setup-qemu-action/issues/198
+    runs-on: ubuntu-22.04
     if: ${{ github.event.workflow_run.conclusion == '' || github.event.workflow_run.conclusion == 'success' }}
     permissions:
       contents: read
