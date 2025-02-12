@@ -102,7 +102,7 @@ describe('Getting root content', () => {
 
         expect(response.body).toStrictEqual({
             ...GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
-            collections: expect.arrayContaining([
+            collections: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
                     collectionId: rootCollection.collectionId,
@@ -124,14 +124,14 @@ describe('Getting root content', () => {
 
         expect(response.body).toStrictEqual({
             ...GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
-            collections: expect.arrayContaining([
+            collections: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
                     collectionId: rootCollection.collectionId,
                     parentId: null,
                 },
             ]),
-            workbooks: expect.arrayContaining([
+            workbooks: expect.toIncludeSameMembers([
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
                     workbookId: rootWorkbook.workbookId,
@@ -165,7 +165,7 @@ describe('Getting collection content', () => {
 
         expect(response.body).toStrictEqual({
             ...GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
-            collections: expect.arrayContaining([
+            collections: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
                     collectionId: nestedCollection.collectionId,
@@ -191,14 +191,14 @@ describe('Getting collection content', () => {
 
         expect(response.body).toStrictEqual({
             ...GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
-            collections: expect.arrayContaining([
+            collections: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
                     collectionId: nestedCollection.collectionId,
                     parentId: rootCollection.collectionId,
                 },
             ]),
-            workbooks: expect.arrayContaining([
+            workbooks: expect.toIncludeSameMembers([
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
                     workbookId: nestedWorkbook.workbookId,
@@ -224,7 +224,7 @@ describe('Getting root content with "includePermissionsInfo" param', () => {
 
         expect(response.body).toStrictEqual({
             ...GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
-            collections: expect.arrayContaining([
+            collections: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
                     collectionId: rootCollection.collectionId,
@@ -235,7 +235,7 @@ describe('Getting root content with "includePermissionsInfo" param', () => {
                     },
                 },
             ]),
-            workbooks: expect.arrayContaining([
+            workbooks: expect.toIncludeSameMembers([
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
                     workbookId: rootWorkbook.workbookId,
@@ -343,7 +343,7 @@ describe('Getting root content with "mode" param', () => {
 
         expect(response.body).toStrictEqual({
             ...GET_COLLECTION_CONTENT_DEFAULT_FIELDS,
-            collections: expect.arrayContaining([
+            collections: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
                     collectionId: rootCollection.collectionId,

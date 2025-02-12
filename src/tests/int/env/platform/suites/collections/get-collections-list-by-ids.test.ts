@@ -91,7 +91,7 @@ describe('Get collections by ids', () => {
             })
             .expect(200);
 
-        expect(response.body).toStrictEqual([
+        expect(response.body).toIncludeSameMembers([
             {
                 ...COLLECTIONS_DEFAULT_FIELDS,
                 collectionId: rootCollection.collectionId,
