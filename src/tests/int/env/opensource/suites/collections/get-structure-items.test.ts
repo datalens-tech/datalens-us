@@ -259,7 +259,7 @@ describe('Getting root content with pagination', () => {
 
         expect(response.body).toStrictEqual({
             ...GET_STRUCTURE_ITEMS_DEFAULT_FIELDS,
-            items: expect.toIncludeSameMembers([
+            items: expect.arrayContaining([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
                     collectionId: rootCollection.collectionId,

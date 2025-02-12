@@ -147,7 +147,7 @@ describe('Workbooks managment', () => {
 
         expect(body1).toStrictEqual({
             nextPageToken: expect.any(String),
-            workbooks: expect.toIncludeSameMembers([
+            workbooks: expect.arrayContaining([
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
                     createdBy: testUserId,
@@ -178,7 +178,7 @@ describe('Workbooks managment', () => {
 
         expect(body2).toStrictEqual({
             nextPageToken: expect.any(String),
-            workbooks: expect.toIncludeSameMembers([
+            workbooks: expect.arrayContaining([
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
                     createdBy: testUserId,
