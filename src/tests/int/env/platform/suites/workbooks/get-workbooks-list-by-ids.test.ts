@@ -91,7 +91,7 @@ describe('Get workbooks by ids', () => {
             })
             .expect(200);
 
-        expect(response.body).toStrictEqual([
+        expect(response.body).toIncludeSameMembers([
             {
                 ...WORKBOOK_DEFAULT_FIELDS,
                 workbookId: rootWorkbook.workbookId,

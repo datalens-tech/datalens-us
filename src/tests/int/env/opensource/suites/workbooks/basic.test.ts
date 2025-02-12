@@ -99,7 +99,7 @@ describe('Workbooks managment', () => {
         const {body} = response;
 
         expect(body).toStrictEqual({
-            workbooks: expect.arrayContaining([
+            workbooks: expect.toIncludeSameMembers([
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
                     createdBy: testUserId,
@@ -354,7 +354,7 @@ describe('Entries in workboooks managment', () => {
         const {body} = response;
 
         expect(body).toStrictEqual({
-            entries: expect.arrayContaining([
+            entries: expect.toIncludeSameMembers([
                 {
                     createdAt: expect.any(String),
                     createdBy: expect.any(String),
@@ -433,7 +433,7 @@ describe('Entries in workboooks managment', () => {
         const {body} = response;
 
         expect(body).toStrictEqual({
-            entries: expect.arrayContaining([
+            entries: expect.toIncludeSameMembers([
                 {
                     createdAt: expect.any(String),
                     createdBy: expect.any(String),

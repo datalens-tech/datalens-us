@@ -158,7 +158,7 @@ describe('Deleting empty and with content collections', () => {
         });
 
         expect(response.body).toStrictEqual({
-            collections: expect.arrayContaining([
+            collections: expect.toIncludeSameMembers([
                 ...collections,
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,

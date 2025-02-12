@@ -90,7 +90,7 @@ describe('Getting root content', () => {
 
         expect(response.body).toStrictEqual({
             ...GET_STRUCTURE_ITEMS_DEFAULT_FIELDS,
-            items: expect.arrayContaining([
+            items: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
                     collectionId: rootCollection.collectionId,
@@ -126,7 +126,7 @@ describe('Getting structure items', () => {
 
         expect(response.body).toStrictEqual({
             ...GET_STRUCTURE_ITEMS_DEFAULT_FIELDS,
-            items: expect.arrayContaining([
+            items: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
                     collectionId: nestedCollection.collectionId,
@@ -189,7 +189,7 @@ describe('Getting root content with "onlyMy" param', () => {
 
         expect(response.body).toStrictEqual({
             ...GET_STRUCTURE_ITEMS_DEFAULT_FIELDS,
-            items: expect.arrayContaining([
+            items: expect.toIncludeAllMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
                     collectionId: rootCollection.collectionId,
