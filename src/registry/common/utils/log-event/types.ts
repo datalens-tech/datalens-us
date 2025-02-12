@@ -18,6 +18,8 @@ import type {
     UpdateColorPaletteReqBody,
     UpdateColorPaletteReqParams,
 } from '../../../../controllers/color-palettes/update-color-palette';
+import type {CopyEntriesToWorkbookReqBody} from '../../../../controllers/entries/copy-entries-to-workbook';
+import type {DeleteEntryReqParams} from '../../../../controllers/entries/delete-entry';
 import type {
     CopyWorkbookReqBody,
     CopyWorkbookReqParams,
@@ -34,9 +36,12 @@ import type {
     UpdateWorkbookReqBody,
     UpdateWorkbookReqParams,
 } from '../../../../controllers/workbooks/update-workbook';
+import OldEntry from '../../../../db/models/entry';
 import type {CollectionModel} from '../../../../db/models/new/collection';
 import {ColorPaletteModel} from '../../../../db/models/new/color-palette';
+import {Entry} from '../../../../db/models/new/entry';
 import type {WorkbookModel} from '../../../../db/models/new/workbook';
+import type {EntryType} from '../../../../types/models';
 
 export enum LogEventType {
     CreateCollectionSuccess = 'createCollectionSuccess',
@@ -86,6 +91,27 @@ export enum LogEventType {
 
     DeleteColorPaletteSuccess = 'deleteColorPaletteSuccess',
     DeleteColorPaletteFail = 'deleteColorPaletteFail',
+
+    CopyEntriesToWorkbookSuccess = 'copyEntriesToWorkbookSuccess',
+    CopyEntriesToWorkbookFail = 'copyEntriesToWorkbookFail',
+
+    CopyEntryToWorkbookSuccess = 'copyEntryToWorkbookSuccess',
+    CopyEntryToWorkbookFail = 'copyEntryToWorkbookFail',
+
+    CreateEntrySuccess = 'createEntrySuccess',
+    CreateEntryFail = 'createEntryFail',
+
+    CreateEntryAltSuccess = 'createEntryAltSuccess',
+    CreateEntryAltFail = 'createEntryAltFail',
+
+    DeleteEntrySuccess = 'deleteEntrySuccess',
+    DeleteEntryFail = 'deleteEntryFail',
+
+    RenameEntrySuccess = 'renameEntrySuccess',
+    RenameEntryFail = 'renameEntryFail',
+
+    UpdateEntrySuccess = 'updateEntrySuccess',
+    UpdateEntryFail = 'updateEntryFail',
 }
 
 interface EventParams {
@@ -329,6 +355,139 @@ export interface LogEventDeleteColorPaletteFailParams extends EventParams {
     error: unknown;
 }
 
+export interface LogEventCopyEntriesToWorkbookSuccessParams extends EventParams {
+    type: LogEventType.CopyEntriesToWorkbookSuccess;
+
+    reqBody: CopyEntriesToWorkbookReqBody;
+    data: {
+        workbookId: string;
+    };
+}
+
+export interface LogEventCopyEntriesToWorkbookFailParams extends EventParams {
+    type: LogEventType.CopyEntriesToWorkbookFail;
+
+    reqBody: CopyEntriesToWorkbookReqBody;
+    error: unknown;
+}
+
+export interface LogEventDeleteEntrySuccessParams extends EventParams {
+    type: LogEventType.DeleteEntrySuccess;
+
+    reqParams: DeleteEntryReqParams;
+    entry: OldEntry | undefined;
+}
+
+export interface LogEventDeleteEntryFailParams extends EventParams {
+    type: LogEventType.DeleteEntryFail;
+
+    reqParams: DeleteEntryReqParams;
+    error: unknown;
+}
+
+type CopyEntryToWorkbookReqParams = {
+    entryId?: string;
+    workbookId?: string;
+};
+
+export interface LogEventCopyEntryToWorkbookSuccessParams extends EventParams {
+    type: LogEventType.CopyEntryToWorkbookSuccess;
+
+    reqParams: CopyEntryToWorkbookReqParams;
+    entry: Entry;
+}
+
+export interface LogEventCopyEntryToWorkbookFailParams extends EventParams {
+    type: LogEventType.CopyEntryToWorkbookFail;
+
+    reqParams: CopyEntryToWorkbookReqParams;
+    error: unknown;
+}
+
+type CreateEntryReqParams = {
+    workbookId?: string;
+    name?: string;
+    scope?: string;
+    type?: string;
+    key?: string;
+    recursion?: boolean;
+};
+
+export interface LogEventCreateEntrySuccessParams extends EventParams {
+    type: LogEventType.CreateEntrySuccess;
+
+    reqParams: CreateEntryReqParams;
+    data: OldEntry | OldEntry[] | undefined;
+}
+
+export interface LogEventCreateEntryFailParams extends EventParams {
+    type: LogEventType.CreateEntryFail;
+
+    reqParams: CreateEntryReqParams;
+    error: unknown;
+}
+
+type CreateEntryAltReqParams = {
+    workbookId?: string;
+    name?: string;
+    scope?: string;
+    type?: string;
+    key?: string;
+    recursion?: boolean;
+};
+
+export interface LogEventCreateEntryAltSuccessParams extends EventParams {
+    type: LogEventType.CreateEntryAltSuccess;
+
+    reqParams: CreateEntryAltReqParams;
+    data: Entry | EntryType | EntryType[] | undefined;
+}
+
+export interface LogEventCreateEntryAltFailParams extends EventParams {
+    type: LogEventType.CreateEntryAltFail;
+
+    reqParams: CreateEntryAltReqParams;
+    error: unknown;
+}
+
+type RenameEntryReqParams = {
+    entryId?: string;
+    name?: string;
+};
+
+export interface LogEventRenameEntrySuccessParams extends EventParams {
+    type: LogEventType.RenameEntrySuccess;
+
+    reqParams: RenameEntryReqParams;
+    data: OldEntry[];
+}
+
+export interface LogEventRenameEntryFailParams extends EventParams {
+    type: LogEventType.RenameEntryFail;
+
+    reqParams: RenameEntryReqParams;
+    error: unknown;
+}
+
+type UpdateEntryReqParams = {
+    entryId?: string;
+    name?: string;
+};
+
+export interface LogEventUpdateEntrySuccessParams extends EventParams {
+    type: LogEventType.UpdateEntrySuccess;
+
+    reqParams: UpdateEntryReqParams;
+    data: OldEntry | undefined;
+}
+
+export interface LogEventUpdateEntryFailParams extends EventParams {
+    type: LogEventType.UpdateEntryFail;
+
+    reqParams: UpdateEntryReqParams;
+    error: unknown;
+}
+
 export type LogEventParams =
     | LogEventCreateCollectionSuccessParams
     | LogEventCreateCollectionFailParams
@@ -361,6 +520,20 @@ export type LogEventParams =
     | LogEventUpdateColorPaletteSuccessParams
     | LogEventUpdateColorPaletteFailParams
     | LogEventDeleteColorPaletteSuccessParams
-    | LogEventDeleteColorPaletteFailParams;
+    | LogEventDeleteColorPaletteFailParams
+    | LogEventCopyEntriesToWorkbookSuccessParams
+    | LogEventCopyEntriesToWorkbookFailParams
+    | LogEventDeleteEntrySuccessParams
+    | LogEventDeleteEntryFailParams
+    | LogEventCopyEntryToWorkbookSuccessParams
+    | LogEventCopyEntryToWorkbookFailParams
+    | LogEventCreateEntrySuccessParams
+    | LogEventCreateEntryFailParams
+    | LogEventCreateEntryAltSuccessParams
+    | LogEventCreateEntryAltFailParams
+    | LogEventRenameEntrySuccessParams
+    | LogEventRenameEntryFailParams
+    | LogEventUpdateEntrySuccessParams
+    | LogEventUpdateEntryFailParams;
 
 export type LogEvent = (params: LogEventParams) => void;
