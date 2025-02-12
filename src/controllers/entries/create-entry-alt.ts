@@ -16,6 +16,7 @@ const controller: AppRouteHandler = async (req, res) => {
         scope: body.scope,
         type: body.type,
         key: body.key,
+        recursion: body.recursion,
     };
 
     try {

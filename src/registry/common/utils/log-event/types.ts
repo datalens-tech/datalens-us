@@ -410,6 +410,7 @@ type CreateEntryReqParams = {
     scope?: string;
     type?: string;
     key?: string;
+    recursion?: boolean;
 };
 
 export interface LogEventCreateEntrySuccessParams extends EventParams {
@@ -432,6 +433,7 @@ type CreateEntryAltReqParams = {
     scope?: string;
     type?: string;
     key?: string;
+    recursion?: boolean;
 };
 
 export interface LogEventCreateEntryAltSuccessParams extends EventParams {
