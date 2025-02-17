@@ -1,24 +1,62 @@
 import {OpenAPIRegistry, OpenApiGeneratorV31} from '@asteasolutions/zod-to-openapi';
-import {AuthPolicy, ExpressKit} from '@gravity-ui/expresskit';
+import {ExpressKit} from '@gravity-ui/expresskit';
 import swaggerUi from 'swagger-ui-express';
-import {ZodType, z} from 'zod';
+import {ZodType} from 'zod';
 
-import {US_MASTER_TOKEN_HEADER} from '../../const';
 import type {ExtendedAppRouteDescription} from '../../routes';
 
-import type {Method} from './types';
+import type {GetAdditionalHeadersResult, GetAdditionalSecuritySchemesResult, Method} from './types';
 
-export {ApiTag} from './tags';
-export * from './utils';
+export {getAdditionalHeaders, getAdditionalSecuritySchemes} from './utils';
+export {ApiTag, SecurityType} from './constants';
+export {
+    SecuritySchemeObject,
+    GetAdditionalHeadersResult,
+    GetAdditionalSecuritySchemesResult,
+} from './types';
 
 const openApiRegistry = new OpenAPIRegistry();
 
+export const initSwagger = (
+    app: ExpressKit,
+    securitySchemes?: GetAdditionalSecuritySchemesResult,
+) => {
+    const {config} = app;
+
+    const installationText = `Installation – <b>${config.appInstallation}</b>`;
+    const envText = `Env – <b>${config.appEnv}</b>`;
+    const descriptionText = `<br />Storage for DataLens entities.`;
+
+    setImmediate(() => {
+        if (securitySchemes) {
+            Object.keys(securitySchemes).forEach((securityType) => {
+                openApiRegistry.registerComponent('securitySchemes', securityType, {
+                    ...securitySchemes[securityType],
+                });
+            });
+        }
+
+        app.express.use(
+            '/api-docs',
+            swaggerUi.serve,
+            swaggerUi.setup(
+                new OpenApiGeneratorV31(openApiRegistry.definitions).generateDocument({
+                    openapi: '3.1.0',
+                    info: {
+                        version: `${config.appVersion}`,
+                        title: `United Storage `,
+                        description: [installationText, envText, descriptionText].join('<br />'),
+                    },
+                    servers: [{url: '/'}],
+                }),
+            ),
+        );
+    });
+};
+
 export const registerApiRoute = (
     routeDescription: ExtendedAppRouteDescription<unknown>,
-    {
-        headers: additionalHeaders,
-        security: additionalSecurity,
-    }: {headers: ZodType<unknown>[]; security: {[key: string]: any}[]},
+    {headers: additionalHeaders, security: additionalSecurity}: GetAdditionalHeadersResult,
 ) => {
     const {route, handler} = routeDescription;
     const {api} = handler;
@@ -46,14 +84,6 @@ export const registerApiRoute = (
 
         const headers: ZodType<unknown>[] = [];
 
-        if (routeDescription.private) {
-            headers.push(
-                z.strictObject({
-                    [US_MASTER_TOKEN_HEADER]: z.string(),
-                }),
-            );
-        }
-
         if (additionalHeaders) {
             headers.push(...additionalHeaders);
         }
@@ -78,40 +108,4 @@ export const registerApiRoute = (
             security: [...additionalSecurity],
         });
     }
-};
-
-export const initSwagger = (app: ExpressKit) => {
-    const {config} = app;
-
-    const installationText = `Installation – <b>${config.appInstallation}</b>`;
-    const envText = `Env – <b>${config.appEnv}</b>`;
-    const descriptionText = `<br />Storage for DataLens entities.`;
-
-    setImmediate(() => {
-        const authDisabled = config.appAuthPolicy === AuthPolicy.disabled;
-
-        if (!authDisabled && (config.zitadelEnabled || config.isAuthEnabled)) {
-            openApiRegistry.registerComponent('securitySchemes', 'bearerAuth', {
-                type: 'http',
-                scheme: 'bearer',
-                bearerFormat: 'JWT',
-            });
-        }
-
-        app.express.use(
-            '/api-docs',
-            swaggerUi.serve,
-            swaggerUi.setup(
-                new OpenApiGeneratorV31(openApiRegistry.definitions).generateDocument({
-                    openapi: '3.1.0',
-                    info: {
-                        version: `${config.appVersion}`,
-                        title: `United Storage `,
-                        description: [installationText, envText, descriptionText].join('<br />'),
-                    },
-                    servers: [{url: '/'}],
-                }),
-            ),
-        );
-    });
 };

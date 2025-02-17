@@ -28,6 +28,11 @@ export {
     initSwagger,
     ApiTag,
     getAdditionalHeaders,
+    getAdditionalSecuritySchemes,
+    SecurityType,
+    SecuritySchemeObject,
+    GetAdditionalHeadersResult,
+    GetAdditionalSecuritySchemesResult,
 } from '../src/components/api-docs';
 export {
     makeParser,
