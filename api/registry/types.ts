@@ -54,5 +54,8 @@ export type {GatewayApi} from '../../src/registry';
 export type {
     CheckCreateEntryAvailability,
     CheckUpdateEntryAvailability,
-    CheckServicePlanAvailability,
 } from '../../src/registry/common/utils/entry/types';
+export type {
+    CheckServicePlanAvailability,
+    GetServicePlan,
+} from '../../src/registry/common/utils/tenant/types';

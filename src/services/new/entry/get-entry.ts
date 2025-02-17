@@ -51,7 +51,7 @@ export interface GetEntryArgs {
     branch?: 'saved' | 'published';
     includePermissionsInfo: boolean;
     includeLinks: boolean;
-    checkServicePlan?: string;
+    includeServicePlan?: boolean;
 }
 
 export type GetEntryResult = {
@@ -59,6 +59,8 @@ export type GetEntryResult = {
     permissions: EntryPermissions;
     includePermissionsInfo: boolean;
     includeLinks: boolean;
+    servicePlan?: string;
+    includeServicePlan?: boolean;
 };
 
 // eslint-disable-next-line complexity
@@ -72,7 +74,7 @@ export const getEntry = async (
         branch = 'saved',
         includePermissionsInfo,
         includeLinks,
-        checkServicePlan,
+        includeServicePlan,
     } = args;
 
     ctx.log('GET_ENTRY_REQUEST', {
@@ -81,7 +83,7 @@ export const getEntry = async (
         branch,
         includePermissionsInfo,
         includeLinks,
-        checkServicePlan,
+        includeServicePlan,
     });
 
     const registry = ctx.get('registry');
@@ -127,8 +129,7 @@ export const getEntry = async (
     });
 
     if (joinedEntryRevisionFavorite) {
-        const {isNeedBypassEntryByKey, checkServicePlanAvailability} =
-            registry.common.functions.get();
+        const {isNeedBypassEntryByKey, getServicePlan} = registry.common.functions.get();
 
         const dlsBypassByKeyEnabled = isNeedBypassEntryByKey(
             ctx,
@@ -199,11 +200,11 @@ export const getEntry = async (
             }
         }
 
-        if (joinedEntryRevisionFavorite.tenantId) {
-            await checkServicePlanAvailability({
+        let servicePlan: string | undefined;
+        if (includeServicePlan && joinedEntryRevisionFavorite.tenantId) {
+            servicePlan = await getServicePlan({
                 ctx,
                 tenantId: joinedEntryRevisionFavorite.tenantId,
-                checkServicePlan,
             });
         }
 
@@ -225,6 +226,8 @@ export const getEntry = async (
             permissions,
             includePermissionsInfo,
             includeLinks,
+            servicePlan,
+            includeServicePlan,
         };
     } else {
         throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {

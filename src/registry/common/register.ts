@@ -11,13 +11,13 @@ import {colorPalettesAdminValidator} from './utils/color-palettes/utils';
 import {checkEmbedding} from './utils/embedding/utils';
 import {
     checkCreateEntryAvailability,
-    checkServicePlanAvailability,
     checkUpdateEntryAvailability,
     getEntryAddFormattedFieldsHook,
     getEntryBeforeDbRequestHook,
     isNeedBypassEntryByKey,
 } from './utils/entry/utils';
 import {logEvent} from './utils/log-event/utils';
+import {checkServicePlanAvailability, getServicePlan} from './utils/tenant/utils';
 
 export const registerCommonPlugins = () => {
     registry.common.classes.register({
@@ -40,5 +40,6 @@ export const registerCommonPlugins = () => {
         checkUpdateEntryAvailability,
         logEvent,
         checkServicePlanAvailability,
+        getServicePlan,
     });
 };

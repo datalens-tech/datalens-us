@@ -2,7 +2,14 @@ import {GetEntryResult} from '../../../../services/new/entry/get-entry';
 import {CTX} from '../../../../types/models';
 
 export const formatGetEntryResponse = async (ctx: CTX, result: GetEntryResult) => {
-    const {joinedEntryRevisionFavorite, permissions, includePermissionsInfo, includeLinks} = result;
+    const {
+        joinedEntryRevisionFavorite,
+        permissions,
+        includePermissionsInfo,
+        includeLinks,
+        servicePlan,
+        includeServicePlan,
+    } = result;
 
     const {privatePermissions, onlyPublic} = ctx.get('info');
     const registry = ctx.get('registry');
@@ -45,6 +52,7 @@ export const formatGetEntryResponse = async (ctx: CTX, result: GetEntryResult) =
         links: includeLinks ? joinedEntryRevisionFavorite.links : undefined,
         isFavorite: isHiddenIsFavorite ? undefined : joinedEntryRevisionFavorite.isFavorite,
         permissions: includePermissionsInfo ? permissions : undefined,
+        servicePlan: includeServicePlan ? servicePlan : undefined,
         ...additionalFields,
     };
 };
