@@ -170,7 +170,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
             checkServicePlanAvailability({
                 ctx,
                 tenantId: entry.tenantId,
-                checkServicePlan,
+                servicePlan: checkServicePlan,
             }),
         ]);
 

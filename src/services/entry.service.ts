@@ -50,7 +50,7 @@ export default class EntryService {
 
         await Promise.all([
             checkCreateEntryAvailability({ctx, tenantId, scope, type}),
-            checkServicePlanAvailability({ctx, tenantId, checkServicePlan}),
+            checkServicePlanAvailability({ctx, tenantId, servicePlan: checkServicePlan}),
         ]);
 
         if (workbookId) {
@@ -130,7 +130,7 @@ export default class EntryService {
 
         await Promise.all([
             checkCreateEntryAvailability({ctx, tenantId, scope, type}),
-            checkServicePlanAvailability({ctx, tenantId, checkServicePlan}),
+            checkServicePlanAvailability({ctx, tenantId, servicePlan: checkServicePlan}),
         ]);
 
         if (workbookId) {
