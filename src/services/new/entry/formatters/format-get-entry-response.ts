@@ -2,13 +2,20 @@ import {GetEntryResult} from '../../../../services/new/entry/get-entry';
 import {CTX} from '../../../../types/models';
 
 export const formatGetEntryResponse = async (ctx: CTX, result: GetEntryResult) => {
-    const {joinedEntryRevisionFavorite, permissions, includePermissionsInfo, includeLinks} = result;
+    const {
+        joinedEntryRevisionFavoriteTenant,
+        permissions,
+        includePermissionsInfo,
+        includeLinks,
+        servicePlan,
+        includeServicePlan,
+    } = result;
 
     const {privatePermissions, onlyPublic} = ctx.get('info');
     const registry = ctx.get('registry');
 
     let isHiddenUnversionedData = false;
-    if (!privatePermissions.ownedScopes.includes(joinedEntryRevisionFavorite?.scope!)) {
+    if (!privatePermissions.ownedScopes.includes(joinedEntryRevisionFavoriteTenant?.scope!)) {
         isHiddenUnversionedData = true;
     }
 
@@ -22,29 +29,30 @@ export const formatGetEntryResponse = async (ctx: CTX, result: GetEntryResult) =
     const additionalFields = await getEntryAddFormattedFieldsHook({ctx, result});
 
     return {
-        entryId: joinedEntryRevisionFavorite.entryId,
-        scope: joinedEntryRevisionFavorite.scope,
-        type: joinedEntryRevisionFavorite.type,
-        key: joinedEntryRevisionFavorite.displayKey,
+        entryId: joinedEntryRevisionFavoriteTenant.entryId,
+        scope: joinedEntryRevisionFavoriteTenant.scope,
+        type: joinedEntryRevisionFavoriteTenant.type,
+        key: joinedEntryRevisionFavoriteTenant.displayKey,
         unversionedData: isHiddenUnversionedData
             ? undefined
-            : joinedEntryRevisionFavorite.unversionedData,
-        createdBy: joinedEntryRevisionFavorite.createdBy,
-        createdAt: joinedEntryRevisionFavorite.createdAt,
-        updatedBy: joinedEntryRevisionFavorite.updatedBy,
-        updatedAt: joinedEntryRevisionFavorite.updatedAt,
-        savedId: joinedEntryRevisionFavorite.savedId,
-        publishedId: joinedEntryRevisionFavorite.publishedId,
-        revId: joinedEntryRevisionFavorite.revId,
-        tenantId: joinedEntryRevisionFavorite.tenantId,
-        data: joinedEntryRevisionFavorite.data,
-        meta: joinedEntryRevisionFavorite.meta,
-        hidden: joinedEntryRevisionFavorite.hidden,
-        public: joinedEntryRevisionFavorite.public,
-        workbookId: joinedEntryRevisionFavorite.workbookId,
-        links: includeLinks ? joinedEntryRevisionFavorite.links : undefined,
-        isFavorite: isHiddenIsFavorite ? undefined : joinedEntryRevisionFavorite.isFavorite,
+            : joinedEntryRevisionFavoriteTenant.unversionedData,
+        createdBy: joinedEntryRevisionFavoriteTenant.createdBy,
+        createdAt: joinedEntryRevisionFavoriteTenant.createdAt,
+        updatedBy: joinedEntryRevisionFavoriteTenant.updatedBy,
+        updatedAt: joinedEntryRevisionFavoriteTenant.updatedAt,
+        savedId: joinedEntryRevisionFavoriteTenant.savedId,
+        publishedId: joinedEntryRevisionFavoriteTenant.publishedId,
+        revId: joinedEntryRevisionFavoriteTenant.revId,
+        tenantId: joinedEntryRevisionFavoriteTenant.tenantId,
+        data: joinedEntryRevisionFavoriteTenant.data,
+        meta: joinedEntryRevisionFavoriteTenant.meta,
+        hidden: joinedEntryRevisionFavoriteTenant.hidden,
+        public: joinedEntryRevisionFavoriteTenant.public,
+        workbookId: joinedEntryRevisionFavoriteTenant.workbookId,
+        links: includeLinks ? joinedEntryRevisionFavoriteTenant.links : undefined,
+        isFavorite: isHiddenIsFavorite ? undefined : joinedEntryRevisionFavoriteTenant.isFavorite,
         permissions: includePermissionsInfo ? permissions : undefined,
+        servicePlan: includeServicePlan ? servicePlan : undefined,
         ...additionalFields,
     };
 };
