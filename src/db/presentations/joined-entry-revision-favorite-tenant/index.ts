@@ -33,7 +33,6 @@ export class JoinedEntryRevisionFavoriteTenant extends JoinedEntryRevisionFavori
         where: Record<string, unknown> | ((builder: Knex.QueryBuilder) => void);
         joinRevisionArgs: JoinRevisionArgs;
         userLogin: string;
-        disableTenantJoin?: boolean;
         trx: TransactionOrKnex;
     }) {
         return this.query(trx)
