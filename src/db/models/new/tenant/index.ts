@@ -17,6 +17,7 @@ export const TenantColumn = {
     BillingEndedAt: 'billingEndedAt',
     Branding: 'branding',
     Settings: 'settings',
+    Features: 'features',
 } as const;
 
 export class Tenant extends Model {
@@ -44,4 +45,5 @@ export class Tenant extends Model {
     [TenantColumn.BillingEndedAt]!: Nullable<string>;
     [TenantColumn.Branding]!: Record<string, unknown>;
     [TenantColumn.Settings]!: Record<string, unknown>;
+    [TenantColumn.Features]!: Record<string, unknown>;
 }
