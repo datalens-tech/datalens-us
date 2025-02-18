@@ -6,9 +6,9 @@ import {US_ERRORS} from '../../../const';
 import OldEntry from '../../../db/models/entry';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {
-    JoinedEntryRevisionFavorite,
-    JoinedEntryRevisionFavoriteColumns,
-} from '../../../db/presentations/joined-entry-revision-favorite';
+    JoinedEntryRevisionFavoriteTenant,
+    JoinedEntryRevisionFavoriteTenantColumns,
+} from '../../../db/presentations';
 import {DlsActions} from '../../../types/models';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
@@ -55,7 +55,7 @@ export interface GetEntryArgs {
 }
 
 export type GetEntryResult = {
-    joinedEntryRevisionFavorite: JoinedEntryRevisionFavoriteColumns;
+    joinedEntryRevisionFavoriteTenant: JoinedEntryRevisionFavoriteTenantColumns;
     permissions: EntryPermissions;
     includePermissionsInfo: boolean;
     includeLinks: boolean;
@@ -101,7 +101,7 @@ export const getEntry = async (
 
     const isEmbedding = checkEmbedding({ctx});
 
-    const joinedEntryRevisionFavorite = await JoinedEntryRevisionFavorite.findOne({
+    const joinedEntryRevisionFavoriteTenant = await JoinedEntryRevisionFavoriteTenant.findOne({
         where: (builder) => {
             builder.where({
                 [`${Entry.tableName}.entryId`]: entryId,
@@ -128,18 +128,18 @@ export const getEntry = async (
         trx: getReplica(trx),
     });
 
-    if (joinedEntryRevisionFavorite) {
+    if (joinedEntryRevisionFavoriteTenant) {
         const {isNeedBypassEntryByKey, getServicePlan} = registry.common.functions.get();
 
         const dlsBypassByKeyEnabled = isNeedBypassEntryByKey(
             ctx,
-            joinedEntryRevisionFavorite.key as string,
+            joinedEntryRevisionFavoriteTenant.key as string,
         );
 
         let dlsPermissions: any; // TODO: Update the type after refactoring DLS.checkPermission(...)
         let iamPermissions: Optional<EntryPermissions>;
 
-        if (joinedEntryRevisionFavorite.workbookId) {
+        if (joinedEntryRevisionFavoriteTenant.workbookId) {
             const checkWorkbookEnabled =
                 !isPrivateRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
 
@@ -147,14 +147,14 @@ export const getEntry = async (
                 if (isEnabledFeature(ctx, Feature.WorkbookIsolationEnabled)) {
                     checkWorkbookIsolation({
                         ctx,
-                        workbookId: joinedEntryRevisionFavorite.workbookId,
+                        workbookId: joinedEntryRevisionFavoriteTenant.workbookId,
                     });
                 }
 
                 const workbook = await getWorkbook(
                     {ctx, trx},
                     {
-                        workbookId: joinedEntryRevisionFavorite.workbookId,
+                        workbookId: joinedEntryRevisionFavoriteTenant.workbookId,
                         includePermissionsInfo,
                     },
                 );
@@ -162,7 +162,7 @@ export const getEntry = async (
                 if (includePermissionsInfo) {
                     iamPermissions = getEntryPermissionsByWorkbook({
                         workbook,
-                        scope: joinedEntryRevisionFavorite[EntryColumn.Scope],
+                        scope: joinedEntryRevisionFavoriteTenant[EntryColumn.Scope],
                     });
                 }
             }
@@ -196,16 +196,13 @@ export const getEntry = async (
                     });
                 }
 
-                await checkFetchedEntry(ctx, joinedEntryRevisionFavorite, getReplica(trx));
+                await checkFetchedEntry(ctx, joinedEntryRevisionFavoriteTenant, getReplica(trx));
             }
         }
 
         let servicePlan: string | undefined;
-        if (includeServicePlan && joinedEntryRevisionFavorite.tenantId) {
-            servicePlan = await getServicePlan({
-                ctx,
-                tenantId: joinedEntryRevisionFavorite.tenantId,
-            });
+        if (includeServicePlan) {
+            servicePlan = getServicePlan(joinedEntryRevisionFavoriteTenant);
         }
 
         let permissions: EntryPermissions = {};
@@ -222,7 +219,7 @@ export const getEntry = async (
         ctx.log('GET_ENTRY_SUCCESS');
 
         return {
-            joinedEntryRevisionFavorite,
+            joinedEntryRevisionFavoriteTenant,
             permissions,
             includePermissionsInfo,
             includeLinks,

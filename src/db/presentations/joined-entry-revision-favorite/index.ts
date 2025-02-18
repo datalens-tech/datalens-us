@@ -13,7 +13,7 @@ import {
 } from '../joined-entry-revision';
 import {leftJoinFavorite} from '../utils';
 
-const selectedColumns = [
+export const selectedJoinedEntryRevisionFavoriteColumns = [
     ...joinedEntryRevisionColumns,
     raw(`CASE WHEN ${Favorite.tableName}.entry_id IS NULL THEN FALSE ELSE TRUE END AS is_favorite`),
 ];
@@ -35,7 +35,7 @@ export class JoinedEntryRevisionFavorite extends JoinedEntryRevision {
         trx: TransactionOrKnex;
     }) {
         return JoinedEntryRevisionFavorite.query(trx)
-            .select(selectedColumns)
+            .select(selectedJoinedEntryRevisionFavoriteColumns)
             .join(RevisionModel.tableName, joinRevision(joinRevisionArgs))
             .leftJoin(Favorite.tableName, leftJoinFavorite(userLogin))
             .where(where)
@@ -56,7 +56,7 @@ export class JoinedEntryRevisionFavorite extends JoinedEntryRevision {
         trx: TransactionOrKnex;
     }) {
         return JoinedEntryRevisionFavorite.query(trx)
-            .select(selectedColumns)
+            .select(selectedJoinedEntryRevisionFavoriteColumns)
             .join(RevisionModel.tableName, joinRevision(joinRevisionArgs))
             .leftJoin(Favorite.tableName, leftJoinFavorite(userLogin))
             .where(where)
@@ -84,7 +84,7 @@ export class JoinedEntryRevisionFavorite extends JoinedEntryRevision {
         trx: TransactionOrKnex;
     }) {
         return JoinedEntryRevisionFavorite.query(trx)
-            .select(selectedColumns)
+            .select(selectedJoinedEntryRevisionFavoriteColumns)
             .join(RevisionModel.tableName, joinRevision(joinRevisionArgs))
             .leftJoin(Favorite.tableName, leftJoinFavorite(userLogin))
             .where(where)
