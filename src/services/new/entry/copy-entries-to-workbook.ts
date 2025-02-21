@@ -1,6 +1,5 @@
 import {transaction} from 'objection';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {JoinedEntryRevisionColumns} from '../../../db/presentations';
 import Utils, {makeUserId} from '../../../utils';
 import {copyToWorkbook} from '../../entry/actions';
@@ -14,33 +13,10 @@ export type CopyEntriesToWorkbookParams = {
     isMigrateCopiedEntries?: boolean;
 };
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['entryIds', 'workbookId'],
-    properties: {
-        entryIds: {
-            type: 'array',
-            items: {
-                type: 'string',
-            },
-        },
-        workbookId: {
-            type: 'string',
-        },
-        isMigrateCopiedEntries: {
-            type: 'boolean',
-        },
-    },
-});
-
 export const copyEntriesToWorkbook = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: CopyEntriesToWorkbookParams,
 ) => {
-    if (!skipValidation) {
-        validateArgs(args);
-    }
-
     const {entryIds, workbookId: targetWorkbookId, isMigrateCopiedEntries} = args;
     const {user} = ctx.get('info');
     const updatedBy = makeUserId(user.userId);
