@@ -24,7 +24,7 @@ const controller: AppRouteHandler = async (req, res) => {
 
     try {
         const result = await copyEntriesToWorkbook(
-            {ctx: req.ctx, skipValidation: true},
+            {ctx: req.ctx},
             {
                 entryIds: body.entryIds,
                 workbookId: body.workbookId,
