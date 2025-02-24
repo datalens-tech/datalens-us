@@ -5,6 +5,7 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {US_ERRORS} from '../../../const';
 import OldEntry from '../../../db/models/entry';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
+import {TenantColumn} from '../../../db/models/new/tenant';
 import {
     JoinedEntryRevisionFavoriteTenant,
     JoinedEntryRevisionFavoriteTenantColumns,
@@ -52,6 +53,7 @@ export interface GetEntryArgs {
     includePermissionsInfo: boolean;
     includeLinks: boolean;
     includeServicePlan?: boolean;
+    includeTenantFeatures?: boolean;
 }
 
 export type GetEntryResult = {
@@ -61,6 +63,8 @@ export type GetEntryResult = {
     includeLinks: boolean;
     servicePlan?: string;
     includeServicePlan?: boolean;
+    includeTenantFeatures?: boolean;
+    tenantFeatures?: Record<string, unknown>;
 };
 
 // eslint-disable-next-line complexity
@@ -75,6 +79,7 @@ export const getEntry = async (
         includePermissionsInfo,
         includeLinks,
         includeServicePlan,
+        includeTenantFeatures,
     } = args;
 
     ctx.log('GET_ENTRY_REQUEST', {
@@ -84,6 +89,7 @@ export const getEntry = async (
         includePermissionsInfo,
         includeLinks,
         includeServicePlan,
+        includeTenantFeatures,
     });
 
     const registry = ctx.get('registry');
@@ -205,6 +211,12 @@ export const getEntry = async (
             servicePlan = getServicePlan(joinedEntryRevisionFavoriteTenant);
         }
 
+        let tenantFeatures: Record<string, unknown> | undefined;
+
+        if (includeTenantFeatures) {
+            tenantFeatures = joinedEntryRevisionFavoriteTenant[TenantColumn.Features] || undefined;
+        }
+
         let permissions: EntryPermissions = {};
         if (includePermissionsInfo) {
             permissions = OldEntry.originatePermissions({
@@ -225,6 +237,8 @@ export const getEntry = async (
             includeLinks,
             servicePlan,
             includeServicePlan,
+            includeTenantFeatures,
+            tenantFeatures,
         };
     } else {
         throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {

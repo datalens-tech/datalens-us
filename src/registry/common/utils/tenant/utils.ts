@@ -1,5 +1,5 @@
-import type {CheckServicePlanAvailability, GetServicePlan} from './types';
+import type {CheckTenant, GetServicePlan} from './types';
 
-export const checkServicePlanAvailability: CheckServicePlanAvailability = () => Promise.resolve();
+export const checkTenant: CheckTenant = () => Promise.resolve();
 
 export const getServicePlan: GetServicePlan = () => undefined;

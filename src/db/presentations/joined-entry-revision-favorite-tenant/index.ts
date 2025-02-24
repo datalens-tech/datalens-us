@@ -13,7 +13,11 @@ import {
 } from '../joined-entry-revision-favorite';
 import {leftJoinFavorite} from '../utils';
 
-const selectedTenantColumns = [TenantColumn.BillingStartedAt, TenantColumn.BillingEndedAt] as const;
+const selectedTenantColumns = [
+    TenantColumn.BillingStartedAt,
+    TenantColumn.BillingEndedAt,
+    TenantColumn.Features,
+] as const;
 
 const selectedColumns = [
     ...selectedJoinedEntryRevisionFavoriteColumns,

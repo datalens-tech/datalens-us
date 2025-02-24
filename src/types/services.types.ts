@@ -46,6 +46,7 @@ export interface CreateEntry extends StdServiceParams {
     initialPermissions?: any;
     initialParentId?: string;
     checkServicePlan?: string;
+    checkTenantFeatures?: string[];
 }
 
 export interface ResolveTenantIdByEntryId extends StdServiceParams {

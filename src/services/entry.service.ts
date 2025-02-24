@@ -40,17 +40,22 @@ export default class EntryService {
         initialPermissions,
         initialParentId,
         checkServicePlan,
+        checkTenantFeatures,
         ctx,
     }: ST.CreateEntry) {
         const {requestId, tenantId, user, dlContext, isPrivateRoute} = ctx.get('info');
 
         const registry = ctx.get('registry');
-        const {checkCreateEntryAvailability, checkServicePlanAvailability} =
-            registry.common.functions.get();
+        const {checkCreateEntryAvailability, checkTenant} = registry.common.functions.get();
 
         await Promise.all([
             checkCreateEntryAvailability({ctx, tenantId, scope, type}),
-            checkServicePlanAvailability({ctx, tenantId, servicePlan: checkServicePlan}),
+            checkTenant({
+                ctx,
+                tenantId,
+                servicePlan: checkServicePlan,
+                features: checkTenantFeatures,
+            }),
         ]);
 
         if (workbookId) {
@@ -115,6 +120,7 @@ export default class EntryService {
         initialPermissions,
         initialParentId,
         checkServicePlan,
+        checkTenantFeatures,
         ctx,
     }: ST.CreateEntry) {
         const {
@@ -125,12 +131,16 @@ export default class EntryService {
         } = ctx.get('info');
 
         const registry = ctx.get('registry');
-        const {checkCreateEntryAvailability, checkServicePlanAvailability} =
-            registry.common.functions.get();
+        const {checkCreateEntryAvailability, checkTenant} = registry.common.functions.get();
 
         await Promise.all([
             checkCreateEntryAvailability({ctx, tenantId, scope, type}),
-            checkServicePlanAvailability({ctx, tenantId, servicePlan: checkServicePlan}),
+            checkTenant({
+                ctx,
+                tenantId,
+                servicePlan: checkServicePlan,
+                features: checkTenantFeatures,
+            }),
         ]);
 
         if (workbookId) {

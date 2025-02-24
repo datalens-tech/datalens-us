@@ -28,6 +28,7 @@ const controller: AppRouteHandler = async (req, res) => {
             skipSyncLinks: body.skipSyncLinks,
             updateRevision: body.updateRevision,
             checkServicePlan: body.checkServicePlan,
+            checkTenantFeatures: body.checkTenantFeatures,
         });
 
         logEvent({
