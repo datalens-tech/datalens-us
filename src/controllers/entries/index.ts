@@ -57,6 +57,7 @@ export default {
                 includePermissionsInfo: isTrueArg(query.includePermissionsInfo),
                 includeLinks: isTrueArg(query.includeLinks),
                 includeServicePlan: isTrueArg(query.includeServicePlan),
+                includeTenantFeatures: isTrueArg(query.includeTenantFeatures),
             },
         );
         const formattedResponse = await formatGetEntryResponse(req.ctx, result);

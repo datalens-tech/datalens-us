@@ -9,6 +9,8 @@ export const formatGetEntryResponse = async (ctx: CTX, result: GetEntryResult) =
         includeLinks,
         servicePlan,
         includeServicePlan,
+        includeTenantFeatures,
+        tenantFeatures,
     } = result;
 
     const {privatePermissions, onlyPublic} = ctx.get('info');
@@ -53,6 +55,7 @@ export const formatGetEntryResponse = async (ctx: CTX, result: GetEntryResult) =
         isFavorite: isHiddenIsFavorite ? undefined : joinedEntryRevisionFavoriteTenant.isFavorite,
         permissions: includePermissionsInfo ? permissions : undefined,
         servicePlan: includeServicePlan ? servicePlan : undefined,
+        tenantFeatures: includeTenantFeatures ? tenantFeatures : undefined,
         ...additionalFields,
     };
 };

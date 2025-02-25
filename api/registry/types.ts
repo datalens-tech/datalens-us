@@ -55,7 +55,4 @@ export type {
     CheckCreateEntryAvailability,
     CheckUpdateEntryAvailability,
 } from '../../src/registry/common/utils/entry/types';
-export type {
-    CheckServicePlanAvailability,
-    GetServicePlan,
-} from '../../src/registry/common/utils/tenant/types';
+export type {CheckTenant, GetServicePlan} from '../../src/registry/common/utils/tenant/types';

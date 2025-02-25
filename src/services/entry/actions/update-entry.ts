@@ -101,6 +101,7 @@ type UpdateEntryData = {
     useLegacyLogin?: boolean;
     updateRevision?: boolean;
     checkServicePlan?: string;
+    checkTenantFeatures?: string[];
 };
 
 export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
@@ -122,6 +123,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         useLegacyLogin = false,
         updateRevision = false,
         checkServicePlan,
+        checkTenantFeatures,
     } = updateData;
 
     ctx.log('UPDATE_ENTRY_REQUEST', {
@@ -137,6 +139,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         skipSyncLinks,
         updateRevision,
         checkServicePlan,
+        checkTenantFeatures,
     });
 
     const registry = ctx.get('registry');
@@ -157,8 +160,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
             await checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
         }
 
-        const {checkUpdateEntryAvailability, checkServicePlanAvailability} =
-            registry.common.functions.get();
+        const {checkUpdateEntryAvailability, checkTenant} = registry.common.functions.get();
 
         await Promise.all([
             checkUpdateEntryAvailability({
@@ -167,10 +169,11 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                 scope: entry.scope,
                 type: entry.type,
             }),
-            checkServicePlanAvailability({
+            checkTenant({
                 ctx,
                 tenantId: entry.tenantId,
                 servicePlan: checkServicePlan,
+                features: checkTenantFeatures,
             }),
         ]);
 

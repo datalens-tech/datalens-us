@@ -40,6 +40,7 @@ const controller: AppRouteHandler = async (req, res) => {
             initialPermissions: body.initialPermissions,
             initialParentId: body.initialParentId,
             checkServicePlan: body.checkServicePlan,
+            checkTenantFeatures: body.checkTenantFeatures,
             ctx: req.ctx,
         });
 

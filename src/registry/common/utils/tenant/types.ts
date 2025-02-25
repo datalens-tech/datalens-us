@@ -2,10 +2,11 @@ import type {AppContext} from '@gravity-ui/nodekit';
 
 import {Tenant, TenantColumn} from '../../../../db/models/new/tenant';
 
-export type CheckServicePlanAvailability = (args: {
+export type CheckTenant = (args: {
     ctx: AppContext;
     tenantId: string;
     servicePlan?: string;
+    features?: string[];
 }) => Promise<void>;
 
 export type GetServicePlan = (
