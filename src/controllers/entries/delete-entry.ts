@@ -18,7 +18,7 @@ export type DeleteEntryReqParams = z.infer<typeof requestSchema.params>;
 
 const parseReq = makeReqParser(requestSchema);
 
-const controller: AppRouteHandler = async (req, res) => {
+export const deleteEntryController: AppRouteHandler = async (req, res) => {
     const {query, params} = await parseReq(req);
 
     const registry = req.ctx.get('registry');
@@ -54,6 +54,4 @@ const controller: AppRouteHandler = async (req, res) => {
     }
 };
 
-controller.manualDecodeId = true;
-
-export {controller as deleteEntry};
+deleteEntryController.manualDecodeId = true;

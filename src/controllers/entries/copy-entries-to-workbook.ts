@@ -16,7 +16,7 @@ export type CopyEntriesToWorkbookReqBody = z.infer<typeof requestSchema.body>;
 
 const parseReq = makeReqParser(requestSchema);
 
-const controller: AppRouteHandler = async (req, res) => {
+export const copyEntriesToWorkbookController: AppRouteHandler = async (req, res) => {
     const {body} = await parseReq(req);
 
     const registry = req.ctx.get('registry');
@@ -53,6 +53,4 @@ const controller: AppRouteHandler = async (req, res) => {
     }
 };
 
-controller.manualDecodeId = true;
-
-export {controller as copyEntriesToWorkbook};
+copyEntriesToWorkbookController.manualDecodeId = true;

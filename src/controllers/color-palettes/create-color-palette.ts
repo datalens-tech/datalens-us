@@ -25,7 +25,10 @@ export type CreateColorPaletteReqBody = z.infer<typeof requestSchema.body>;
 
 const parseReq = makeReqParser(requestSchema);
 
-const controller: AppRouteHandler = async (req, res: Response<ColorPaletteResponseModel>) => {
+export const createColorPaletteController: AppRouteHandler = async (
+    req,
+    res: Response<ColorPaletteResponseModel>,
+) => {
     const {body} = await parseReq(req);
 
     const {displayName, colors, isDefault, isGradient} = body;
@@ -64,7 +67,7 @@ const controller: AppRouteHandler = async (req, res: Response<ColorPaletteRespon
     }
 };
 
-controller.api = {
+createColorPaletteController.api = {
     summary: 'Create color palette',
     tags: [ApiTag.ColorPalettes],
     request: {
@@ -88,6 +91,4 @@ controller.api = {
     },
 };
 
-controller.manualDecodeId = true;
-
-export {controller as createColorPalette};
+createColorPaletteController.manualDecodeId = true;

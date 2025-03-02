@@ -22,7 +22,7 @@ export type MoveWorkbooksListReqBody = z.infer<typeof requestSchema.body>;
 
 const parseReq = makeReqParser(requestSchema);
 
-const controller: AppRouteHandler = async (
+export const moveWorkbooksListController: AppRouteHandler = async (
     req,
     res: Response<WorkbookModelArrayInObjectResponseModel>,
 ) => {
@@ -62,7 +62,7 @@ const controller: AppRouteHandler = async (
     }
 };
 
-controller.api = {
+moveWorkbooksListController.api = {
     summary: 'Move workbooks list',
     tags: [ApiTag.Workbooks],
     request: {
@@ -86,6 +86,4 @@ controller.api = {
     },
 };
 
-controller.manualDecodeId = true;
-
-export {controller as moveWorkbooksList};
+moveWorkbooksListController.manualDecodeId = true;

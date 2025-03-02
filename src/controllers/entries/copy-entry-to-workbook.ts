@@ -5,7 +5,7 @@ import {LogEventType} from '../../registry/common/utils/log-event/types';
 import {copyEntryToWorkbook} from '../../services/new/entry';
 import {formatEntryModel} from '../../services/new/entry/formatters';
 
-const controller: AppRouteHandler = async (req, res) => {
+export const copyEntryToWorkbookController: AppRouteHandler = async (req, res) => {
     const {params, body} = req;
 
     const registry = req.ctx.get('registry');
@@ -45,5 +45,3 @@ const controller: AppRouteHandler = async (req, res) => {
         throw error;
     }
 };
-
-export {controller as copyEntryToWorkbook};

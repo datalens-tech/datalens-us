@@ -3,16 +3,16 @@ import type {HttpMethod} from '@gravity-ui/expresskit/dist/types';
 import type {NodeKit} from '@gravity-ui/nodekit';
 
 import {Feature} from './components/features';
-import collectionsController from './controllers/collections';
-import colorPalettesController from './controllers/color-palettes';
-import entriesController from './controllers/entries';
-import favoritesController from './controllers/favorites';
-import helpersController from './controllers/helpers';
+import collections from './controllers/collections';
+import colorPalettes from './controllers/color-palettes';
+import entries from './controllers/entries';
+import favorites from './controllers/favorites';
+import helpers from './controllers/helpers';
 import homeController from './controllers/home';
-import locksController from './controllers/locks';
-import statesController from './controllers/states';
-import structureItemsController from './controllers/structure-items';
-import workbooksController from './controllers/workbooks';
+import locks from './controllers/locks';
+import states from './controllers/states';
+import structureItems from './controllers/structure-items';
+import workbooks from './controllers/workbooks';
 
 export type GetRoutesOptions = {
     beforeAuth: AppMiddleware[];
@@ -41,67 +41,67 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         ping: {
             route: 'GET /ping',
-            handler: helpersController.ping,
+            handler: helpers.ping,
             authPolicy: AuthPolicy.disabled,
         },
         pingDb: {
             route: 'GET /ping-db',
-            handler: helpersController.pingDb,
+            handler: helpers.pingDb,
             authPolicy: AuthPolicy.disabled,
         },
         pingDbPrimary: {
             route: 'GET /ping-db-primary',
-            handler: helpersController.pingDbPrimary,
+            handler: helpers.pingDbPrimary,
             authPolicy: AuthPolicy.disabled,
         },
         pool: {
             route: 'GET /pool',
-            handler: helpersController.pool,
+            handler: helpers.pool,
             authPolicy: AuthPolicy.disabled,
         },
 
         getEntry: makeRoute({
             route: 'GET /v1/entries/:entryId',
-            handler: entriesController.getEntry,
+            handler: entries.getEntry,
         }),
         privateGetEntry: makeRoute({
             route: 'GET /private/entries/:entryId',
-            handler: entriesController.getEntry,
+            handler: entries.getEntry,
             authPolicy: AuthPolicy.disabled,
             private: true,
         }),
 
         getEntryMeta: makeRoute({
             route: 'GET /v1/entries/:entryId/meta',
-            handler: entriesController.getEntryMeta,
+            handler: entries.getEntryMeta,
         }),
         privateGetEntryMeta: makeRoute({
             route: 'GET /private/entries/:entryId/meta',
-            handler: entriesController.getEntryMeta,
+            handler: entries.getEntryMeta,
             authPolicy: AuthPolicy.disabled,
             private: true,
         }),
         privateGetEntryMetaAlt: makeRoute({
             route: 'GET /private/getEntryMeta/:entryId',
-            handler: entriesController.getEntryMetaPrivate,
+            handler: entries.getEntryMetaPrivate,
             private: true,
         }),
 
         createEntry: makeRoute({
             route: 'POST /v1/entries',
-            handler: entriesController.createEntry,
+            handler: entries.createEntryController,
             write: true,
         }),
         privateCreateEntry: makeRoute({
             route: 'POST /private/entries',
-            handler: entriesController.createEntry,
+            handler: entries.createEntryController,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
         }),
         privateCreateEntryAlt: makeRoute({
             route: 'POST /private/createEntry',
-            handler: entriesController.createEntryAlt,
+            handler: entries.createEntryAltController,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
@@ -109,12 +109,12 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         updateEntry: makeRoute({
             route: 'POST /v1/entries/:entryId',
-            handler: entriesController.updateEntry,
+            handler: entries.updateEntryController,
             write: true,
         }),
         privateUpdateEntry: makeRoute({
             route: 'POST /private/entries/:entryId',
-            handler: entriesController.updateEntry,
+            handler: entries.updateEntryController,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
@@ -122,7 +122,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         privateSwitchRevisionEntry: makeRoute({
             route: 'POST /private/entries/:entryId/switch-revision',
-            handler: entriesController.switchRevisionEntry,
+            handler: entries.switchRevisionEntry,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
@@ -130,12 +130,12 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         renameEntry: makeRoute({
             route: 'POST /v1/entries/:entryId/rename',
-            handler: entriesController.renameEntry,
+            handler: entries.renameEntryController,
             write: true,
         }),
         privateRenameEntry: makeRoute({
             route: 'POST /private/entries/:entryId/rename',
-            handler: entriesController.renameEntry,
+            handler: entries.renameEntryController,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
@@ -143,12 +143,12 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         deleteEntry: makeRoute({
             route: 'DELETE /v1/entries/:entryId',
-            handler: entriesController.deleteEntry,
+            handler: entries.deleteEntryController,
             write: true,
         }),
         privateDeleteEntry: makeRoute({
             route: 'DELETE /private/entries/:entryId',
-            handler: entriesController.deleteEntry,
+            handler: entries.deleteEntryController,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
@@ -156,61 +156,61 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         getEntries: makeRoute({
             route: 'GET /v1/entries',
-            handler: entriesController.getEntries,
+            handler: entries.getEntries,
         }),
         privateGetEntries: makeRoute({
             route: 'GET /private/entries',
-            handler: entriesController.getEntries,
+            handler: entries.getEntries,
             authPolicy: AuthPolicy.disabled,
             private: true,
         }),
 
         getRevisions: makeRoute({
             route: 'GET /v1/entries/:entryId/revisions',
-            handler: entriesController.getRevisions,
+            handler: entries.getRevisions,
         }),
         privateGetRevisions: makeRoute({
             route: 'GET /private/entries/:entryId/revisions',
-            handler: entriesController.getRevisions,
+            handler: entries.getRevisions,
             authPolicy: AuthPolicy.disabled,
             private: true,
         }),
 
         getRelations: makeRoute({
             route: 'GET /v1/entries/:entryId/relations',
-            handler: entriesController.getRelations,
+            handler: entries.getRelations,
         }),
         privateGetRelations: makeRoute({
             route: 'GET /private/entries/:entryId/relations',
-            handler: entriesController.getRelations,
+            handler: entries.getRelations,
             authPolicy: AuthPolicy.disabled,
             private: true,
         }),
 
         getEntriesData: makeRoute({
             route: 'POST /v1/get-entries-data',
-            handler: entriesController.getEntriesData,
+            handler: entries.getEntriesDataController,
         }),
 
         verifyLockExistence: makeRoute({
             route: 'GET /v1/locks/:entryId',
-            handler: locksController.verifyExistence,
+            handler: locks.verifyExistence,
         }),
         privateVerifyLockExistence: makeRoute({
             route: 'GET /private/locks/:entryId',
-            handler: locksController.verifyExistence,
+            handler: locks.verifyExistence,
             authPolicy: AuthPolicy.disabled,
             private: true,
         }),
 
         createLock: makeRoute({
             route: 'POST /v1/locks/:entryId',
-            handler: locksController.lock,
+            handler: locks.lock,
             write: true,
         }),
         privateCreateLock: makeRoute({
             route: 'POST /private/locks/:entryId',
-            handler: locksController.lock,
+            handler: locks.lock,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
@@ -218,12 +218,12 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         deleteLock: makeRoute({
             route: 'DELETE /v1/locks/:entryId',
-            handler: locksController.unlock,
+            handler: locks.unlock,
             write: true,
         }),
         privateDeleteLock: makeRoute({
             route: 'DELETE /private/locks/:entryId',
-            handler: locksController.unlock,
+            handler: locks.unlock,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
@@ -231,12 +231,12 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         extendLock: makeRoute({
             route: 'POST /v1/locks/:entryId/extend',
-            handler: locksController.extend,
+            handler: locks.extend,
             write: true,
         }),
         privateExtendLock: makeRoute({
             route: 'POST /private/locks/:entryId/extend',
-            handler: locksController.extend,
+            handler: locks.extend,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
@@ -244,83 +244,83 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         getState: makeRoute({
             route: 'GET /v1/states/:entryId/:hash',
-            handler: statesController.getState,
+            handler: states.getState,
         }),
         createState: makeRoute({
             route: 'POST /v1/states/:entryId',
-            handler: statesController.createState,
+            handler: states.createState,
             write: true,
         }),
 
         getFavorites: makeRoute({
             route: 'GET /v1/favorites',
-            handler: favoritesController.getFavorites,
+            handler: favorites.getFavorites,
         }),
         addFavorite: makeRoute({
             route: 'POST /v1/favorites/:entryId',
-            handler: favoritesController.addFavorite,
+            handler: favorites.addFavorite,
             write: true,
         }),
         deleteFavorite: makeRoute({
             route: 'DELETE /v1/favorites/:entryId',
-            handler: favoritesController.deleteFavorite,
+            handler: favorites.deleteFavorite,
             write: true,
         }),
         renameFavorite: makeRoute({
             route: 'POST /v1/favorites/:entryId/rename',
-            handler: favoritesController.renameFavorite,
+            handler: favorites.renameFavorite,
             write: true,
         }),
 
         getWorkbookContent: makeRoute({
             route: 'GET /v2/workbooks/:workbookId/entries',
-            handler: workbooksController.getContent,
+            handler: workbooks.getContent,
             features: [Feature.CollectionsEnabled],
         }),
         privateGetWorkbookContent: makeRoute({
             route: 'GET /private/v2/workbooks/:workbookId/entries',
-            handler: workbooksController.getContent,
+            handler: workbooks.getContent,
             authPolicy: AuthPolicy.disabled,
             private: true,
             features: [Feature.CollectionsEnabled],
         }),
         getWorkbook: makeRoute({
             route: 'GET /v2/workbooks/:workbookId',
-            handler: workbooksController.get,
+            handler: workbooks.get,
             features: [Feature.CollectionsEnabled],
         }),
         privateGetWorkbook: makeRoute({
             route: 'GET /private/v2/workbooks/:workbookId',
-            handler: workbooksController.get,
+            handler: workbooks.get,
             authPolicy: AuthPolicy.disabled,
             private: true,
             features: [Feature.CollectionsEnabled],
         }),
         getWorkbooks: makeRoute({
             route: 'GET /v2/workbooks',
-            handler: workbooksController.getList,
+            handler: workbooks.getList,
             features: [Feature.CollectionsEnabled],
         }),
         getWorkbooksListByIds: makeRoute({
             route: 'POST /v2/workbooks-get-list-by-ids',
-            handler: workbooksController.getWorkbooksListByIds,
+            handler: workbooks.getWorkbooksListByIds,
             features: [Feature.CollectionsEnabled],
         }),
         updateWorkbook: makeRoute({
             route: 'POST /v2/workbooks/:workbookId/update',
-            handler: workbooksController.updateWorkbook,
+            handler: workbooks.updateWorkbookController,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         createWorkbook: makeRoute({
             route: 'POST /v2/workbooks',
-            handler: workbooksController.createWorkbook,
+            handler: workbooks.createWorkbookController,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         privateCreateWorkbook: makeRoute({
             route: 'POST /private/v2/workbooks',
-            handler: workbooksController.createWorkbook,
+            handler: workbooks.createWorkbookController,
             write: true,
             authPolicy: AuthPolicy.disabled,
             private: true,
@@ -328,43 +328,43 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
         }),
         deleteWorkbook: makeRoute({
             route: 'DELETE /v2/workbooks/:workbookId',
-            handler: workbooksController.deleteWorkbook,
+            handler: workbooks.deleteWorkbookController,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         deleteWorkbooks: makeRoute({
             route: 'DELETE /v2/delete-workbooks',
-            handler: workbooksController.deleteWorkbooksList,
+            handler: workbooks.deleteWorkbooksListController,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         moveWorkbook: makeRoute({
             route: 'POST /v2/workbooks/:workbookId/move',
-            handler: workbooksController.moveWorkbook,
+            handler: workbooks.moveWorkbookController,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         moveWorkbooks: makeRoute({
             route: 'POST /v2/move-workbooks',
-            handler: workbooksController.moveWorkbooksList,
+            handler: workbooks.moveWorkbooksListController,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         copyWorkbook: makeRoute({
             route: 'POST /v2/workbooks/:workbookId/copy',
-            handler: workbooksController.copyWorkbook,
+            handler: workbooks.copyWorkbookController,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         copyWorkbookTemplate: makeRoute({
             route: 'POST /v2/workbooks/:workbookId/copyTemplate',
-            handler: workbooksController.copyTemplate,
+            handler: workbooks.copyTemplate,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         privateSetIsTemplateWorkbook: makeRoute({
             route: 'POST /private/v2/workbooks/:workbookId/setIsTemplate',
-            handler: workbooksController.setIsTemplate,
+            handler: workbooks.setIsTemplate,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
@@ -373,7 +373,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         privateRestoreWorkbook: makeRoute({
             route: 'POST /private/v2/workbooks/:workbookId/restore',
-            handler: workbooksController.restore,
+            handler: workbooks.restore,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
@@ -382,7 +382,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         privateGetAllWorkbooks: makeRoute({
             route: 'GET /private/all-workbooks',
-            handler: workbooksController.getAll,
+            handler: workbooks.getAll,
             authPolicy: AuthPolicy.disabled,
             private: true,
             features: [Feature.CollectionsEnabled],
@@ -390,13 +390,13 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         createCollection: makeRoute({
             route: 'POST /v1/collections',
-            handler: collectionsController.createCollection,
+            handler: collections.createCollectionController,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         privateCreateCollection: makeRoute({
             route: 'POST /private/v1/collections',
-            handler: collectionsController.createCollection,
+            handler: collections.createCollectionController,
             write: true,
             authPolicy: AuthPolicy.disabled,
             private: true,
@@ -404,112 +404,112 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
         }),
         getCollection: makeRoute({
             route: 'GET /v1/collections/:collectionId',
-            handler: collectionsController.getCollection,
+            handler: collections.getCollectionController,
             features: [Feature.CollectionsEnabled],
         }),
         privateGetCollection: makeRoute({
             route: 'GET /private/v1/collections/:collectionId',
-            handler: collectionsController.getCollection,
+            handler: collections.getCollectionController,
             authPolicy: AuthPolicy.disabled,
             private: true,
             features: [Feature.CollectionsEnabled],
         }),
         getCollectionsListByIds: makeRoute({
             route: 'POST /v1/collections-get-list-by-ids',
-            handler: collectionsController.getCollectionsListByIds,
+            handler: collections.getCollectionsListByIdsController,
             features: [Feature.CollectionsEnabled],
         }),
         getCollectionContent: makeRoute({
             route: 'GET /v1/collection-content',
-            handler: collectionsController.getCollectionContent,
+            handler: collections.getCollectionContentController,
             features: [Feature.CollectionsEnabled],
         }),
         getStructureItems: makeRoute({
             route: 'GET /v1/structure-items',
-            handler: structureItemsController.getStructureItems,
+            handler: structureItems.getStructureItems,
             features: [Feature.CollectionsEnabled],
         }),
         getRootCollectionPermissions: makeRoute({
             route: 'GET /v1/root-collection-permissions',
-            handler: collectionsController.getRootPermissions,
+            handler: collections.getRootPermissionsController,
             features: [Feature.CollectionsEnabled],
         }),
         getCollectionBreadcrumbs: makeRoute({
             route: 'GET /v1/collections/:collectionId/breadcrumbs',
-            handler: collectionsController.getCollectionBreadcrumbs,
+            handler: collections.getCollectionBreadcrumbsController,
             features: [Feature.CollectionsEnabled],
         }),
         deleteCollection: makeRoute({
             route: 'DELETE /v1/collections/:collectionId',
-            handler: collectionsController.deleteCollection,
+            handler: collections.deleteCollectionController,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         deleteCollections: makeRoute({
             route: 'DELETE /v1/delete-collections',
-            handler: collectionsController.deleteCollectionsList,
+            handler: collections.deleteCollectionsListController,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         moveCollection: makeRoute({
             route: 'POST /v1/collections/:collectionId/move',
-            handler: collectionsController.moveCollection,
+            handler: collections.moveCollectionController,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         moveCollections: makeRoute({
             route: 'POST /v1/move-collections',
-            handler: collectionsController.moveCollectionsList,
+            handler: collections.moveCollectionsListController,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
         updateCollection: makeRoute({
             route: 'POST /v1/collections/:collectionId/update',
-            handler: collectionsController.updateCollection,
+            handler: collections.updateCollectionController,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
 
         copyEntryToWorkbook: makeRoute({
             route: 'POST /v2/entries/:entryId/copy',
-            handler: entriesController.copyEntryToWorkbook,
+            handler: entries.copyEntryToWorkbookController,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
 
         copyEntriesToWorkbook: makeRoute({
             route: 'POST /v2/copy-entries',
-            handler: entriesController.copyEntriesToWorkbook,
+            handler: entries.copyEntriesToWorkbookController,
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
 
         getColorPalettes: makeRoute({
             route: 'GET /v1/color-palettes',
-            handler: colorPalettesController.getList,
+            handler: colorPalettes.getList,
             features: [Feature.ColorPalettesEnabled],
         }),
         getColorPalette: makeRoute({
             route: 'GET /v1/color-palettes/:colorPaletteId',
-            handler: colorPalettesController.get,
+            handler: colorPalettes.get,
             authPolicy: AuthPolicy.disabled,
             features: [Feature.ColorPalettesEnabled],
         }),
         createColorPalette: makeRoute({
             route: 'POST /v1/color-palettes',
-            handler: colorPalettesController.createColorPalette,
+            handler: colorPalettes.createColorPaletteController,
             write: true,
             features: [Feature.ColorPalettesEnabled],
         }),
         updateColorPalette: makeRoute({
             route: 'POST /v1/color-palettes/:colorPaletteId/update',
-            handler: colorPalettesController.updateColorPalette,
+            handler: colorPalettes.updateColorPaletteController,
             write: true,
             features: [Feature.ColorPalettesEnabled],
         }),
         deleteColorPalette: makeRoute({
             route: 'DELETE /v1/color-palettes/:colorPaletteId',
-            handler: colorPalettesController.deleteColorPalette,
+            handler: colorPalettes.deleteColorPaletteController,
             write: true,
             features: [Feature.ColorPalettesEnabled],
         }),

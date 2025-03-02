@@ -18,7 +18,7 @@ export type DeleteCollectionReqParams = z.infer<typeof requestSchema.params>;
 
 const parseReq = makeReqParser(requestSchema);
 
-export const controller: AppRouteHandler = async (req, res) => {
+export const deleteCollectionController: AppRouteHandler = async (req, res) => {
     const {params} = await parseReq(req);
 
     const registry = req.ctx.get('registry');
@@ -52,7 +52,7 @@ export const controller: AppRouteHandler = async (req, res) => {
     }
 };
 
-controller.api = {
+deleteCollectionController.api = {
     summary: 'Delete collection',
     tags: [ApiTag.Collections],
     request: {
@@ -70,6 +70,4 @@ controller.api = {
     },
 };
 
-controller.manualDecodeId = true;
-
-export {controller as deleteCollection};
+deleteCollectionController.manualDecodeId = true;

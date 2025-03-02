@@ -4,7 +4,7 @@ import {prepareResponseAsync} from '../../components/response-presenter';
 import {LogEventType} from '../../registry/common/utils/log-event/types';
 import {renameEntry} from '../../services/entry';
 
-const controller: AppRouteHandler = async (req, res) => {
+export const renameEntryController: AppRouteHandler = async (req, res) => {
     const {params, body} = req;
 
     const registry = req.ctx.get('registry');
@@ -39,5 +39,3 @@ const controller: AppRouteHandler = async (req, res) => {
         throw error;
     }
 };
-
-export {controller as renameEntry};

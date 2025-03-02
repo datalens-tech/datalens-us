@@ -4,14 +4,14 @@ import {prepareResponseAsync} from '../../components/response-presenter';
 import {getColorPalette, getColorPalettesList} from '../../services/color-palettes';
 import {formatColorPaletteList} from '../../services/color-palettes/formatters';
 
-import {createColorPalette} from './create-color-palette';
-import {deleteColorPalette} from './delete-color-palette';
-import {updateColorPalette} from './update-color-palette';
+import {createColorPaletteController} from './create-color-palette';
+import {deleteColorPaletteController} from './delete-color-palette';
+import {updateColorPaletteController} from './update-color-palette';
 
 export default {
-    createColorPalette,
-    updateColorPalette,
-    deleteColorPalette,
+    createColorPaletteController,
+    updateColorPaletteController,
+    deleteColorPaletteController,
 
     getList: async (req: Request, res: Response) => {
         const result = await getColorPalettesList(

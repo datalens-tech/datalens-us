@@ -26,24 +26,24 @@ import {
 import * as ST from '../../types/services.types';
 import {isTrueArg} from '../../utils/env-utils';
 
-import {copyEntriesToWorkbook} from './copy-entries-to-workbook';
-import {copyEntryToWorkbook} from './copy-entry-to-workbook';
-import {createEntry} from './create-entry';
-import {createEntryAlt} from './create-entry-alt';
-import {deleteEntry} from './delete-entry';
-import {getEntriesData} from './get-entries-data';
-import {renameEntry} from './rename-entry';
-import {updateEntry} from './update-entry';
+import {copyEntriesToWorkbookController} from './copy-entries-to-workbook';
+import {copyEntryToWorkbookController} from './copy-entry-to-workbook';
+import {createEntryController} from './create-entry';
+import {createEntryAltController} from './create-entry-alt';
+import {deleteEntryController} from './delete-entry';
+import {getEntriesDataController} from './get-entries-data';
+import {renameEntryController} from './rename-entry';
+import {updateEntryController} from './update-entry';
 
 export default {
-    getEntriesData,
-    deleteEntry,
-    copyEntryToWorkbook,
-    copyEntriesToWorkbook,
-    renameEntry,
-    updateEntry,
-    createEntry,
-    createEntryAlt,
+    getEntriesDataController,
+    deleteEntryController,
+    copyEntryToWorkbookController,
+    copyEntriesToWorkbookController,
+    renameEntryController,
+    updateEntryController,
+    createEntryController,
+    createEntryAltController,
 
     getEntry: async (req: Request, res: Response) => {
         const {query, params} = req;

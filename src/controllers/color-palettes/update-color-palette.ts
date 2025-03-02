@@ -29,7 +29,10 @@ export type UpdateColorPaletteReqBody = z.infer<typeof requestSchema.body>;
 
 const parseReq = makeReqParser(requestSchema);
 
-const controller: AppRouteHandler = async (req, res: Response<ColorPaletteResponseModel>) => {
+export const updateColorPaletteController: AppRouteHandler = async (
+    req,
+    res: Response<ColorPaletteResponseModel>,
+) => {
     const {params, body} = await parseReq(req);
 
     const registry = req.ctx.get('registry');
@@ -69,7 +72,7 @@ const controller: AppRouteHandler = async (req, res: Response<ColorPaletteRespon
     }
 };
 
-controller.api = {
+updateColorPaletteController.api = {
     summary: 'Update color palette',
     tags: [ApiTag.ColorPalettes],
     request: {
@@ -94,6 +97,4 @@ controller.api = {
     },
 };
 
-controller.manualDecodeId = true;
-
-export {controller as updateColorPalette};
+updateColorPaletteController.manualDecodeId = true;

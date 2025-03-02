@@ -27,7 +27,7 @@ export type CopyWorkbookReqBody = z.infer<typeof requestSchema.body>;
 
 const parseReq = makeReqParser(requestSchema);
 
-const controller: AppRouteHandler = async (
+export const copyWorkbookController: AppRouteHandler = async (
     req,
     res: Response<WorkbookModelWithOperationResponseModel>,
 ) => {
@@ -70,7 +70,7 @@ const controller: AppRouteHandler = async (
     }
 };
 
-controller.api = {
+copyWorkbookController.api = {
     summary: 'Copy workbook',
     tags: [ApiTag.Workbooks],
     request: {
@@ -95,6 +95,4 @@ controller.api = {
     },
 };
 
-controller.manualDecodeId = true;
-
-export {controller as copyWorkbook};
+copyWorkbookController.manualDecodeId = true;

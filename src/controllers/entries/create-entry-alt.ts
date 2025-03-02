@@ -4,7 +4,7 @@ import {prepareResponseAsync} from '../../components/response-presenter';
 import {LogEventType} from '../../registry/common/utils/log-event/types';
 import EntryService from '../../services/entry.service';
 
-const controller: AppRouteHandler = async (req, res) => {
+export const createEntryAltController: AppRouteHandler = async (req, res) => {
     const {body} = req;
 
     const registry = req.ctx.get('registry');
@@ -63,5 +63,3 @@ const controller: AppRouteHandler = async (req, res) => {
         throw error;
     }
 };
-
-export {controller as createEntryAlt};

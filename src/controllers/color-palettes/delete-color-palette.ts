@@ -17,7 +17,10 @@ export type DeleteColorPaletteReqParams = z.infer<typeof requestSchema.params>;
 
 const parseReq = makeReqParser(requestSchema);
 
-const controller: AppRouteHandler = async (req, res: Response<ColorPaletteResponseModel>) => {
+export const deleteColorPaletteController: AppRouteHandler = async (
+    req,
+    res: Response<ColorPaletteResponseModel>,
+) => {
     const {params} = await parseReq(req);
 
     const {colorPaletteId} = params;
@@ -53,7 +56,7 @@ const controller: AppRouteHandler = async (req, res: Response<ColorPaletteRespon
     }
 };
 
-controller.api = {
+deleteColorPaletteController.api = {
     summary: 'Delete color palette',
     tags: [ApiTag.ColorPalettes],
     request: {
@@ -66,6 +69,4 @@ controller.api = {
     },
 };
 
-controller.manualDecodeId = true;
-
-export {controller as deleteColorPalette};
+deleteColorPaletteController.manualDecodeId = true;

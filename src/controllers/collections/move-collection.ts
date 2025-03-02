@@ -24,7 +24,7 @@ export type MoveCollectionReqBody = z.infer<typeof requestSchema.body>;
 
 const parseReq = makeReqParser(requestSchema);
 
-export const controller: AppRouteHandler = async (req, res) => {
+export const moveCollectionController: AppRouteHandler = async (req, res) => {
     const {params, body} = await parseReq(req);
 
     const registry = req.ctx.get('registry');
@@ -62,7 +62,7 @@ export const controller: AppRouteHandler = async (req, res) => {
     }
 };
 
-controller.api = {
+moveCollectionController.api = {
     summary: 'Move collection',
     tags: [ApiTag.Collections],
     request: {
@@ -87,6 +87,4 @@ controller.api = {
     },
 };
 
-controller.manualDecodeId = true;
-
-export {controller as moveCollection};
+moveCollectionController.manualDecodeId = true;

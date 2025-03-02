@@ -24,7 +24,7 @@ const requestSchema = {
 
 const parseReq = makeReqParser(requestSchema);
 
-export const controller: AppRouteHandler = async (req, res) => {
+export const getCollectionContentController: AppRouteHandler = async (req, res) => {
     const {query} = await parseReq(req);
 
     let collectionsPage: Optional<Nullable<number>>;
@@ -60,7 +60,7 @@ export const controller: AppRouteHandler = async (req, res) => {
     res.status(200).send(await collectionContent.format(result));
 };
 
-controller.api = {
+getCollectionContentController.api = {
     summary: 'Get collection content',
     description: 'Get collection content',
     deprecated: true,
@@ -80,6 +80,4 @@ controller.api = {
     },
 };
 
-controller.manualDecodeId = true;
-
-export {controller as getCollectionContent};
+getCollectionContentController.manualDecodeId = true;
