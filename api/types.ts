@@ -1,3 +1,4 @@
+import '../src/global';
 export type {
     PlatformAppConfig,
     PlatformAppContextParams,
