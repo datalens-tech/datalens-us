@@ -18,7 +18,10 @@ export type DeleteWorkbookReqParams = z.infer<typeof requestSchema.params>;
 
 const parseReq = makeReqParser(requestSchema);
 
-const controller: AppRouteHandler = async (req, res: Response<WorkbookResponseModel>) => {
+export const deleteWorkbookController: AppRouteHandler = async (
+    req,
+    res: Response<WorkbookResponseModel>,
+) => {
     const {params} = await parseReq(req);
 
     const registry = req.ctx.get('registry');
@@ -54,7 +57,7 @@ const controller: AppRouteHandler = async (req, res: Response<WorkbookResponseMo
     }
 };
 
-controller.api = {
+deleteWorkbookController.api = {
     summary: 'Delete workbook',
     tags: [ApiTag.Workbooks],
     request: {
@@ -72,6 +75,4 @@ controller.api = {
     },
 };
 
-controller.manualDecodeId = true;
-
-export {controller as deleteWorkbook};
+deleteWorkbookController.manualDecodeId = true;

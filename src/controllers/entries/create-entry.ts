@@ -5,7 +5,7 @@ import {LogEventType} from '../../registry/common/utils/log-event/types';
 import EntryService from '../../services/entry.service';
 import {isTrueArg} from '../../utils/env-utils';
 
-const controller: AppRouteHandler = async (req, res) => {
+export const createEntryController: AppRouteHandler = async (req, res) => {
     const {body} = req;
 
     const registry = req.ctx.get('registry');
@@ -65,5 +65,3 @@ const controller: AppRouteHandler = async (req, res) => {
         throw error;
     }
 };
-
-export {controller as createEntry};

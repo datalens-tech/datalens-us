@@ -22,7 +22,7 @@ export type GetEntriesDataRequestBody = z.infer<typeof requestSchema.body>;
 
 const parseReq = makeReqParser(requestSchema);
 
-const controller: AppRouteHandler = async (
+export const getEntriesDataController: AppRouteHandler = async (
     req: Request,
     res: Response<GetEntriesDataResponseBody>,
 ) => {
@@ -50,7 +50,7 @@ const controller: AppRouteHandler = async (
     res.status(200).send(response);
 };
 
-controller.api = {
+getEntriesDataController.api = {
     summary: 'Get entries data',
     tags: [ApiTag.Entries],
     request: {
@@ -74,6 +74,4 @@ controller.api = {
     },
 };
 
-controller.manualDecodeId = true;
-
-export {controller as getEntriesData};
+getEntriesDataController.manualDecodeId = true;

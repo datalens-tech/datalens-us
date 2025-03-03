@@ -25,22 +25,22 @@ import {
 import {getWorkbooksListByIds} from '../../services/new/workbook/get-workbooks-list-by-ids';
 import {isTrueArg} from '../../utils/env-utils';
 
-import {copyWorkbook} from './copy-workbook';
-import {createWorkbook} from './create-workbook';
-import {deleteWorkbook} from './delete-workbook';
-import {deleteWorkbooksList} from './delete-workbooks-list';
-import {moveWorkbook} from './move-workbook';
-import {moveWorkbooksList} from './move-workbooks-list';
-import {updateWorkbook} from './update-workbook';
+import {copyWorkbookController} from './copy-workbook';
+import {createWorkbookController} from './create-workbook';
+import {deleteWorkbookController} from './delete-workbook';
+import {deleteWorkbooksListController} from './delete-workbooks-list';
+import {moveWorkbookController} from './move-workbook';
+import {moveWorkbooksListController} from './move-workbooks-list';
+import {updateWorkbookController} from './update-workbook';
 
 export default {
-    createWorkbook,
-    updateWorkbook,
-    moveWorkbook,
-    moveWorkbooksList,
-    deleteWorkbook,
-    deleteWorkbooksList,
-    copyWorkbook,
+    createWorkbookController,
+    updateWorkbookController,
+    moveWorkbookController,
+    moveWorkbooksListController,
+    deleteWorkbookController,
+    deleteWorkbooksListController,
+    copyWorkbookController,
 
     get: async (req: Request, res: Response) => {
         const {params, query} = req;

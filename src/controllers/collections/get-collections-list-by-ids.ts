@@ -15,7 +15,7 @@ const requestSchema = {
 
 const parseReq = makeReqParser(requestSchema);
 
-export const controller: AppRouteHandler = async (req, res) => {
+export const getCollectionsListByIdsController: AppRouteHandler = async (req, res) => {
     const {body} = await parseReq(req);
 
     const result = await getCollectionsListByIds(
@@ -30,7 +30,7 @@ export const controller: AppRouteHandler = async (req, res) => {
     );
 };
 
-controller.api = {
+getCollectionsListByIdsController.api = {
     summary: 'Get collections list by ids',
     tags: [ApiTag.Collections],
     request: {
@@ -54,6 +54,4 @@ controller.api = {
     },
 };
 
-controller.manualDecodeId = true;
-
-export {controller as getCollectionsListByIds};
+getCollectionsListByIdsController.manualDecodeId = true;

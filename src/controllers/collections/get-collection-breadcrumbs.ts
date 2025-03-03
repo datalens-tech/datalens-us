@@ -18,7 +18,7 @@ const requestSchema = {
 
 const parseReq = makeReqParser(requestSchema);
 
-export const controller: AppRouteHandler = async (req, res) => {
+export const getCollectionBreadcrumbsController: AppRouteHandler = async (req, res) => {
     const {params, query} = await parseReq(req);
 
     const result = await getCollectionBreadcrumbs(
@@ -32,7 +32,7 @@ export const controller: AppRouteHandler = async (req, res) => {
     res.status(200).send(await collectionInstanceArray.format(result));
 };
 
-controller.api = {
+getCollectionBreadcrumbsController.api = {
     summary: 'Get collection breadcrumbs',
     tags: [ApiTag.Collections],
     request: {
@@ -51,6 +51,4 @@ controller.api = {
     },
 };
 
-controller.manualDecodeId = true;
-
-export {controller as getCollectionBreadcrumbs};
+getCollectionBreadcrumbsController.manualDecodeId = true;

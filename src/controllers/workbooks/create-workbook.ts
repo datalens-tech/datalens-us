@@ -23,7 +23,7 @@ export type CreateWorkbookReqBody = z.infer<typeof requestSchema.body>;
 
 const parseReq = makeReqParser(requestSchema);
 
-const controller: AppRouteHandler = async (
+export const createWorkbookController: AppRouteHandler = async (
     req,
     res: Response<WorkbookInstanceWithOperationResponseModel>,
 ) => {
@@ -66,7 +66,7 @@ const controller: AppRouteHandler = async (
     }
 };
 
-controller.api = {
+createWorkbookController.api = {
     summary: 'Create workbook',
     tags: [ApiTag.Workbooks],
     request: {
@@ -90,6 +90,4 @@ controller.api = {
     },
 };
 
-controller.manualDecodeId = true;
-
-export {controller as createWorkbook};
+createWorkbookController.manualDecodeId = true;
