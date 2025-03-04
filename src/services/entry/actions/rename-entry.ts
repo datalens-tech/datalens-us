@@ -103,6 +103,8 @@ export const renameEntry = async (ctx: CTX, renameEntryData: RenameEntryData) =>
 
         const oldEntryDisplayKey = renamingEntry.displayKey;
 
+        const oldEntryKey = renamingEntry.key;
+
         let parentFolderDisplayKey = Utils.getParentFolderKey({
             keyFormatted: oldEntryDisplayKey,
         });
@@ -112,13 +114,11 @@ export const renameEntry = async (ctx: CTX, renameEntryData: RenameEntryData) =>
         }
 
         const newEntryDisplayKey = `${parentFolderDisplayKey}${name}${isFolder ? '/' : ''}`;
+        const newEntryKey = newEntryDisplayKey.toLowerCase();
 
         const renamingEntries = await Entry.query(trx)
             .patch({
-                key: raw(`? || substr(key, ?)`, [
-                    newEntryDisplayKey.toLowerCase(),
-                    oldEntryDisplayKey.toLowerCase().length + 1,
-                ]),
+                key: raw(`? || substr(key, ?)`, [newEntryKey, oldEntryKey.length + 1]),
                 displayKey: raw(`? || substr(display_key, ?)`, [
                     newEntryDisplayKey,
                     oldEntryDisplayKey.length + 1,
@@ -126,11 +126,7 @@ export const renameEntry = async (ctx: CTX, renameEntryData: RenameEntryData) =>
                 updatedBy,
                 updatedAt: raw(CURRENT_TIMESTAMP),
             })
-            .where(
-                'displayKey',
-                'like',
-                `${Utils.escapeStringForLike(oldEntryDisplayKey)}${isFolder ? '%' : ''}`,
-            )
+            .where('key', 'like', `${Utils.escapeStringForLike(oldEntryKey)}${isFolder ? '%' : ''}`)
             .where({tenantId})
             .returning('*')
             .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
