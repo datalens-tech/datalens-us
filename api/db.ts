@@ -58,3 +58,7 @@ export {
     JoinedEmbedEmbeddingSecret,
     JoinedEmbedEmbeddingSecretColumns,
 } from '../src/db/presentations/joined-embed-embedding-secret';
+export {
+    JoinedEntryRevisionTenant,
+    JoinedEntryRevisionTenantColumns,
+} from '../src/db/presentations/joined-entry-revision-tenant';
