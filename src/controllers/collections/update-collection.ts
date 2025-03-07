@@ -35,8 +35,8 @@ export const updateCollectionController: AppRouteHandler = async (req, res) => {
             {ctx: req.ctx},
             {
                 collectionId: params.collectionId,
-                title: body.title,
-                description: body.description,
+                title: body.title?.trim(),
+                description: body.description?.trim(),
             },
         );
 

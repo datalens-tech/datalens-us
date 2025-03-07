@@ -39,8 +39,8 @@ export const createWorkbookController: AppRouteHandler = async (
             },
             {
                 collectionId: body.collectionId ?? null,
-                title: body.title,
-                description: body.description,
+                title: body.title.trim(),
+                description: body.description?.trim(),
             },
         );
 
