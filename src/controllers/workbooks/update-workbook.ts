@@ -49,8 +49,8 @@ export const updateWorkbookController: AppRouteHandler = async (
             },
             {
                 workbookId: params.workbookId,
-                title: body.title,
-                description: body.description,
+                title: body.title?.trim(),
+                description: body.description?.trim(),
             },
         );
 
