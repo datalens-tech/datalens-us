@@ -30,8 +30,8 @@ export const createCollectionController: AppRouteHandler = async (req, res) => {
         const result = await createCollection(
             {ctx: req.ctx},
             {
-                title: body.title,
-                description: body.description,
+                title: body.title.trim(),
+                description: body.description?.trim(),
                 parentId: body.parentId,
             },
         );
