@@ -55,7 +55,7 @@ export default class EntryService {
                 tenantId,
                 servicePlan: checkServicePlan,
                 features: checkTenantFeatures,
-                workbookId: workbookId || null,
+                foldersEnabled: !workbookId,
             }),
         ]);
 
@@ -141,7 +141,7 @@ export default class EntryService {
                 tenantId,
                 servicePlan: checkServicePlan,
                 features: checkTenantFeatures,
-                workbookId: workbookId || null,
+                foldersEnabled: !workbookId,
             }),
         ]);
 
