@@ -303,7 +303,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
         }),
         getWorkbooksListByIds: makeRoute({
             route: 'POST /v2/workbooks-get-list-by-ids',
-            handler: workbooks.getWorkbookListController,
+            handler: workbooks.getWorkbookListByIdsController,
             features: [Feature.CollectionsEnabled],
         }),
         updateWorkbook: makeRoute({

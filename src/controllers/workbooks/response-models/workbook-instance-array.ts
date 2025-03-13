@@ -3,7 +3,7 @@ import type {WorkbookInstance} from '../../../registry/common/entities/workbook/
 
 import {workbookInstance as originalWorkbookInstance} from './workbook-instance';
 
-const schema = originalWorkbookInstance.schema.array().describe('Workbook model array');
+const schema = z.array(originalWorkbookInstance.schema).describe('Workbook model array');
 
 export type WorkbookInstanceArrayResponseModel = z.infer<typeof schema>;
 

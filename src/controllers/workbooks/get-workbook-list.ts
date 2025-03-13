@@ -12,7 +12,7 @@ import {
 
 const requestSchema = {
     query: z.object({
-        collectionId: zc.encodedId().nullable(),
+        collectionId: zc.encodedId().optional(),
         includePermissionsInfo: zc.stringBoolean().optional(),
         filterString: z.string().optional(),
         page: zc.stringNumber().optional(),
@@ -34,7 +34,7 @@ export const getWorkbookListController: AppRouteHandler = async (
     const result = await getWorkbooksList(
         {ctx: req.ctx},
         {
-            collectionId: query.collectionId,
+            collectionId: query.collectionId ?? null,
             includePermissionsInfo: query.includePermissionsInfo,
             filterString: query.filterString,
             page: query.page,

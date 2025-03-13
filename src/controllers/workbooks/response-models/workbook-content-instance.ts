@@ -63,7 +63,7 @@ const format = ({
             updatedBy: data.updatedBy,
             updatedAt: data.updatedAt,
             savedId: Utils.encodeId(data.savedId),
-            publishedId: Utils.encodeId(data.publishedId),
+            publishedId: data.publishedId ? Utils.encodeId(data.publishedId) : null,
             meta: data.meta,
             hidden: data.hidden,
             workbookId: Utils.encodeId(data.workbookId),
