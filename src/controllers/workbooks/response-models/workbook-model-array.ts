@@ -1,14 +1,14 @@
 import {z} from '../../../components/zod';
-import type {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+import {WorkbookModel} from '../../../db/models/new/workbook';
 
-import {workbookInstance as originalWorkbookInstance} from './workbook-instance';
+import {workbookModel as originalWorkbookModel} from './workbook-model';
 
-const schema = originalWorkbookInstance.schema.array().describe('Workbook model array');
+const schema = originalWorkbookModel.schema.array().describe('Workbook model array');
 
 export type WorkbookArrayResponseModel = z.infer<typeof schema>;
 
-const format = (workbooks: WorkbookInstance[]): WorkbookArrayResponseModel => {
-    return workbooks.map(originalWorkbookInstance.format);
+const format = (workbooks: WorkbookModel[]): WorkbookArrayResponseModel => {
+    return workbooks.map(originalWorkbookModel.format);
 };
 
 export const WorkbookModelArray = {

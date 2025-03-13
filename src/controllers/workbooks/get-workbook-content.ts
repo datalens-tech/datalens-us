@@ -1,14 +1,12 @@
 import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
-import {prepareResponseAsync} from '../../components/response-presenter';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {EntryScope} from '../../db/models/new/entry/types';
 import {getWorkbookContent} from '../../services/new/workbook';
-import {formatGetWorkbookContent} from '../../services/new/workbook/formatters';
 
-import {workbookContentModel} from './response-models';
+import {workbookContentInstance} from './response-models';
 
 const scopeEnum = z.nativeEnum(EntryScope);
 
@@ -27,9 +25,11 @@ const requestSchema = {
                 direction: z.enum(['asc', 'desc']),
             })
             .optional(),
-        filters: z.object({
-            name: z.string().optional(),
-        }),
+        filters: z
+            .object({
+                name: z.string().optional(),
+            })
+            .optional(),
         scope: scopeEnum.or(z.array(scopeEnum)).optional(),
     }),
 };
@@ -53,9 +53,7 @@ export const getWorkbookContentController: AppRouteHandler = async (req, res: Re
         },
     );
 
-    const formattedResponse = formatGetWorkbookContent(result);
-    const {code, response} = await prepareResponseAsync({data: formattedResponse});
-    res.status(code).send(response);
+    res.status(200).send(workbookContentInstance.format(result));
 };
 
 getWorkbookContentController.api = {
@@ -67,10 +65,10 @@ getWorkbookContentController.api = {
     },
     responses: {
         200: {
-            description: workbookContentModel.schema.description ?? '',
+            description: workbookContentInstance.schema.description ?? '',
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: workbookContentModel.schema,
+                    schema: workbookContentInstance.schema,
                 },
             },
         },

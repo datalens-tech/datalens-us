@@ -1,15 +1,13 @@
 import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
-import {prepareResponseAsync} from '../../components/response-presenter';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {copyWorkbookTemplate} from '../../services/new/workbook';
-import {formatWorkbookModelWithOperation} from '../../services/new/workbook/formatters';
 
 import {
-    WorkbookInstanceWithOperationResponseModel,
-    workbookInstanceWithOperation,
+    WorkbookModelWithOperationResponseModel,
+    workbookModelWithOperation,
 } from './response-models';
 
 const requestSchema = {
@@ -27,7 +25,7 @@ const parseReq = makeReqParser(requestSchema);
 
 export const copyTemplateController: AppRouteHandler = async (
     req,
-    res: Response<WorkbookInstanceWithOperationResponseModel>,
+    res: Response<WorkbookModelWithOperationResponseModel>,
 ) => {
     const {body, params} = await parseReq(req);
 
@@ -43,9 +41,7 @@ export const copyTemplateController: AppRouteHandler = async (
         },
     );
 
-    const formattedResponse = formatWorkbookModelWithOperation(result.workbook, result.operation);
-    const {code, response} = await prepareResponseAsync({data: formattedResponse});
-    res.status(code).send(response);
+    res.status(200).send(workbookModelWithOperation.format(result.workbook, result.operation));
 };
 
 copyTemplateController.api = {
@@ -63,10 +59,10 @@ copyTemplateController.api = {
     },
     responses: {
         200: {
-            description: workbookInstanceWithOperation.schema.description ?? '',
+            description: workbookModelWithOperation.schema.description ?? '',
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: workbookInstanceWithOperation.schema,
+                    schema: workbookModelWithOperation.schema,
                 },
             },
         },

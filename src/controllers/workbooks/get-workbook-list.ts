@@ -1,11 +1,9 @@
 import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
-import {prepareResponseAsync} from '../../components/response-presenter';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {getWorkbooksList} from '../../services/new/workbook';
-import {formatWorkbooksList} from '../../services/new/workbook/formatters';
 
 import {
     WorkbookInstanceArrayWithNextPageToken,
@@ -14,7 +12,7 @@ import {
 
 const requestSchema = {
     query: z.object({
-        collectionId: z.string().nullable(),
+        collectionId: zc.encodedId().nullable(),
         includePermissionsInfo: zc.stringBoolean().optional(),
         filterString: z.string().optional(),
         page: zc.stringNumber().optional(),
@@ -47,9 +45,7 @@ export const getWorkbookListController: AppRouteHandler = async (
         },
     );
 
-    const formattedResponse = formatWorkbooksList(result);
-    const {code, response} = await prepareResponseAsync({data: formattedResponse});
-    res.status(code).send(response);
+    res.status(200).send(WorkbookInstanceArrayWithNextPageToken.format(result));
 };
 
 getWorkbookListController.api = {
@@ -69,3 +65,5 @@ getWorkbookListController.api = {
         },
     },
 };
+
+getWorkbookListController.manualDecodeId = true;

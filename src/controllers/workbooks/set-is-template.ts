@@ -1,11 +1,9 @@
 import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
-import {prepareResponseAsync} from '../../components/response-presenter';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {setWorkbookIsTemplate} from '../../services/new/workbook';
-import {formatSetWorkbookIsTemplate} from '../../services/new/workbook/formatters';
 
 import {WorkbookIdWithTemplateModel, WorkbookIdWithTemplateResponseModel} from './response-models';
 
@@ -36,9 +34,7 @@ export const setIsTemplateController: AppRouteHandler = async (
         },
     );
 
-    const formattedResponse = formatSetWorkbookIsTemplate(result);
-    const {code, response} = await prepareResponseAsync({data: formattedResponse});
-    res.status(code).send(response);
+    res.status(200).send(WorkbookIdWithTemplateModel.format(result));
 };
 
 setIsTemplateController.api = {

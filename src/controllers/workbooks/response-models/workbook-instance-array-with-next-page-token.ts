@@ -1,11 +1,11 @@
 import {z} from '../../../components/zod';
 import type {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
 
-import {WorkbookModelArray} from './workbook-model-array';
+import {WorkbookInstanceArray} from './workbook-instance-array';
 
 const schema = z
     .object({
-        workbooks: WorkbookModelArray.schema,
+        workbooks: WorkbookInstanceArray.schema,
         nextPageToken: z.string().optional(),
     })
     .describe('Workbook instance array with nextPageToken');
@@ -20,7 +20,7 @@ const format = ({
     nextPageToken?: string;
 }): WorkbookInstanceArrayWithNextPageTokenResponseModel => {
     return {
-        workbooks: WorkbookModelArray.format(workbooks),
+        workbooks: WorkbookInstanceArray.format(workbooks),
         nextPageToken,
     };
 };

@@ -1,11 +1,9 @@
 import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
-import {prepareResponseAsync} from '../../components/response-presenter';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {restoreWorkbook} from '../../services/new/workbook';
-import {formatRestoreWorkbook} from '../../services/new/workbook/formatters';
 
 import {WorkbookIdModel, WorkbookIdResponseModel} from './response-models';
 
@@ -32,9 +30,7 @@ export const restoreWorkbookController: AppRouteHandler = async (
         },
     );
 
-    const formattedResponse = formatRestoreWorkbook(result);
-    const {code, response} = await prepareResponseAsync({data: formattedResponse});
-    res.status(code).send(response);
+    res.status(200).send(WorkbookIdModel.format(result));
 };
 
 restoreWorkbookController.api = {

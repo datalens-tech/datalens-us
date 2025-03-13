@@ -1,13 +1,11 @@
 import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
-import {prepareResponseAsync} from '../../components/response-presenter';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {getWorkbook} from '../../services/new/workbook';
-import {formatWorkbook} from '../../services/new/workbook/formatters';
 
-import {WorkbookInstanceResponseModel, workbookModel} from './response-models';
+import {WorkbookInstanceResponseModel, workbookInstance} from './response-models';
 
 const requestSchema = {
     params: z.object({
@@ -36,10 +34,10 @@ export const getWorkbookController: AppRouteHandler = async (
         },
     );
 
-    const formattedResponse = formatWorkbook(result);
+    /*   const formattedResponse = formatWorkbook(result);
     const {code, response} = await prepareResponseAsync({data: formattedResponse});
-
-    res.status(code).send(response);
+*/
+    res.status(200).send(workbookInstance.format(result));
 };
 
 getWorkbookController.api = {
@@ -51,12 +49,14 @@ getWorkbookController.api = {
     },
     responses: {
         200: {
-            description: workbookModel.schema.description ?? '',
+            description: workbookInstance.schema.description ?? '',
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: workbookModel.schema,
+                    schema: workbookInstance.schema,
                 },
             },
         },
     },
 };
+
+getWorkbookController.manualDecodeId = true;
