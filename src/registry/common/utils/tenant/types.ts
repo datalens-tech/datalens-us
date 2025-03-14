@@ -7,6 +7,7 @@ export type CheckTenant = (args: {
     tenantId: string;
     servicePlan?: string;
     features?: string[];
+    foldersEnabled?: boolean;
 }) => Promise<void>;
 
 export type GetServicePlan = (
