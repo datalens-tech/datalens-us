@@ -5,18 +5,15 @@ import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {getWorkbooksList} from '../../services/new/workbook';
 
-import {
-    WorkbookInstanceArrayWithNextPageToken,
-    WorkbookInstanceArrayWithNextPageTokenResponseModel,
-} from './response-models';
+import {WorkbookInstancePage, WorkbookInstancePageResponseModel} from './response-models';
 
 const requestSchema = {
     query: z.object({
         collectionId: zc.encodedId().optional(),
         includePermissionsInfo: zc.stringBoolean().optional(),
         filterString: z.string().optional(),
-        page: zc.stringNumber().optional(),
-        pageSize: zc.stringNumber().optional(),
+        page: zc.stringNumber({min: 0}).optional(),
+        pageSize: zc.stringNumber({min: 1, max: 1000}).optional(),
         orderField: z.enum(['title', 'createdAt', 'updatedAt']).optional(),
         orderDirection: z.enum(['asc', 'desc']).optional(),
         onlyMy: zc.stringBoolean().optional(),
@@ -27,7 +24,7 @@ const parseReq = makeReqParser(requestSchema);
 
 export const getWorkbookListController: AppRouteHandler = async (
     req,
-    res: Response<WorkbookInstanceArrayWithNextPageTokenResponseModel>,
+    res: Response<WorkbookInstancePageResponseModel>,
 ) => {
     const {query} = await parseReq(req);
 
@@ -45,7 +42,7 @@ export const getWorkbookListController: AppRouteHandler = async (
         },
     );
 
-    res.status(200).send(WorkbookInstanceArrayWithNextPageToken.format(result));
+    res.status(200).send(WorkbookInstancePage.format(result));
 };
 
 getWorkbookListController.api = {
@@ -56,10 +53,10 @@ getWorkbookListController.api = {
     },
     responses: {
         200: {
-            description: WorkbookInstanceArrayWithNextPageToken.schema.description ?? '',
+            description: WorkbookInstancePage.schema.description ?? '',
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: WorkbookInstanceArrayWithNextPageToken.schema,
+                    schema: WorkbookInstancePage.schema,
                 },
             },
         },

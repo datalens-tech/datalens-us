@@ -1,4 +1,3 @@
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
@@ -7,29 +6,13 @@ import {makeWorkbooksWithParentsMap} from '../collection/utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['workbookIds'],
-    properties: {
-        workbookIds: {
-            type: 'array',
-            minItems: 1,
-            maxItems: 1000,
-            items: {type: 'string'},
-        },
-        includePermissionsInfo: {
-            type: 'boolean',
-        },
-    },
-});
-
 type GetWorkbooksListAndAllParentsArgs = {
     workbookIds: string[];
     includePermissionsInfo?: boolean;
 };
 
 export const getWorkbooksListByIds = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: GetWorkbooksListAndAllParentsArgs,
 ) => {
     const {workbookIds, includePermissionsInfo = false} = args;
@@ -41,10 +24,6 @@ export const getWorkbooksListByIds = async (
 
     const {tenantId, isPrivateRoute} = ctx.get('info');
     const registry = ctx.get('registry');
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const targetTrx = getReplica(trx);
 

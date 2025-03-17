@@ -8,11 +8,11 @@ const schema = z
         createdBy: z.string(),
         createdAt: z.object({
             nanos: z.number().optional(),
-            seconds: z.string().or(z.number()),
+            seconds: z.string(),
         }),
         modifiedAt: z.object({
             nanos: z.number().optional(),
-            seconds: z.string().or(z.number()),
+            seconds: z.string(),
         }),
         metadata: z.object({}),
         done: z.boolean(),

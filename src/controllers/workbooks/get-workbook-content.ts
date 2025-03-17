@@ -6,7 +6,7 @@ import {CONTENT_TYPE_JSON} from '../../const';
 import {EntryScope} from '../../db/models/new/entry/types';
 import {getWorkbookContent} from '../../services/new/workbook';
 
-import {workbookContentInstance} from './response-models';
+import {workbookContentModel} from './response-models';
 
 const scopeEnum = z.nativeEnum(EntryScope);
 
@@ -53,7 +53,7 @@ export const getWorkbookContentController: AppRouteHandler = async (req, res: Re
         },
     );
 
-    res.status(200).send(workbookContentInstance.format(result));
+    res.status(200).send(workbookContentModel.format(result));
 };
 
 getWorkbookContentController.api = {
@@ -65,10 +65,10 @@ getWorkbookContentController.api = {
     },
     responses: {
         200: {
-            description: workbookContentInstance.schema.description ?? '',
+            description: workbookContentModel.schema.description ?? '',
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: workbookContentInstance.schema,
+                    schema: workbookContentModel.schema,
                 },
             },
         },

@@ -5,10 +5,7 @@ import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {getAllWorkbooks} from '../../services/new/workbook';
 
-import {
-    WorkbookModelArrayWithNextPageToken,
-    WorkbookModelArrayWithNextPageTokenResponseModel,
-} from './response-models';
+import {WorkbookModelPageResponseModel, workbookModelPage} from './response-models';
 
 const requestSchema = {
     query: z.object({
@@ -21,7 +18,7 @@ const parseReq = makeReqParser(requestSchema);
 
 export const getAllWorkbooksController: AppRouteHandler = async (
     req,
-    res: Response<WorkbookModelArrayWithNextPageTokenResponseModel>,
+    res: Response<WorkbookModelPageResponseModel>,
 ) => {
     const {query} = await parseReq(req);
 
@@ -33,7 +30,7 @@ export const getAllWorkbooksController: AppRouteHandler = async (
         },
     );
 
-    res.status(200).send(WorkbookModelArrayWithNextPageToken.format(result));
+    res.status(200).send(workbookModelPage.format(result));
 };
 
 getAllWorkbooksController.api = {
@@ -44,12 +41,14 @@ getAllWorkbooksController.api = {
     },
     responses: {
         200: {
-            description: WorkbookModelArrayWithNextPageToken.schema.description ?? '',
+            description: workbookModelPage.schema.description ?? '',
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: WorkbookModelArrayWithNextPageToken.schema,
+                    schema: workbookModelPage.schema,
                 },
             },
         },
     },
 };
+
+getAllWorkbooksController.manualDecodeId = true;

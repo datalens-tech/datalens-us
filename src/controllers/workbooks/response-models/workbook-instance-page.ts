@@ -8,9 +8,9 @@ const schema = z
         workbooks: WorkbookInstanceArray.schema,
         nextPageToken: z.string().optional(),
     })
-    .describe('Workbook instance array with nextPageToken');
+    .describe('Workbook instance page');
 
-export type WorkbookInstanceArrayWithNextPageTokenResponseModel = z.infer<typeof schema>;
+export type WorkbookInstancePageResponseModel = z.infer<typeof schema>;
 
 const format = ({
     workbooks,
@@ -18,14 +18,14 @@ const format = ({
 }: {
     workbooks: WorkbookInstance[];
     nextPageToken?: string;
-}): WorkbookInstanceArrayWithNextPageTokenResponseModel => {
+}): WorkbookInstancePageResponseModel => {
     return {
         workbooks: WorkbookInstanceArray.format(workbooks),
         nextPageToken,
     };
 };
 
-export const WorkbookInstanceArrayWithNextPageToken = {
+export const WorkbookInstancePage = {
     schema,
     format,
 };

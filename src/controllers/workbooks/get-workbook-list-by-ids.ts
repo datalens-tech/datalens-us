@@ -9,7 +9,7 @@ import {WorkbookInstanceArray, WorkbookInstanceArrayResponseModel} from './respo
 
 const requestSchema = {
     body: z.object({
-        workbookIds: zc.encodedId().array(),
+        workbookIds: zc.encodedId().array().min(1).max(1000),
     }),
 };
 

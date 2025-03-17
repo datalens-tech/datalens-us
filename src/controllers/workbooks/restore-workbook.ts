@@ -50,3 +50,5 @@ restoreWorkbookController.api = {
         },
     },
 };
+
+restoreWorkbookController.manualDecodeId = true;

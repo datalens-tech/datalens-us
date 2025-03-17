@@ -1,6 +1,5 @@
 import {AppError} from '@gravity-ui/nodekit';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
 import {WorkbookModel} from '../../../db/models/new/workbook';
 import Utils from '../../../utils';
@@ -9,22 +8,6 @@ import {getReplica} from '../utils';
 
 import {copyWorkbook} from './copy-workbook';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['workbookId', 'collectionId', 'title'],
-    properties: {
-        workbookId: {
-            type: 'string',
-        },
-        collectionId: {
-            type: ['string', 'null'],
-        },
-        title: {
-            type: 'string',
-        },
-    },
-});
-
 export interface CopyWorkbookTemplateArgs {
     workbookId: string;
     collectionId: Nullable<string>;
@@ -32,7 +15,7 @@ export interface CopyWorkbookTemplateArgs {
 }
 
 export const copyWorkbookTemplate = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: CopyWorkbookTemplateArgs,
 ) => {
     const {workbookId, collectionId: newCollectionId, title: newTitle} = args;
@@ -42,10 +25,6 @@ export const copyWorkbookTemplate = async (
         newCollectionId,
         newTitle,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const {tenantId} = ctx.get('info');
 

@@ -34,9 +34,6 @@ export const getWorkbookController: AppRouteHandler = async (
         },
     );
 
-    /*   const formattedResponse = formatWorkbook(result);
-    const {code, response} = await prepareResponseAsync({data: formattedResponse});
-*/
     res.status(200).send(workbookInstance.format(result));
 };
 

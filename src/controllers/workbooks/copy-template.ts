@@ -14,11 +14,23 @@ const requestSchema = {
     params: z.object({
         workbookId: zc.encodedId(),
     }),
-    body: z.object({
-        collectionId: zc.encodedId().nullable(),
-        title: z.string().optional(),
-        newTitle: z.string(),
-    }),
+    body: z
+        .object({
+            collectionId: zc.encodedId().nullable(),
+            title: z.string().optional(),
+            newTitle: z.string().optional(),
+        })
+        .superRefine((data, ctx) => {
+            const isTitleEmpty = !data.title || data.title.trim() === '';
+            const isNewTitleEmpty = !data.newTitle || data.newTitle.trim() === '';
+            if (isTitleEmpty && isNewTitleEmpty) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message:
+                        'one of the fields "title" or "newTitle" is required. Both fields cannot be empty',
+                });
+            }
+        }),
 };
 
 const parseReq = makeReqParser(requestSchema);
@@ -37,7 +49,7 @@ export const copyTemplateController: AppRouteHandler = async (
             workbookId: params.workbookId,
             collectionId: body.collectionId,
             // newTitle for compatibility
-            title: body.title ?? body.newTitle,
+            title: (body.title ?? body.newTitle) as string,
         },
     );
 
