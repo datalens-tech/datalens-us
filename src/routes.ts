@@ -332,6 +332,14 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
+        privateDeleteWorkbook: makeRoute({
+            route: 'DELETE /private/v2/workbooks/:workbookId',
+            handler: workbooks.deleteWorkbookController,
+            write: true,
+            authPolicy: AuthPolicy.disabled,
+            private: true,
+            features: [Feature.CollectionsEnabled],
+        }),
         deleteWorkbooks: makeRoute({
             route: 'DELETE /v2/delete-workbooks',
             handler: workbooks.deleteWorkbooksListController,
