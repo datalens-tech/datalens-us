@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import type {NodeKit} from '@gravity-ui/nodekit';
-import {initDB as initPosgresDB} from '@gravity-ui/postgreskit';
+import {initDB as initPostgresDB} from '@gravity-ui/postgreskit';
 
 import {AppEnv, DEFAULT_QUERY_TIMEOUT} from '../const';
 import {getTestDsnList} from '../tests/int/db';
@@ -81,7 +81,7 @@ export function initDB(nodekit: NodeKit) {
         suppressStatusLogs,
     };
 
-    const {db, CoreBaseModel, helpers} = initPosgresDB({
+    const {db, CoreBaseModel, helpers} = initPostgresDB({
         connectionString: dsnList,
         dispatcherOptions,
         knexOptions: getKnexOptions(),
