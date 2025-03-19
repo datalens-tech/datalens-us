@@ -55,54 +55,39 @@ export async function getRelatedEntries(
 
     const relatedEntries = Entry.query(getReplica(trx))
         .withRecursive('relatedEntries', (qb) => {
-            qb.select(['fromId', 'toId', raw('1 depth')])
+            qb.select(['fromId AS entryId', 'toId', raw('1 AS depth')])
                 .from('links')
                 .join('entries', 'entries.entryId', endToStart ? 'links.toId' : 'links.fromId')
                 .where({isDeleted: false})
                 .whereIn(endToStart ? 'links.fromId' : 'links.toId', entryIds)
-                .union((qbx) => {
-                    qbx.select(['l.fromId', 'l.toId', raw('depth + 1')])
+                .unionAll((qbx) => {
+                    qbx.select(['l.fromId AS entryId', 'l.toId', raw('depth + 1')])
                         .from('links as l')
                         .join(
                             'relatedEntries',
-                            endToStart ? 'relatedEntries.toId' : 'relatedEntries.fromId',
+                            'relatedEntries.entryId',
                             endToStart ? 'l.fromId' : 'l.toId',
                         )
                         .join('entries', 'entries.entryId', endToStart ? 'l.toId' : 'l.fromId')
                         .where((builder) => {
                             builder.where({isDeleted: false});
-
                             builder.andWhere('depth', '<', 5);
 
                             if (scope) {
-                                builder.andWhere('entries.scope', scope);
+                                builder.andWhere({[EntryColumn.Scope]: scope});
                             }
                         });
                 });
         })
-        .select()
-        .from((qb) => {
-            qb.select(
-                raw('distinct on (??) ??', [
-                    'entries.entryId',
-                    RETURN_RELATION_COLUMNS.concat('entries.created_at'),
-                ]),
-            )
-                .from('relatedEntries')
-                .join(
-                    'entries',
-                    endToStart ? 'relatedEntries.toId' : 'relatedEntries.fromId',
-                    'entries.entryId',
-                )
-                .join('revisions', 'entries.savedId', 'revisions.revId')
-                .as('re');
+        .with('distinct_entry_ids', (qb) => {
+            qb.select('entryId').distinct().from('relatedEntries');
         })
-        .where((builder) => {
-            if (scope) {
-                builder.where({[EntryColumn.Scope]: scope});
-            }
-        })
-        .orderBy('createdAt');
+        .select([...RETURN_RELATION_COLUMNS, 'entries.created_at', 'relatedEntries.depth'])
+        .from('distinct_entry_ids')
+        .join('entries', 'distinct_entry_ids.entryId', 'entries.entryId')
+        .join('revisions', 'entries.savedId', 'revisions.revId')
+        .join('relatedEntries', 'relatedEntries.entryId', 'entries.entryId')
+        .orderBy('entries.created_at', 'asc');
 
     if (pageSize) {
         relatedEntries.limit(pageSize);
