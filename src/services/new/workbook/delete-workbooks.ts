@@ -33,6 +33,7 @@ export const deleteWorkbooks = async (
 
     const {
         user: {userId},
+        isPrivateRoute,
     } = ctx.get('info');
 
     const targetTrx = getPrimary(trx);
@@ -61,7 +62,7 @@ export const deleteWorkbooks = async (
             });
         }
 
-        if (accessServiceEnabled && !skipCheckPermissions) {
+        if (accessServiceEnabled && !skipCheckPermissions && !isPrivateRoute) {
             await workbook.checkPermission({
                 parentIds,
                 permission: WorkbookPermission.Delete,
