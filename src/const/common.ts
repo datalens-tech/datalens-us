@@ -67,7 +67,6 @@ export const RETURN_RELATION_COLUMNS = [
     'type',
     'display_key as key',
     'meta',
-    'depth',
     'tenantId',
     'public',
     'workbookId',
