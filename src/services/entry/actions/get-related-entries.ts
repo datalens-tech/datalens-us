@@ -82,7 +82,9 @@ export async function getRelatedEntries(
         .select([{entryId: endToStart ? 'toId' : 'fromId'}, 'depth'])
         .from('relatedEntries');
 
-    const relatedEntryIds = await relatedEntryIdsQuery;
+    const relatedEntryIds = await relatedEntryIdsQuery.timeout(
+        extendedTimeout ? EXTENDED_QUERY_TIMEOUT : DEFAULT_QUERY_TIMEOUT,
+    );
 
     const depthMap = new Map<string, number>();
     for (const row of relatedEntryIds as unknown as {entryId: string; depth: number}[]) {
@@ -102,7 +104,6 @@ export async function getRelatedEntries(
 
     const relatedEntriesQuery = Entry.query(getReplica(trx))
         .select([...RETURN_RELATION_COLUMNS, 'entries.created_at'])
-        .from('entries')
         .join('revisions', 'entries.savedId', 'revisions.revId')
         .whereIn('entries.entryId', entryIdList)
         .orderBy('entries.createdAt');
