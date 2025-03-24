@@ -6,7 +6,6 @@ import {
     RETURN_RELATION_COLUMNS,
 } from '../../../const';
 import Entry from '../../../db/models/entry';
-import {EntryColumn} from '../../../db/models/new/entry';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import {ServiceArgs} from '../../new/types';
 import {getReplica} from '../../new/utils';
@@ -53,7 +52,7 @@ export async function getRelatedEntries(
 
     const endToStart = direction === RelationDirection.Parent;
 
-    const relatedEntries = Entry.query(getReplica(trx))
+    const relatedEntryIdsQuery = Entry.query(getReplica(trx))
         .withRecursive('relatedEntries', (qb) => {
             qb.select(['fromId', 'toId', raw('1 depth')])
                 .from('links')
@@ -80,45 +79,56 @@ export async function getRelatedEntries(
                         });
                 });
         })
-        .select()
-        .from((qb) => {
-            qb.select(
-                raw('distinct on (??) ??', [
-                    'entries.entryId',
-                    RETURN_RELATION_COLUMNS.concat('entries.created_at'),
-                ]),
-            )
-                .from('relatedEntries')
-                .join(
-                    'entries',
-                    endToStart ? 'relatedEntries.toId' : 'relatedEntries.fromId',
-                    'entries.entryId',
-                )
-                .join('revisions', 'entries.savedId', 'revisions.revId')
-                .as('re');
-        })
-        .where((builder) => {
-            if (scope) {
-                builder.where({[EntryColumn.Scope]: scope});
-            }
-        })
-        .orderBy('createdAt');
+        .select([{entryId: endToStart ? 'toId' : 'fromId'}, 'depth'])
+        .from('relatedEntries');
 
-    if (pageSize) {
-        relatedEntries.limit(pageSize);
+    const relatedEntryIds = await relatedEntryIdsQuery.timeout(
+        extendedTimeout ? EXTENDED_QUERY_TIMEOUT : DEFAULT_QUERY_TIMEOUT,
+    );
 
-        if (page) {
-            relatedEntries.offset(pageSize * page);
+    const depthMap = new Map<string, number>();
+    for (const row of relatedEntryIds as unknown as {entryId: string; depth: number}[]) {
+        if (depthMap.has(row.entryId)) {
+            depthMap.set(row.entryId, Math.min(depthMap.get(row.entryId)!, row.depth));
+        } else {
+            depthMap.set(row.entryId, row.depth);
         }
     }
 
-    const result = (await relatedEntries.timeout(
-        extendedTimeout ? EXTENDED_QUERY_TIMEOUT : DEFAULT_QUERY_TIMEOUT,
-    )) as unknown[] as GetRelatedEntriesResult[];
+    const entryIdList = Array.from(depthMap.keys());
 
-    ctx.log('GET_RELATED_ENTRIES_DONE', {
-        amount: result?.length,
-    });
+    if (entryIdList.length === 0) {
+        ctx.log('GET_RELATED_ENTRIES_DONE', {amount: 0});
+        return [];
+    }
+
+    const relatedEntriesQuery = Entry.query(getReplica(trx))
+        .select([...RETURN_RELATION_COLUMNS, 'entries.created_at'])
+        .join('revisions', 'entries.savedId', 'revisions.revId')
+        .whereIn('entries.entryId', entryIdList)
+        .orderBy('entries.createdAt');
+
+    if (scope) {
+        relatedEntriesQuery.where('entries.scope', scope);
+    }
+
+    if (pageSize) {
+        relatedEntriesQuery.limit(pageSize);
+        if (page) {
+            relatedEntriesQuery.offset(pageSize * page);
+        }
+    }
+
+    const baseResult = await relatedEntriesQuery.timeout(
+        extendedTimeout ? EXTENDED_QUERY_TIMEOUT : DEFAULT_QUERY_TIMEOUT,
+    );
+
+    const result: GetRelatedEntriesResult[] = baseResult.map((entry) => ({
+        ...(entry as unknown as GetRelatedEntriesResult),
+        depth: depthMap.get(entry.entryId) ?? 1,
+    }));
+
+    ctx.log('GET_RELATED_ENTRIES_DONE', {amount: result?.length});
 
     return result;
 }
