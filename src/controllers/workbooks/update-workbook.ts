@@ -3,6 +3,7 @@ import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
+import {WorkbookStatus} from '../../db/models/new/workbook/types';
 import {LogEventType} from '../../registry/common/utils/log-event/types';
 import {updateWorkbook} from '../../services/new/workbook';
 
@@ -16,6 +17,7 @@ const requestSchema = {
         .object({
             title: z.string().optional(),
             description: z.string().optional(),
+            status: z.nativeEnum(WorkbookStatus).nullable().optional(),
         })
         .refine(
             ({title, description}) => {
@@ -51,6 +53,7 @@ export const updateWorkbookController: AppRouteHandler = async (
                 workbookId: params.workbookId,
                 title: body.title?.trim(),
                 description: body.description?.trim(),
+                status: body.status,
             },
         );
 

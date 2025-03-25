@@ -312,6 +312,14 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
+        privateUpdateWorkbook: makeRoute({
+            route: 'POST /private/v2/workbooks/:workbookId/update',
+            handler: workbooks.updateWorkbookController,
+            write: true,
+            authPolicy: AuthPolicy.disabled,
+            private: true,
+            features: [Feature.CollectionsEnabled],
+        }),
         createWorkbook: makeRoute({
             route: 'POST /v2/workbooks',
             handler: workbooks.createWorkbookController,
