@@ -18,18 +18,27 @@ export interface UpdateWorkbookArgs {
     title?: string;
     description?: string;
     status?: Nullable<WorkbookStatus>;
+    meta?: Record<string, unknown>;
 }
 
 export const updateWorkbook = async (
     {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: UpdateWorkbookArgs,
 ) => {
-    const {workbookId, title: newTitle, description: newDescription, status: newStatus} = args;
+    const {
+        workbookId,
+        title: newTitle,
+        description: newDescription,
+        status: newStatus,
+        meta: newMeta,
+    } = args;
 
     ctx.log('UPDATE_WORKBOOK_START', {
         workbookId: Utils.encodeId(workbookId),
         newTitle,
         newDescription,
+        newStatus,
+        newMeta,
     });
 
     const {accessServiceEnabled} = ctx.config;
@@ -92,6 +101,7 @@ export const updateWorkbook = async (
             [WorkbookModelColumn.UpdatedBy]: userId,
             [WorkbookModelColumn.UpdatedAt]: raw(CURRENT_TIMESTAMP),
             [WorkbookModelColumn.Status]: newStatus,
+            [WorkbookModelColumn.Meta]: newMeta,
         })
         .where({
             [WorkbookModelColumn.WorkbookId]: workbookId,

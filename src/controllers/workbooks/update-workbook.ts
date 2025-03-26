@@ -18,13 +18,19 @@ const requestSchema = {
             title: z.string().optional(),
             description: z.string().optional(),
             status: z.nativeEnum(WorkbookStatus).nullable().optional(),
+            meta: z.record(z.string(), z.unknown()).optional(),
         })
         .refine(
-            ({title, description}) => {
-                return typeof title === 'string' || typeof description === 'string';
+            ({title, description, status, meta}) => {
+                return (
+                    typeof title === 'string' ||
+                    typeof description === 'string' ||
+                    status !== undefined ||
+                    meta !== undefined
+                );
             },
             {
-                message: `The request body must contain either "title" or "description".`,
+                message: `The request body must contain at least one of the following fields: "title", "description", "status", or "meta".`,
             },
         ),
 };
@@ -54,6 +60,7 @@ export const updateWorkbookController: AppRouteHandler = async (
                 title: body.title?.trim(),
                 description: body.description?.trim(),
                 status: body.status,
+                meta: body.meta,
             },
         );
 
