@@ -23,7 +23,7 @@ export const createWorkbook = async (
     {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: CreateWorkbookArgs,
 ) => {
-    const {title, description, collectionId, meta} = args;
+    const {title, description, collectionId, meta, status} = args;
 
     ctx.log('CREATE_WORKBOOK_START', {
         title,
@@ -92,6 +92,7 @@ export const createWorkbook = async (
                 [WorkbookModelColumn.CreatedBy]: userId,
                 [WorkbookModelColumn.UpdatedBy]: userId,
                 [WorkbookModelColumn.Meta]: meta,
+                [WorkbookModelColumn.Status]: status,
             })
             .returning('*')
             .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
