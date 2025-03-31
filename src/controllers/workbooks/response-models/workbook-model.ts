@@ -15,7 +15,7 @@ const schema = z
         createdAt: z.string(),
         updatedBy: z.string().nullable(),
         updatedAt: z.string(),
-        status: z.nativeEnum(WorkbookStatus).nullable(),
+        status: z.nativeEnum(WorkbookStatus),
     })
     .describe('Workbook model');
 

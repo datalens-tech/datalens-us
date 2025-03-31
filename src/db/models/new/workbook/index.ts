@@ -59,7 +59,7 @@ export class WorkbookModel extends Model {
     [WorkbookModelColumn.DeletedAt]!: Nullable<string>;
     [WorkbookModelColumn.IsTemplate]!: boolean;
     [WorkbookModelColumn.SortTitle]!: string;
-    [WorkbookModelColumn.Status]!: Nullable<WorkbookStatus>;
+    [WorkbookModelColumn.Status]!: WorkbookStatus;
 
     entries?: Entry[];
 }
