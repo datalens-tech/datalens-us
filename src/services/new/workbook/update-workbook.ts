@@ -17,7 +17,7 @@ export interface UpdateWorkbookArgs {
     workbookId: string;
     title?: string;
     description?: string;
-    status?: Nullable<WorkbookStatus>;
+    status?: WorkbookStatus;
     meta?: Record<string, unknown>;
 }
 
