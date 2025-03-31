@@ -41,6 +41,7 @@ export const getWorkbooksQuery = ({ctx, trx}: ServiceArgs, args: GetWorkbooksQue
             WorkbookModelColumn.UpdatedBy,
             WorkbookModelColumn.UpdatedAt,
             WorkbookModelColumn.Meta,
+            WorkbookModelColumn.Status,
         ])
         .where({
             [WorkbookModelColumn.TenantId]: tenantId,
@@ -89,6 +90,7 @@ export const getCollectionsQuery = ({ctx, trx}: ServiceArgs, args: GetCollection
             CollectionModelColumn.UpdatedBy,
             CollectionModelColumn.UpdatedAt,
             CollectionModelColumn.Meta,
+            raw('null as ??', 'status'),
         ])
         .where({
             [CollectionModelColumn.TenantId]: tenantId,
