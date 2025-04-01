@@ -77,7 +77,6 @@ export const RETURN_NAVIGATION_COLUMNS = [
     'scope',
     'type',
     'display_key as key',
-    'unversionedData',
     'revisions.meta',
     'entries.createdBy',
     'entries.createdAt',
