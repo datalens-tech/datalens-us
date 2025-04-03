@@ -46,18 +46,15 @@ export default class EntryService {
         const {requestId, tenantId, user, dlContext, isPrivateRoute} = ctx.get('info');
 
         const registry = ctx.get('registry');
-        const {checkCreateEntryAvailability, checkTenant} = registry.common.functions.get();
+        const {checkTenant} = registry.common.functions.get();
 
-        await Promise.all([
-            checkCreateEntryAvailability({ctx, tenantId, scope, type}),
-            checkTenant({
-                ctx,
-                tenantId,
-                servicePlan: checkServicePlan,
-                features: checkTenantFeatures,
-                foldersEnabled: !workbookId,
-            }),
-        ]);
+        await checkTenant({
+            ctx,
+            tenantId,
+            servicePlan: checkServicePlan,
+            features: checkTenantFeatures,
+            foldersEnabled: !workbookId,
+        });
 
         if (workbookId) {
             return await createEntryInWorkbook(ctx, {
@@ -132,18 +129,15 @@ export default class EntryService {
         } = ctx.get('info');
 
         const registry = ctx.get('registry');
-        const {checkCreateEntryAvailability, checkTenant} = registry.common.functions.get();
+        const {checkTenant} = registry.common.functions.get();
 
-        await Promise.all([
-            checkCreateEntryAvailability({ctx, tenantId, scope, type}),
-            checkTenant({
-                ctx,
-                tenantId,
-                servicePlan: checkServicePlan,
-                features: checkTenantFeatures,
-                foldersEnabled: !workbookId,
-            }),
-        ]);
+        await checkTenant({
+            ctx,
+            tenantId,
+            servicePlan: checkServicePlan,
+            features: checkTenantFeatures,
+            foldersEnabled: !workbookId,
+        });
 
         if (workbookId) {
             return await createEntryInWorkbook(ctx, {
