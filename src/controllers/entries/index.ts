@@ -19,6 +19,7 @@ import {
     getEntryMetaPrivate,
 } from '../../services/new/entry';
 import {
+    formatGetEntriesResponse,
     formatGetEntryMetaPrivateResponse,
     formatGetEntryMetaResponse,
     formatGetEntryResponse,
@@ -188,7 +189,9 @@ export default {
             ctx: req.ctx,
         });
 
-        const {code, response} = await prepareResponseAsync({data: result});
+        const formattedResponse = formatGetEntriesResponse(req.ctx, result);
+
+        const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
         res.status(code).send(response);
     },
