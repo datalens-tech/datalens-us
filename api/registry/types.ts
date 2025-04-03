@@ -51,8 +51,4 @@ export type {
 } from '../../src/registry/common/utils/log-event/types';
 export {LogEventType} from '../../src/registry/common/utils/log-event/types';
 export type {GatewayApi} from '../../src/registry';
-export type {
-    CheckCreateEntryAvailability,
-    CheckUpdateEntryAvailability,
-} from '../../src/registry/common/utils/entry/types';
 export type {CheckTenant, GetServicePlan} from '../../src/registry/common/utils/tenant/types';
