@@ -1,4 +1,3 @@
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE} from '../../../const';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import {JoinedEntryRevisionFavorite} from '../../../db/presentations';
@@ -9,56 +8,6 @@ import {getReplica} from '../utils';
 
 import {getWorkbook} from './get-workbook';
 import {getEntryPermissionsByWorkbook} from './utils';
-
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['workbookId'],
-    properties: {
-        workbookId: {
-            type: 'string',
-        },
-        page: {
-            type: 'number',
-            minimum: 0,
-        },
-        pageSize: {
-            type: 'number',
-            minimum: 1,
-            maximum: 200,
-        },
-        includePermissionsInfo: {
-            type: 'boolean',
-        },
-        createdBy: {
-            type: 'string',
-        },
-        filters: {
-            type: 'object',
-            properties: {
-                name: {
-                    type: 'string',
-                },
-            },
-        },
-        orderBy: {
-            type: 'object',
-            required: ['field', 'direction'],
-            properties: {
-                field: {
-                    type: 'string',
-                    enum: ['name', 'createdAt'],
-                },
-                direction: {
-                    type: 'string',
-                    enum: ['asc', 'desc'],
-                },
-            },
-        },
-        scope: {
-            type: ['array', 'string'],
-        },
-    },
-});
 
 export interface GetWorkbookContentArgs {
     workbookId: string;
@@ -77,7 +26,7 @@ export interface GetWorkbookContentArgs {
 }
 
 export const getWorkbookContent = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: GetWorkbookContentArgs,
 ) => {
     const {
@@ -101,10 +50,6 @@ export const getWorkbookContent = async (
         orderBy,
         scope,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const targetTrx = getReplica(trx);
 

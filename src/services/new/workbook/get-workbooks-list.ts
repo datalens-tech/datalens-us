@@ -1,6 +1,5 @@
 import {AppError} from '@gravity-ui/nodekit';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE, US_ERRORS} from '../../../const';
 import {CollectionModel} from '../../../db/models/new/collection';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
@@ -10,39 +9,6 @@ import Utils from '../../../utils';
 import {getParents} from '../collection/utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
-
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['collectionId'],
-    properties: {
-        collectionId: {
-            type: ['string', 'null'],
-        },
-        includePermissionsInfo: {
-            type: 'boolean',
-        },
-        filterString: {
-            type: 'string',
-        },
-        page: {
-            type: 'number',
-            minimim: 0,
-        },
-        pageSize: {
-            type: 'number',
-            minimum: 1,
-            maximum: 1000,
-        },
-        orderField: {
-            type: 'string',
-            enum: ['title', 'createdAt', 'updatedAt'],
-        },
-        orderDirection: {
-            type: 'string',
-            enum: ['asc', 'desc'],
-        },
-    },
-});
 
 export type OrderField = 'title' | 'createdAt' | 'updatedAt';
 
@@ -60,7 +26,7 @@ export interface GetWorkbookListArgs {
 }
 
 export const getWorkbooksList = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: GetWorkbookListArgs,
 ) => {
     const {
@@ -82,10 +48,6 @@ export const getWorkbooksList = async (
         orderField,
         orderDirection,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const {accessServiceEnabled} = ctx.config;
     const registry = ctx.get('registry');

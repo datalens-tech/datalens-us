@@ -1,21 +1,7 @@
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {WorkbookModel} from '../../../db/models/new/workbook';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
-
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['workbookId', 'isTemplate'],
-    properties: {
-        workbookId: {
-            type: 'string',
-        },
-        isTemplate: {
-            type: 'boolean',
-        },
-    },
-});
 
 export interface SetWorkbookIsTemplateArgs {
     workbookId: string;
@@ -23,7 +9,7 @@ export interface SetWorkbookIsTemplateArgs {
 }
 
 export const setWorkbookIsTemplate = async (
-    {ctx, trx, skipValidation = false}: ServiceArgs,
+    {ctx, trx}: ServiceArgs,
     args: SetWorkbookIsTemplateArgs,
 ) => {
     const {workbookId, isTemplate} = args;
@@ -32,10 +18,6 @@ export const setWorkbookIsTemplate = async (
         workbookId: Utils.encodeId(workbookId),
         isTemplate,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const workbook = await WorkbookModel.query(getPrimary(trx)).patchAndFetchById(workbookId, {
         isTemplate,
