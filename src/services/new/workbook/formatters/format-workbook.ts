@@ -13,5 +13,6 @@ export const formatWorkbook = (workbook: WorkbookInstance) => {
         updatedBy: workbook.model.updatedBy,
         updatedAt: workbook.model.updatedAt,
         permissions: workbook.permissions,
+        status: workbook.model.status,
     };
 };

@@ -1,3 +1,4 @@
+import {WorkbookStatus} from '../../../db/models/new/workbook/types';
 import {testTenantId} from '../auth';
 
 export const WORKBOOK_DEFAULT_FIELDS = {
@@ -11,6 +12,7 @@ export const WORKBOOK_DEFAULT_FIELDS = {
     updatedBy: expect.any(String),
     meta: {},
     tenantId: testTenantId,
+    status: WorkbookStatus.Active,
 };
 
 export const WORKBOOKS_DEFAULT_PERMISSIONS = {
