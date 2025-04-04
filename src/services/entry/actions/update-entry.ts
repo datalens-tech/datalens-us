@@ -160,22 +160,14 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
             await checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
         }
 
-        const {checkUpdateEntryAvailability, checkTenant} = registry.common.functions.get();
+        const {checkTenant} = registry.common.functions.get();
 
-        await Promise.all([
-            checkUpdateEntryAvailability({
-                ctx,
-                tenantId: entry.tenantId,
-                scope: entry.scope,
-                type: entry.type,
-            }),
-            checkTenant({
-                ctx,
-                tenantId: entry.tenantId,
-                servicePlan: checkServicePlan,
-                features: checkTenantFeatures,
-            }),
-        ]);
+        await checkTenant({
+            ctx,
+            tenantId: entry.tenantId,
+            servicePlan: checkServicePlan,
+            features: checkTenantFeatures,
+        });
 
         await Lock.checkLock({entryId, lockToken}, ctx);
     } else {
