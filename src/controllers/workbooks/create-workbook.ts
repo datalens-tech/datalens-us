@@ -17,7 +17,7 @@ const requestSchema = {
         collectionId: zc.encodedId().optional().nullable(),
         title: z.string(),
         description: z.string().optional(),
-        meta: z.record(z.string(), z.unknown()).optional(),
+        meta: zc.limitedObject({limit: 3000}).optional(),
         status: z.nativeEnum(WorkbookStatus).optional(),
     }),
 };

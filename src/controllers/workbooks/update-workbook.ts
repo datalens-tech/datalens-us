@@ -18,7 +18,7 @@ const requestSchema = {
             title: z.string().optional(),
             description: z.string().optional(),
             status: z.nativeEnum(WorkbookStatus).optional(),
-            meta: z.record(z.string(), z.unknown()).optional(),
+            meta: zc.limitedObject({limit: 3000}).optional(),
         })
         .refine(
             ({title, description, status, meta}) => {
