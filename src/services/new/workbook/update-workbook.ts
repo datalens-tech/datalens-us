@@ -3,6 +3,7 @@ import {raw} from 'objection';
 
 import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
+import {WorkbookStatus} from '../../../db/models/new/workbook/types';
 import {WorkbookPermission} from '../../../entities/workbook';
 import Utils from '../../../utils';
 import {getParentIds} from '../collection/utils';
@@ -16,24 +17,35 @@ export interface UpdateWorkbookArgs {
     workbookId: string;
     title?: string;
     description?: string;
+    status?: WorkbookStatus;
+    meta?: Record<string, unknown>;
 }
 
 export const updateWorkbook = async (
     {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: UpdateWorkbookArgs,
 ) => {
-    const {workbookId, title: newTitle, description: newDescription} = args;
+    const {
+        workbookId,
+        title: newTitle,
+        description: newDescription,
+        status: newStatus,
+        meta: newMeta,
+    } = args;
 
     ctx.log('UPDATE_WORKBOOK_START', {
         workbookId: Utils.encodeId(workbookId),
         newTitle,
         newDescription,
+        newStatus,
+        newMeta,
     });
 
     const {accessServiceEnabled} = ctx.config;
 
     const {
         user: {userId},
+        isPrivateRoute,
     } = ctx.get('info');
 
     const targetTrx = getPrimary(trx);
@@ -43,7 +55,7 @@ export const updateWorkbook = async (
         {workbookId},
     );
 
-    if (accessServiceEnabled && !skipCheckPermissions) {
+    if (accessServiceEnabled && !skipCheckPermissions && !isPrivateRoute) {
         let parentIds: string[] = [];
 
         if (workbook.model.collectionId !== null) {
@@ -88,6 +100,8 @@ export const updateWorkbook = async (
             [WorkbookModelColumn.Description]: newDescription,
             [WorkbookModelColumn.UpdatedBy]: userId,
             [WorkbookModelColumn.UpdatedAt]: raw(CURRENT_TIMESTAMP),
+            [WorkbookModelColumn.Status]: newStatus,
+            [WorkbookModelColumn.Meta]: newMeta,
         })
         .where({
             [WorkbookModelColumn.WorkbookId]: workbookId,

@@ -1,6 +1,6 @@
 const {resolve} = require('path');
 
-const jtcPreset = require('@trendyol/jest-testcontainers/jest-preset');
+const jtcPreset = require('@blueground/jest-testcontainers/jest-preset');
 
 module.exports = {
     ...jtcPreset,

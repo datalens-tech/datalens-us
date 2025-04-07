@@ -36,10 +36,10 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@blueground/jest-testcontainers": "^3.0.4",
     "@gravity-ui/eslint-config": "^3.2.0",
     "@gravity-ui/prettier-config": "^1.1.0",
     "@gravity-ui/tsconfig": "^1.0.0",
-    "@trendyol/jest-testcontainers": "^2.1.1",
     "@types/express": "^4.17.15",
     "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.7",
@@ -58,7 +58,6 @@
     "prettier": "^3.3.3",
     "source-map-support": "^0.5.19",
     "supertest": "^3.3.0",
-    "testcontainers": "^8.11.0",
     "ts-node": "^10.9.2",
     "tsc-watch": "^6.2.1",
     "typescript": "^5.6.3"
