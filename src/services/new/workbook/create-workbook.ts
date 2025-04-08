@@ -3,6 +3,7 @@ import {transaction} from 'objection';
 
 import {US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
+import {WorkbookStatus} from '../../../db/models/new/workbook/types';
 import Utils from '../../../utils';
 import {getParentIds} from '../collection/utils/get-parents';
 import {ServiceArgs} from '../types';
@@ -14,13 +15,15 @@ export interface CreateWorkbookArgs {
     collectionId: Nullable<string>;
     title: string;
     description?: string;
+    meta?: Record<string, unknown>;
+    status?: WorkbookStatus;
 }
 
 export const createWorkbook = async (
     {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: CreateWorkbookArgs,
 ) => {
-    const {title, description, collectionId} = args;
+    const {title, description, collectionId, meta, status} = args;
 
     ctx.log('CREATE_WORKBOOK_START', {
         title,
@@ -88,6 +91,8 @@ export const createWorkbook = async (
                 [WorkbookModelColumn.CollectionId]: collectionId,
                 [WorkbookModelColumn.CreatedBy]: userId,
                 [WorkbookModelColumn.UpdatedBy]: userId,
+                [WorkbookModelColumn.Meta]: meta,
+                [WorkbookModelColumn.Status]: status,
             })
             .returning('*')
             .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);

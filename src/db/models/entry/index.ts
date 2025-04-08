@@ -395,7 +395,7 @@ class Entry extends Model {
                     .join('revisions', 'entries.savedId', 'revisions.revId')
                     .where({
                         tenantId,
-                        displayKey: Utils.getParentFolderKey({keyFormatted: displayKey}),
+                        key: parentFolderKey,
                         isDeleted: false,
                     })
                     .first();

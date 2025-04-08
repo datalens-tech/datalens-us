@@ -1,4 +1,4 @@
-const {TestcontainersEnvironment} = require('@trendyol/jest-testcontainers');
+const {TestcontainersEnvironment} = require('@blueground/jest-testcontainers');
 
 class TestEnvironment extends TestcontainersEnvironment {
     async setup() {

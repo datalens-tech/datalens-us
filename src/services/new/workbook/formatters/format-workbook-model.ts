@@ -12,5 +12,6 @@ export const formatWorkbookModel = (workbookModel: WorkbookModel) => {
         createdAt: workbookModel.createdAt,
         updatedBy: workbookModel.updatedBy,
         updatedAt: workbookModel.updatedAt,
+        status: workbookModel.status,
     };
 };

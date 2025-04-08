@@ -1,6 +1,8 @@
 import {Model} from '../../..';
 import {Entry} from '../entry';
 
+import type {WorkbookStatus} from './types';
+
 export const WorkbookModelColumn = {
     WorkbookId: 'workbookId',
     CollectionId: 'collectionId',
@@ -17,6 +19,7 @@ export const WorkbookModelColumn = {
     DeletedBy: 'deletedBy',
     IsTemplate: 'isTemplate',
     SortTitle: 'sortTitle',
+    Status: 'status',
 } as const;
 
 export class WorkbookModel extends Model {
@@ -56,6 +59,7 @@ export class WorkbookModel extends Model {
     [WorkbookModelColumn.DeletedAt]!: Nullable<string>;
     [WorkbookModelColumn.IsTemplate]!: boolean;
     [WorkbookModelColumn.SortTitle]!: string;
+    [WorkbookModelColumn.Status]!: WorkbookStatus;
 
     entries?: Entry[];
 }
