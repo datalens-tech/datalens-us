@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-if [ "$SKIP_INSTALL_DB_EXTENSIONS" = "1" ]; then
+if [ "${SKIP_INSTALL_DB_EXTENSIONS}" = "1" ]; then
   echo '{"level":"INFO","msg":"Skip extensions setting up"}'
 else
   echo '{"level":"INFO","msg":"Start setting up extensions"}'
