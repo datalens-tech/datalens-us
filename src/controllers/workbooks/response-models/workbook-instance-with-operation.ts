@@ -1,11 +1,11 @@
 import {z} from '../../../components/zod';
 import type {Operation} from '../../../entities/types';
-import type {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
 import {operation as operationResponseModel} from '../../response-models';
 
-import {workbookInstance as originalWorkbookInstance} from './workbook-instance';
+import {workbookInstance as workbookInstanceModel} from './workbook-instance';
 
-const schema = originalWorkbookInstance.schema
+const schema = workbookInstanceModel.schema
     .merge(
         z.object({
             operation: operationResponseModel.schema.optional(),
@@ -20,7 +20,7 @@ const format = (
     operation?: Operation,
 ): WorkbookInstanceWithOperationResponseModel => {
     return {
-        ...originalWorkbookInstance.format(workbookInstance),
+        ...workbookInstanceModel.format(workbookInstance),
         operation: operation ? operationResponseModel.format(operation) : undefined,
     };
 };

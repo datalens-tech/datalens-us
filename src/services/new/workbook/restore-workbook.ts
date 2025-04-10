@@ -1,7 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {raw, transaction} from 'objection';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, TRASH_FOLDER, US_ERRORS} from '../../../const';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
@@ -9,33 +8,16 @@ import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getPrimary, getReplica} from '../utils';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['workbookId'],
-    properties: {
-        workbookId: {
-            type: 'string',
-        },
-    },
-});
-
 export interface RestoreWorkbookArgs {
     workbookId: string;
 }
 
-export const restoreWorkbook = async (
-    {ctx, trx, skipValidation = false}: ServiceArgs,
-    args: RestoreWorkbookArgs,
-) => {
+export const restoreWorkbook = async ({ctx, trx}: ServiceArgs, args: RestoreWorkbookArgs) => {
     const {workbookId} = args;
 
     ctx.log('RESTORE_WORKBOOK_START', {
         workbookId: Utils.encodeId(workbookId),
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const {tenantId} = ctx.get('info');
 
