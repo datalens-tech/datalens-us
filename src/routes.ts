@@ -372,12 +372,6 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             write: true,
             features: [Feature.CollectionsEnabled],
         }),
-        copyWorkbookTemplate: makeRoute({
-            route: 'POST /v2/workbooks/:workbookId/copyTemplate',
-            handler: workbooks.copyTemplate,
-            write: true,
-            features: [Feature.CollectionsEnabled],
-        }),
         privateSetIsTemplateWorkbook: makeRoute({
             route: 'POST /private/v2/workbooks/:workbookId/setIsTemplate',
             handler: workbooks.setIsTemplate,

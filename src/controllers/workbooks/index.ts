@@ -4,7 +4,6 @@ import {prepareResponseAsync} from '../../components/response-presenter';
 import {
     OrderDirection,
     OrderField,
-    copyWorkbookTemplate,
     getAllWorkbooks,
     getWorkbook,
     getWorkbookContent,
@@ -18,7 +17,6 @@ import {
     formatSetWorkbookIsTemplate,
     formatWorkbook,
     formatWorkbookModel,
-    formatWorkbookModelWithOperation,
     formatWorkbookModelsList,
     formatWorkbooksList,
 } from '../../services/new/workbook/formatters';
@@ -133,29 +131,6 @@ export default {
         );
 
         const formattedResponse = formatSetWorkbookIsTemplate(result);
-        const {code, response} = await prepareResponseAsync({data: formattedResponse});
-        res.status(code).send(response);
-    },
-
-    copyTemplate: async (req: Request, res: Response) => {
-        const {body, params} = req;
-
-        const result = await copyWorkbookTemplate(
-            {
-                ctx: req.ctx,
-            },
-            {
-                workbookId: params.workbookId,
-                collectionId: body.collectionId ?? null,
-                // newTitle for compatibility
-                title: body.title ?? body.newTitle,
-            },
-        );
-
-        const formattedResponse = formatWorkbookModelWithOperation(
-            result.workbook,
-            result.operation,
-        );
         const {code, response} = await prepareResponseAsync({data: formattedResponse});
         res.status(code).send(response);
     },
