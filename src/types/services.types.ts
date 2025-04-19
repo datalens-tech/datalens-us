@@ -54,7 +54,7 @@ export interface ResolveTenantIdByEntryId extends StdServiceParams {
 }
 
 interface NavigationServiceParams extends StdServiceParams {
-    scope: EntryScope;
+    scope?: EntryScope;
     page?: number;
     pageSize?: number;
 }
@@ -73,6 +73,7 @@ export interface GetEntries extends NavigationServiceParams {
     excludeLocked?: boolean;
 }
 export interface InterTenantGetEntries extends NavigationServiceParams {
+    scope: EntryScope;
     ids?: string | string[];
     type?: string;
     orderBy?: OrderByDirection;

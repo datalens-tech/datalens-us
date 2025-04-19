@@ -12,7 +12,7 @@ export interface PaginationEntriesResponse {
 export interface GetEntriesConfig extends BasicRequestParams {
     tenantId: string;
     ids?: string | string[];
-    scope: EntryScope;
+    scope?: EntryScope;
     type?: string;
     orderBy?: EntriesOrderByFilter;
     createdBy?: string | string[];
