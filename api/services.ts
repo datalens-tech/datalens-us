@@ -43,7 +43,6 @@ export {
     formatEntryModel,
     formatJoinedEntryRevisionModel,
 } from '../src/services/new/entry/formatters';
-export {formatWorkbookModel} from '../src/services/new/workbook/formatters';
 
 export {crossSyncCopiedJoinedEntryRevisions} from '../src/services/new/workbook';
 
