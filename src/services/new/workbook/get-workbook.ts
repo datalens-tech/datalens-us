@@ -1,6 +1,5 @@
 import {AppError} from '@gravity-ui/nodekit';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../entities/workbook';
@@ -10,26 +9,13 @@ import {getParentIds} from '../collection/utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['workbookId'],
-    properties: {
-        workbookId: {
-            type: 'string',
-        },
-        includePermissionsInfo: {
-            type: 'boolean',
-        },
-    },
-});
-
 export interface GetWorkbookArgs {
     workbookId: string;
     includePermissionsInfo?: boolean;
 }
 
 export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>(
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: GetWorkbookArgs,
 ): Promise<T> => {
     const {workbookId, includePermissionsInfo = false} = args;
@@ -39,12 +25,7 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
         includePermissionsInfo,
     });
 
-    if (!skipValidation) {
-        validateArgs(args);
-    }
-
     const {tenantId, isPrivateRoute, onlyMirrored} = ctx.get('info');
-
     const {accessServiceEnabled} = ctx.config;
 
     const targetTrx = getReplica(trx);
