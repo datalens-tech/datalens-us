@@ -7,7 +7,7 @@ import {
 
 export const validateGetEntries = compileSchema({
     type: 'object',
-    required: ['tenantId', 'scope'],
+    required: ['tenantId'],
     properties: {
         tenantId: {
             type: 'string',
@@ -74,6 +74,14 @@ export const validateGetEntries = compileSchema({
             type: 'boolean',
         },
     },
+    anyOf: [
+        {
+            required: ['scope'],
+        },
+        {
+            required: ['ids'],
+        },
+    ],
 });
 
 export const validateInterTenantGetEntries = compileSchema({
