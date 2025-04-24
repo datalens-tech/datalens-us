@@ -142,7 +142,7 @@ class Navigation extends Model {
             )
             .where({
                 isDeleted: false,
-                scope,
+                ...(scope ? {scope} : {}),
                 'entries.tenantId': tenantId,
             })
             .where((builder) => {

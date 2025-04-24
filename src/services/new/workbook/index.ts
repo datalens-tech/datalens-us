@@ -9,6 +9,6 @@ export * from './move-workbooks-list';
 export * from './delete-workbooks';
 export * from './set-workbook-is-template';
 export * from './copy-workbook';
-export * from './copy-workbook-template';
 export * from './get-all-workbooks';
 export * from './restore-workbook';
+export * from './get-workbooks-list-by-ids';

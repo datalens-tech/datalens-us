@@ -3,7 +3,7 @@ import request from 'supertest';
 import {systemUserId} from '../../../../constants';
 import {WORKBOOK_DEFAULT_FIELDS} from '../../../../models';
 import {routes} from '../../../../routes';
-import {app, authMasterToken} from '../../auth';
+import {app, authMasterToken, testTenantId} from '../../auth';
 
 const workbooksData = {
     id: null,
@@ -106,15 +106,18 @@ describe('Private Entries in workboooks managment', () => {
                     isLocked: false,
                     isFavorite: false,
                     key: expect.any(String),
+                    displayKey: expect.any(String),
                     meta: {},
                     mirrored: false,
                     publishedId: null,
                     savedId: expect.any(String),
+                    revId: expect.any(String),
                     scope: 'dataset',
                     type: 'graph',
                     updatedAt: expect.any(String),
                     updatedBy: expect.any(String),
                     workbookId: testWorkbookId,
+                    tenantId: testTenantId,
                 },
             ]),
         });
