@@ -8,6 +8,6 @@ export async function up(knex: Knex): Promise<void> {
     `);
 }
 
-export async function down(knex: Knex): Promise<void> {
-    return knex.raw('');
+export async function down(): Promise<void> {
+    return;
 }
