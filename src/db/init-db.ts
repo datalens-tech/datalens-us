@@ -73,7 +73,7 @@ export function initDB(nodekit: NodeKit) {
         dsnList = Utils.getDsnList();
     }
 
-    const suppressStatusLogs = isTrueArg(process.env.US_SURPRESS_DB_STATUS_LOGS);
+    const suppressStatusLogs = isTrueArg(process.env.SUPPRESS_DB_STATUS_LOGS);
 
     const dispatcherOptions = {
         healthcheckInterval: 5000,
