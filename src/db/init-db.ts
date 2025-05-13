@@ -2,30 +2,12 @@ import * as path from 'path';
 
 import type {NodeKit} from '@gravity-ui/nodekit';
 import {initDB as initPostgresDB} from '@gravity-ui/postgreskit';
+import {knexSnakeCaseMappers} from 'objection';
 
 import {AppEnv, DEFAULT_QUERY_TIMEOUT} from '../const';
 import {getTestDsnList} from '../tests/int/db';
 import Utils from '../utils';
 import {isTrueArg} from '../utils/env-utils';
-
-interface OrigImplFunction {
-    (snakeCaseFormat: string): string;
-}
-
-function convertCamelCase(dataObj = {}) {
-    return Object.entries(dataObj).reduce((dataObjFormed: {[key: string]: any}, objEntry) => {
-        const [property, value] = objEntry;
-
-        const propertyCamelCase = Utils.camelCase(property).replace(
-            /(uuid)/gi,
-            (foundValue: string) => foundValue.toUpperCase(),
-        );
-
-        dataObjFormed[propertyCamelCase] = value;
-
-        return dataObjFormed;
-    }, {});
-}
 
 export const getKnexOptions = () => ({
     client: 'pg',
@@ -44,24 +26,7 @@ export const getKnexOptions = () => ({
         extension: 'js',
         loadExtensions: ['.js'],
     },
-    postProcessResponse: (result: any): any => {
-        let dataFormed;
-
-        if (Array.isArray(result)) {
-            dataFormed = result.map((dataObj) => convertCamelCase(dataObj));
-        } else if (result !== null && typeof result === 'object') {
-            dataFormed = convertCamelCase(result);
-        } else {
-            dataFormed = result;
-        }
-
-        return dataFormed;
-    },
-    wrapIdentifier: (value: string, origImpl: OrigImplFunction): string => {
-        const snakeCaseFormat = value.replace(/(?=[A-Z])/g, '_').toLowerCase();
-
-        return origImpl(snakeCaseFormat);
-    },
+    ...knexSnakeCaseMappers(),
     debug: isTrueArg(process.env.SQL_DEBUG),
 });
 

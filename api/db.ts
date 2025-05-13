@@ -9,6 +9,7 @@ export {default as LegacyTenant} from '../src/db/models/tenant';
 
 export {Entry, EntryColumn, EntryColumnRaw} from '../src/db/models/new/entry';
 export {EntryScope, EntryType} from '../src/db/models/new/entry/types';
+export {DataExportStatus} from '../src/db/models/new/data-export/types';
 export {
     RevisionModel,
     RevisionModelColumn,
