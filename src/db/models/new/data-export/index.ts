@@ -1,12 +1,7 @@
 import {Model} from '../../..';
 import {Entry} from '../entry';
 
-export enum DataExportStatus {
-    InProgress = 'IN_PROGRESS',
-    Cancelled = 'CANCELLED',
-    Finished = 'FINISHED',
-    Failed = 'FAILED',
-}
+import {DataExportStatus} from './types';
 
 export class DataExport extends Model {
     static get tableName() {
