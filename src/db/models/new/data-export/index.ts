@@ -52,7 +52,7 @@ export class DataExport extends Model {
     params!: Record<string, unknown>;
     createdBy!: string;
     createdAt!: string;
-    expiredAt!: string;
+    expiredAt!: Nullable<string>;
     jobId!: string;
     s3Key!: Nullable<string>;
     uploadId!: Nullable<string>;
