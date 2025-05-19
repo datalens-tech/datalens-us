@@ -100,7 +100,8 @@ class Links extends Model {
         const existingEntries = await Entry.query(trx)
             .select('entryId')
             .whereIn('entryId', targetEntryIds)
-            .where('tenantId', tenantId);
+            .where('tenantId', tenantId)
+            .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
         const existingEntryIdsSet = new Set(existingEntries.map((entry) => entry.entryId));
         const linksByToId = new Map(dbLinks.map((link) => [link.toId, link]));
