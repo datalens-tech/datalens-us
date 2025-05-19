@@ -98,6 +98,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
+            requireCtxTenantId: true,
         }),
         privateCreateEntryAlt: makeRoute({
             route: 'POST /private/createEntry',
@@ -105,6 +106,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
+            requireCtxTenantId: true,
         }),
 
         updateEntry: makeRoute({
@@ -333,6 +335,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             authPolicy: AuthPolicy.disabled,
             private: true,
             features: [Feature.CollectionsEnabled],
+            requireCtxTenantId: true,
         }),
         deleteWorkbook: makeRoute({
             route: 'DELETE /v2/workbooks/:workbookId',
@@ -411,6 +414,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             authPolicy: AuthPolicy.disabled,
             private: true,
             features: [Feature.CollectionsEnabled],
+            requireCtxTenantId: true,
         }),
         getCollection: makeRoute({
             route: 'GET /v1/collections/:collectionId',
