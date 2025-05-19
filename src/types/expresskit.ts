@@ -4,6 +4,7 @@ export interface PlatformAppRouteParams {
     private?: boolean;
     write?: boolean;
     manualDecodeId?: boolean;
+    requireCtxTenantId?: boolean;
 }
 
 export interface PlatformAppRouteHandler {

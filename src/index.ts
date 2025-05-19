@@ -4,6 +4,7 @@ import {registerAppPlugins} from './registry/register-app-plugins';
 import {AppMiddleware, AppRoutes, AuthPolicy, ExpressKit} from '@gravity-ui/expresskit';
 import {
     authZitadel,
+    checkCtxTenantId,
     checkReadOnlyMode,
     ctx,
     decodeId,
@@ -56,6 +57,7 @@ afterAuth.push(
     resolveSpecialTokens,
     ctx,
     checkReadOnlyMode,
+    checkCtxTenantId,
 );
 
 if (nodekit.config.zitadelEnabled) {
