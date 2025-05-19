@@ -95,7 +95,7 @@ class Links extends Model {
         targetEntryIds: string[],
         dbLinks: Array<{fromId: string; toId: string; name: string}>,
         tenantId: string,
-        trx?: TransactionOrKnex,
+        trx: TransactionOrKnex,
     ): Promise<void> {
         const existingEntries = await Entry.query(trx)
             .select('entryId')
@@ -111,7 +111,7 @@ class Links extends Model {
             return;
         }
 
-        const invalidLinks = nonExistentEntryIds.map((id) => {
+        const invalidLinks = await Utils.macrotasksMap(nonExistentEntryIds, (id) => {
             const link = linksByToId.get(id);
             return {
                 name: link?.name || 'unknown',
