@@ -49,7 +49,14 @@ class Links extends Model {
             const targetEntryIds = dbLinks.map((link) => link.toId).filter(Boolean);
 
             if (targetEntryIds.length) {
-                await Links.validateTargetEntriesExist(targetEntryIds, dbLinks, trxOverride);
+                const {tenantId} = ctx.get('info');
+
+                await Links.validateTargetEntriesExist(
+                    targetEntryIds,
+                    dbLinks,
+                    tenantId,
+                    trxOverride,
+                );
             }
 
             ctx.log('DB_LINKS', {dbLinks});
@@ -87,11 +94,13 @@ class Links extends Model {
     private static async validateTargetEntriesExist(
         targetEntryIds: string[],
         dbLinks: Array<{fromId: string; toId: string; name: string}>,
+        tenantId: string,
         trx?: TransactionOrKnex,
     ): Promise<void> {
         const existingEntries = await Entry.query(trx)
             .select('entryId')
-            .whereIn('entryId', targetEntryIds);
+            .whereIn('entryId', targetEntryIds)
+            .where('tenantId', tenantId);
 
         const existingEntryIdsSet = new Set(existingEntries.map((entry) => entry.entryId));
         const linksByToId = new Map(dbLinks.map((link) => [link.toId, link]));
