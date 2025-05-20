@@ -388,6 +388,17 @@ export default (error: AppError | DBError) => {
             };
         }
 
+        case US_ERRORS.TENANT_ID_MISSING_IN_CONTEXT: {
+            return {
+                code: 400,
+                response: {
+                    code,
+                    message:
+                        'TenantId is missing. Probably it needs to be passed in the request headers.',
+                },
+            };
+        }
+
         default:
             return {
                 code: 500,

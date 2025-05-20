@@ -8,4 +8,5 @@ export {
     resolveWorkbookId,
     setCiEnv,
     authZitadel,
+    checkCtxTenantId,
 } from '../src/components/middlewares';
