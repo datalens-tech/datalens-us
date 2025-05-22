@@ -197,6 +197,34 @@ export class Utils {
         return results;
     }
 
+    static async macrotasksForEach<T>(
+        arr: T[],
+        cb: (item: T) => unknown,
+        chunkSize = 1000,
+    ): Promise<void> {
+        const chunks = chunk(arr, chunkSize);
+        for (const chunkItem of chunks) {
+            await new Promise<void>((resolve, reject) => {
+                function done() {
+                    try {
+                        for (const item of chunkItem) {
+                            cb(item);
+                        }
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    }
+                }
+
+                if (chunkItem === chunks[0]) {
+                    done();
+                } else {
+                    setImmediate(done);
+                }
+            });
+        }
+    }
+
     static waitNextMacrotask = async () => {
         return new Promise((resolve) => {
             setImmediate(resolve);
