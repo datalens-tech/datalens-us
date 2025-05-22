@@ -9,7 +9,7 @@ import Utils from '../../../utils';
 import Favorite from '../favorite';
 import Revision from '../revision';
 
-import {validateGetEntries, validateInterTenantGetEntries} from './scheme';
+import {validateInterTenantGetEntries} from './scheme';
 import {whereBuilderInterTenantGetEntries} from './utils';
 
 interface NavigationFields extends MT.EntryColumns {
@@ -89,29 +89,6 @@ class Navigation extends Model {
         });
 
         const {user} = ctx.get('info');
-
-        const {isValid, validationErrors} = validateGetEntries({
-            tenantId,
-            ids,
-            scope,
-            type,
-            createdBy,
-            metaFilters,
-            filters,
-            orderBy,
-            page,
-            pageSize,
-            includePermissionsInfo,
-            includeData,
-            includeLinks,
-        });
-
-        if (!isValid) {
-            throw new AppError('Validation error', {
-                code: US_ERRORS.VALIDATION_ERROR,
-                details: {validationErrors},
-            });
-        }
 
         const returnColumnNames = includeLinks
             ? RETURN_NAVIGATION_COLUMNS.concat('links')

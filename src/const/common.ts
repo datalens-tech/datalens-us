@@ -138,6 +138,8 @@ export const ID_VARIABLES = [
 ];
 
 export const CODING_BASE = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
+export const ENCODED_ID_LENGTH = 13;
+
 export const MAX_META_OBJECT_SYMBOLS = 2000;
 export const MAX_UNVERSIONED_DATA_OBJECT_SYMBOLS = 5000;
 export const MAX_PRESET_DATA_OBJECT_SYMBOLS = 15000;

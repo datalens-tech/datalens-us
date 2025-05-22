@@ -10,7 +10,6 @@ import {
     getEntryRevisions,
     switchRevisionEntry,
 } from '../../services/entry';
-import NavigationService from '../../services/navigation.service';
 import {
     GetEntryArgs,
     GetEntryMetaPrivateArgs,
@@ -19,12 +18,10 @@ import {
     getEntryMetaPrivate,
 } from '../../services/new/entry';
 import {
-    formatGetEntriesResponse,
     formatGetEntryMetaPrivateResponse,
     formatGetEntryMetaResponse,
     formatGetEntryResponse,
 } from '../../services/new/entry/formatters';
-import * as ST from '../../types/services.types';
 import {isTrueArg} from '../../utils/env-utils';
 
 import {copyEntriesToWorkbookController} from './copy-entries-to-workbook';
@@ -32,6 +29,7 @@ import {copyEntryToWorkbookController} from './copy-entry-to-workbook';
 import {createEntryController} from './create-entry';
 import {createEntryAltController} from './create-entry-alt';
 import {deleteEntryController} from './delete-entry';
+import {getEntriesController} from './get-entries';
 import {getEntriesDataController} from './get-entries-data';
 import {renameEntryController} from './rename-entry';
 import {updateEntryController} from './update-entry';
@@ -45,6 +43,7 @@ export default {
     updateEntryController,
     createEntryController,
     createEntryAltController,
+    getEntriesController,
 
     getEntry: async (req: Request, res: Response) => {
         const {query, params} = req;
@@ -162,34 +161,6 @@ export default {
             typeof query.page !== 'undefined' && typeof query.pageSize !== 'undefined'
                 ? result
                 : result.relations;
-
-        const {code, response} = await prepareResponseAsync({data: formattedResponse});
-
-        res.status(code).send(response);
-    },
-
-    getEntries: async (req: Request, res: Response) => {
-        const query = req.query as unknown as ST.GetEntries;
-
-        const result = await NavigationService.getEntries({
-            ids: query.ids,
-            scope: query.scope,
-            type: query.type,
-            createdBy: query.createdBy,
-            orderBy: query.orderBy,
-            meta: query.meta,
-            filters: query.filters,
-            page: query.page && Number(query.page),
-            pageSize: query.pageSize && Number(query.pageSize),
-            includePermissionsInfo: isTrueArg(query.includePermissionsInfo),
-            ignoreWorkbookEntries: isTrueArg(query.ignoreWorkbookEntries),
-            includeData: isTrueArg(query.includeData),
-            includeLinks: isTrueArg(query.includeLinks),
-            excludeLocked: isTrueArg(query.excludeLocked),
-            ctx: req.ctx,
-        });
-
-        const formattedResponse = formatGetEntriesResponse(req.ctx, result);
 
         const {code, response} = await prepareResponseAsync({data: formattedResponse});
 
