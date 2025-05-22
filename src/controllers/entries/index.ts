@@ -43,6 +43,7 @@ export default {
     updateEntryController,
     createEntryController,
     createEntryAltController,
+    getEntriesController,
 
     getEntry: async (req: Request, res: Response) => {
         const {query, params} = req;
@@ -165,6 +166,4 @@ export default {
 
         res.status(code).send(response);
     },
-
-    getEntriesController,
 };

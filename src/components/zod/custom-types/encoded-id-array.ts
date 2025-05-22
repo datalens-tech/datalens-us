@@ -15,20 +15,20 @@ export const encodedIdArray = ({min, max}: {min: number; max: number}) => {
 
 export const encodedIdArraySafe = ({min, max}: {min: number; max: number}) => {
     return baseArray({min, max}).transform(async (ids) => {
-        const validIds: string[] = [];
-        const invalidIds: string[] = [];
+        const decoded: string[] = [];
+        const failed: string[] = [];
 
         await Utils.macrotasksForEach(ids, (val) => {
             try {
-                validIds.push(Utils.decodeId(val));
+                decoded.push(Utils.decodeId(val));
             } catch (error) {
-                invalidIds.push(val);
+                failed.push(val);
             }
         });
 
         return {
-            validIds,
-            invalidIds,
+            decoded,
+            failed,
         };
     });
 };

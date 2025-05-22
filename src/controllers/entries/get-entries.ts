@@ -56,7 +56,7 @@ export const getEntriesController = async (req: Request, res: Response) => {
     const {query} = await parseReq(req);
 
     const result = await NavigationService.getEntries({
-        ids: query.ids?.validIds,
+        ids: query.ids?.decoded,
         scope: query.scope,
         type: query.type,
         createdBy: query.createdBy,
@@ -79,3 +79,5 @@ export const getEntriesController = async (req: Request, res: Response) => {
 
     res.status(code).send(response);
 };
+
+getEntriesController.manualDecodeId = true;
