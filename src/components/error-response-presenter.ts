@@ -63,7 +63,8 @@ export default (error: AppError | DBError) => {
         case US_ERRORS.PARENT_FOLDER_NOT_EXIST:
         case US_ERRORS.MODE_NOT_ALLOWED:
         case US_ERRORS.DECODE_ID_FAILED:
-        case US_ERRORS.VALIDATION_ERROR: {
+        case US_ERRORS.VALIDATION_ERROR:
+        case US_ERRORS.INCORRECT_LINK_ERROR: {
             return {
                 code: 400,
                 response: {

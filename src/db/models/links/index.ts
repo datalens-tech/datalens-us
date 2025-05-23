@@ -30,7 +30,7 @@ class Links extends Model {
                 });
             }
 
-            const dbLinks = Links.produceDbLinks(entryId, links);
+            const dbLinks = await Links.produceDbLinks(entryId, links);
 
             ctx.log('DB_LINKS', {dbLinks});
 
@@ -50,18 +50,42 @@ class Links extends Model {
         } catch (error) {
             ctx.logError('SYNC_LINKS_FAILED', error);
 
+            if (AppError.isAppError(error)) {
+                throw error;
+            }
+
             throw new AppError('SYNC_LINKS_FAILED', {
                 code: 'SYNC_LINKS_FAILED',
             });
         }
     }
 
-    private static produceDbLinks(entryId: string, links: {}) {
-        return Object.entries(links).map(([name, toId]) => ({
-            fromId: entryId,
-            toId: Utils.decodeId(toId as string),
-            name,
-        }));
+    private static async produceDbLinks(entryId: string, links: {}) {
+        const linkEntries = Object.entries(links);
+        const invalidLinkIds: Record<string, string> = {};
+        const validLinks: {fromId: string; toId: string; name: string}[] = [];
+
+        await Utils.macrotasksMap(linkEntries, ([name, toId]) => {
+            try {
+                const decodedId = Utils.decodeId(toId as string);
+                validLinks.push({
+                    fromId: entryId,
+                    toId: decodedId,
+                    name,
+                });
+            } catch (error) {
+                invalidLinkIds[name] = toId as string;
+            }
+        });
+
+        if (Object.keys(invalidLinkIds).length > 0) {
+            throw new AppError(US_ERRORS.INCORRECT_LINK_ERROR, {
+                code: US_ERRORS.INCORRECT_LINK_ERROR,
+                details: {invalidLinkIds},
+            });
+        }
+
+        return validLinks;
     }
 }
 
