@@ -32,13 +32,13 @@ class Links extends Model {
 
             const dbLinks = await Links.produceDbLinks(entryId, links);
 
-            if (!dbLinks.length) {
-                return null;
-            }
-
             ctx.log('DB_LINKS', {dbLinks});
 
             await Links.query(trxOverride).where({fromId: entryId}).delete();
+
+            if (!dbLinks.length) {
+                return null;
+            }
 
             const result = await Links.query(trxOverride).upsertGraph(dbLinks, {
                 insertMissing: true,
