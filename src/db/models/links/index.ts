@@ -1,11 +1,9 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {TransactionOrKnex} from 'objection';
 
 import {Model} from '../..';
 import {US_ERRORS} from '../../../const';
 import * as MT from '../../../types/models';
 import Utils from '../../../utils';
-import Entry from '../entry';
 
 import {validateCreateLink} from './scheme';
 
@@ -32,31 +30,10 @@ class Links extends Model {
                 });
             }
 
-            let dbLinks;
-
-            try {
-                dbLinks = Links.produceDbLinks(entryId, links);
-            } catch (error) {
-                throw new AppError('Failed to decode link ID', {
-                    code: US_ERRORS.DECODE_ID_FAILED,
-                });
-            }
+            const dbLinks = await Links.produceDbLinks(entryId, links);
 
             if (!dbLinks.length) {
                 return null;
-            }
-
-            const targetEntryIds = dbLinks.map((link) => link.toId).filter(Boolean);
-
-            if (targetEntryIds.length) {
-                const {tenantId} = ctx.get('info');
-
-                await Links.validateTargetEntriesExist(
-                    targetEntryIds,
-                    dbLinks,
-                    tenantId,
-                    trxOverride,
-                );
             }
 
             ctx.log('DB_LINKS', {dbLinks});
@@ -83,51 +60,32 @@ class Links extends Model {
         }
     }
 
-    private static produceDbLinks(entryId: string, links: {}) {
-        return Object.entries(links).map(([name, toId]) => ({
-            fromId: entryId,
-            toId: Utils.decodeId(toId as string),
-            name,
-        }));
-    }
+    private static async produceDbLinks(entryId: string, links: {}) {
+        const linkEntries = Object.entries(links);
+        const invalidLinkIds: Record<string, string> = {};
+        const validLinks: {fromId: string; toId: string; name: string}[] = [];
 
-    private static async validateTargetEntriesExist(
-        targetEntryIds: string[],
-        dbLinks: Array<{fromId: string; toId: string; name: string}>,
-        tenantId: string,
-        trx: TransactionOrKnex,
-    ): Promise<void> {
-        const existingEntries = await Entry.query(trx)
-            .select('entryId')
-            .whereIn('entryId', targetEntryIds)
-            .where('tenantId', tenantId)
-            .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
+        await Utils.macrotasksMap(linkEntries, ([name, toId]) => {
+            try {
+                const decodedId = Utils.decodeId(toId as string);
+                validLinks.push({
+                    fromId: entryId,
+                    toId: decodedId,
+                    name,
+                });
+            } catch (error) {
+                invalidLinkIds[name] = toId as string;
+            }
+        });
 
-        const existingEntryIdsSet = new Set(existingEntries.map((entry) => entry.entryId));
-        const linksByToId = new Map(dbLinks.map((link) => [link.toId, link]));
-
-        const nonExistentEntryIds = targetEntryIds.filter((id) => !existingEntryIdsSet.has(id));
-
-        if (nonExistentEntryIds.length === 0) {
-            return;
+        if (Object.keys(invalidLinkIds).length > 0) {
+            throw new AppError(US_ERRORS.INCORRECT_LINK_ERROR, {
+                code: US_ERRORS.INCORRECT_LINK_ERROR,
+                details: {invalidLinkIds},
+            });
         }
 
-        const invalidLinks = await Utils.macrotasksMap(nonExistentEntryIds, (id) => {
-            const link = linksByToId.get(id);
-            return {
-                name: link?.name || 'unknown',
-                id: Utils.encodeId(id),
-            };
-        });
-
-        throw new AppError('Some referenced entries do not exist', {
-            code: US_ERRORS.VALIDATION_ERROR,
-            details: {
-                invalidLinks,
-                totalLinks: dbLinks.length,
-                missingCount: nonExistentEntryIds.length,
-            },
-        });
+        return validLinks;
     }
 }
 
