@@ -17,13 +17,11 @@ let secondTestEntry: {
 };
 
 describe('Entry relations', () => {
-    // Create the test workbook and entries first
     beforeAll(async () => {
         // Create a workbook
         const workbook = await createMockWorkbook({title: 'Relations Test Workbook'});
         workbookId = workbook.workbookId;
 
-        // Create a test entry for the update test
         const entryResponse = await createMockWorkbookEntry({
             name: 'Test Entry',
             workbookId: workbook.workbookId,
@@ -39,7 +37,6 @@ describe('Entry relations', () => {
             meta: {testField: 'value'},
         };
 
-        // Create a second test entry for cross-linking tests
         const secondEntryResponse = await createMockWorkbookEntry({
             name: 'Second Test Entry',
             workbookId: workbook.workbookId,
