@@ -1,10 +1,9 @@
 import request from 'supertest';
 
-import {app, auth} from '../../auth';
-import {PlatformRole} from '../../roles';
+import {app, auth, getWorkbookBinding} from '../../auth';
+import {createMockWorkbook, createMockWorkbookEntry} from '../../helpers';
 
-const testFolderName = 'relations-test-folder';
-
+let workbookId: string;
 let testEntry: {
     entryId: string;
     data: Record<string, string>;
@@ -18,54 +17,40 @@ let secondTestEntry: {
 };
 
 describe('Entry relations', () => {
-    // Create the test folder and entry first
+    // Create the test workbook and entries first
     beforeAll(async () => {
-        await auth(request(app).post('/v1/entries'), {
-            role: PlatformRole.Creator,
-        })
-            .send({
-                scope: 'folder',
-                type: '',
-                key: testFolderName,
-                meta: {},
-                data: {},
-            })
-            .expect(200);
+        // Create a workbook
+        const workbook = await createMockWorkbook({title: 'Relations Test Workbook'});
+        workbookId = workbook.workbookId;
 
         // Create a test entry for the update test
-        const entryResponse = await auth(request(app).post('/v1/entries'), {
-            role: PlatformRole.Creator,
-        })
-            .send({
-                scope: 'dataset',
-                type: 'graph',
-                key: `${testFolderName}/test-entry`,
-                meta: {testField: 'value'},
-                data: {testData: 'data'},
-            })
-            .expect(200);
+        const entryResponse = await createMockWorkbookEntry({
+            name: 'Test Entry',
+            workbookId: workbook.workbookId,
+            scope: 'dataset',
+            type: 'graph',
+            data: {testData: 'data'},
+            meta: {testField: 'value'},
+        });
 
         testEntry = {
-            entryId: entryResponse.body.entryId,
+            entryId: entryResponse.entryId,
             data: {testData: 'data'},
             meta: {testField: 'value'},
         };
 
         // Create a second test entry for cross-linking tests
-        const secondEntryResponse = await auth(request(app).post('/v1/entries'), {
-            role: PlatformRole.Creator,
-        })
-            .send({
-                scope: 'dataset',
-                type: 'graph',
-                key: `${testFolderName}/second-test-entry`,
-                meta: {secondField: 'value2'},
-                data: {secondData: 'data2'},
-            })
-            .expect(200);
+        const secondEntryResponse = await createMockWorkbookEntry({
+            name: 'Second Test Entry',
+            workbookId: workbook.workbookId,
+            scope: 'dataset',
+            type: 'graph',
+            data: {secondData: 'data2'},
+            meta: {secondField: 'value2'},
+        });
 
         secondTestEntry = {
-            entryId: secondEntryResponse.body.entryId,
+            entryId: secondEntryResponse.entryId,
             data: {secondData: 'data2'},
             meta: {secondField: 'value2'},
         };
@@ -73,12 +58,17 @@ describe('Entry relations', () => {
 
     test('Create dataset with valid links', async () => {
         const response = await auth(request(app).post('/v1/entries'), {
-            role: PlatformRole.Creator,
+            accessBindings: [
+                getWorkbookBinding(workbookId, 'limitedView'),
+                getWorkbookBinding(workbookId, 'view'),
+                getWorkbookBinding(workbookId, 'update'),
+            ],
         })
             .send({
                 scope: 'dataset',
                 type: 'graph',
-                key: `${testFolderName}/dataset-valid-links`,
+                workbookId: workbookId,
+                name: 'Dataset with Valid Links',
                 meta: {},
                 data: {},
                 links: {
@@ -90,19 +80,24 @@ describe('Entry relations', () => {
         // Verify the response contains the entry data
         expect(response.body).toMatchObject({
             entryId: expect.any(String),
+            key: expect.stringMatching(/\d+\/Dataset with Valid Links$/),
             savedId: expect.any(String),
-            key: `${testFolderName}/dataset-valid-links`,
         });
     });
 
     test('Create dataset with invalid links - malformed entry ID', async () => {
         const response = await auth(request(app).post('/v1/entries'), {
-            role: PlatformRole.Creator,
+            accessBindings: [
+                getWorkbookBinding(workbookId, 'limitedView'),
+                getWorkbookBinding(workbookId, 'view'),
+                getWorkbookBinding(workbookId, 'update'),
+            ],
         })
             .send({
                 scope: 'dataset',
                 type: 'graph',
-                key: `${testFolderName}/dataset-malformed-links`,
+                workbookId: workbookId,
+                name: 'Dataset with Malformed Links',
                 meta: {},
                 data: {},
                 links: {
@@ -124,7 +119,11 @@ describe('Entry relations', () => {
 
     test('Update with invalid links - malformed entry ID', async () => {
         const response = await auth(request(app).post(`/v1/entries/${testEntry.entryId}`), {
-            role: PlatformRole.Creator,
+            accessBindings: [
+                getWorkbookBinding(workbookId, 'limitedView'),
+                getWorkbookBinding(workbookId, 'view'),
+                getWorkbookBinding(workbookId, 'update'),
+            ],
         })
             .send({
                 mode: 'save',
@@ -149,7 +148,11 @@ describe('Entry relations', () => {
 
     test('Update with valid links', async () => {
         const response = await auth(request(app).post(`/v1/entries/${testEntry.entryId}`), {
-            role: PlatformRole.Creator,
+            accessBindings: [
+                getWorkbookBinding(workbookId, 'limitedView'),
+                getWorkbookBinding(workbookId, 'view'),
+                getWorkbookBinding(workbookId, 'update'),
+            ],
         })
             .send({
                 mode: 'save',
