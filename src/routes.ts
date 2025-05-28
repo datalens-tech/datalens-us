@@ -158,13 +158,15 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         getEntries: makeRoute({
             route: 'GET /v1/entries',
-            handler: entries.getEntries,
+            handler: entries.getEntriesController,
+            requireCtxTenantId: true,
         }),
         privateGetEntries: makeRoute({
             route: 'GET /private/entries',
-            handler: entries.getEntries,
+            handler: entries.getEntriesController,
             authPolicy: AuthPolicy.disabled,
             private: true,
+            requireCtxTenantId: true,
         }),
 
         getRevisions: makeRoute({
