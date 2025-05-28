@@ -1,6 +1,15 @@
+import {AppError} from '@gravity-ui/nodekit';
 import chunk from 'lodash/chunk';
 
-import {CODING_BASE, COPY_END, COPY_START, ID_VARIABLES, TRUE_FLAGS} from '../const';
+import {
+    CODING_BASE,
+    COPY_END,
+    COPY_START,
+    ENCODED_ID_LENGTH,
+    ID_VARIABLES,
+    TRUE_FLAGS,
+    US_ERRORS,
+} from '../const';
 import {EntryScope as EntryScopeEnum, EntryType} from '../db/models/new/entry/types';
 import {EntryScope, USAPIResponse} from '../types/models';
 
@@ -197,6 +206,34 @@ export class Utils {
         return results;
     }
 
+    static async macrotasksForEach<T>(
+        arr: T[],
+        cb: (item: T) => unknown,
+        chunkSize = 1000,
+    ): Promise<void> {
+        const chunks = chunk(arr, chunkSize);
+        for (const chunkItem of chunks) {
+            await new Promise<void>((resolve, reject) => {
+                function done() {
+                    try {
+                        for (const item of chunkItem) {
+                            cb(item);
+                        }
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    }
+                }
+
+                if (chunkItem === chunks[0]) {
+                    done();
+                } else {
+                    setImmediate(done);
+                }
+            });
+        }
+    }
+
     static waitNextMacrotask = async () => {
         return new Promise((resolve) => {
             setImmediate(resolve);
@@ -225,6 +262,12 @@ export class Utils {
         let decodedId = '';
 
         if (id) {
+            if (id.length !== ENCODED_ID_LENGTH) {
+                throw new AppError('The ID must consist of 13 characters.', {
+                    code: US_ERRORS.DECODE_ID_FAILED,
+                });
+            }
+
             const encodedRotationNumber = id.slice(-1);
             const encodedLongPart = id.slice(0, -1);
 
