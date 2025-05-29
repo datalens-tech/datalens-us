@@ -508,6 +508,10 @@ export class Utils {
         return str.replace(/[%_]/g, '\\$&');
     }
 
+    static escapeStringRegexp(str: string) {
+        return str.replace(/[!$()*+.:<=>?[\\\]^{|}-]/g, '\\$&');
+    }
+
     static camelCase(str: string) {
         const wordPattern = new RegExp(
             ['[A-Z][a-z]+', '[A-Z]+(?=[A-Z][a-z])', '[A-Z]+', '[a-z]+', '[0-9]+'].join('|'),
