@@ -52,3 +52,4 @@ export type {
 export {LogEventType} from '../../src/registry/common/utils/log-event/types';
 export type {GatewayApi} from '../../src/registry';
 export type {CheckTenant, GetServicePlan} from '../../src/registry/common/utils/tenant/types';
+export type {GetEntryResolveUserLogin} from '../../src/registry/common/utils/entry/types';
