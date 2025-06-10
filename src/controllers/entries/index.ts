@@ -31,6 +31,7 @@ import {createEntryAltController} from './create-entry-alt';
 import {deleteEntryController} from './delete-entry';
 import {getEntriesController} from './get-entries';
 import {getEntriesDataController} from './get-entries-data';
+import {getEntryController as getEntryV2Controller} from './get-entry';
 import {renameEntryController} from './rename-entry';
 import {updateEntryController} from './update-entry';
 
@@ -44,6 +45,7 @@ export default {
     createEntryController,
     createEntryAltController,
     getEntriesController,
+    getEntryV2Controller,
 
     getEntry: async (req: Request, res: Response) => {
         const {query, params} = req;

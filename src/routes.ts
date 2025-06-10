@@ -6,7 +6,6 @@ import {Feature} from './components/features';
 import collections from './controllers/collections';
 import colorPalettes from './controllers/color-palettes';
 import entries from './controllers/entries';
-import {getEntryController} from './controllers/entries/get-entry';
 import favorites from './controllers/favorites';
 import helpers from './controllers/helpers';
 import homeController from './controllers/home';
@@ -73,11 +72,11 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
         }),
         getEntryV2: makeRoute({
             route: 'GET /v2/entries/:entryId',
-            handler: getEntryController,
+            handler: entries.getEntryV2Controller,
         }),
         privateGetEntryV2: makeRoute({
             route: 'GET /v2/private/entries/:entryId',
-            handler: getEntryController,
+            handler: entries.getEntryV2Controller,
             authPolicy: AuthPolicy.disabled,
             private: true,
         }),
