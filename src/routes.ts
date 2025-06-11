@@ -258,21 +258,21 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         getFavorites: makeRoute({
             route: 'GET /v1/favorites',
-            handler: favorites.getFavorites,
+            handler: favorites.getFavoritesController,
         }),
         addFavorite: makeRoute({
             route: 'POST /v1/favorites/:entryId',
-            handler: favorites.addFavorite,
+            handler: favorites.addFavoriteController,
             write: true,
         }),
         deleteFavorite: makeRoute({
             route: 'DELETE /v1/favorites/:entryId',
-            handler: favorites.deleteFavorite,
+            handler: favorites.deleteFavoriteController,
             write: true,
         }),
         renameFavorite: makeRoute({
             route: 'POST /v1/favorites/:entryId/rename',
-            handler: favorites.renameFavorite,
+            handler: favorites.renameFavoriteController,
             write: true,
         }),
 
