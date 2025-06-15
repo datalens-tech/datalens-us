@@ -248,11 +248,11 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         getState: makeRoute({
             route: 'GET /v1/states/:entryId/:hash',
-            handler: states.getState,
+            handler: states.getStateController,
         }),
         createState: makeRoute({
             route: 'POST /v1/states/:entryId',
-            handler: states.createState,
+            handler: states.createStateController,
             write: true,
         }),
 
