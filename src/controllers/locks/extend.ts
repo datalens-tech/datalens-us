@@ -1,42 +1,45 @@
 import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
-import {prepareResponseAsync} from '../../components/response-presenter';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-import FavoriteService from '../../services/favorite.service';
+import Lock from '../../db/models/lock';
+import LockService from '../../services/lock.service';
 
-import {favoriteEntryModel} from './response-models/favorite-entry-model';
+import {lockEntryModel} from './response-models/lock-entry-model';
 
 const requestSchema = {
     params: z.object({
         entryId: zc.encodedId(),
     }),
     body: z.object({
-        name: z.string().min(1, 'Name cannot be empty'),
+        duration: z.coerce.number().min(1).max(600000),
+        lockToken: z.string(),
+        force: z.coerce.boolean().optional(),
     }),
 };
 const parseReq = makeReqParser(requestSchema);
 
-export const renameFavoriteController: AppRouteHandler = async (req, res: Response) => {
+export const extendController: AppRouteHandler = async (req, res: Response) => {
     const {params, body} = await parseReq(req);
+
     const {entryId} = params;
-    const {name} = body;
+    const {duration, lockToken, force} = body;
 
-    const result = await FavoriteService.rename({
+    const result = (await LockService.extend({
         entryId,
-        name,
+        duration,
+        lockToken,
+        force,
         ctx: req.ctx,
-    });
+    })) as unknown as Lock;
 
-    const {code, response} = await prepareResponseAsync({data: result});
-
-    res.status(code).send(response);
+    res.status(200).send(lockEntryModel.format(result));
 };
 
-renameFavoriteController.api = {
-    tags: [ApiTag.Favorites],
-    summary: 'Rename favorite entry',
+extendController.api = {
+    tags: [ApiTag.Locks],
+    summary: 'Extend lock duration for entry',
     request: {
         params: requestSchema.params,
         body: {
@@ -49,12 +52,13 @@ renameFavoriteController.api = {
     },
     responses: {
         200: {
-            description: favoriteEntryModel.schema.description ?? '',
+            description: lockEntryModel.schema.description ?? '',
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: favoriteEntryModel.schema,
+                    schema: lockEntryModel.schema,
                 },
             },
         },
     },
 };
+extendController.manualDecodeId = true;

@@ -1,42 +1,42 @@
 import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
-import {prepareResponseAsync} from '../../components/response-presenter';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-import FavoriteService from '../../services/favorite.service';
+import LockService from '../../services/lock.service';
 
-import {favoriteEntryModel} from './response-models/favorite-entry-model';
+import {lockTokenModel} from './response-models/lock-token-model';
 
 const requestSchema = {
     params: z.object({
         entryId: zc.encodedId(),
     }),
     body: z.object({
-        name: z.string().min(1, 'Name cannot be empty'),
+        duration: z.coerce.number().min(1).max(600000),
+        force: z.coerce.boolean().optional(),
     }),
 };
 const parseReq = makeReqParser(requestSchema);
 
-export const renameFavoriteController: AppRouteHandler = async (req, res: Response) => {
+export const lockController: AppRouteHandler = async (req, res: Response) => {
     const {params, body} = await parseReq(req);
-    const {entryId} = params;
-    const {name} = body;
 
-    const result = await FavoriteService.rename({
+    const {entryId} = params;
+    const {duration, force} = body;
+
+    const result = await LockService.lock({
         entryId,
-        name,
+        duration,
+        force,
         ctx: req.ctx,
     });
 
-    const {code, response} = await prepareResponseAsync({data: result});
-
-    res.status(code).send(response);
+    res.status(200).send(lockTokenModel.format(result));
 };
 
-renameFavoriteController.api = {
-    tags: [ApiTag.Favorites],
-    summary: 'Rename favorite entry',
+lockController.api = {
+    tags: [ApiTag.Locks],
+    summary: 'Create lock for entry',
     request: {
         params: requestSchema.params,
         body: {
@@ -49,12 +49,14 @@ renameFavoriteController.api = {
     },
     responses: {
         200: {
-            description: favoriteEntryModel.schema.description ?? '',
+            description: lockTokenModel.schema.description ?? '',
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: favoriteEntryModel.schema,
+                    schema: lockTokenModel.schema,
                 },
             },
         },
     },
 };
+
+lockController.manualDecodeId = true;

@@ -1,8 +1,7 @@
 import {z} from '../../../components/zod';
-import {EntryPermissions} from '../../../services/new/entry/types';
 import Utils from '../../../utils';
 
-import {Favorite, favoriteEntryModel} from './favorite-entry-model';
+import {FavoriteEntryWithPermissions, favoriteEntryModel} from './favorite-entry-model';
 
 const schema = z
     .object({
@@ -14,10 +13,7 @@ const schema = z
 export type FavoritesModel = z.infer<typeof schema>;
 
 const format = async (data: {
-    entries: (Favorite & {
-        isLocked: boolean;
-        permissions?: EntryPermissions;
-    })[];
+    entries: FavoriteEntryWithPermissions[];
     nextPageToken?: string;
 }): Promise<FavoritesModel> => {
     return {
@@ -25,6 +21,7 @@ const format = async (data: {
         nextPageToken: data.nextPageToken,
     };
 };
+
 export const favoritesModel = {
     schema,
     format,

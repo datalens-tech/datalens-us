@@ -11,4 +11,5 @@ export enum ApiTag {
     Templates = 'Templates',
     ColorPalettes = 'ColorPalettes',
     Favorites = 'Favorites',
+    Locks = 'Locks',
 }

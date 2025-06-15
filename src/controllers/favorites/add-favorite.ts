@@ -2,21 +2,23 @@ import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
 import {prepareResponseAsync} from '../../components/response-presenter';
-import {z, zc} from '../../components/zod';
+import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import Entry from '../../db/models/entry';
 import FavoriteService from '../../services/favorite.service';
 
-import {favoriteEntryModel} from './response-models/favorite-entry-model';
+import {favoriteInstanceModel} from './response-models/favorite-instance-model';
 
 const requestSchema = {
     params: z.object({
         entryId: zc.encodedId(),
     }),
 };
+const parseReq = makeReqParser(requestSchema);
+
 export const addFavoriteController: AppRouteHandler = async (req, res: Response) => {
-    const {params} = req;
-    const entryId = params.entryId;
+    const {params} = await parseReq(req);
+    const {entryId} = params;
 
     const entry = await Entry.query(Entry.replica).select('tenantId').findById(entryId);
 
@@ -32,7 +34,7 @@ export const addFavoriteController: AppRouteHandler = async (req, res: Response)
 
     const {code, response} = await prepareResponseAsync({data: result});
 
-    res.status(code).send(response);
+    res.status(code).send(favoriteInstanceModel.format(response));
 };
 
 addFavoriteController.api = {
@@ -43,12 +45,14 @@ addFavoriteController.api = {
     },
     responses: {
         200: {
-            description: favoriteEntryModel.schema.description ?? '',
+            description: favoriteInstanceModel.schema.description ?? '',
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: favoriteEntryModel.schema,
+                    schema: favoriteInstanceModel.schema,
                 },
             },
         },
     },
 };
+
+addFavoriteController.manualDecodeId = true;
