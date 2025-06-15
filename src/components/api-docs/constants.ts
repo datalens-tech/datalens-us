@@ -13,4 +13,5 @@ export enum ApiTag {
     Favorites = 'Favorites',
     Locks = 'Locks',
     States = 'States',
+    StructureItems = 'StructureItems',
 }

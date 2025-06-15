@@ -442,7 +442,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
         }),
         getStructureItems: makeRoute({
             route: 'GET /v1/structure-items',
-            handler: structureItems.getStructureItems,
+            handler: structureItems.getStructureItemsController,
             features: [Feature.CollectionsEnabled],
         }),
         getRootCollectionPermissions: makeRoute({
