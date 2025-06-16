@@ -78,7 +78,7 @@ export const getStructureItems = async (
     } = args;
 
     ctx.log('GET_STRUCTURE_ITEMS_START', {
-        collectionId: collectionId ?? null,
+        collectionId: collectionId ? Utils.encodeId(collectionId) : null,
         includePermissionsInfo,
         filterString,
         page: page,
