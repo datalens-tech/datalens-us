@@ -3,7 +3,6 @@ import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-import Lock from '../../db/models/lock';
 import LockService from '../../services/lock.service';
 
 import {lockEntryModel} from './response-models/lock-entry-model';
@@ -25,12 +24,12 @@ export const unlockController: AppRouteHandler = async (req, res: Response) => {
     const {entryId} = params;
     const {lockToken, force} = query;
 
-    const result = (await LockService.unlock({
+    const result = await LockService.unlock({
         entryId,
         lockToken,
         force,
         ctx: req.ctx,
-    })) as unknown as Lock;
+    });
 
     res.status(200).send(lockEntryModel.format(result));
 };
@@ -48,6 +47,16 @@ unlockController.api = {
             content: {
                 [CONTENT_TYPE_JSON]: {
                     schema: lockEntryModel.schema,
+                },
+            },
+        },
+        404: {
+            description: 'Lock not found or already unlocked',
+            content: {
+                [CONTENT_TYPE_JSON]: {
+                    schema: z.object({
+                        error: z.string(),
+                    }),
                 },
             },
         },

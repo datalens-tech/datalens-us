@@ -299,6 +299,12 @@ class Lock extends Model {
                     .timeout(Model.DEFAULT_QUERY_TIMEOUT);
             }
 
+            if (!result) {
+                throw new AppError(US_ERRORS.ENTRY_LOCK_FORCE_CONFLICT, {
+                    code: US_ERRORS.ENTRY_LOCK_FORCE_CONFLICT,
+                });
+            }
+
             return result;
         });
 
@@ -390,9 +396,15 @@ class Lock extends Model {
                         expiryDate,
                         login: requestedBy.login,
                     })
-                    .first()
                     .returning('*')
+                    .first()
                     .timeout(Model.DEFAULT_QUERY_TIMEOUT);
+            }
+
+            if (!result) {
+                throw new AppError(US_ERRORS.ENTRY_LOCK_FORCE_CONFLICT, {
+                    code: US_ERRORS.ENTRY_LOCK_FORCE_CONFLICT,
+                });
             }
 
             return result;
