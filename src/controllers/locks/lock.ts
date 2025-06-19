@@ -1,4 +1,4 @@
-import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
+import {AppRouteHandler} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
@@ -12,13 +12,13 @@ const requestSchema = {
         entryId: zc.encodedId(),
     }),
     body: z.object({
-        duration: z.coerce.number().min(1).max(600000),
-        force: z.coerce.boolean().optional(),
+        duration: z.number().min(1).max(600000),
+        force: z.boolean().optional(),
     }),
 };
 const parseReq = makeReqParser(requestSchema);
 
-export const lockController: AppRouteHandler = async (req, res: Response) => {
+export const lockController: AppRouteHandler = async (req, res) => {
     const {params, body} = await parseReq(req);
 
     const {entryId} = params;

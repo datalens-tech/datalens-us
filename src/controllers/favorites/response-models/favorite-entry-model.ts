@@ -1,7 +1,7 @@
 import {z} from '../../../components/zod';
+import Favorite from '../../../db/models/favorite';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import {EntryPermissions} from '../../../services/new/entry/types';
-import * as MT from '../../../types/models';
 import Utils from '../../../utils';
 import {entryPermissionsModel} from '../../entries/response-models';
 
@@ -29,7 +29,7 @@ const schema = z
 
 export type FavoriteEntryModel = z.infer<typeof schema>;
 
-export interface FavoriteEntry extends MT.FavoriteColumns {
+export interface FavoriteEntry extends Favorite {
     scope: EntryScope;
     type: string;
     key: string;

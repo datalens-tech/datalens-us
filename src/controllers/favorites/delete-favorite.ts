@@ -1,7 +1,6 @@
-import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
+import {AppRouteHandler} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
-import {prepareResponseAsync} from '../../components/response-presenter';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import Entry from '../../db/models/entry';
@@ -16,7 +15,7 @@ const requestSchema = {
 };
 const parseReq = makeReqParser(requestSchema);
 
-export const deleteFavoriteController: AppRouteHandler = async (req, res: Response) => {
+export const deleteFavoriteController: AppRouteHandler = async (req, res) => {
     const {params} = await parseReq(req);
     const {entryId} = params;
 
@@ -32,9 +31,7 @@ export const deleteFavoriteController: AppRouteHandler = async (req, res: Respon
         ctx: req.ctx,
     });
 
-    const {code, response} = await prepareResponseAsync({data: result});
-
-    res.status(code).send([favoriteInstanceModel.format(response[0])]);
+    res.status(200).send([favoriteInstanceModel.format(result[0])]);
 };
 
 deleteFavoriteController.api = {

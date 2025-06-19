@@ -1,4 +1,4 @@
-import {AppRouteHandler, Request, Response} from '@gravity-ui/expresskit';
+import {AppRouteHandler} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
@@ -17,7 +17,7 @@ const requestSchema = {
 };
 const parseReq = makeReqParser(requestSchema);
 
-export const createStateController: AppRouteHandler = async (req: Request, res: Response) => {
+export const createStateController: AppRouteHandler = async (req, res) => {
     const {params, body} = await parseReq(req);
 
     const result = await createState(

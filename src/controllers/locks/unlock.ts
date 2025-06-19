@@ -1,4 +1,4 @@
-import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
+import {AppRouteHandler} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
@@ -13,12 +13,12 @@ const requestSchema = {
     }),
     query: z.object({
         lockToken: z.string().optional(),
-        force: z.coerce.boolean().optional(),
+        force: zc.stringBoolean().optional(),
     }),
 };
 const parseReq = makeReqParser(requestSchema);
 
-export const unlockController: AppRouteHandler = async (req, res: Response) => {
+export const unlockController: AppRouteHandler = async (req, res) => {
     const {params, query} = await parseReq(req);
 
     const {entryId} = params;
@@ -50,16 +50,7 @@ unlockController.api = {
                 },
             },
         },
-        404: {
-            description: 'Lock not found or already unlocked',
-            content: {
-                [CONTENT_TYPE_JSON]: {
-                    schema: z.object({
-                        error: z.string(),
-                    }),
-                },
-            },
-        },
     },
 };
+
 unlockController.manualDecodeId = true;

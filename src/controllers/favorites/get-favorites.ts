@@ -1,11 +1,10 @@
-import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
+import {AppRouteHandler} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {EntryScope} from '../../db/models/new/entry/types';
 import FavoriteService from '../../services/favorite.service';
-import {isTrueArg} from '../../utils/env-utils';
 
 import {favoritesModel} from './response-models/favorites-model';
 
@@ -35,7 +34,7 @@ const requestSchema = {
 
 const parseReq = makeReqParser(requestSchema);
 
-export const getFavoritesController: AppRouteHandler = async (req, res: Response) => {
+export const getFavoritesController: AppRouteHandler = async (req, res) => {
     const {query} = await parseReq(req);
     const {orderBy, filters, page, pageSize, scope, includePermissionsInfo, ignoreWorkbookEntries} =
         query;
@@ -45,8 +44,8 @@ export const getFavoritesController: AppRouteHandler = async (req, res: Response
         page,
         pageSize,
         scope,
-        includePermissionsInfo: isTrueArg(includePermissionsInfo),
-        ignoreWorkbookEntries: isTrueArg(ignoreWorkbookEntries),
+        includePermissionsInfo,
+        ignoreWorkbookEntries,
         ctx: req.ctx,
     });
 

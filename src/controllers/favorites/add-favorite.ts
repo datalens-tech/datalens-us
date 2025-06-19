@@ -1,10 +1,8 @@
-import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
+import {AppRouteHandler} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
-import {prepareResponseAsync} from '../../components/response-presenter';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-import Entry from '../../db/models/entry';
 import FavoriteService from '../../services/favorite.service';
 
 import {favoriteInstanceModel} from './response-models/favorite-instance-model';
@@ -16,25 +14,16 @@ const requestSchema = {
 };
 const parseReq = makeReqParser(requestSchema);
 
-export const addFavoriteController: AppRouteHandler = async (req, res: Response) => {
+export const addFavoriteController: AppRouteHandler = async (req, res) => {
     const {params} = await parseReq(req);
     const {entryId} = params;
-
-    const entry = await Entry.query(Entry.replica).select('tenantId').findById(entryId);
-
-    if (!entry || entry.tenantId !== res.locals.tenantId) {
-        res.status(404).send({error: 'Entry not found'});
-        return;
-    }
 
     const result = await FavoriteService.add({
         entryId,
         ctx: req.ctx,
     });
 
-    const {code, response} = await prepareResponseAsync({data: result});
-
-    res.status(code).send(favoriteInstanceModel.format(response));
+    res.status(200).send(favoriteInstanceModel.format(result));
 };
 
 addFavoriteController.api = {

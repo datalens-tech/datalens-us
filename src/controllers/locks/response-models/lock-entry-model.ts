@@ -17,7 +17,7 @@ export type LockEntryModel = z.infer<typeof schema>;
 
 const format = (data: Lock): LockEntryModel => {
     return {
-        lockId: data.lockId,
+        lockId: Utils.encodeId(data.lockId),
         entryId: Utils.encodeId(data.entryId),
         lockToken: data.lockToken,
         expiryDate: data.expiryDate,

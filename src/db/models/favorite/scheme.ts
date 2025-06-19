@@ -1,5 +1,4 @@
-import compileSchema, {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {AJV_PATTERN_KEYS_NOT_OBJECT} from '../../../const';
+import compileSchema from '../../../components/validation-schema-compiler';
 
 export const validateGetFavorites = compileSchema({
     type: 'object',
@@ -10,42 +9,6 @@ export const validateGetFavorites = compileSchema({
         },
         login: {
             type: 'string',
-        },
-        includePermissionsInfo: {
-            type: 'boolean',
-        },
-        ignoreWorkbookEntries: {
-            type: 'boolean',
-        },
-        filters: {
-            type: 'object',
-            patternProperties: AJV_PATTERN_KEYS_NOT_OBJECT,
-        },
-        orderBy: {
-            type: 'object',
-            required: ['field', 'direction'],
-            properties: {
-                field: {
-                    type: 'string',
-                    enum: ['createdAt', 'name'],
-                },
-                direction: {
-                    type: 'string',
-                    enum: ['asc', 'desc'],
-                },
-            },
-        },
-        page: {
-            type: 'integer',
-            minimum: 0,
-        },
-        pageSize: {
-            type: 'integer',
-            minimum: 1,
-            maximum: 200,
-        },
-        scope: {
-            type: ['array', 'string'],
         },
     },
 });
@@ -73,19 +36,6 @@ export const validateDeleteFavorite = compileSchema({
         },
         login: {
             type: 'string',
-        },
-    },
-});
-export const validateRenameFavorite = makeSchemaValidator({
-    type: 'object',
-    required: ['entryId', 'name'],
-    properties: {
-        entryId: {
-            type: 'string',
-        },
-        name: {
-            type: ['string', 'null'],
-            verifyEntryName: true,
         },
     },
 });
