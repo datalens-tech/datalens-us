@@ -11,12 +11,7 @@ import Utils from '../../../utils';
 import Entry from '../entry';
 import {Entry as EntryModel} from '../new/entry';
 
-import {
-    validateAddFavorite,
-    validateDeleteFavorite,
-    validateGetFavorites,
-    validateRenameFavorite,
-} from './scheme';
+import {validateAddFavorite, validateDeleteFavorite, validateGetFavorites} from './scheme';
 
 interface FavoriteFields extends MT.FavoriteColumns {
     isLocked?: boolean;
@@ -272,8 +267,6 @@ class Favorite extends Model {
             dlContext,
         });
 
-        validateRenameFavorite({entryId, name});
-
         const {login} = requestedBy;
 
         const displayAlias = name ? name : null;
@@ -282,8 +275,8 @@ class Favorite extends Model {
         const result = await Favorite.query(this.primary)
             .update({alias, displayAlias})
             .where({entryId, tenantId, login})
-            .returning('*')
             .first()
+            .returning('*')
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);
 
         ctx.log('RENAME_FAVORITE_SUCCESS');
