@@ -106,16 +106,6 @@ export interface GetFavorite extends StdServiceParams {
     includePermissionsInfo?: boolean;
     ignoreWorkbookEntries?: boolean;
 }
-export interface AddFavorite extends StdServiceParams {
-    entryId: string;
-}
-export interface RenameFavorite extends StdServiceParams {
-    entryId: string;
-    name: string | null;
-}
-export interface DeleteFavorite extends StdServiceParams {
-    entryId: string;
-}
 
 export interface VerifyLockExistence extends StdServiceParams {
     entryId: string;

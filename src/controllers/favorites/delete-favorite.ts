@@ -4,7 +4,7 @@ import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import Entry from '../../db/models/entry';
-import FavoriteService from '../../services/favorite.service';
+import {deleteFavoriteService} from '../../services/new/favorites/delete-favorite';
 
 import {favoriteInstanceModel} from './response-models/favorite-instance-model';
 
@@ -26,10 +26,14 @@ export const deleteFavoriteController: AppRouteHandler = async (req, res) => {
         return;
     }
 
-    const result = await FavoriteService.delete({
-        entryId,
-        ctx: req.ctx,
-    });
+    const result = await deleteFavoriteService(
+        {
+            ctx: req.ctx,
+        },
+        {
+            entryId,
+        },
+    );
 
     res.status(200).send([favoriteInstanceModel.format(result[0])]);
 };

@@ -1,6 +1,26 @@
 import {Model} from '../../..';
 import {Entry} from '../entry';
 
+export const FavoriteColumns = {
+    EntryId: 'entryId',
+    TenantId: 'tenantId',
+    Login: 'login',
+    Alias: 'alias',
+    DisplayAlias: 'displayAlias',
+    SortAlias: 'sortAlias',
+    CreatedAt: 'createdAt',
+} as const;
+
+export const FavoriteColumnsRaw = {
+    EntryId: 'entry_id',
+    TenantId: 'tenant_id',
+    Login: 'login',
+    Alias: 'alias',
+    DisplayAlias: 'display_alias',
+    SortAlias: 'sort_alias',
+    CreatedAt: 'created_at',
+} as const;
+
 export class Favorite extends Model {
     static get tableName() {
         return 'favorites';
@@ -23,11 +43,13 @@ export class Favorite extends Model {
         };
     }
 
-    entryId!: string;
-    tenantId!: string;
-    login!: string;
-    alias!: string | null;
-    createdAt!: string;
+    [FavoriteColumns.EntryId]!: string;
+    [FavoriteColumns.TenantId]!: string;
+    [FavoriteColumns.Login]!: string;
+    [FavoriteColumns.Alias]!: string | null;
+    [FavoriteColumns.DisplayAlias]!: string | null;
+    [FavoriteColumns.SortAlias]!: string | null;
+    [FavoriteColumns.CreatedAt]!: string;
 
     entry?: Entry;
 }

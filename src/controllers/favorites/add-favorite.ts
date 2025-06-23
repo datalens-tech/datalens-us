@@ -3,7 +3,7 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-import FavoriteService from '../../services/favorite.service';
+import {addFavoriteService} from '../../services/new/favorites/add-favorite';
 
 import {favoriteInstanceModel} from './response-models/favorite-instance-model';
 
@@ -18,10 +18,7 @@ export const addFavoriteController: AppRouteHandler = async (req, res) => {
     const {params} = await parseReq(req);
     const {entryId} = params;
 
-    const result = await FavoriteService.add({
-        entryId,
-        ctx: req.ctx,
-    });
+    const result = await addFavoriteService({ctx: req.ctx}, {entryId});
 
     res.status(200).send(favoriteInstanceModel.format(result));
 };

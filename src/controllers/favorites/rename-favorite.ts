@@ -3,7 +3,7 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-import FavoriteService from '../../services/favorite.service';
+import {renameFavoriteService} from '../../services/new/favorites/rename-favorites';
 
 import {favoriteEntryModel} from './response-models/favorite-entry-model';
 import {favoriteInstanceModel} from './response-models/favorite-instance-model';
@@ -23,11 +23,7 @@ export const renameFavoriteController: AppRouteHandler = async (req, res) => {
     const {entryId} = params;
     const {name} = body;
 
-    const result = await FavoriteService.rename({
-        entryId,
-        name,
-        ctx: req.ctx,
-    });
+    const result = await renameFavoriteService({ctx: req.ctx}, {entryId, name});
 
     res.status(200).send(favoriteInstanceModel.format(result[0]));
 };

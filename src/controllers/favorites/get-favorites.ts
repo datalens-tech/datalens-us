@@ -4,7 +4,7 @@ import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {EntryScope} from '../../db/models/new/entry/types';
-import FavoriteService from '../../services/favorite.service';
+import {getFavoritesService} from '../../services/new/favorites/get-favorites';
 
 import {favoritesModel} from './response-models/favorites-model';
 
@@ -38,16 +38,20 @@ export const getFavoritesController: AppRouteHandler = async (req, res) => {
     const {query} = await parseReq(req);
     const {orderBy, filters, page, pageSize, scope, includePermissionsInfo, ignoreWorkbookEntries} =
         query;
-    const result = await FavoriteService.get({
-        orderBy,
-        filters,
-        page,
-        pageSize,
-        scope,
-        includePermissionsInfo,
-        ignoreWorkbookEntries,
-        ctx: req.ctx,
-    });
+    const result = await getFavoritesService(
+        {
+            ctx: req.ctx,
+        },
+        {
+            orderBy,
+            filters,
+            page,
+            pageSize,
+            scope,
+            includePermissionsInfo,
+            ignoreWorkbookEntries,
+        },
+    );
 
     res.status(200).send(await favoritesModel.format(result));
 };
