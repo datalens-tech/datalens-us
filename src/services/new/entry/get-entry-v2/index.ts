@@ -46,7 +46,7 @@ export type GetEntryNextResult = {
 };
 
 // eslint-disable-next-line complexity
-export const getEntryNext = async (
+export const getEntryV2 = async (
     {ctx, trx}: ServiceArgs,
     args: GetEntryNextArgs,
 ): Promise<GetEntryNextResult> => {

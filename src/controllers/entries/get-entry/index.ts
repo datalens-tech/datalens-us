@@ -3,7 +3,7 @@ import {Request, Response} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../../components/api-docs';
 import {makeReqParser, z, zc} from '../../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../../const';
-import {getEntryNext} from '../../../services/new/entry';
+import {getEntryV2} from '../../../services/new/entry';
 
 import {getEntryResult} from './response-model';
 
@@ -27,7 +27,7 @@ const parseReq = makeReqParser(requestSchema);
 export const getEntryController = async (req: Request, res: Response) => {
     const {query, params} = await parseReq(req);
 
-    const result = await getEntryNext(
+    const result = await getEntryV2(
         {ctx: req.ctx},
         {
             entryId: params.entryId,
