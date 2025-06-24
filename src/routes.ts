@@ -70,6 +70,16 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             authPolicy: AuthPolicy.disabled,
             private: true,
         }),
+        getEntryV2: makeRoute({
+            route: 'GET /v2/entries/:entryId',
+            handler: entries.getEntryV2Controller,
+        }),
+        privateGetEntryV2: makeRoute({
+            route: 'GET /v2/private/entries/:entryId',
+            handler: entries.getEntryV2Controller,
+            authPolicy: AuthPolicy.disabled,
+            private: true,
+        }),
 
         getEntryMeta: makeRoute({
             route: 'GET /v1/entries/:entryId/meta',
