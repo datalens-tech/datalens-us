@@ -2,13 +2,13 @@ import {QueryBuilder, TransactionOrKnex} from 'objection';
 
 import {Model} from '../..';
 import {Entry, EntryColumn} from '../../models/new/entry';
-import {Favorite, FavoriteColumns} from '../../models/new/favorite';
+import {Favorite, FavoriteColumn} from '../../models/new/favorite';
 import {WorkbookModel} from '../../models/new/workbook';
 
 const selectedFavoriteColumns = [
-    FavoriteColumns.Alias,
-    FavoriteColumns.DisplayAlias,
-    FavoriteColumns.EntryId,
+    FavoriteColumn.Alias,
+    FavoriteColumn.DisplayAlias,
+    FavoriteColumn.EntryId,
 ] as const;
 
 const selectedEntryColumns = [

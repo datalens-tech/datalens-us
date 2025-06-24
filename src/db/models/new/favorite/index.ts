@@ -1,7 +1,7 @@
 import {Model} from '../../..';
 import {Entry} from '../entry';
 
-export const FavoriteColumns = {
+export const FavoriteColumn = {
     EntryId: 'entryId',
     TenantId: 'tenantId',
     Login: 'login',
@@ -11,7 +11,7 @@ export const FavoriteColumns = {
     CreatedAt: 'createdAt',
 } as const;
 
-export const FavoriteColumnsRaw = {
+export const FavoriteColumnRaw = {
     EntryId: 'entry_id',
     TenantId: 'tenant_id',
     Login: 'login',
@@ -43,13 +43,13 @@ export class Favorite extends Model {
         };
     }
 
-    [FavoriteColumns.EntryId]!: string;
-    [FavoriteColumns.TenantId]!: string;
-    [FavoriteColumns.Login]!: string;
-    [FavoriteColumns.Alias]!: string | null;
-    [FavoriteColumns.DisplayAlias]!: string | null;
-    [FavoriteColumns.SortAlias]!: string | null;
-    [FavoriteColumns.CreatedAt]!: string;
+    [FavoriteColumn.EntryId]!: string;
+    [FavoriteColumn.TenantId]!: string;
+    [FavoriteColumn.Login]!: string;
+    [FavoriteColumn.Alias]!: string | null;
+    [FavoriteColumn.DisplayAlias]!: string | null;
+    [FavoriteColumn.SortAlias]!: string | null;
+    [FavoriteColumn.CreatedAt]!: string;
 
     entry?: Entry;
 }
