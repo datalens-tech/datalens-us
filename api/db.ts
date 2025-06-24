@@ -25,7 +25,7 @@ export {Template} from '../src/db/models/new/template';
 export {Preset} from '../src/db/models/new/preset';
 export {Link} from '../src/db/models/new/link';
 export {Lock} from '../src/db/models/new/lock';
-export {Favorite,FavoriteColumn, FavoriteColumnRaw} from '../src/db/models/new/favorite';
+export {Favorite, FavoriteColumn, FavoriteColumnRaw} from '../src/db/models/new/favorite';
 export {UserSettings} from '../src/db/models/new/user-settings';
 export {Comment, CommentType} from '../src/db/models/new/comment';
 export {DataExport} from '../src/db/models/new/data-export';
