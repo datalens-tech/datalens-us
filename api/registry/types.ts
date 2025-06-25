@@ -52,3 +52,12 @@ export type {
 export {LogEventType} from '../../src/registry/common/utils/log-event/types';
 export type {GatewayApi} from '../../src/registry';
 export type {CheckTenant, GetServicePlan} from '../../src/registry/common/utils/tenant/types';
+export type {
+    CollectionConstructor,
+    CollectionInstance,
+} from '../../src/registry/common/entities/collection/types';
+export type {
+    WorkbookConstructor,
+    WorkbookInstance,
+} from '../../src/registry/common/entities/workbook/types';
+export type {StructureItemInstance} from '../../src/registry/common/entities/structure-item/types';
