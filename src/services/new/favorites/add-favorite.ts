@@ -6,7 +6,7 @@ import {Favorite} from '../../../db/models/new/favorite';
 import {getWorkbook} from '../../../services/new/workbook';
 import {DlsActions} from '../../../types/models';
 import {ServiceArgs} from '../types';
-import {getPrimary} from '../utils';
+import {getReplica} from '../utils';
 
 interface AddFavoriteArgs {
     entryId: string;
@@ -24,7 +24,7 @@ export const addFavoriteService = async ({ctx, trx}: ServiceArgs, {entryId}: Add
     const registry = ctx.get('registry');
     const {DLS} = registry.common.classes.get();
     const {login} = user;
-    const targetTrx = getPrimary(trx);
+    const targetTrx = getReplica(trx);
 
     const entry = await Entry.query(targetTrx)
         .select()

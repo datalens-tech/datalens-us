@@ -1,10 +1,10 @@
 import {raw} from 'objection';
 
-import {JoinedFavoriteEntry} from '../../../db/presentations/joined-favorite-entry';
+import {JoinedFavoriteEntryWorkbook} from '../../../db/presentations/joined-favorite-entry-workbook';
 import Utils from '../../../utils';
 import {filterEntriesByPermission} from '../entry/utils';
 import {ServiceArgs} from '../types';
-import {getPrimary} from '../utils';
+import {getReplica} from '../utils';
 
 interface GetFavoritesArgs {
     orderBy?: {
@@ -34,7 +34,7 @@ export const getFavoritesService = async (
     }: GetFavoritesArgs,
 ) => {
     const {tenantId, user, dlContext} = ctx.get('info');
-    const targetTrx = getPrimary(trx);
+    const targetTrx = getReplica(trx);
 
     ctx.log('GET_FAVORITES_REQUEST', {
         tenantId,
@@ -51,7 +51,7 @@ export const getFavoritesService = async (
 
     const {login} = user;
 
-    const entries = await JoinedFavoriteEntry.find({
+    const entries = await JoinedFavoriteEntryWorkbook.findPage({
         where: [
             {
                 'favorites.tenantId': tenantId,

@@ -1,7 +1,10 @@
+import {AppError} from '@gravity-ui/nodekit';
+
 import {Model} from '../../../db';
+import {Entry} from '../../../db/models/new/entry';
 import {Favorite} from '../../../db/models/new/favorite';
 import {ServiceArgs} from '../types';
-import {getPrimary} from '../utils';
+import {getReplica} from '../utils';
 
 export interface DeleteFavoriteArgs {
     entryId: string;
@@ -19,7 +22,24 @@ export const deleteFavoriteService = async (
         dlContext,
     });
     const {login} = user;
-    const targetTrx = getPrimary(trx);
+    const targetTrx = getReplica(trx);
+
+    const entry = await Entry.query(targetTrx)
+        .select()
+        .where({
+            entryId,
+            tenantId,
+            isDeleted: false,
+        })
+        .first()
+        .timeout(Model.DEFAULT_QUERY_TIMEOUT);
+
+    if (!entry) {
+        throw new AppError('NOT_EXIST_ENTRY', {
+            code: 'NOT_EXIST_ENTRY',
+        });
+    }
+
     const result = await Favorite.query(targetTrx)
         .delete()
         .where({entryId, tenantId, login})

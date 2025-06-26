@@ -3,10 +3,9 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-import Entry from '../../db/models/entry';
 import {deleteFavoriteService} from '../../services/new/favorites/delete-favorite';
 
-import {favoriteInstanceModel} from './response-models/favorite-instance-model';
+import {favoriteModel} from './response-models/favorite-model';
 
 const requestSchema = {
     params: z.object({
@@ -19,23 +18,9 @@ export const deleteFavoriteController: AppRouteHandler = async (req, res) => {
     const {params} = await parseReq(req);
     const {entryId} = params;
 
-    const entry = await Entry.query(Entry.replica).select('tenantId').findById(entryId);
+    const result = await deleteFavoriteService({ctx: req.ctx}, {entryId});
 
-    if (!entry || entry.tenantId !== res.locals.tenantId) {
-        res.status(404).send({error: 'Entry not found'});
-        return;
-    }
-
-    const result = await deleteFavoriteService(
-        {
-            ctx: req.ctx,
-        },
-        {
-            entryId,
-        },
-    );
-
-    res.status(200).send([favoriteInstanceModel.format(result[0])]);
+    res.status(200).send([favoriteModel.format(result[0])]);
 };
 
 deleteFavoriteController.api = {
@@ -46,10 +31,10 @@ deleteFavoriteController.api = {
     },
     responses: {
         200: {
-            description: favoriteInstanceModel.schema.description ?? '',
+            description: favoriteModel.schema.description ?? '',
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: favoriteInstanceModel.schema,
+                    schema: favoriteModel.schema.array(),
                 },
             },
         },

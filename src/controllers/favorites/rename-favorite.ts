@@ -6,7 +6,7 @@ import {CONTENT_TYPE_JSON} from '../../const';
 import {renameFavoriteService} from '../../services/new/favorites/rename-favorites';
 
 import {favoriteEntryModel} from './response-models/favorite-entry-model';
-import {favoriteInstanceModel} from './response-models/favorite-instance-model';
+import {favoriteModel} from './response-models/favorite-model';
 
 const requestSchema = {
     params: z.object({
@@ -25,7 +25,7 @@ export const renameFavoriteController: AppRouteHandler = async (req, res) => {
 
     const result = await renameFavoriteService({ctx: req.ctx}, {entryId, name});
 
-    res.status(200).send(favoriteInstanceModel.format(result[0]));
+    res.status(200).send(favoriteModel.format(result));
 };
 
 renameFavoriteController.api = {

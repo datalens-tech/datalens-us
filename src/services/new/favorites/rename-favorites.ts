@@ -1,7 +1,7 @@
 import {Model} from '../../../db';
 import {Favorite} from '../../../db/models/new/favorite';
 import {ServiceArgs} from '../types';
-import {getPrimary} from '../utils';
+import {getReplica} from '../utils';
 
 interface RenameFavoriteArgs {
     entryId: string;
@@ -22,16 +22,16 @@ export const renameFavoriteService = async (
         dlContext,
     });
     const {login} = user;
-    const targetTrx = getPrimary(trx);
+    const targetTrx = getReplica(trx);
     const displayAlias = name ? name : null;
     const alias = displayAlias ? displayAlias.toLowerCase() : null;
 
-    const result = await Favorite.query(targetTrx)
+    const result = (await Favorite.query(targetTrx)
         .update({alias, displayAlias})
         .where({entryId, tenantId, login})
-        .first()
         .returning('*')
-        .timeout(Model.DEFAULT_QUERY_TIMEOUT);
+        .first()
+        .timeout(Model.DEFAULT_QUERY_TIMEOUT)) as unknown as Favorite;
 
     ctx.log('RENAME_FAVORITE_SUCCESS');
 

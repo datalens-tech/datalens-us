@@ -25,7 +25,7 @@ const selectedEntryColumns = [
 
 const selectedWorkbookColumns = ['workbookId', 'title'] as const;
 
-export type JoinedFavoriteEntryColumns = Pick<
+export type JoinedFavoriteEntryWorkbookColumns = Pick<
     Favorite,
     ArrayElement<typeof selectedFavoriteColumns>
 > &
@@ -37,7 +37,9 @@ const selectedColumns = [
     ...selectedEntryColumns.map((col) => `${Entry.tableName}.${col}`),
     ...selectedWorkbookColumns.map((col) => `${WorkbookModel.tableName}.${col}`),
 ];
-type ModifierFn = (builder: QueryBuilder<JoinedFavoriteEntry, JoinedFavoriteEntry[]>) => void;
+type ModifierFn = (
+    builder: QueryBuilder<JoinedFavoriteEntryWorkbook, JoinedFavoriteEntryWorkbook[]>,
+) => void;
 type QueryWhereType = Record<string, unknown> | ModifierFn;
 type JoinedFavoriteEntryFindArgs = {
     where: QueryWhereType | QueryWhereType[];
@@ -48,7 +50,7 @@ type JoinedFavoriteEntryFindArgs = {
     trx: TransactionOrKnex;
 };
 
-export class JoinedFavoriteEntry extends Model {
+export class JoinedFavoriteEntryWorkbook extends Model {
     static get tableName() {
         return Favorite.tableName;
     }
@@ -57,7 +59,7 @@ export class JoinedFavoriteEntry extends Model {
         return Favorite.idColumn;
     }
 
-    static find({
+    static findPage({
         where,
         orderByRaw,
         modifier,
@@ -65,7 +67,7 @@ export class JoinedFavoriteEntry extends Model {
         pageSize = 100,
         trx,
     }: JoinedFavoriteEntryFindArgs) {
-        const query = JoinedFavoriteEntry.query(trx)
+        const query = JoinedFavoriteEntryWorkbook.query(trx)
             .select(selectedColumns)
             .join(Entry.tableName, `${Favorite.tableName}.entryId`, `${Entry.tableName}.entryId`)
             .leftJoin(
@@ -88,8 +90,8 @@ export class JoinedFavoriteEntry extends Model {
         return query
             .limit(pageSize)
             .offset(pageSize * page)
-            .timeout(JoinedFavoriteEntry.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<
-            JoinedFavoriteEntryColumns[]
+            .timeout(JoinedFavoriteEntryWorkbook.DEFAULT_QUERY_TIMEOUT) as unknown as Promise<
+            JoinedFavoriteEntryWorkbookColumns[]
         >;
     }
 }

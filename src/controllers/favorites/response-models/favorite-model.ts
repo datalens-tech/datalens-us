@@ -1,5 +1,6 @@
 import {z} from '../../../components/zod';
 import {Favorite} from '../../../db/models/new/favorite';
+import Utils from '../../../utils';
 
 const schema = z
     .object({
@@ -13,21 +14,21 @@ const schema = z
     })
     .describe('Favorite instance model');
 
-export type FavoriteInstanceModel = z.infer<typeof schema>;
+export type FavoriteModel = z.infer<typeof schema>;
 
-const format = (data: Favorite): FavoriteInstanceModel => {
+const format = (data: Favorite): FavoriteModel => {
     return {
-        entryId: data.entryId,
+        entryId: Utils.encodeId(data.entryId),
         login: data.login,
         tenantId: data.tenantId,
         createdAt: data.createdAt,
-        alias: data.alias || null,
-        displayAlias: data.displayAlias || null,
-        sortAlias: data.sortAlias || null,
+        alias: data.alias,
+        displayAlias: data.displayAlias,
+        sortAlias: data.sortAlias,
     };
 };
 
-export const favoriteInstanceModel = {
+export const favoriteModel = {
     schema,
     format,
 };

@@ -5,7 +5,7 @@ import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {addFavoriteService} from '../../services/new/favorites/add-favorite';
 
-import {favoriteInstanceModel} from './response-models/favorite-instance-model';
+import {favoriteModel} from './response-models/favorite-model';
 
 const requestSchema = {
     params: z.object({
@@ -20,7 +20,7 @@ export const addFavoriteController: AppRouteHandler = async (req, res) => {
 
     const result = await addFavoriteService({ctx: req.ctx}, {entryId});
 
-    res.status(200).send(favoriteInstanceModel.format(result));
+    res.status(200).send(favoriteModel.format(result));
 };
 
 addFavoriteController.api = {
@@ -31,10 +31,10 @@ addFavoriteController.api = {
     },
     responses: {
         200: {
-            description: favoriteInstanceModel.schema.description ?? '',
+            description: favoriteModel.schema.description ?? '',
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: favoriteInstanceModel.schema,
+                    schema: favoriteModel.schema,
                 },
             },
         },

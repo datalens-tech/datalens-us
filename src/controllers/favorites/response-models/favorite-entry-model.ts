@@ -1,6 +1,6 @@
 import {z} from '../../../components/zod';
 import {EntryScope} from '../../../db/models/new/entry/types';
-import {JoinedFavoriteEntryColumns} from '../../../db/presentations/joined-favorite-entry';
+import {JoinedFavoriteEntryWorkbookColumns} from '../../../db/presentations';
 import {EntryPermissions} from '../../../services/new/entry/types';
 import Utils from '../../../utils';
 import {entryPermissionsModel} from '../../entries/response-models';
@@ -26,12 +26,15 @@ const schema = z
 
 export type FavoriteEntryModel = z.infer<typeof schema>;
 
-export type JoinedFavoriteEntryModelWithPermissions = JoinedFavoriteEntryColumns & {
-    isLocked?: boolean;
-    permissions?: EntryPermissions;
-};
+export type JoinedFavoriteEntryWorkbookColumnsModelWithPermissions =
+    JoinedFavoriteEntryWorkbookColumns & {
+        isLocked?: boolean;
+        permissions?: EntryPermissions;
+    };
 
-const format = (data: JoinedFavoriteEntryModelWithPermissions): FavoriteEntryModel => {
+const format = (
+    data: JoinedFavoriteEntryWorkbookColumnsModelWithPermissions,
+): FavoriteEntryModel => {
     return {
         entryId: Utils.encodeId(data.entryId),
         scope: data.scope,
