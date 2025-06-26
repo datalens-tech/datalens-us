@@ -42,7 +42,7 @@ type ModifierFn = (
 ) => void;
 type QueryWhereType = Record<string, unknown> | ModifierFn;
 type JoinedFavoriteEntryFindArgs = {
-    where: QueryWhereType | QueryWhereType[];
+    where: QueryWhereType;
     orderByRaw?: string;
     modifier?: ModifierFn;
     page?: number;

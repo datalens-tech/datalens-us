@@ -52,35 +52,32 @@ export const getFavoritesService = async (
     const {login} = user;
 
     const entries = await JoinedFavoriteEntryWorkbook.findPage({
-        where: [
-            {
+        where: (builder) => {
+            builder.where({
                 'favorites.tenantId': tenantId,
                 'favorites.login': login,
                 'entries.isDeleted': false,
-            },
-            (builder) => {
-                if (filters && filters.name) {
-                    builder.where(
-                        raw('coalesce(favorites.alias, entries.name)'),
-                        'like',
-                        `%${Utils.escapeStringForLike(filters.name.toLowerCase())}%`,
-                    );
-                }
-                if (scope) {
-                    const scopes = Array.isArray(scope)
-                        ? scope
-                        : scope.replace(/\s/g, '').split(',');
+            });
+            if (filters && filters.name) {
+                builder.where(
+                    raw('coalesce(favorites.alias, entries.name)'),
+                    'like',
+                    `%${Utils.escapeStringForLike(filters.name.toLowerCase())}%`,
+                );
+            }
+            if (scope) {
+                const scopes = Array.isArray(scope) ? scope : scope.replace(/\s/g, '').split(',');
 
-                    builder.whereIn('scope', ['folder', ...scopes]);
-                }
+                builder.whereIn('scope', ['folder', ...scopes]);
+            }
 
-                if (ignoreWorkbookEntries) {
-                    builder.where('entries.workbookId', null);
-                }
-            },
-        ],
-        orderByRaw: "CASE WHEN scope = 'folder' THEN 0 ELSE 1 END",
+            if (ignoreWorkbookEntries) {
+                builder.where('entries.workbookId', null);
+            }
+        },
         modifier: (builder) => {
+            builder.orderByRaw("CASE WHEN scope = 'folder' THEN 0 ELSE 1 END");
+
             if (orderBy) {
                 switch (orderBy.field) {
                     case 'createdAt':
