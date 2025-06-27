@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-import {AppEnv, TRUE_FLAGS} from '../const/common';
+import {TRUE_FLAGS} from '../const/common';
 import {TESTING_ENV} from '../const/testing-env';
 
 export const getEnvCert = (envCert?: string) => envCert?.replace(/\\n/g, '\n');
