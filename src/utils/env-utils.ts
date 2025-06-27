@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 
-import {TRUE_FLAGS} from '../const/common';
+import {AppEnv, TRUE_FLAGS} from '../const/common';
+import {TESTING_ENV} from '../const/testing-env';
 
 export const getEnvCert = (envCert?: string) => envCert?.replace(/\\n/g, '\n');
 
@@ -37,4 +38,13 @@ export function getEnvTokenVariable(envTokenVariableName: string) {
 
 export function isTrueArg(arg: any): boolean {
     return TRUE_FLAGS.includes(arg);
+}
+
+export function setTestingEnv(): void {
+    let key: keyof typeof TESTING_ENV;
+    for (key in TESTING_ENV) {
+        if (key in TESTING_ENV) {
+            process.env[key] = TESTING_ENV[key] as string;
+        }
+    }
 }
