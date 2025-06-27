@@ -43,9 +43,6 @@ export function isTrueArg(arg: any): boolean {
 }
 
 export function setTestingEnv(): void {
-    if (!TESTING_ENV) {
-        return;
-    }
     for (const key of objectKeys(TESTING_ENV)) {
         process.env[key] = TESTING_ENV[key];
     }
