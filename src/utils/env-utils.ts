@@ -44,7 +44,7 @@ export function setTestingEnv(): void {
     let key: keyof typeof TESTING_ENV;
     for (key in TESTING_ENV) {
         if (key in TESTING_ENV) {
-            process.env[key] = TESTING_ENV[key] as string;
+            process.env[key] = TESTING_ENV[key];
         }
     }
 }
