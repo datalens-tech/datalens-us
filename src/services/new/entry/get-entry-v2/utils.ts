@@ -11,6 +11,8 @@ import {getReplica} from '../../utils';
 import {getEntryPermissionsByWorkbook} from '../../workbook/utils';
 import {checkWorkbookIsolation} from '../utils';
 
+const GET_PARENTS_QUERY_TIMEOUT = 3000;
+
 export const checkWorkbookEntry = async ({
     ctx,
     trx,
@@ -38,6 +40,7 @@ export const checkWorkbookEntry = async ({
             ctx,
             trx: getReplica(trx),
             collectionId: workbook.collectionId,
+            getParentsQueryTimeout: GET_PARENTS_QUERY_TIMEOUT,
         });
     }
 

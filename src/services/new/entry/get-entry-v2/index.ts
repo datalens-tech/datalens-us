@@ -7,7 +7,7 @@ import {Entry} from '../../../../db/models/new/entry';
 import {RevisionModel} from '../../../../db/models/new/revision';
 import {TenantColumn} from '../../../../db/models/new/tenant';
 import {DlsActions} from '../../../../types/models';
-import Utils from '../../../../utils';
+import Utils, {withTimeout} from '../../../../utils';
 import {ServiceArgs} from '../../types';
 import {getReplica} from '../../utils';
 import {EntryPermissions} from '../types';
@@ -20,6 +20,8 @@ import {
     selectedTenantColumns,
 } from './constants';
 import {checkWorkbookEntry} from './utils';
+
+const ENTRY_QUERY_TIMEOUT = 3000;
 
 interface GetEntryNextArgs {
     entryId: string;
@@ -141,7 +143,7 @@ export const getEntryV2 = async (
             },
         })
         .first()
-        .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
+        .timeout(ENTRY_QUERY_TIMEOUT);
 
     const revision = entry?.publishedRevision ?? entry?.savedRevision ?? entry?.revisions?.[0];
 
@@ -186,13 +188,16 @@ export const getEntryV2 = async (
             !onlyMirrored;
 
         if (checkPermissionEnabled) {
-            dlsPermissions = await DLS.checkPermission(
-                {ctx, trx},
-                {
-                    entryId,
-                    action: DlsActions.Execute,
-                    includePermissionsInfo,
-                },
+            dlsPermissions = await withTimeout(
+                DLS.checkPermission(
+                    {ctx, trx},
+                    {
+                        entryId,
+                        action: DlsActions.Execute,
+                        includePermissionsInfo,
+                    },
+                ),
+                {timeoutMs: 3000, errorMessage: 'DLS.checkPermission timeout'},
             );
         }
 
