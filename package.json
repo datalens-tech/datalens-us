@@ -13,7 +13,7 @@
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.0",
     "@gravity-ui/expresskit": "^2.4.0",
-    "@gravity-ui/gateway": "^2.6.2",
+    "@gravity-ui/gateway": "^4.7.2",
     "@gravity-ui/nodekit": "^2.4.1",
     "@gravity-ui/postgreskit": "^2.0.0",
     "ajv": "^6.12.4",
