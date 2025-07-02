@@ -63,7 +63,7 @@ export const getEntryV2 = async (
         includeFavorite,
     } = args;
 
-    ctx.log('GET_ENTRY_REQUEST', {
+    ctx.log('GET_ENTRY_V2_REQUEST', {
         entryId: Utils.encodeId(entryId),
         revId: Utils.encodeId(revId),
         branch,
@@ -237,7 +237,7 @@ export const getEntryV2 = async (
         });
     }
 
-    ctx.log('GET_ENTRY_SUCCESS');
+    ctx.log('GET_ENTRY_V2_SUCCESS');
 
     return {
         entry,
