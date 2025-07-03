@@ -3,13 +3,14 @@ import {TransactionOrKnex} from 'objection';
 
 import {Feature, isEnabledFeature} from '../../../../components/features';
 import {US_ERRORS} from '../../../../const';
-import {Entry} from '../../../../db/models/new/entry';
 import {WorkbookModel} from '../../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../../entities/workbook';
 import {getParentIds} from '../../collection/utils';
 import {getReplica} from '../../utils';
 import {getEntryPermissionsByWorkbook} from '../../workbook/utils';
 import {checkWorkbookIsolation} from '../utils';
+
+import {SelectedEntry} from './types';
 
 const GET_PARENTS_QUERY_TIMEOUT = 3000;
 
@@ -22,7 +23,7 @@ export const checkWorkbookEntry = async ({
 }: {
     ctx: AppContext;
     trx?: TransactionOrKnex;
-    entry: Entry;
+    entry: SelectedEntry;
     workbook: WorkbookModel;
     includePermissionsInfo?: boolean;
 }) => {

@@ -4,7 +4,6 @@ import {Feature, isEnabledFeature} from '../../../../components/features';
 import {US_ERRORS} from '../../../../const';
 import OldEntry from '../../../../db/models/entry';
 import {Entry} from '../../../../db/models/new/entry';
-import {RevisionModel} from '../../../../db/models/new/revision';
 import {TenantColumn} from '../../../../db/models/new/tenant';
 import {DlsActions} from '../../../../types/models';
 import Utils, {withTimeout} from '../../../../utils';
@@ -19,11 +18,12 @@ import {
     selectedRevisionColumns,
     selectedTenantColumns,
 } from './constants';
+import type {SelectedEntry, SelectedRevision} from './types';
 import {checkWorkbookEntry} from './utils';
 
 const ENTRY_QUERY_TIMEOUT = 3000;
 
-interface GetEntryNextArgs {
+interface GetEntryV2Args {
     entryId: string;
     revId?: string;
     branch?: 'saved' | 'published';
@@ -34,9 +34,9 @@ interface GetEntryNextArgs {
     includeFavorite?: boolean;
 }
 
-export type GetEntryNextResult = {
-    entry: Entry;
-    revision: RevisionModel;
+export type GetEntryV2Result = {
+    entry: SelectedEntry;
+    revision: SelectedRevision;
     includePermissionsInfo?: boolean;
     permissions: EntryPermissions;
     includeLinks?: boolean;
@@ -50,8 +50,8 @@ export type GetEntryNextResult = {
 // eslint-disable-next-line complexity
 export const getEntryV2 = async (
     {ctx, trx}: ServiceArgs,
-    args: GetEntryNextArgs,
-): Promise<GetEntryNextResult> => {
+    args: GetEntryV2Args,
+): Promise<GetEntryV2Result> => {
     const {
         entryId,
         revId,
@@ -108,7 +108,7 @@ export const getEntryV2 = async (
         graphRelations.push('favorite(favoriteModifier)');
     }
 
-    const entry = await Entry.query(getReplica(trx))
+    const entry: SelectedEntry | undefined = await Entry.query(getReplica(trx))
         .select(selectedEntryColumns)
         .where((builder) => {
             builder.where({

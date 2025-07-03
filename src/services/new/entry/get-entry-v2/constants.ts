@@ -3,46 +3,55 @@ import {Favorite, FavoriteColumn} from '../../../../db/models/new/favorite';
 import {RevisionModel, RevisionModelColumn} from '../../../../db/models/new/revision';
 import {Tenant, TenantColumn} from '../../../../db/models/new/tenant';
 
-export const selectedEntryColumns = [
-    `${Entry.tableName}.${EntryColumn.Scope}`,
-    `${Entry.tableName}.${EntryColumn.Type}`,
-    `${Entry.tableName}.${EntryColumn.Key}`,
-    `${Entry.tableName}.${EntryColumn.InnerMeta}`,
-    `${Entry.tableName}.${EntryColumn.CreatedBy}`,
-    `${Entry.tableName}.${EntryColumn.CreatedAt}`,
-    `${Entry.tableName}.${EntryColumn.IsDeleted}`,
-    `${Entry.tableName}.${EntryColumn.DeletedAt}`,
-    `${Entry.tableName}.${EntryColumn.Hidden}`,
-    `${Entry.tableName}.${EntryColumn.DisplayKey}`,
-    `${Entry.tableName}.${EntryColumn.EntryId}`,
-    `${Entry.tableName}.${EntryColumn.SavedId}`,
-    `${Entry.tableName}.${EntryColumn.PublishedId}`,
-    `${Entry.tableName}.${EntryColumn.TenantId}`,
-    `${Entry.tableName}.${EntryColumn.Name}`,
-    `${Entry.tableName}.${EntryColumn.SortName}`,
-    `${Entry.tableName}.${EntryColumn.Public}`,
-    `${Entry.tableName}.${EntryColumn.UnversionedData}`,
-    `${Entry.tableName}.${EntryColumn.WorkbookId}`,
-    `${Entry.tableName}.${EntryColumn.Mirrored}`,
+export const entryColumns = [
+    EntryColumn.Scope,
+    EntryColumn.Type,
+    EntryColumn.Key,
+    EntryColumn.InnerMeta,
+    EntryColumn.CreatedBy,
+    EntryColumn.CreatedAt,
+    EntryColumn.IsDeleted,
+    EntryColumn.DeletedAt,
+    EntryColumn.Hidden,
+    EntryColumn.DisplayKey,
+    EntryColumn.EntryId,
+    EntryColumn.SavedId,
+    EntryColumn.PublishedId,
+    EntryColumn.TenantId,
+    EntryColumn.Name,
+    EntryColumn.SortName,
+    EntryColumn.Public,
+    EntryColumn.UnversionedData,
+    EntryColumn.WorkbookId,
+    EntryColumn.Mirrored,
+];
+
+export const selectedEntryColumns = entryColumns.map((column) => `${Entry.tableName}.${column}`);
+
+export const revisionColumns = [
+    RevisionModelColumn.Data,
+    RevisionModelColumn.Meta,
+    RevisionModelColumn.UpdatedBy,
+    RevisionModelColumn.UpdatedAt,
+    RevisionModelColumn.RevId,
+    RevisionModelColumn.Links,
+    RevisionModelColumn.EntryId,
 ] as const;
 
-export const selectedRevisionColumns = [
-    `${RevisionModel.tableName}.${RevisionModelColumn.Data}`,
-    `${RevisionModel.tableName}.${RevisionModelColumn.Meta}`,
-    `${RevisionModel.tableName}.${RevisionModelColumn.UpdatedBy}`,
-    `${RevisionModel.tableName}.${RevisionModelColumn.UpdatedAt}`,
-    `${RevisionModel.tableName}.${RevisionModelColumn.RevId}`,
-    `${RevisionModel.tableName}.${RevisionModelColumn.Links}`,
-    `${RevisionModel.tableName}.${RevisionModelColumn.EntryId}`,
+export const selectedRevisionColumns = revisionColumns.map(
+    (column) => `${RevisionModel.tableName}.${column}`,
+);
+
+export const tenantColumns = [
+    TenantColumn.BillingStartedAt,
+    TenantColumn.BillingEndedAt,
+    TenantColumn.Features,
 ] as const;
 
-export const selectedTenantColumns = [
-    `${Tenant.tableName}.${TenantColumn.BillingStartedAt}`,
-    `${Tenant.tableName}.${TenantColumn.BillingEndedAt}`,
-    `${Tenant.tableName}.${TenantColumn.Features}`,
-] as const;
+export const selectedTenantColumns = tenantColumns.map((column) => `${Tenant.tableName}.${column}`);
 
-export const selectedFavoriteColumns = [
-    `${Favorite.tableName}.${FavoriteColumn.EntryId}`,
-    `${Favorite.tableName}.${FavoriteColumn.Login}`,
-] as const;
+export const favoriteColumns = [FavoriteColumn.EntryId, FavoriteColumn.Login] as const;
+
+export const selectedFavoriteColumns = tenantColumns.map(
+    (column) => `${Favorite.tableName}.${column}`,
+);
