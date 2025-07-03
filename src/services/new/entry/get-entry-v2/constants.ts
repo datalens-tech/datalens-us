@@ -52,6 +52,6 @@ export const selectedTenantColumns = tenantColumns.map((column) => `${Tenant.tab
 
 export const favoriteColumns = [FavoriteColumn.EntryId, FavoriteColumn.Login] as const;
 
-export const selectedFavoriteColumns = tenantColumns.map(
+export const selectedFavoriteColumns = favoriteColumns.map(
     (column) => `${Favorite.tableName}.${column}`,
 );
