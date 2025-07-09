@@ -6,7 +6,6 @@ import Ajv from 'ajv';
 import {
     MAX_BRANDING_OBJECT_SYMBOLS,
     MAX_META_OBJECT_SYMBOLS,
-    MAX_PRESET_DATA_OBJECT_SYMBOLS,
     MAX_UNVERSIONED_DATA_OBJECT_SYMBOLS,
 } from '../const';
 import {US_ERRORS} from '../const/errors';
@@ -160,30 +159,6 @@ ajv.addKeyword('restrictUnversionedDataSize', {
             ];
 
             return dataStringified.length <= MAX_UNVERSIONED_DATA_OBJECT_SYMBOLS;
-        }
-    },
-    errors: true,
-});
-
-ajv.addKeyword('restrictPresetDataSize', {
-    validate: function validate(schema: object | string | boolean, data: any) {
-        if (data === null) {
-            return true;
-        } else {
-            const dataStringified = JSON.stringify(data);
-
-            // @ts-ignore
-            validate.errors = [
-                {
-                    format: 'string',
-                    message: `preset data jsonb object can contain not greater ${MAX_PRESET_DATA_OBJECT_SYMBOLS} symbols`,
-                    params: {
-                        keyword: 'restrictPresetDataSize',
-                    },
-                },
-            ];
-
-            return dataStringified.length <= MAX_PRESET_DATA_OBJECT_SYMBOLS;
         }
     },
     errors: true,
