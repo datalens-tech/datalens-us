@@ -1,8 +1,9 @@
 import type {ExpressKit, Request, Response} from '@gravity-ui/expresskit';
-import getGatewayControllers, {
+import {
     ApiWithRoot,
     GatewayConfig,
     SchemasByScope,
+    getGatewayControllers,
 } from '@gravity-ui/gateway';
 import type {AppContext} from '@gravity-ui/nodekit';
 
