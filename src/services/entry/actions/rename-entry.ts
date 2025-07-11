@@ -2,7 +2,13 @@ import {AppError} from '@gravity-ui/nodekit';
 import {raw, transaction} from 'objection';
 
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {BiTrackingLogs, CURRENT_TIMESTAMP, RETURN_COLUMNS, US_ERRORS} from '../../../const';
+import {
+    BiTrackingLogs,
+    CURRENT_TIMESTAMP,
+    EXTENDED_QUERY_TIMEOUT,
+    RETURN_COLUMNS,
+    US_ERRORS,
+} from '../../../const';
 import Entry from '../../../db/models/entry';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {CTX, DlsActions} from '../../../types/models';
@@ -129,7 +135,7 @@ export const renameEntry = async (ctx: CTX, renameEntryData: RenameEntryData) =>
             .where('key', 'like', `${Utils.escapeStringForLike(oldEntryKey)}${isFolder ? '%' : ''}`)
             .where({tenantId})
             .returning('*')
-            .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
+            .timeout(isFolder ? EXTENDED_QUERY_TIMEOUT : Entry.DEFAULT_QUERY_TIMEOUT);
 
         return await Entry.query(trx)
             .select(RETURN_COLUMNS)
