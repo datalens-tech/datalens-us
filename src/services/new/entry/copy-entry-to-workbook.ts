@@ -3,7 +3,6 @@ import {transaction} from 'objection';
 
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {BiTrackingLogs, US_ERRORS} from '../../../const';
-import {getId} from '../../../db';
 import OldEntry from '../../../db/models/entry';
 import {Entry} from '../../../db/models/new/entry';
 import {EntryScope} from '../../../db/models/new/entry/types';
@@ -47,6 +46,8 @@ export const copyEntryToWorkbook = async (
 
     const {accessServiceEnabled} = ctx.config;
     const {tenantId, user, isPrivateRoute} = ctx.get('info');
+    const registry = ctx.get('registry');
+    const {getId} = registry.getDbInstance();
 
     const copiedBy = makeUserId(user.userId);
 
