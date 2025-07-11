@@ -1,5 +1,3 @@
-export {db, getId, Model} from '../src/db';
-
 export {default as LegacyEntry} from '../src/db/models/entry';
 export {default as LegacyRevision} from '../src/db/models/revision';
 export {default as LegacyFavorite} from '../src/db/models/favorite';

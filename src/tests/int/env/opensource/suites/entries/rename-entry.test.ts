@@ -1,13 +1,12 @@
 import request from 'supertest';
 
-import {getId} from '../../../../../../db';
 import {Entry} from '../../../../../../db/models/new/entry';
 import {EntryScope} from '../../../../../../db/models/new/entry/types';
 import {WorkbookModel, WorkbookModelColumn} from '../../../../../../db/models/new/workbook';
 import Utils from '../../../../../../utils';
 import {testUserId} from '../../../../constants';
 import {routes} from '../../../../routes';
-import {app, auth, testTenantId} from '../../auth';
+import {app, appNodekit, auth, testTenantId} from '../../auth';
 import {OpensourceRole} from '../../roles';
 
 const workbookTitle = 'Favourite Workbook';
@@ -26,6 +25,8 @@ let workbookEntryId: string;
 
 describe('Rename entries', () => {
     beforeAll(async () => {
+        const {getId} = appNodekit.ctx.get('registry').getDbInstance();
+
         const workbook = await WorkbookModel.query(WorkbookModel.primary)
             .insert({
                 [WorkbookModelColumn.Title]: workbookTitle,
