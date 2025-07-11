@@ -16,29 +16,6 @@ const validateArgs = makeSchemaValidator({
         collectionId: {
             type: ['string', 'null'],
         },
-        includePermissionsInfo: {
-            type: 'boolean',
-        },
-        filterString: {
-            type: 'string',
-        },
-        page: {
-            type: 'number',
-            minimum: 0,
-        },
-        pageSize: {
-            type: 'number',
-            minimum: 1,
-            maximum: 200,
-        },
-        orderField: {
-            type: 'string',
-            enum: ['title', 'createdAt', 'updatedAt'],
-        },
-        orderDirection: {
-            type: 'string',
-            enum: ['asc', 'desc'],
-        },
     },
 });
 
