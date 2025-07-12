@@ -1,13 +1,17 @@
 import * as path from 'path';
 
 import type {NodeKit} from '@gravity-ui/nodekit';
-import {initDB as initPostgresDB} from '@gravity-ui/postgreskit';
+import {getModel, initDB as initPostgresDB} from '@gravity-ui/postgreskit';
 import {knexSnakeCaseMappers} from 'objection';
 
 import {AppEnv, DEFAULT_QUERY_TIMEOUT} from '../const';
 import {getTestDsnList} from '../tests/int/db';
 import Utils from '../utils';
 import {isTrueArg} from '../utils/env-utils';
+
+export class Model extends getModel() {
+    static DEFAULT_QUERY_TIMEOUT = DEFAULT_QUERY_TIMEOUT;
+}
 
 export const getKnexOptions = () => ({
     client: 'pg',
@@ -46,7 +50,7 @@ export function initDB(nodekit: NodeKit) {
         suppressStatusLogs,
     };
 
-    const {db, CoreBaseModel, helpers} = initPostgresDB({
+    const {db, helpers} = initPostgresDB({
         connectionString: dsnList,
         dispatcherOptions,
         knexOptions: getKnexOptions(),
@@ -61,9 +65,7 @@ export function initDB(nodekit: NodeKit) {
         return queryResult.rows[0].id;
     }
 
-    class Model extends CoreBaseModel {
-        static DEFAULT_QUERY_TIMEOUT = DEFAULT_QUERY_TIMEOUT;
-    }
+    Model.db = db;
 
     return {db, Model, getId, helpers};
 }

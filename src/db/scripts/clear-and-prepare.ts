@@ -1,7 +1,9 @@
-require('dotenv').config();
-require('../../index');
+import dotenv from 'dotenv';
+dotenv.config();
+
+import '../../index';
+import {registry} from '../../registry';
 import {Utils} from '../../utils/utils';
-import {helpers} from '../index';
 
 let dsnList;
 
@@ -28,13 +30,17 @@ if (process.env.QLOUD_INSTALLATION) {
     process.exit(1);
 }
 
-helpers
-    .clearDatabase()
-    .then(() => helpers.prepareDatabase())
-    .then(() => {
-        process.exit(0);
-    })
-    .catch((error) => {
-        console.error(error);
-        process.exit(1);
-    });
+if (require.main === module) {
+    const {helpers} = registry.getDbInstance();
+
+    helpers
+        .clearDatabase()
+        .then(() => helpers.prepareDatabase())
+        .then(() => {
+            process.exit(0);
+        })
+        .catch((error) => {
+            console.error(error);
+            process.exit(1);
+        });
+}

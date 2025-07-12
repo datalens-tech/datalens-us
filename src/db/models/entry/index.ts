@@ -1,7 +1,7 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {Model, getId} from '../..';
+import {Model} from '../..';
 import {BiTrackingLogs, RETURN_COLUMNS, US_ERRORS} from '../../../const';
 import * as MT from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
@@ -190,6 +190,7 @@ class Entry extends Model {
         });
 
         const registry = ctx.get('registry');
+        const {getId} = registry.getDbInstance();
 
         const {DLS} = registry.common.classes.get();
 

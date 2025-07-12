@@ -6,16 +6,18 @@ require('events').EventEmitter.defaultMaxListeners = 1000;
 require('../../dist/server/tests/int/mocks');
 require('../../dist/server');
 
-const {db} = require('../../dist/server/db');
+const {registry} = require('../../dist/server/registry');
 
 const {prepareTestDb} = require('./prepare-test-db');
 
 global.beforeAll(async () => {
+    const {db} = registry.getDbInstance();
     await db.ready();
 
     await prepareTestDb();
 });
 
 global.afterAll(async () => {
+    const {db} = registry.getDbInstance();
     await db.terminate();
 });
