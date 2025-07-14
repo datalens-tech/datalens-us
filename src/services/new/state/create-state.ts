@@ -1,31 +1,13 @@
 import hashGenerator from '../../../components/hash-generator';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {State} from '../../../db/models/new/state';
 import {ServiceArgs} from '../types';
-
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['entryId', 'data'],
-    properties: {
-        entryId: {
-            type: 'string',
-        },
-        data: {
-            type: 'object',
-        },
-    },
-});
 
 interface CreateStateArgs {
     entryId: string;
     data: Record<string, unknown>;
 }
 
-export const createState = async (
-    {ctx, trx}: ServiceArgs,
-    args: CreateStateArgs,
-    skipValidation = false,
-) => {
+export const createState = async ({ctx, trx}: ServiceArgs, args: CreateStateArgs) => {
     const targetTrx = trx ?? State.primary;
 
     const {entryId, data} = args;
@@ -33,10 +15,6 @@ export const createState = async (
     const {tenantId} = ctx.get('info');
 
     ctx.log('CREATE_STATE_REQUEST', {tenantId, entryId});
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const hash = hashGenerator({entryId, data});
 

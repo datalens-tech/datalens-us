@@ -6,7 +6,7 @@ import {RETURN_NAVIGATION_COLUMNS, US_ERRORS} from '../../../const';
 import {filterEntriesByPermission} from '../../../services/new/entry/utils';
 import * as MT from '../../../types/models';
 import Utils from '../../../utils';
-import Favorite from '../favorite';
+import {Favorite} from '../new/favorite';
 import Revision from '../revision';
 
 import {validateInterTenantGetEntries} from './scheme';
