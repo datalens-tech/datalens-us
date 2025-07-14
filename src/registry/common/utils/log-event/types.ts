@@ -20,6 +20,8 @@ import type {
 } from '../../../../controllers/color-palettes/update-color-palette';
 import type {CopyEntriesToWorkbookReqBody} from '../../../../controllers/entries/copy-entries-to-workbook';
 import type {DeleteEntryReqParams} from '../../../../controllers/entries/delete-entry';
+import {TenantWithSettingsModel} from '../../../../controllers/tenants/response-models';
+import {SetDefaultColorPaletteRequestBodySchema} from '../../../../controllers/tenants/set-default-color-palette';
 import type {
     CopyWorkbookReqBody,
     CopyWorkbookReqParams,
@@ -112,6 +114,9 @@ export enum LogEventType {
 
     UpdateEntrySuccess = 'updateEntrySuccess',
     UpdateEntryFail = 'updateEntryFail',
+
+    SetDefaultColorPaletteSuccess = 'setDefaultColorPaletteSuccess',
+    SetDefaultColorPaletteFail = 'setDefaultColorPaletteFail',
 }
 
 interface EventParams {
@@ -488,6 +493,20 @@ export interface LogEventUpdateEntryFailParams extends EventParams {
     error: unknown;
 }
 
+export interface LogEventSetDefaultColorPaletteSuccessParams extends EventParams {
+    type: LogEventType.SetDefaultColorPaletteSuccess;
+
+    reqBody: SetDefaultColorPaletteRequestBodySchema;
+    tenant: TenantWithSettingsModel;
+}
+
+export interface LogEventSetDefaultColorPaletteFailParams extends EventParams {
+    type: LogEventType.SetDefaultColorPaletteFail;
+
+    reqBody: SetDefaultColorPaletteRequestBodySchema;
+    error: unknown;
+}
+
 export type LogEventParams =
     | LogEventCreateCollectionSuccessParams
     | LogEventCreateCollectionFailParams
@@ -534,6 +553,8 @@ export type LogEventParams =
     | LogEventRenameEntrySuccessParams
     | LogEventRenameEntryFailParams
     | LogEventUpdateEntrySuccessParams
-    | LogEventUpdateEntryFailParams;
+    | LogEventUpdateEntryFailParams
+    | LogEventSetDefaultColorPaletteSuccessParams
+    | LogEventSetDefaultColorPaletteFailParams;
 
 export type LogEvent = (params: LogEventParams) => void;
