@@ -2,7 +2,7 @@ import request from 'supertest';
 
 import {routes} from '../../../../routes';
 import {app, auth} from '../../auth';
-import {OpensourceRole} from '../../roles';
+import {PlatformRole} from '../../roles';
 
 const defaultColorPaletteId = 'test1';
 const updatedDefaultColorPaletteId = 'test2';
@@ -22,7 +22,7 @@ describe('Set default color palette', () => {
 
     test('Set defaultColorPaletteId with wrong role error', async () => {
         await auth(request(app).post(routes.setDefaultColorPalette), {
-            role: OpensourceRole.Editor,
+            role: PlatformRole.Visitor,
         })
             .send({
                 defaultColorPaletteId,
@@ -30,7 +30,7 @@ describe('Set default color palette', () => {
             .expect(403);
 
         await auth(request(app).post(routes.setDefaultColorPalette), {
-            role: OpensourceRole.Viewer,
+            role: PlatformRole.Creator,
         })
             .send({
                 defaultColorPaletteId,
@@ -40,7 +40,7 @@ describe('Set default color palette', () => {
 
     test('Set defaultColorPaletteId', async () => {
         const updateResponse = await auth(request(app).post(routes.setDefaultColorPalette), {
-            role: OpensourceRole.Admin,
+            role: PlatformRole.Admin,
         })
             .send({
                 defaultColorPaletteId,
@@ -54,7 +54,7 @@ describe('Set default color palette', () => {
 
     test('Update defaultColorPaletteId', async () => {
         const updateResponse = await auth(request(app).post(routes.setDefaultColorPalette), {
-            role: OpensourceRole.Admin,
+            role: PlatformRole.Admin,
         })
             .send({
                 defaultColorPaletteId: updatedDefaultColorPaletteId,
