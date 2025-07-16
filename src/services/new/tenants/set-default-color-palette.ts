@@ -15,12 +15,15 @@ export interface SetDefaultColorPaletteArgs {
 export const setDefaultColorPalette = async (
     {ctx, trx}: ServiceArgs,
     args: SetDefaultColorPaletteArgs,
+    skipCheckPermission = false,
 ) => {
-    const {checkOrganizationPermission} = registry.common.functions.get();
-    await checkOrganizationPermission({
-        ctx,
-        permission: OrganizationPermission.ManageInstance,
-    });
+    if (!skipCheckPermission) {
+        const {checkOrganizationPermission} = registry.common.functions.get();
+        await checkOrganizationPermission({
+            ctx,
+            permission: OrganizationPermission.ManageInstance,
+        });
+    }
 
     const {tenantId} = ctx.get('info');
     const {defaultColorPaletteId} = args;
@@ -32,9 +35,9 @@ export const setDefaultColorPalette = async (
     const updatedTenant = await Tenant.query(getPrimary(trx))
         .where({tenantId})
         .patch({
-            settings: raw(`jsonb_set(??, '{defaultColorPaletteId}', ?)`, [
+            settings: raw(`jsonb_set(??, '{defaultColorPaletteId}', to_jsonb(?::text))`, [
                 'settings',
-                JSON.stringify(defaultColorPaletteId),
+                defaultColorPaletteId,
             ]),
         })
         .returning('*')
