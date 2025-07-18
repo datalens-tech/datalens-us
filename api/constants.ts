@@ -23,4 +23,5 @@ export {
     AUTHORIZATION_HEADER,
     DL_AUTH_HEADER_KEY,
     CONTENT_TYPE_JSON,
+    TenantSettingsKey,
 } from '../src/const';
