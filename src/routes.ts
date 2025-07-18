@@ -535,7 +535,6 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             route: 'POST /v1/tenants/set-default-color-palette',
             handler: tenants.setDefaultColorPaletteController,
             write: true,
-            requireCtxTenantId: true,
             features: [Feature.DefaultColorPaletteEnabled],
         }),
     } as const;

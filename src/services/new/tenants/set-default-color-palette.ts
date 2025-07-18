@@ -2,7 +2,7 @@ import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
 import {OrganizationPermission} from '../../../components/iam';
-import {US_ERRORS} from '../../../const';
+import {TenantSettingsKey, US_ERRORS} from '../../../const';
 import {Tenant} from '../../../db/models/new/tenant';
 import {registry} from '../../../registry';
 import {ServiceArgs} from '../types';
@@ -13,11 +13,10 @@ export interface SetDefaultColorPaletteArgs {
 }
 
 export const setDefaultColorPalette = async (
-    {ctx, trx}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions}: ServiceArgs,
     args: SetDefaultColorPaletteArgs,
-    skipCheckPermission = false,
 ) => {
-    if (!skipCheckPermission) {
+    if (!skipCheckPermissions) {
         const {checkOrganizationPermission} = registry.common.functions.get();
         await checkOrganizationPermission({
             ctx,
@@ -35,10 +34,10 @@ export const setDefaultColorPalette = async (
     const updatedTenant = await Tenant.query(getPrimary(trx))
         .where({tenantId})
         .patch({
-            settings: raw(`jsonb_set(??, '{defaultColorPaletteId}', to_jsonb(?::text))`, [
-                'settings',
-                defaultColorPaletteId,
-            ]),
+            settings: raw(
+                `jsonb_set(??, '{${TenantSettingsKey.DefaultColorPaletteId}}', to_jsonb(?::text))`,
+                ['settings', defaultColorPaletteId],
+            ),
         })
         .returning('*')
         .first()
