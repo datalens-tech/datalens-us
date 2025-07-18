@@ -1,26 +1,26 @@
 import {z} from '../../../components/zod';
 import {Tenant} from '../../../db/models/new/tenant';
 
-import {tenantModel} from './tenant-model';
+import {briefTenantModel} from './brief-tenant-model';
 
-const schema = tenantModel.schema
+const schema = briefTenantModel.schema
     .merge(
         z.object({
             settings: z.record(z.string(), z.unknown()),
         }),
     )
-    .describe('Tenant with settings model');
+    .describe('Tenant brief model with settings');
 
-export type TenantWithSettingsModel = z.infer<typeof schema>;
+export type BriefTenantWithSettingsModel = z.infer<typeof schema>;
 
 const format = (data: Tenant): z.infer<typeof schema> => {
     return {
-        ...tenantModel.format(data),
+        ...briefTenantModel.format(data),
         settings: data.settings,
     };
 };
 
-export const tenantWithSettingsModel = {
+export const briefTenantWithSettingsModel = {
     schema,
     format,
 };

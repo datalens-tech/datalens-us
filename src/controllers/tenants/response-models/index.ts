@@ -1,2 +1,2 @@
-export * from './tenant-model';
-export * from './tenant-with-settings-model';
+export * from './brief-tenant-model';
+export * from './brief-tenant-with-settings-model';

@@ -13,7 +13,7 @@ const schema = z
         collectionsEnabled: z.boolean(),
         foldersEnabled: z.boolean(),
     })
-    .describe('Tenant model');
+    .describe('Tenant brief model');
 
 const format = (data: Tenant): z.infer<typeof schema> => {
     return {
@@ -29,7 +29,7 @@ const format = (data: Tenant): z.infer<typeof schema> => {
     };
 };
 
-export const tenantModel = {
+export const briefTenantModel = {
     schema,
     format,
 };

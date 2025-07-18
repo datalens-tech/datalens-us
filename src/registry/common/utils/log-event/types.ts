@@ -20,7 +20,7 @@ import type {
 } from '../../../../controllers/color-palettes/update-color-palette';
 import type {CopyEntriesToWorkbookReqBody} from '../../../../controllers/entries/copy-entries-to-workbook';
 import type {DeleteEntryReqParams} from '../../../../controllers/entries/delete-entry';
-import {TenantWithSettingsModel} from '../../../../controllers/tenants/response-models';
+import {BriefTenantWithSettingsModel} from '../../../../controllers/tenants/response-models';
 import {SetDefaultColorPaletteRequestBodySchema} from '../../../../controllers/tenants/set-default-color-palette';
 import type {
     CopyWorkbookReqBody,
@@ -497,7 +497,7 @@ export interface LogEventSetDefaultColorPaletteSuccessParams extends EventParams
     type: LogEventType.SetDefaultColorPaletteSuccess;
 
     reqBody: SetDefaultColorPaletteRequestBodySchema;
-    tenant: TenantWithSettingsModel;
+    tenant: BriefTenantWithSettingsModel;
 }
 
 export interface LogEventSetDefaultColorPaletteFailParams extends EventParams {

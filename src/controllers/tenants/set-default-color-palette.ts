@@ -6,7 +6,7 @@ import {CONTENT_TYPE_JSON} from '../../const';
 import {LogEventType} from '../../registry/common/utils/log-event/types';
 import {setDefaultColorPalette} from '../../services/new/tenants';
 
-import {tenantWithSettingsModel} from './response-models';
+import {briefTenantWithSettingsModel} from './response-models';
 
 const requestSchema = {
     body: z.object({
@@ -34,7 +34,7 @@ export const setDefaultColorPaletteController: AppRouteHandler = async (req, res
             reqBody: body,
             tenant: result,
         });
-        res.status(200).send(tenantWithSettingsModel.format(result));
+        res.status(200).send(briefTenantWithSettingsModel.format(result));
     } catch (error) {
         logEvent({
             type: LogEventType.SetDefaultColorPaletteFail,
@@ -60,10 +60,10 @@ setDefaultColorPaletteController.api = {
     },
     responses: {
         200: {
-            description: tenantWithSettingsModel.schema.description ?? '',
+            description: briefTenantWithSettingsModel.schema.description ?? '',
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: tenantWithSettingsModel.schema,
+                    schema: briefTenantWithSettingsModel.schema,
                 },
             },
         },
