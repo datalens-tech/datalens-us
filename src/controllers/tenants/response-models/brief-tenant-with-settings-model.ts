@@ -13,7 +13,7 @@ const schema = briefTenantModel.schema
 
 export type BriefTenantWithSettingsModel = z.infer<typeof schema>;
 
-const format = (data: Tenant): z.infer<typeof schema> => {
+const format = (data: Tenant): BriefTenantWithSettingsModel => {
     return {
         ...briefTenantModel.format(data),
         settings: data.settings,
