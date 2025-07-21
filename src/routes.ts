@@ -12,6 +12,7 @@ import homeController from './controllers/home';
 import locks from './controllers/locks';
 import states from './controllers/states';
 import structureItems from './controllers/structure-items';
+import tenants from './controllers/tenants';
 import workbooks from './controllers/workbooks';
 
 export type GetRoutesOptions = {
@@ -528,6 +529,13 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             handler: colorPalettes.deleteColorPaletteController,
             write: true,
             features: [Feature.ColorPalettesEnabled],
+        }),
+
+        setDefaultColorPalette: makeRoute({
+            route: 'POST /v1/tenants/set-default-color-palette',
+            handler: tenants.setDefaultColorPaletteController,
+            write: true,
+            features: [Feature.ColorPalettesEnabled, Feature.DefaultColorPaletteEnabled],
         }),
     } as const;
 
