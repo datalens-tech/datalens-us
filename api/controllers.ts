@@ -6,4 +6,5 @@ export {entryWithRevisionModel} from '../src/controllers/entries/response-models
 export {
     briefTenantModel,
     briefTenantWithSettingsModel,
+    BriefTenantWithSettingsModel,
 } from '../src/controllers/tenants/response-models';
