@@ -41,8 +41,8 @@ import OldEntry from '../../../../db/models/entry';
 import type {CollectionModel} from '../../../../db/models/new/collection';
 import {ColorPaletteModel} from '../../../../db/models/new/color-palette';
 import {Entry} from '../../../../db/models/new/entry';
+import {Tenant} from '../../../../db/models/new/tenant';
 import type {WorkbookModel} from '../../../../db/models/new/workbook';
-import Tenant from '../../../../db/models/tenant';
 import type {EntryType} from '../../../../types/models';
 
 export enum LogEventType {
