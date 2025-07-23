@@ -42,8 +42,8 @@ import type {CollectionModel} from '../../../../db/models/new/collection';
 import {ColorPaletteModel} from '../../../../db/models/new/color-palette';
 import {Entry} from '../../../../db/models/new/entry';
 import type {WorkbookModel} from '../../../../db/models/new/workbook';
-import type {EntryType} from '../../../../types/models';
 import Tenant from '../../../../db/models/tenant';
+import type {EntryType} from '../../../../types/models';
 
 export enum LogEventType {
     CreateCollectionSuccess = 'createCollectionSuccess',
