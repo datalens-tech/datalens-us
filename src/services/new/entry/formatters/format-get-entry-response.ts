@@ -28,7 +28,7 @@ export const formatGetEntryResponse = async (ctx: CTX, result: GetEntryResult) =
 
     const {getEntryAddFormattedFieldsHook} = registry.common.functions.get();
 
-    const additionalFields = await getEntryAddFormattedFieldsHook({ctx, result});
+    const additionalFields = getEntryAddFormattedFieldsHook({ctx});
 
     return {
         entryId: joinedEntryRevisionFavoriteTenant.entryId,
