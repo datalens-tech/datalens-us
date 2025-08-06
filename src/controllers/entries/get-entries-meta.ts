@@ -1,4 +1,4 @@
-import {AppRouteHandler} from '@gravity-ui/expresskit';
+import {AppRouteHandler, Request} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
@@ -6,7 +6,7 @@ import {CONTENT_TYPE_JSON} from '../../const';
 import {EntryScope} from '../../db/models/new/entry/types';
 import {getJoinedEntriesRevisionsByIds} from '../../services/new/entry';
 
-import {entriesDataModel} from './response-models';
+import {entriesMetaModel} from './response-models';
 
 const requestSchema = {
     body: z.object({
@@ -19,7 +19,7 @@ const requestSchema = {
 
 const parseReq = makeReqParser(requestSchema);
 
-export const getEntriesDataController: AppRouteHandler = async (req, res) => {
+export const getEntriesMetaController: AppRouteHandler = async (req: Request, res) => {
     const {body} = await parseReq(req);
 
     const result = await getJoinedEntriesRevisionsByIds(
@@ -35,7 +35,7 @@ export const getEntriesDataController: AppRouteHandler = async (req, res) => {
         fields: body.fields,
     });
 
-    const response = entriesDataModel.format({
+    const response = entriesMetaModel.format({
         result,
         entryIds: body.entryIds,
         fields: body.fields,
@@ -44,8 +44,8 @@ export const getEntriesDataController: AppRouteHandler = async (req, res) => {
     res.status(200).send(response);
 };
 
-getEntriesDataController.api = {
-    summary: 'Get entries data',
+getEntriesMetaController.api = {
+    summary: 'Get entries meta',
     tags: [ApiTag.Entries],
     request: {
         body: {
@@ -58,14 +58,14 @@ getEntriesDataController.api = {
     },
     responses: {
         200: {
-            description: `${entriesDataModel.schema.description}`,
+            description: `${entriesMetaModel.schema.description}`,
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: entriesDataModel.schema,
+                    schema: entriesMetaModel.schema,
                 },
             },
         },
     },
 };
 
-getEntriesDataController.manualDecodeId = true;
+getEntriesMetaController.manualDecodeId = true;
