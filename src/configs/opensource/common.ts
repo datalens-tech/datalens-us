@@ -11,6 +11,7 @@ export const features: FeaturesConfig = {
     [Feature.UseIpV6]: false,
     [Feature.WorkbookIsolationEnabled]: true,
     [Feature.DefaultColorPaletteEnabled]: true,
+    [Feature.TenantsEnabled]: true,
 };
 
 export default {
