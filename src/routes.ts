@@ -537,6 +537,32 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             write: true,
             features: [Feature.ColorPalettesEnabled, Feature.DefaultColorPaletteEnabled],
         }),
+        getTenantDetails: makeRoute({
+            route: 'GET /v1/tenants/details',
+            handler: tenants.getTenantDetailsController,
+            features: [Feature.TenantsEnabled],
+        }),
+        privateGetTenantDetails: makeRoute({
+            route: 'GET /private/tenants/:tenantId/details',
+            handler: tenants.getTenantDetailsByIdController,
+            authPolicy: AuthPolicy.disabled,
+            private: true,
+            features: [Feature.TenantsEnabled],
+        }),
+        privateResolveTenantByEntryId: makeRoute({
+            route: 'GET /private/resolveTenantByEntryId',
+            handler: tenants.resolveTenantByEntryIdController,
+            authPolicy: AuthPolicy.disabled,
+            private: true,
+            features: [Feature.TenantsEnabled],
+        }),
+        privateResolveTenant: makeRoute({
+            route: 'GET /private/resolve-tenant',
+            handler: tenants.resolveTenantController,
+            authPolicy: AuthPolicy.disabled,
+            private: true,
+            features: [Feature.TenantsEnabled],
+        }),
     } as const;
 
     const typedRoutes: {[key in keyof typeof routes]: ExtendedAppRouteDescription} = routes;
