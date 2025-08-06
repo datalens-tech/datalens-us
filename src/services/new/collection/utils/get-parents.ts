@@ -15,13 +15,20 @@ interface Ctx {
 
 interface GetCollectionsParentIds extends Ctx {
     collectionIds: Nullable<string>[];
+    queryTimeout?: number;
 }
 
 interface GetCollectionParentIds extends Ctx {
     collectionId: string;
+    getParentsQueryTimeout?: number;
 }
 
-export const getParents = async ({ctx, trx, collectionIds}: GetCollectionsParentIds) => {
+export const getParents = async ({
+    ctx,
+    trx,
+    collectionIds,
+    queryTimeout = CollectionModel.DEFAULT_QUERY_TIMEOUT,
+}: GetCollectionsParentIds) => {
     const {tenantId, onlyMirrored} = ctx.get('info');
 
     const targetTrx = getReplica(trx);
@@ -59,13 +66,23 @@ export const getParents = async ({ctx, trx, collectionIds}: GetCollectionsParent
         })
         .select()
         .from(recursiveName)
-        .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
+        .timeout(queryTimeout);
 
     return result;
 };
 
-export const getParentIds = async ({ctx, trx, collectionId}: GetCollectionParentIds) => {
-    const parents = await getParents({ctx, trx, collectionIds: [collectionId]});
+export const getParentIds = async ({
+    ctx,
+    trx,
+    collectionId,
+    getParentsQueryTimeout,
+}: GetCollectionParentIds) => {
+    const parents = await getParents({
+        ctx,
+        trx,
+        collectionIds: [collectionId],
+        queryTimeout: getParentsQueryTimeout,
+    });
     return parents.map((item) => item.collectionId);
 };
 
