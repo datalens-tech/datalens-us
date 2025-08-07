@@ -199,7 +199,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         getEntriesMeta: makeRoute({
             route: 'POST /v1/get-entries-meta',
-            handler: entries.getEntriesDataController,
+            handler: entries.getEntriesMetaController,
         }),
 
         verifyLockExistence: makeRoute({

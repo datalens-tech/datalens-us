@@ -13,7 +13,14 @@ const requestSchema = {
         entryIds: zc.encodedIdArray({min: 1, max: 1000}),
         scope: z.nativeEnum(EntryScope).optional(),
         type: z.string().optional(),
-        fields: z.string().array().min(1).max(100),
+        fields: z
+            .string()
+            .refine((val) => !val.includes('.'), {
+                message: 'nested fields are not supported',
+            })
+            .array()
+            .min(1)
+            .max(100),
     }),
 };
 
