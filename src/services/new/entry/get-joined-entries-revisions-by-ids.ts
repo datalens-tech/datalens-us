@@ -120,7 +120,7 @@ export type GetJoinedEntriesRevisionsByIdsArgs = {
 
 export type GetJoinedEntriesRevisionsByIdsResult = {
     entries: Record<string, JoinedEntryRevisionColumns>;
-    accessDeniedEntryIds: string[];
+    accessDeniedEntryIds: Set<string>;
 };
 
 export const getJoinedEntriesRevisionsByIds = async (
@@ -192,6 +192,9 @@ export const getJoinedEntriesRevisionsByIds = async (
 
     return {
         entries: entriesMap,
-        accessDeniedEntryIds: [...accessDeniedWorkbookEntryIds, ...accessDeniedFolderEntryIds],
+        accessDeniedEntryIds: new Set([
+            ...accessDeniedWorkbookEntryIds,
+            ...accessDeniedFolderEntryIds,
+        ]),
     };
 };

@@ -197,6 +197,11 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             handler: entries.getEntriesDataController,
         }),
 
+        getEntriesMeta: makeRoute({
+            route: 'POST /v1/get-entries-meta',
+            handler: entries.getEntriesMetaController,
+        }),
+
         verifyLockExistence: makeRoute({
             route: 'GET /v1/locks/:entryId',
             handler: locks.verifyExistence,
