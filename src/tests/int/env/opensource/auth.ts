@@ -7,7 +7,7 @@ import {testUserId, testUserLogin} from '../../constants';
 
 import {OpensourceRole} from './roles';
 
-export {US_ERRORS, app, appConfig, testTenantId, authMasterToken} from '../../auth';
+export {US_ERRORS, app, appConfig, testTenantId, authMasterToken, appNodekit} from '../../auth';
 
 export type AuthArgs = CommonAuthArgs & {
     role?: OpensourceRole;

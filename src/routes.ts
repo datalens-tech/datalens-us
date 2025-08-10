@@ -12,6 +12,7 @@ import homeController from './controllers/home';
 import locks from './controllers/locks';
 import states from './controllers/states';
 import structureItems from './controllers/structure-items';
+import tenants from './controllers/tenants';
 import testGraphController from './controllers/test-graph';
 import testPresentationsController from './controllers/test-presentations';
 import workbooks from './controllers/workbooks';
@@ -541,6 +542,39 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             handler: colorPalettes.deleteColorPaletteController,
             write: true,
             features: [Feature.ColorPalettesEnabled],
+        }),
+
+        setDefaultColorPalette: makeRoute({
+            route: 'POST /v1/tenants/set-default-color-palette',
+            handler: tenants.setDefaultColorPaletteController,
+            write: true,
+            features: [Feature.ColorPalettesEnabled, Feature.DefaultColorPaletteEnabled],
+        }),
+        getTenantDetails: makeRoute({
+            route: 'GET /v1/tenants/details',
+            handler: tenants.getTenantDetailsController,
+            features: [Feature.TenantsEnabled],
+        }),
+        privateGetTenantDetails: makeRoute({
+            route: 'GET /private/tenants/:tenantId/details',
+            handler: tenants.getTenantDetailsByIdController,
+            authPolicy: AuthPolicy.disabled,
+            private: true,
+            features: [Feature.TenantsEnabled],
+        }),
+        privateResolveTenantByEntryId: makeRoute({
+            route: 'GET /private/resolveTenantByEntryId',
+            handler: tenants.resolveTenantByEntryIdController,
+            authPolicy: AuthPolicy.disabled,
+            private: true,
+            features: [Feature.TenantsEnabled],
+        }),
+        privateResolveTenant: makeRoute({
+            route: 'GET /private/resolve-tenant',
+            handler: tenants.resolveTenantController,
+            authPolicy: AuthPolicy.disabled,
+            private: true,
+            features: [Feature.TenantsEnabled],
         }),
     } as const;
 

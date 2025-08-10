@@ -8,7 +8,6 @@ import {
     ModeValues,
     RETURN_COLUMNS,
 } from '../../../const';
-import {getId} from '../../../db';
 import Entry from '../../../db/models/entry';
 import Revision from '../../../db/models/revision';
 import {WorkbookPermission} from '../../../entities/workbook';
@@ -125,6 +124,8 @@ export async function createEntryInWorkbook(
         includePermissionsInfo,
     });
 
+    const registry = ctx.get('registry');
+    const {getId} = registry.getDbInstance();
     const {tenantId, isPrivateRoute, user} = ctx.get('info');
     const createdBy = makeUserId(user.userId);
 

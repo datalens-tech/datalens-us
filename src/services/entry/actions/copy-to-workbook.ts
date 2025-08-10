@@ -3,7 +3,6 @@ import {TransactionOrKnex} from 'objection';
 
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {BiTrackingLogs, US_ERRORS} from '../../../const';
-import {getId} from '../../../db';
 import Link from '../../../db/models/links';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {WorkbookModel} from '../../../db/models/new/workbook';
@@ -76,6 +75,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
 
     const {tenantId, user} = ctx.get('info');
     const registry = ctx.get('registry');
+    const {getId} = registry.getDbInstance();
     const createdBy = makeUserId(user.userId);
 
     const targetTenantId = tenantIdOverride ?? tenantId;
