@@ -1,6 +1,14 @@
 import {Model} from '../../..';
 import {Entry} from '../entry';
 
+export const FavoriteColumn = {
+    EntryId: 'entryId',
+    TenantId: 'tenantId',
+    Login: 'login',
+    Alias: 'alias',
+    CreatedAt: 'createdAt',
+} as const;
+
 export class Favorite extends Model {
     static get tableName() {
         return 'favorites';
