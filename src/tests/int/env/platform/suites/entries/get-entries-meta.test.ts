@@ -28,7 +28,7 @@ const NOT_FOUND_ERROR = {
 };
 
 describe('Get entries meta', () => {
-    test('[Setup test meta] Create workbook and entry', async () => {
+    test('[Setup test data] Create workbook and entry', async () => {
         const workbook = await createMockWorkbook({title: 'My workbook'});
 
         workbookId = workbook.workbookId;
@@ -58,6 +58,10 @@ describe('Get entries meta', () => {
         });
 
         workbook2EntryId = worbookEntry.entryId;
+    });
+
+    test('Get entry meta without auth error', async () => {
+        await request(app).post(routes.getEntriesMeta).expect(401);
     });
 
     test('Get workbook entry meta, not existing entry meta and access denied workbook entry meta', async () => {

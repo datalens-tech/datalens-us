@@ -64,6 +64,10 @@ describe('Get entries data', () => {
         workbook2EntryId = worbookEntry.entryId;
     });
 
+    test('Get entry data without auth error', async () => {
+        await request(app).post(routes.getEntriesData).expect(401);
+    });
+
     test('Get workbook entry data, not existing entry data and access denied workbook entry data', async () => {
         const response = await auth(request(app).post(routes.getEntriesData), {
             accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],

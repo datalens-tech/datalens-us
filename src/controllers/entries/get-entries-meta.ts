@@ -1,4 +1,4 @@
-import {AppRouteHandler, Request} from '@gravity-ui/expresskit';
+import {AppRouteHandler} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
@@ -26,7 +26,7 @@ const requestSchema = {
 
 const parseReq = makeReqParser(requestSchema);
 
-export const getEntriesMetaController: AppRouteHandler = async (req: Request, res) => {
+export const getEntriesMetaController: AppRouteHandler = async (req, res) => {
     const {body} = await parseReq(req);
 
     const result = await getJoinedEntriesRevisionsByIds(
