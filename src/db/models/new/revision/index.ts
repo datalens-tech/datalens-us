@@ -3,7 +3,6 @@ import {Model} from '../../..';
 export const RevisionModelColumn = {
     Data: 'data',
     Meta: 'meta',
-    Annotation: 'annotation',
     CreatedBy: 'createdBy',
     CreatedAt: 'createdAt',
     UpdatedBy: 'updatedBy',
@@ -16,7 +15,6 @@ export const RevisionModelColumn = {
 export const RevisionModelColumnRaw = {
     Data: 'data',
     Meta: 'meta',
-    Annotation: 'annotation',
     CreatedBy: 'created_by',
     CreatedAt: 'created_at',
     UpdatedBy: 'updated_by',
@@ -37,7 +35,6 @@ export class RevisionModel extends Model {
 
     [RevisionModelColumn.Data]!: Nullable<Record<string, unknown>>;
     [RevisionModelColumn.Meta]!: Nullable<Record<string, unknown>>;
-    [RevisionModelColumn.Annotation]!: Nullable<Record<string, unknown>>;
     [RevisionModelColumn.CreatedBy]!: string;
     [RevisionModelColumn.CreatedAt]!: string;
     [RevisionModelColumn.UpdatedBy]!: string;
