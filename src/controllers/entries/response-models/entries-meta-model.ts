@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import {z, zc} from '../../../components/zod';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import type {GetJoinedEntriesRevisionsByIdsResult} from '../../../services/new/entry';
@@ -34,7 +32,7 @@ const format = ({result, entryIds, fields}: FormatParams): z.infer<typeof schema
 
         if (entry) {
             const filteredFields = entry.meta
-                ? Object.fromEntries(fields.map((path) => [path, _.get(entry.meta, path)]))
+                ? Object.fromEntries(fields.map((path) => [path, entry.meta?.[path]]))
                 : {};
 
             return {

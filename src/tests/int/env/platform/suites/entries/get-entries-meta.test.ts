@@ -44,7 +44,7 @@ describe('Get entries meta', () => {
         workbookEntryId = worbookEntry.entryId;
     });
 
-    test('[Setup test meta] Create workbook2 and entry', async () => {
+    test('[Setup test data] Create workbook2 and entry', async () => {
         const workbook = await createMockWorkbook({title: 'My workbook 2'});
 
         workbook2Id = workbook.workbookId;
@@ -62,6 +62,26 @@ describe('Get entries meta', () => {
 
     test('Get entry meta without auth error', async () => {
         await request(app).post(routes.getEntriesMeta).expect(401);
+    });
+
+    test('Get entry meta validation error', async () => {
+        await auth(request(app).post(routes.getEntriesMeta), {
+            accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
+        })
+            .send({
+                entryIds: [workbookEntryId, notExistingEntryId, workbook2EntryId],
+                fields: ['test.test', 'test2', 'notExistingfield'],
+            })
+            .expect(400);
+
+        await auth(request(app).post(routes.getEntriesMeta), {
+            accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
+        })
+            .send({
+                entryIds: [workbookEntryId, notExistingEntryId, workbook2EntryId],
+                fields: ['test[0]', 'test2', 'notExistingfield'],
+            })
+            .expect(400);
     });
 
     test('Get workbook entry meta, not existing entry meta and access denied workbook entry meta', async () => {

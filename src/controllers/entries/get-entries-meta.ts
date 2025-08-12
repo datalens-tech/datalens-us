@@ -15,8 +15,8 @@ const requestSchema = {
         type: z.string().optional(),
         fields: z
             .string()
-            .refine((val) => !val.includes('.'), {
-                message: 'nested fields are not supported',
+            .refine((val) => !val.includes('.') && !val.includes('['), {
+                message: 'nested fields or arrays are not supported',
             })
             .array()
             .min(1)
