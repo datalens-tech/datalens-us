@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import {z, zc} from '../../../components/zod';
+import {z} from '../../../components/zod';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import type {GetJoinedEntriesRevisionsByIdsResult} from '../../../services/new/entry';
 import Utils from '../../../utils';
@@ -9,7 +9,7 @@ import {entriesErrorModel} from './entries-error-model';
 
 const schema = z
     .object({
-        entryId: zc.encodedId(),
+        entryId: z.string(),
         result: z.object({
             scope: z.nativeEnum(EntryScope),
             type: z.string(),
