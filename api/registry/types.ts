@@ -48,6 +48,8 @@ export type {
     LogEventRenameEntrySuccessParams,
     LogEventUpdateEntryFailParams,
     LogEventUpdateEntrySuccessParams,
+    LogEventSetDefaultColorPaletteFailParams,
+    LogEventSetDefaultColorPaletteSuccessParams,
 } from '../../src/registry/common/utils/log-event/types';
 export {LogEventType} from '../../src/registry/common/utils/log-event/types';
 export type {GatewayApi} from '../../src/registry';

@@ -12,6 +12,7 @@ export {US_ERRORS};
 
 export const app = usApp.express;
 export const appConfig = usApp.config;
+export const appNodekit = usApp.nodekit;
 
 export const testTenantId = 'common';
 

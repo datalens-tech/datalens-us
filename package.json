@@ -74,7 +74,6 @@
     "db:migrate-one": "node dist/server/db/scripts/migrate-one.js",
     "db:rollback": "node dist/server/db/scripts/rollback.js",
     "db:rollback-one": "node dist/server/db/scripts/rollback-one.js",
-    "console": "node dist/server/console",
     "prepare-and-test": "rm -rf dist/server && npm run build && npm test",
     "prepare:db": "npm run build && CI_MODE=true SQL_DEBUG=false DEBUG=false node dist/server/db/scripts/clear-and-prepare",
     "migration:create": "npx knex migrate:make --migrations-directory ./src/db/migrations -x ts",
