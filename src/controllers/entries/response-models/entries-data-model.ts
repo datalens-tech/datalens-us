@@ -13,7 +13,7 @@ const schema = z
         result: z.object({
             scope: z.nativeEnum(EntryScope),
             type: z.string(),
-            data: z.record(z.string(), z.unknown()).or(z.object({})),
+            data: z.record(z.string(), z.unknown()),
         }),
     })
     .or(entriesErrorModel.schema)
