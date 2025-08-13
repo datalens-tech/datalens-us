@@ -3,14 +3,14 @@ import {AppError} from '@gravity-ui/nodekit';
 import {Feature, isEnabledFeature} from '../../../../components/features';
 import {US_ERRORS} from '../../../../const';
 import OldEntry from '../../../../db/models/entry';
-import {Entry} from '../../../../db/models/new/entry';
+import {Entry, EntryColumn} from '../../../../db/models/new/entry';
 import {TenantColumn} from '../../../../db/models/new/tenant';
 import {DlsActions} from '../../../../types/models';
 import Utils, {withTimeout} from '../../../../utils';
 import {ServiceArgs} from '../../types';
 import {getReplica} from '../../utils';
 import {EntryPermissions} from '../types';
-import {checkFetchedEntry, checkWorkbookIsolation} from '../utils';
+import {checkWorkbookIsolation} from '../utils';
 
 import {
     selectedEntryColumns,
@@ -77,14 +77,17 @@ export const getEntryV2 = async (
     const registry = ctx.get('registry');
     const {DLS} = registry.common.classes.get();
 
-    const {isPrivateRoute, user, onlyPublic, onlyMirrored} = ctx.get('info');
+    const {isPrivateRoute, user, onlyPublic, onlyMirrored, tenantId} = ctx.get('info');
 
     const {getEntryBeforeDbRequestHook, checkEmbedding, getEntryResolveUserLogin} =
         registry.common.functions.get();
 
-    let userLoginPromise;
+    let userLoginPromise: Promise<string | undefined> = Promise.resolve(undefined);
+
     if (includeFavorite) {
-        userLoginPromise = user.login ? user.login : getEntryResolveUserLogin({ctx});
+        userLoginPromise = user.login
+            ? Promise.resolve(user.login)
+            : getEntryResolveUserLogin({ctx});
     }
 
     const [userLogin] = await Promise.all([
@@ -112,8 +115,9 @@ export const getEntryV2 = async (
         .select(selectedEntryColumns)
         .where((builder) => {
             builder.where({
-                [`${Entry.tableName}.entryId`]: entryId,
-                [`${Entry.tableName}.isDeleted`]: false,
+                [`${Entry.tableName}.${EntryColumn.EntryId}`]: entryId,
+                [`${Entry.tableName}.${EntryColumn.TenantId}`]: tenantId,
+                [`${Entry.tableName}.${EntryColumn.IsDeleted}`]: false,
             });
 
             if (onlyPublic) {
@@ -210,8 +214,6 @@ export const getEntryV2 = async (
                     workbookId: null,
                 });
             }
-
-            await checkFetchedEntry(ctx, entry, getReplica(trx));
         }
     }
 
@@ -221,7 +223,6 @@ export const getEntryV2 = async (
     }
 
     let tenantFeatures: Record<string, unknown> | undefined;
-
     if (includeTenantFeatures) {
         tenantFeatures = entry.tenant[TenantColumn.Features] || undefined;
     }

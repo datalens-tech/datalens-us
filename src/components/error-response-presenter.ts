@@ -400,12 +400,12 @@ export default (error: AppError | DBError) => {
             };
         }
 
-        case US_ERRORS.OPERATION_TIMEOUT: {
+        case US_ERRORS.ACTION_TIMEOUT: {
             return {
                 code: 504,
                 response: {
                     code,
-                    message: 'Operation timed out',
+                    message: 'Action timed out',
                 },
             };
         }

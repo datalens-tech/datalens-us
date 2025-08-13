@@ -10,7 +10,7 @@ export const withTimeout = async <T>(
         setTimeout(() => {
             reject(
                 new AppError(errorMessage, {
-                    code: US_ERRORS.OPERATION_TIMEOUT,
+                    code: US_ERRORS.ACTION_TIMEOUT,
                 }),
             );
         }, timeoutMs);
