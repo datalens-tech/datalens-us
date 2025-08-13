@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import {z} from '../../../components/zod';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import type {GetJoinedEntriesRevisionsByIdsResult} from '../../../services/new/entry';
@@ -13,12 +11,12 @@ const schema = z
         result: z.object({
             scope: z.nativeEnum(EntryScope),
             type: z.string(),
-            data: z.record(z.string(), z.unknown()),
+            meta: z.record(z.string(), z.unknown()),
         }),
     })
     .or(entriesErrorModel.schema)
     .array()
-    .describe('Entries data model');
+    .describe('Entries meta model');
 
 type FormatParams = {
     result: GetJoinedEntriesRevisionsByIdsResult;
@@ -33,8 +31,8 @@ const format = ({result, entryIds, fields}: FormatParams): z.infer<typeof schema
         const entry = entries[entryId];
 
         if (entry) {
-            const filteredFields = entry.data
-                ? Object.fromEntries(fields.map((path) => [path, _.get(entry.data, path)]))
+            const filteredFields = entry.meta
+                ? Object.fromEntries(fields.map((path) => [path, entry.meta?.[path]]))
                 : {};
 
             return {
@@ -42,7 +40,7 @@ const format = ({result, entryIds, fields}: FormatParams): z.infer<typeof schema
                 result: {
                     scope: entry.scope,
                     type: entry.type,
-                    data: filteredFields,
+                    meta: filteredFields,
                 },
             };
         }
@@ -51,7 +49,7 @@ const format = ({result, entryIds, fields}: FormatParams): z.infer<typeof schema
     });
 };
 
-export const entriesDataModel = {
+export const entriesMetaModel = {
     schema,
     format,
 };
