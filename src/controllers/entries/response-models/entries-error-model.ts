@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import {z, zc} from '../../../components/zod';
+import {z} from '../../../components/zod';
 import type {GetJoinedEntriesRevisionsByIdsResult} from '../../../services/new/entry';
 import Utils from '../../../utils';
 
@@ -8,7 +8,7 @@ const NOT_FOUND_ERROR = 'NOT_FOUND';
 const ACCESS_DENIED_ERROR = 'ACCESS_DENIED';
 
 const schema = z.object({
-    entryId: zc.encodedId(),
+    entryId: z.string(),
     error: z.object({
         code: z.enum([NOT_FOUND_ERROR, ACCESS_DENIED_ERROR]),
     }),
