@@ -1,14 +1,12 @@
 import {AppContext, AppError} from '@gravity-ui/nodekit';
 import {TransactionOrKnex} from 'objection';
 
-import {Feature, isEnabledFeature} from '../../../../components/features';
 import {US_ERRORS} from '../../../../const';
 import {WorkbookModel} from '../../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../../entities/workbook';
 import {getParentIds} from '../../collection/utils';
 import {getReplica} from '../../utils';
 import {getEntryPermissionsByWorkbook} from '../../workbook/utils';
-import {checkWorkbookIsolation} from '../utils';
 
 import {SelectedEntry} from './types';
 
@@ -27,13 +25,6 @@ export const checkWorkbookEntry = async ({
     workbook: WorkbookModel;
     includePermissionsInfo?: boolean;
 }) => {
-    if (isEnabledFeature(ctx, Feature.WorkbookIsolationEnabled)) {
-        checkWorkbookIsolation({
-            ctx,
-            workbookId: workbook.workbookId,
-        });
-    }
-
     let parentIds: string[] = [];
 
     if (workbook.collectionId !== null) {

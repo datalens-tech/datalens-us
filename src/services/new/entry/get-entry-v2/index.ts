@@ -111,13 +111,19 @@ export const getEntryV2 = async (
         graphRelations.push('favorite(favoriteModifier)');
     }
 
+    const checkEntryTenantEnabled = !isPrivateRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
+
     const entry: SelectedEntry | undefined = await Entry.query(getReplica(trx))
         .select(selectedEntryColumns)
         .where((builder) => {
             builder.where({
                 [`${Entry.tableName}.${EntryColumn.EntryId}`]: entryId,
-                [`${Entry.tableName}.${EntryColumn.TenantId}`]: tenantId,
                 [`${Entry.tableName}.${EntryColumn.IsDeleted}`]: false,
+                ...(checkEntryTenantEnabled
+                    ? {
+                          [`${Entry.tableName}.${EntryColumn.TenantId}`]: tenantId,
+                      }
+                    : {}),
             });
 
             if (onlyPublic) {
@@ -163,6 +169,20 @@ export const getEntryV2 = async (
         });
     }
 
+    const checkWorkbookIsolationEnabled =
+        !isPrivateRoute &&
+        !onlyPublic &&
+        !onlyMirrored &&
+        !isEmbedding &&
+        isEnabledFeature(ctx, Feature.WorkbookIsolationEnabled);
+
+    if (checkWorkbookIsolationEnabled) {
+        checkWorkbookIsolation({
+            ctx,
+            workbookId: entry.workbookId,
+        });
+    }
+
     const {isNeedBypassEntryByKey, getServicePlan} = registry.common.functions.get();
 
     const dlsBypassByKeyEnabled = isNeedBypassEntryByKey(ctx, entry.key as string);
@@ -203,17 +223,6 @@ export const getEntryV2 = async (
                 ),
                 {timeoutMs: 3000, errorMessage: 'DLS.checkPermission timeout'},
             );
-        }
-
-        const checkEntryEnabled = !isPrivateRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
-
-        if (checkEntryEnabled) {
-            if (isEnabledFeature(ctx, Feature.WorkbookIsolationEnabled)) {
-                checkWorkbookIsolation({
-                    ctx,
-                    workbookId: null,
-                });
-            }
         }
     }
 
