@@ -15,7 +15,7 @@ import {
 const requestSchema = {
     body: z.object({
         collectionId: zc.encodedId().optional().nullable(),
-        title: z.string(),
+        title: zc.entryName(),
         description: z.string().optional(),
         meta: zc.limitedObject({limit: 3000}).optional(),
         status: z.nativeEnum(WorkbookStatus).optional(),

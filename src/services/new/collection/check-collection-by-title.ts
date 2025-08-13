@@ -15,6 +15,7 @@ const validateArgs = makeSchemaValidator({
         },
         title: {
             type: 'string',
+            verifyEntryName: true,
         },
     },
 });

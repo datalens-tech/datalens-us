@@ -13,7 +13,7 @@ const requestSchema = {
         collectionId: zc.encodedId(),
     }),
     body: z.object({
-        title: z.string().optional(),
+        title: zc.entryName().optional(),
         description: z.string().optional(),
     }),
 };
