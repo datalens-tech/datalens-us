@@ -32,12 +32,14 @@ import {createEntryAltController} from './create-entry-alt';
 import {deleteEntryController} from './delete-entry';
 import {getEntriesController} from './get-entries';
 import {getEntriesDataController} from './get-entries-data';
+import {getEntriesMetaController} from './get-entries-meta';
 import {getEntryController as getEntryV2Controller} from './get-entry';
 import {renameEntryController} from './rename-entry';
 import {updateEntryController} from './update-entry';
 
 export default {
     getEntriesDataController,
+    getEntriesMetaController,
     deleteEntryController,
     copyEntryToWorkbookController,
     copyEntriesToWorkbookController,
