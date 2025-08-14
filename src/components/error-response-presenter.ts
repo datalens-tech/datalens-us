@@ -317,6 +317,7 @@ export default (error: AppError | DBError) => {
             };
         }
 
+        case US_ERRORS.ENTRY_AND_WORKBOOK_TENANT_MISMATCH:
         case US_ERRORS.TOO_MANY_COLOR_PALETTES: {
             return {
                 code: 500,

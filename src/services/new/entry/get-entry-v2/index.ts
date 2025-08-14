@@ -190,7 +190,19 @@ export const getEntryV2 = async (
     let dlsPermissions: any; // TODO: Update the type after refactoring DLS.checkPermission(...)
     let iamPermissions: Optional<EntryPermissions>;
 
-    if (entry.workbook) {
+    if (entry.workbookId) {
+        if (!entry.workbook) {
+            throw new AppError(US_ERRORS.WORKBOOK_NOT_EXISTS, {
+                code: US_ERRORS.WORKBOOK_NOT_EXISTS,
+            });
+        }
+
+        if (entry.tenantId !== entry.workbook.tenantId) {
+            throw new AppError(US_ERRORS.ENTRY_AND_WORKBOOK_TENANT_MISMATCH, {
+                code: US_ERRORS.ENTRY_AND_WORKBOOK_TENANT_MISMATCH,
+            });
+        }
+
         const checkWorkbookEnabled =
             !isPrivateRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
 
