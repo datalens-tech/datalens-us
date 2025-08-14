@@ -6,20 +6,27 @@ import {CONTENT_TYPE_JSON} from '../../const';
 import {EntryScope} from '../../db/models/new/entry/types';
 import {getJoinedEntriesRevisionsByIds} from '../../services/new/entry';
 
-import {entriesDataModel} from './response-models';
+import {entriesMetaModel} from './response-models';
 
 const requestSchema = {
     body: z.object({
         entryIds: zc.encodedIdArray({min: 1, max: 1000}),
         scope: z.nativeEnum(EntryScope).optional(),
         type: z.string().optional(),
-        fields: z.string().array().min(1).max(100),
+        fields: z
+            .string()
+            .refine((val) => !val.includes('.') && !val.includes('['), {
+                message: 'nested fields or arrays are not supported',
+            })
+            .array()
+            .min(1)
+            .max(100),
     }),
 };
 
 const parseReq = makeReqParser(requestSchema);
 
-export const getEntriesDataController: AppRouteHandler = async (req, res) => {
+export const getEntriesMetaController: AppRouteHandler = async (req, res) => {
     const {body} = await parseReq(req);
 
     const result = await getJoinedEntriesRevisionsByIds(
@@ -35,7 +42,7 @@ export const getEntriesDataController: AppRouteHandler = async (req, res) => {
         fields: body.fields,
     });
 
-    const response = entriesDataModel.format({
+    const response = entriesMetaModel.format({
         result,
         entryIds: body.entryIds,
         fields: body.fields,
@@ -44,8 +51,8 @@ export const getEntriesDataController: AppRouteHandler = async (req, res) => {
     res.status(200).send(response);
 };
 
-getEntriesDataController.api = {
-    summary: 'Get entries data',
+getEntriesMetaController.api = {
+    summary: 'Get entries meta',
     tags: [ApiTag.Entries],
     request: {
         body: {
@@ -58,14 +65,14 @@ getEntriesDataController.api = {
     },
     responses: {
         200: {
-            description: `${entriesDataModel.schema.description}`,
+            description: `${entriesMetaModel.schema.description}`,
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: entriesDataModel.schema,
+                    schema: entriesMetaModel.schema,
                 },
             },
         },
     },
 };
 
-getEntriesDataController.manualDecodeId = true;
+getEntriesMetaController.manualDecodeId = true;
