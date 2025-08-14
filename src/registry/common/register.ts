@@ -12,6 +12,7 @@ import {checkEmbedding} from './utils/embedding/utils';
 import {
     getEntryAddFormattedFieldsHook,
     getEntryBeforeDbRequestHook,
+    getEntryResolveUserLogin,
     isNeedBypassEntryByKey,
 } from './utils/entry/utils';
 import {logEvent} from './utils/log-event/utils';
@@ -33,6 +34,7 @@ export const registerCommonPlugins = () => {
         getZitadelUserRole,
         getEntryBeforeDbRequestHook,
         getEntryAddFormattedFieldsHook,
+        getEntryResolveUserLogin,
         checkEmbedding,
         logEvent,
         checkTenant,
