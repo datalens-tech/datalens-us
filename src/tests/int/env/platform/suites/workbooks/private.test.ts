@@ -20,14 +20,14 @@ describe('Private Workbooks managment', () => {
                 title: `${workbooksData.title}/`,
                 description: workbooksData.description,
             })
-            .expect(200);
+            .expect(400);
 
         await authMasterToken(request(app).post(routes.privateWorkbooks))
             .send({
                 title: `${workbooksData.title}\u206a`,
                 description: workbooksData.description,
             })
-            .expect(200);
+            .expect(400);
     });
 
     test('Create workbooks', async () => {
