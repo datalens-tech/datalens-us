@@ -317,6 +317,7 @@ export default (error: AppError | DBError) => {
             };
         }
 
+        case US_ERRORS.ENTRY_AND_WORKBOOK_TENANT_MISMATCH:
         case US_ERRORS.TOO_MANY_COLOR_PALETTES: {
             return {
                 code: 500,
@@ -396,6 +397,16 @@ export default (error: AppError | DBError) => {
                     code,
                     message:
                         'TenantId is missing. Probably it needs to be passed in the request headers.',
+                },
+            };
+        }
+
+        case US_ERRORS.ACTION_TIMEOUT: {
+            return {
+                code: 504,
+                response: {
+                    code,
+                    message: 'Action timed out',
                 },
             };
         }
