@@ -15,6 +15,24 @@ describe('Creating private collection', () => {
         await request(app).post(routes.privateCollections).expect(403);
     });
 
+    test('Validation title error', async () => {
+        await authMasterToken(request(app).post(routes.privateCollections))
+            .send({
+                title: `${testCollection.title}/`,
+                description: testCollection.description,
+                parentId: null,
+            })
+            .expect(400);
+
+        await authMasterToken(request(app).post(routes.privateCollections))
+            .send({
+                title: `${testCollection.title}\u206a`,
+                description: testCollection.description,
+                parentId: null,
+            })
+            .expect(400);
+    });
+
     test('Create', async () => {
         const response = await authMasterToken(request(app).post(routes.privateCollections))
             .send({
