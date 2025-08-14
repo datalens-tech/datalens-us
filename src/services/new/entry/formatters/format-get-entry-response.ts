@@ -48,6 +48,7 @@ export const formatGetEntryResponse = async (ctx: CTX, result: GetEntryResult) =
         tenantId: joinedEntryRevisionFavoriteTenant.tenantId,
         data: joinedEntryRevisionFavoriteTenant.data,
         meta: joinedEntryRevisionFavoriteTenant.meta,
+        annotation: joinedEntryRevisionFavoriteTenant.annotation,
         hidden: joinedEntryRevisionFavoriteTenant.hidden,
         public: joinedEntryRevisionFavoriteTenant.public,
         workbookId: joinedEntryRevisionFavoriteTenant.workbookId,
