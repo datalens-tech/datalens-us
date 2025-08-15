@@ -54,6 +54,7 @@ export interface GetEntryArgs {
     includeLinks: boolean;
     includeServicePlan?: boolean;
     includeTenantFeatures?: boolean;
+    includeTenantSettings?: boolean;
 }
 
 export type GetEntryResult = {
@@ -65,6 +66,8 @@ export type GetEntryResult = {
     includeServicePlan?: boolean;
     includeTenantFeatures?: boolean;
     tenantFeatures?: Record<string, unknown>;
+    includeTenantSettings?: boolean;
+    tenantSettings?: Record<string, unknown>;
 };
 
 // eslint-disable-next-line complexity
@@ -80,6 +83,7 @@ export const getEntry = async (
         includeLinks,
         includeServicePlan,
         includeTenantFeatures,
+        includeTenantSettings,
     } = args;
 
     ctx.log('GET_ENTRY_REQUEST', {
@@ -90,6 +94,7 @@ export const getEntry = async (
         includeLinks,
         includeServicePlan,
         includeTenantFeatures,
+        includeTenantSettings,
     });
 
     const registry = ctx.get('registry');
@@ -221,6 +226,12 @@ export const getEntry = async (
         tenantFeatures = joinedEntryRevisionFavoriteTenant[TenantColumn.Features] || undefined;
     }
 
+    let tenantSettings: Record<string, unknown> | undefined;
+
+    if (includeTenantSettings) {
+        tenantSettings = joinedEntryRevisionFavoriteTenant[TenantColumn.Settings] || undefined;
+    }
+
     let permissions: EntryPermissions = {};
     if (includePermissionsInfo) {
         permissions = OldEntry.originatePermissions({
@@ -243,5 +254,7 @@ export const getEntry = async (
         includeServicePlan,
         includeTenantFeatures,
         tenantFeatures,
+        includeTenantSettings,
+        tenantSettings,
     };
 };
