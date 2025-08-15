@@ -202,6 +202,11 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             handler: entries.getEntriesMetaController,
         }),
 
+        getEntriesAnnotation: makeRoute({
+            route: 'POST /v1/get-entries-annotation',
+            handler: entries.getEntriesAnnotationController,
+        }),
+
         verifyLockExistence: makeRoute({
             route: 'GET /v1/locks/:entryId',
             handler: locks.verifyExistence,
