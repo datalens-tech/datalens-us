@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 import {KEY_REG, symbolsValidateMessage} from '../../validation-schema-compiler';
 
-export const entryName = () =>
+export const entityName = () =>
     z
         .string()
         .refine((value) => !value.includes('/'), {
