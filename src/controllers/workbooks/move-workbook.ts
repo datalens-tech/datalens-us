@@ -14,7 +14,7 @@ const requestSchema = {
     }),
     body: z.object({
         collectionId: zc.encodedId().nullable(),
-        title: z.string().optional(),
+        title: zc.entityName().optional(),
     }),
 };
 

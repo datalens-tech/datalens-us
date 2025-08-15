@@ -19,7 +19,7 @@ const ajv = new Ajv({
 export const KEY_REG =
     /^[\wА-Яа-яЁё_@()%]([\wА-Яа-яЁё_@().,:;'\u00A0\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF| \-–—−$*&%]*[\wА-Яа-яЁё_@()%]+)?$/;
 
-const symbolsValidateMessage =
+export const symbolsValidateMessage =
     "should start and end with A-Za-zА-Яа-яЁё0-9_@()% and can contain only symbols: A-Za-zА-Яа-яЁё0-9_@()%.,:;'|-–—−$*& and spaces";
 
 ajv.addKeyword('verifyEntryKey', {
