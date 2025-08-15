@@ -37,6 +37,7 @@ const schema = z
             .optional(),
         servicePlan: z.string().optional(),
         tenantFeatures: z.record(z.string(), z.unknown()).optional(),
+        tenantSettings: z.record(z.string(), z.unknown()).optional(),
     })
     .describe('Get entry result');
 
@@ -53,6 +54,8 @@ const format = (
         includeTenantFeatures,
         tenantFeatures,
         includeFavorite,
+        includeTenantSettings,
+        tenantSettings,
     }: GetEntryV2Result,
 ): z.infer<typeof schema> => {
     const {privatePermissions, onlyPublic} = ctx.get('info');
@@ -96,6 +99,7 @@ const format = (
         permissions: includePermissionsInfo ? permissions : undefined,
         servicePlan: includeServicePlan ? servicePlan : undefined,
         tenantFeatures: includeTenantFeatures ? tenantFeatures : undefined,
+        tenantSettings: includeTenantSettings ? tenantSettings : undefined,
         ...additionalFields,
     };
 };

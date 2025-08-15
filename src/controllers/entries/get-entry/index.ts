@@ -19,6 +19,7 @@ const requestSchema = {
         includeServicePlan: zc.stringBoolean().optional(),
         includeTenantFeatures: zc.stringBoolean().optional(),
         includeFavorite: zc.stringBoolean().optional(),
+        includeTenantSettings: zc.stringBoolean().optional(),
     }),
 };
 
@@ -38,6 +39,7 @@ export const getEntryController = async (req: Request, res: Response) => {
             includeServicePlan: query.includeServicePlan,
             includeTenantFeatures: query.includeTenantFeatures,
             includeFavorite: query.includeFavorite,
+            includeTenantSettings: query.includeTenantSettings,
         },
     );
 

@@ -46,6 +46,7 @@ export const tenantColumns = [
     TenantColumn.BillingStartedAt,
     TenantColumn.BillingEndedAt,
     TenantColumn.Features,
+    TenantColumn.Settings,
 ] as const;
 
 export const selectedTenantColumns = tenantColumns.map((column) => `${Tenant.tableName}.${column}`);

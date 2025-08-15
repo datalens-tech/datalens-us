@@ -65,6 +65,7 @@ export default {
                     includeLinks: isTrueArg(query.includeLinks),
                     includeServicePlan: isTrueArg(query.includeServicePlan),
                     includeTenantFeatures: isTrueArg(query.includeTenantFeatures),
+                    includeTenantSettings: isTrueArg(query.includeTenantSettings),
                 },
             );
             const formattedResponse = await formatGetEntryResponse(req.ctx, result);
