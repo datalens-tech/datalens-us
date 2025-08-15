@@ -82,6 +82,9 @@ const validateUpdateEntry = makeSchemaValidator({
         checkServicePlan: {
             type: 'string',
         },
+        description: {
+            type: ['string', 'null'],
+        },
     },
 });
 
@@ -93,6 +96,7 @@ type UpdateEntryData = {
     mirrored?: EntryColumns['mirrored'];
     meta?: RevisionColumns['meta'];
     data?: RevisionColumns['data'];
+    description?: string;
     revId?: RevisionColumns['revId'];
     mode?: Mode;
     links?: SyncLinks;
@@ -111,6 +115,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         entryId,
         meta,
         data,
+        description,
         unversionedData,
         links,
         mode = 'save',
@@ -224,10 +229,19 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         let revision: Revision;
 
         if (isPrivateRoute && updateRevision) {
+            const annotation = description
+                ? {
+                      annotation: raw(`jsonb_set(??, '{description}', to_jsonb(?::text))`, [
+                          'annotation',
+                          description,
+                      ]),
+                  }
+                : {};
             const updatedRevision = await Revision.query(trx)
                 .patch({
                     data,
                     meta,
+                    ...annotation,
                     links: syncedLinks,
                     updatedBy,
                     updatedAt: raw(CURRENT_TIMESTAMP),
@@ -254,6 +268,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                     entryId,
                     data,
                     meta,
+                    ...(description ? {annotation: {description}} : {}),
                     links: syncedLinks,
                     createdBy: updatedBy,
                     updatedBy: updatedBy,

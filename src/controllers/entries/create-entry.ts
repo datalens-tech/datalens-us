@@ -28,6 +28,7 @@ export const createEntryController: AppRouteHandler = async (req, res) => {
             type: body.type,
             key: body.key,
             meta: body.meta,
+            description: body.description,
             recursion: body.recursion,
             hidden: body.hidden,
             mirrored: body.mirrored,

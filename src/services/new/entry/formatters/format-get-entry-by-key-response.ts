@@ -36,6 +36,7 @@ export const formatGetEntryByKeyResponse = (
         tenantId: joinedEntryRevision.tenantId,
         data: joinedEntryRevision.data,
         meta: joinedEntryRevision.meta,
+        annotation: joinedEntryRevision.annotation,
         hidden: joinedEntryRevision.hidden,
         public: joinedEntryRevision.public,
         workbookId: joinedEntryRevision.workbookId,

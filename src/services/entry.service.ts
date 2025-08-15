@@ -28,6 +28,7 @@ export default class EntryService {
         type,
         key,
         meta,
+        description,
         recursion,
         hidden,
         mirrored,
@@ -69,6 +70,7 @@ export default class EntryService {
                 unversionedData,
                 meta,
                 data,
+                description,
                 includePermissionsInfo,
             });
         }
@@ -87,6 +89,7 @@ export default class EntryService {
                 mode,
                 requestedBy: user,
                 data,
+                description,
                 unversionedData,
                 links,
                 permissionsMode,
@@ -112,6 +115,7 @@ export default class EntryService {
         mirrored,
         mode,
         data,
+        description,
         unversionedData,
         links,
         permissionsMode,
@@ -152,6 +156,7 @@ export default class EntryService {
                 unversionedData,
                 meta,
                 data,
+                description,
                 includePermissionsInfo: false,
             });
         }
@@ -175,6 +180,7 @@ export default class EntryService {
                 mode,
                 requestedBy,
                 data,
+                description,
                 unversionedData: unversionedData,
                 links,
                 permissionsMode,

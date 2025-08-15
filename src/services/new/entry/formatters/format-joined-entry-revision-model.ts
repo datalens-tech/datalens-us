@@ -18,6 +18,7 @@ export const formatJoinedEntryRevisionModel = (joinedEntryRevision: JoinedEntryR
         workbookId: joinedEntryRevision.workbookId,
         data: joinedEntryRevision.data,
         meta: joinedEntryRevision.meta,
+        annotation: joinedEntryRevision.annotation,
         links: joinedEntryRevision.links,
     };
 };

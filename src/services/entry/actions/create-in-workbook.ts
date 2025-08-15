@@ -72,6 +72,9 @@ export const validateCreateEntryInWorkbook = makeSchemaValidator({
         includePermissionsInfo: {
             type: 'boolean',
         },
+        description: {
+            type: ['string', 'null'],
+        },
     },
 });
 
@@ -87,6 +90,7 @@ export type CreateEntryInWorkbookData = {
     unversionedData?: EntryColumns['unversionedData'];
     meta?: RevisionColumns['meta'];
     data?: RevisionColumns['data'];
+    description?: string;
     includePermissionsInfo?: boolean;
 };
 
@@ -104,6 +108,7 @@ export async function createEntryInWorkbook(
         unversionedData,
         meta,
         data,
+        description,
         includePermissionsInfo,
     }: CreateEntryInWorkbookData,
 ) {
@@ -121,6 +126,7 @@ export async function createEntryInWorkbook(
         unversionedData,
         meta,
         data,
+        description,
         includePermissionsInfo,
     });
 
@@ -184,6 +190,7 @@ export async function createEntryInWorkbook(
             links: syncedLinks,
             createdBy: createdBy,
             updatedBy: createdBy,
+            ...(description ? {annotation: {description}} : {}),
         });
 
         return await Entry.query(trx)

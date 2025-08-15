@@ -55,6 +55,9 @@ export const validateCreateEntry = compileSchema({
             type: 'string',
             enum: ModeValues,
         },
+        description: {
+            type: ['string', 'null'],
+        },
     },
 });
 
