@@ -250,3 +250,8 @@ export const ALLOWED_ENTRIES_SCOPE = [
 ] as const;
 
 export const CONTENT_TYPE_JSON = 'application/json';
+
+export const ANNOTATION_DESCRIPTION_SCHEMA = {
+    type: ['string'],
+    maxLength: 36000,
+};

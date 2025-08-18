@@ -3,6 +3,7 @@ import {transaction} from 'objection';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {
     AJV_PATTERN_KEYS_NOT_OBJECT,
+    ANNOTATION_DESCRIPTION_SCHEMA,
     BiTrackingLogs,
     DEFAULT_QUERY_TIMEOUT,
     ModeValues,
@@ -72,9 +73,7 @@ export const validateCreateEntryInWorkbook = makeSchemaValidator({
         includePermissionsInfo: {
             type: 'boolean',
         },
-        description: {
-            type: ['string', 'null'],
-        },
+        description: ANNOTATION_DESCRIPTION_SCHEMA,
     },
 });
 

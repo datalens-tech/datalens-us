@@ -5,6 +5,7 @@ import {Optional} from 'utility-types';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {
     AJV_PATTERN_KEYS_NOT_OBJECT,
+    ANNOTATION_DESCRIPTION_SCHEMA,
     BiTrackingLogs,
     CURRENT_TIMESTAMP,
     DEFAULT_QUERY_TIMEOUT,
@@ -82,9 +83,7 @@ const validateUpdateEntry = makeSchemaValidator({
         checkServicePlan: {
             type: 'string',
         },
-        description: {
-            type: ['string', 'null'],
-        },
+        description: ANNOTATION_DESCRIPTION_SCHEMA,
     },
 });
 
@@ -231,10 +230,10 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         if (isPrivateRoute && updateRevision) {
             const annotation = description
                 ? {
-                      annotation: raw(`jsonb_set(??, '{description}', to_jsonb(?::text))`, [
-                          'annotation',
-                          description,
-                      ]),
+                      annotation: raw(
+                          `jsonb_set(COALESCE(??, '{}'::jsonb), '{description}', to_jsonb(?::text))`,
+                          ['annotation', description],
+                      ),
                   }
                 : {};
             const updatedRevision = await Revision.query(trx)

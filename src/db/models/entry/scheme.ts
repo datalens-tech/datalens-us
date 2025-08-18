@@ -1,5 +1,10 @@
 import compileSchema from '../../../components/validation-schema-compiler';
-import {AJV_PATTERN_KEYS_NOT_OBJECT, ALLOWED_SCOPE_VALUES, ModeValues} from '../../../const';
+import {
+    AJV_PATTERN_KEYS_NOT_OBJECT,
+    ALLOWED_SCOPE_VALUES,
+    ANNOTATION_DESCRIPTION_SCHEMA,
+    ModeValues,
+} from '../../../const';
 
 export const validateCreateEntry = compileSchema({
     type: 'object',
@@ -55,9 +60,7 @@ export const validateCreateEntry = compileSchema({
             type: 'string',
             enum: ModeValues,
         },
-        description: {
-            type: ['string', 'null'],
-        },
+        description: ANNOTATION_DESCRIPTION_SCHEMA,
     },
 });
 

@@ -59,7 +59,7 @@ export interface RevisionColumns {
     entryId: string;
     data: Record<string, unknown> | null;
     meta: Record<string, unknown> | null;
-    annotation: Record<string, unknown> | null;
+    annotation: Nullable<{description?: string}>;
     links: SyncLinks | null;
     createdBy: string;
     createdAt: string;
