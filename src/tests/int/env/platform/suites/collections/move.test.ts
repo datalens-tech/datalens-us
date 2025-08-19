@@ -161,6 +161,34 @@ describe('Moving collection', () => {
             .expect(403);
     });
 
+    test('Validation title error', async () => {
+        await auth(
+            request(app).post(`${routes.collections}/${targetCollection.collectionId}/move`),
+            {
+                role: PlatformRole.Creator,
+                accessBindings: [getCollectionBinding(targetCollection.collectionId, 'move')],
+            },
+        )
+            .send({
+                parentId: null,
+                title: `${targetCollection.title}/${targetCollection.title}`,
+            })
+            .expect(400);
+
+        await auth(
+            request(app).post(`${routes.collections}/${targetCollection.collectionId}/move`),
+            {
+                role: PlatformRole.Creator,
+                accessBindings: [getCollectionBinding(targetCollection.collectionId, 'move')],
+            },
+        )
+            .send({
+                parentId: null,
+                title: `${targetCollection.title}\u206a`,
+            })
+            .expect(400);
+    });
+
     test('Move to root', async () => {
         const response = await auth(
             request(app).post(`${routes.collections}/${targetCollection.collectionId}/move`),

@@ -54,6 +54,7 @@ export interface GetEntryArgs {
     includeLinks: boolean;
     includeServicePlan?: boolean;
     includeTenantFeatures?: boolean;
+    includeTenantSettings?: boolean;
 }
 
 export type GetEntryResult = {
@@ -65,6 +66,8 @@ export type GetEntryResult = {
     includeServicePlan?: boolean;
     includeTenantFeatures?: boolean;
     tenantFeatures?: Record<string, unknown>;
+    includeTenantSettings?: boolean;
+    tenantSettings?: Record<string, unknown>;
 };
 
 // eslint-disable-next-line complexity
@@ -80,6 +83,7 @@ export const getEntry = async (
         includeLinks,
         includeServicePlan,
         includeTenantFeatures,
+        includeTenantSettings,
     } = args;
 
     ctx.log('GET_ENTRY_REQUEST', {
@@ -90,6 +94,7 @@ export const getEntry = async (
         includeLinks,
         includeServicePlan,
         includeTenantFeatures,
+        includeTenantSettings,
     });
 
     const registry = ctx.get('registry');
@@ -134,115 +139,122 @@ export const getEntry = async (
         trx: getReplica(trx),
     });
 
-    if (joinedEntryRevisionFavoriteTenant) {
-        const {isNeedBypassEntryByKey, getServicePlan} = registry.common.functions.get();
-
-        const dlsBypassByKeyEnabled = isNeedBypassEntryByKey(
-            ctx,
-            joinedEntryRevisionFavoriteTenant.key as string,
-        );
-
-        let dlsPermissions: any; // TODO: Update the type after refactoring DLS.checkPermission(...)
-        let iamPermissions: Optional<EntryPermissions>;
-
-        if (joinedEntryRevisionFavoriteTenant.workbookId) {
-            const checkWorkbookEnabled =
-                !isPrivateRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
-
-            if (checkWorkbookEnabled) {
-                if (isEnabledFeature(ctx, Feature.WorkbookIsolationEnabled)) {
-                    checkWorkbookIsolation({
-                        ctx,
-                        workbookId: joinedEntryRevisionFavoriteTenant.workbookId,
-                    });
-                }
-
-                const workbook = await getWorkbook(
-                    {ctx, trx},
-                    {
-                        workbookId: joinedEntryRevisionFavoriteTenant.workbookId,
-                        includePermissionsInfo,
-                    },
-                );
-
-                if (includePermissionsInfo) {
-                    iamPermissions = getEntryPermissionsByWorkbook({
-                        workbook,
-                        scope: joinedEntryRevisionFavoriteTenant[EntryColumn.Scope],
-                    });
-                }
-            }
-        } else {
-            const checkPermissionEnabled =
-                !dlsBypassByKeyEnabled &&
-                !isPrivateRoute &&
-                ctx.config.dlsEnabled &&
-                !onlyPublic &&
-                !onlyMirrored;
-
-            const checkEntryEnabled =
-                !isPrivateRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
-
-            if (checkPermissionEnabled) {
-                dlsPermissions = await DLS.checkPermission(
-                    {ctx, trx},
-                    {
-                        entryId,
-                        action: DlsActions.Execute,
-                        includePermissionsInfo,
-                    },
-                );
-            }
-
-            if (checkEntryEnabled) {
-                if (isEnabledFeature(ctx, Feature.WorkbookIsolationEnabled)) {
-                    checkWorkbookIsolation({
-                        ctx,
-                        workbookId: null,
-                    });
-                }
-
-                await checkFetchedEntry(ctx, joinedEntryRevisionFavoriteTenant, getReplica(trx));
-            }
-        }
-
-        let servicePlan: string | undefined;
-        if (includeServicePlan) {
-            servicePlan = getServicePlan(joinedEntryRevisionFavoriteTenant);
-        }
-
-        let tenantFeatures: Record<string, unknown> | undefined;
-
-        if (includeTenantFeatures) {
-            tenantFeatures = joinedEntryRevisionFavoriteTenant[TenantColumn.Features] || undefined;
-        }
-
-        let permissions: EntryPermissions = {};
-        if (includePermissionsInfo) {
-            permissions = OldEntry.originatePermissions({
-                isPrivateRoute,
-                shared: onlyPublic || isEmbedding,
-                permissions: dlsPermissions,
-                iamPermissions,
-                ctx,
-            });
-        }
-
-        ctx.log('GET_ENTRY_SUCCESS');
-
-        return {
-            joinedEntryRevisionFavoriteTenant,
-            permissions,
-            includePermissionsInfo,
-            includeLinks,
-            servicePlan,
-            includeServicePlan,
-            includeTenantFeatures,
-            tenantFeatures,
-        };
-    } else {
+    if (!joinedEntryRevisionFavoriteTenant) {
         throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
             code: US_ERRORS.NOT_EXIST_ENTRY,
         });
     }
+
+    const {isNeedBypassEntryByKey, getServicePlan} = registry.common.functions.get();
+
+    const dlsBypassByKeyEnabled = isNeedBypassEntryByKey(
+        ctx,
+        joinedEntryRevisionFavoriteTenant.key as string,
+    );
+
+    let dlsPermissions: any; // TODO: Update the type after refactoring DLS.checkPermission(...)
+    let iamPermissions: Optional<EntryPermissions>;
+
+    if (joinedEntryRevisionFavoriteTenant.workbookId) {
+        const checkWorkbookEnabled =
+            !isPrivateRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
+
+        if (checkWorkbookEnabled) {
+            if (isEnabledFeature(ctx, Feature.WorkbookIsolationEnabled)) {
+                checkWorkbookIsolation({
+                    ctx,
+                    workbookId: joinedEntryRevisionFavoriteTenant.workbookId,
+                });
+            }
+
+            const workbook = await getWorkbook(
+                {ctx, trx},
+                {
+                    workbookId: joinedEntryRevisionFavoriteTenant.workbookId,
+                    includePermissionsInfo,
+                },
+            );
+
+            if (includePermissionsInfo) {
+                iamPermissions = getEntryPermissionsByWorkbook({
+                    workbook,
+                    scope: joinedEntryRevisionFavoriteTenant[EntryColumn.Scope],
+                });
+            }
+        }
+    } else {
+        const checkPermissionEnabled =
+            !dlsBypassByKeyEnabled &&
+            !isPrivateRoute &&
+            ctx.config.dlsEnabled &&
+            !onlyPublic &&
+            !onlyMirrored;
+
+        const checkEntryEnabled = !isPrivateRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
+
+        if (checkPermissionEnabled) {
+            dlsPermissions = await DLS.checkPermission(
+                {ctx, trx},
+                {
+                    entryId,
+                    action: DlsActions.Execute,
+                    includePermissionsInfo,
+                },
+            );
+        }
+
+        if (checkEntryEnabled) {
+            if (isEnabledFeature(ctx, Feature.WorkbookIsolationEnabled)) {
+                checkWorkbookIsolation({
+                    ctx,
+                    workbookId: null,
+                });
+            }
+
+            await checkFetchedEntry(ctx, joinedEntryRevisionFavoriteTenant, getReplica(trx));
+        }
+    }
+
+    let servicePlan: string | undefined;
+    if (includeServicePlan) {
+        servicePlan = getServicePlan(joinedEntryRevisionFavoriteTenant);
+    }
+
+    let tenantFeatures: Record<string, unknown> | undefined;
+
+    if (includeTenantFeatures) {
+        tenantFeatures = joinedEntryRevisionFavoriteTenant[TenantColumn.Features] || undefined;
+    }
+
+    let tenantSettings: Record<string, unknown> | undefined;
+
+    if (includeTenantSettings) {
+        tenantSettings = joinedEntryRevisionFavoriteTenant[TenantColumn.Settings] || undefined;
+    }
+
+    let permissions: EntryPermissions = {};
+    if (includePermissionsInfo) {
+        permissions = OldEntry.originatePermissions({
+            isPrivateRoute,
+            shared: onlyPublic || isEmbedding,
+            permissions: dlsPermissions,
+            iamPermissions,
+            ctx,
+        });
+    }
+
+    ctx.log('GET_ENTRY_SUCCESS');
+
+    return {
+        joinedEntryRevisionFavoriteTenant,
+        permissions,
+        includePermissionsInfo,
+        includeLinks,
+        servicePlan,
+        includeServicePlan,
+        includeTenantFeatures,
+        tenantFeatures,
+        includeTenantSettings,
+        tenantSettings,
+    };
 };

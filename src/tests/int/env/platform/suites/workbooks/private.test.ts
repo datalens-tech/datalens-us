@@ -14,6 +14,22 @@ const workbooksData = {
 let testWorkbookId: string;
 
 describe('Private Workbooks managment', () => {
+    test('Create workbooks validation error', async () => {
+        await authMasterToken(request(app).post(routes.privateWorkbooks))
+            .send({
+                title: `${workbooksData.title}/`,
+                description: workbooksData.description,
+            })
+            .expect(400);
+
+        await authMasterToken(request(app).post(routes.privateWorkbooks))
+            .send({
+                title: `${workbooksData.title}\u206a`,
+                description: workbooksData.description,
+            })
+            .expect(400);
+    });
+
     test('Create workbooks', async () => {
         await request(app).post(routes.privateWorkbooks).expect(403);
 

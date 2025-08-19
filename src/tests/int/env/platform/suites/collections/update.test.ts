@@ -76,6 +76,30 @@ describe('Updating collection', () => {
     //     ).expect(400);
     // });
 
+    test('Update title validation error', async () => {
+        await auth(
+            request(app).post(`${routes.collections}/${testCollection.collectionId}/update`),
+            {
+                accessBindings: [getCollectionBinding(testCollection.collectionId, 'update')],
+            },
+        )
+            .send({
+                title: `${newTitle}\u206a`,
+            })
+            .expect(400);
+
+        await auth(
+            request(app).post(`${routes.collections}/${testCollection.collectionId}/update`),
+            {
+                accessBindings: [getCollectionBinding(testCollection.collectionId, 'update')],
+            },
+        )
+            .send({
+                title: `${newTitle}/${newTitle}`,
+            })
+            .expect(400);
+    });
+
     test('Update title', async () => {
         const updateResponse = await auth(
             request(app).post(`${routes.collections}/${testCollection.collectionId}/update`),
