@@ -37,7 +37,7 @@ export class RevisionModel extends Model {
 
     [RevisionModelColumn.Data]!: Nullable<Record<string, unknown>>;
     [RevisionModelColumn.Meta]!: Nullable<Record<string, unknown>>;
-    [RevisionModelColumn.Annotation]!: Nullable<Record<string, unknown>>;
+    [RevisionModelColumn.Annotation]!: Nullable<{description?: string}>;
     [RevisionModelColumn.CreatedBy]!: string;
     [RevisionModelColumn.CreatedAt]!: string;
     [RevisionModelColumn.UpdatedBy]!: string;
