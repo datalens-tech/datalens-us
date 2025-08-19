@@ -228,14 +228,15 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         let revision: Revision;
 
         if (isPrivateRoute && updateRevision) {
-            const annotation = description
-                ? {
-                      annotation: raw(
-                          `jsonb_set(COALESCE(??, '{}'::jsonb), '{description}', to_jsonb(?::text))`,
-                          ['annotation', description],
-                      ),
-                  }
-                : {};
+            const annotation =
+                typeof description === 'string'
+                    ? {
+                          annotation: raw(
+                              `jsonb_set(COALESCE(??, '{}'::jsonb), '{description}', to_jsonb(?::text))`,
+                              ['annotation', description],
+                          ),
+                      }
+                    : {};
             const updatedRevision = await Revision.query(trx)
                 .patch({
                     data,
