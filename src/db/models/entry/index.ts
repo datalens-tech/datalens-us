@@ -362,7 +362,6 @@ class Entry extends Model {
                                 entryId,
                                 meta: {},
                                 data: {},
-                                ...(description ? {annotation: {description}} : {}),
                                 createdBy: createdBy,
                                 updatedBy: createdBy,
                             });
