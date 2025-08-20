@@ -21,6 +21,7 @@ const schema = z
         workbookId: z.string().nullable(),
         data: z.record(z.string(), z.unknown()).nullable(),
         meta: z.record(z.string(), z.unknown()).nullable(),
+        annotation: z.record(z.string(), z.unknown()).nullable(),
         links: z.record(z.string(), z.unknown()).nullable(),
     })
     .describe('Entry with revision model');
@@ -43,6 +44,7 @@ const format = (data: JoinedEntryRevisionColumns): z.infer<typeof schema> => {
         workbookId: data.workbookId ? Utils.encodeId(data.workbookId) : null,
         data: data.data,
         meta: data.meta,
+        annotation: data.annotation,
         links: data.links,
     };
 };

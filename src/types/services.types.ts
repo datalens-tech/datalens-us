@@ -33,6 +33,7 @@ export interface CreateEntry extends StdServiceParams {
     type?: EntryColumns['type'];
     key?: EntryColumns['key'];
     meta?: RevisionColumns['meta'];
+    description?: string;
     hidden?: EntryColumns['hidden'];
     mirrored?: EntryColumns['mirrored'];
     mode?: 'save' | 'publish';
