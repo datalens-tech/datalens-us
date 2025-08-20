@@ -73,7 +73,6 @@ describe('Get entries annotation', () => {
         })
             .send({
                 entryIds: [workbookEntryId, notExistingEntryId, workbook2EntryId],
-                fields: ['description', 'notExistingfield'],
             })
             .expect(200);
 
@@ -106,7 +105,6 @@ describe('Get entries annotation', () => {
         })
             .send({
                 entryIds: [workbookEntryId, workbook2EntryId],
-                fields: ['description', 'notExistingfield'],
             })
             .expect(200);
 

@@ -13,7 +13,6 @@ const requestSchema = {
         entryIds: zc.encodedIdArray({min: 1, max: 1000}),
         scope: z.nativeEnum(EntryScope).optional(),
         type: z.string().optional(),
-        fields: z.string().array().min(1).max(100),
     }),
 };
 
@@ -31,14 +30,11 @@ export const getEntriesAnnotationController: AppRouteHandler = async (req, res) 
         },
     );
 
-    req.ctx.log('FILTERED_FIELDS', {
-        fields: body.fields,
-    });
+    req.ctx.log('FILTERED_FIELDS');
 
     const response = entriesAnnotationModel.format({
         result,
         entryIds: body.entryIds,
-        fields: body.fields,
     });
 
     res.status(200).send(response);

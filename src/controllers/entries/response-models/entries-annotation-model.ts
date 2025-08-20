@@ -28,33 +28,21 @@ const schema = z
 type FormatParams = {
     result: GetJoinedEntriesRevisionsByIdsResult;
     entryIds: string[];
-    fields: string[];
 };
 
-const format = ({result, entryIds, fields}: FormatParams): z.infer<typeof schema> => {
+const format = ({result, entryIds}: FormatParams): z.infer<typeof schema> => {
     const {entries, accessDeniedEntryIds} = result;
 
     return entryIds.map((entryId) => {
         const entry = entries[entryId];
 
         if (entry) {
-            const filteredFields = entry.annotation
-                ? Object.fromEntries(
-                      fields.map((path) => [
-                          path,
-                          path === RevisionAnnotationFields.Description
-                              ? entry?.annotation?.[path]
-                              : undefined,
-                      ]),
-                  )
-                : {};
-
             return {
                 entryId: Utils.encodeId(entryId),
                 result: {
                     scope: entry.scope,
                     type: entry.type,
-                    annotation: filteredFields,
+                    annotation: entry.annotation ?? {},
                 },
             };
         }
