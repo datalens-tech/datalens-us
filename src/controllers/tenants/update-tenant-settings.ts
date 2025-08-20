@@ -1,0 +1,75 @@
+import {AppRouteHandler} from '@gravity-ui/expresskit';
+
+import {ApiTag} from '../../components/api-docs';
+import {makeReqParser, z} from '../../components/zod';
+import {CONTENT_TYPE_JSON} from '../../const';
+// import {LogEventType} from '../../registry/common/utils/log-event/types';
+import {updateTenantSettings} from '../../services/new/tenants';
+
+import {briefTenantWithSettingsModel} from './response-models';
+
+const requestSchema = {
+    body: z.object({
+        key: z.string(),
+        value: z.string().or(z.boolean()).nullable(),
+    }),
+};
+export type UpdateTenantSettingsRequestBodySchema = z.infer<typeof requestSchema.body>;
+
+const parseReq = makeReqParser(requestSchema);
+
+export const updateTenantSettingsController: AppRouteHandler = async (req, res) => {
+    const {body} = await parseReq(req);
+    // const registry = req.ctx.get('registry');
+    // const {logEvent} = registry.common.functions.get();
+
+    const result = await updateTenantSettings(
+        {
+            ctx: req.ctx,
+        },
+        {key: body.key, value: body.value},
+    );
+    res.status(200).send(briefTenantWithSettingsModel.format(result));
+    // try {
+    //     logEvent({
+    //         type: LogEventType.SetDefaultColorPaletteSuccess,
+    //         ctx: req.ctx,
+    //         reqBody: body,
+    //         tenant: result,
+    //     });
+    // } catch (error) {
+    //     logEvent({
+    //         type: LogEventType.SetDefaultColorPaletteFail,
+    //         ctx: req.ctx,
+    //         reqBody: body,
+    //         error,
+    //     });
+    //     throw error;
+    // }
+};
+
+updateTenantSettingsController.api = {
+    summary: 'Update tenant settings',
+    tags: [ApiTag.Tenants],
+    request: {
+        body: {
+            content: {
+                [CONTENT_TYPE_JSON]: {
+                    schema: requestSchema.body,
+                },
+            },
+        },
+    },
+    responses: {
+        200: {
+            description: briefTenantWithSettingsModel.schema.description ?? '',
+            content: {
+                [CONTENT_TYPE_JSON]: {
+                    schema: briefTenantWithSettingsModel.schema,
+                },
+            },
+        },
+    },
+};
+
+updateTenantSettingsController.manualDecodeId = true;
