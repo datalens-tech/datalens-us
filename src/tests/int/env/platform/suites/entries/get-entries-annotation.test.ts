@@ -67,6 +67,17 @@ describe('Get entries annotation', () => {
         await request(app).post(routes.getEntriesAnnotation).expect(401);
     });
 
+    test('Get folder entry annotation validation error', async () => {
+        await auth(request(app).post(routes.getEntriesAnnotation), {
+            accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
+        })
+            .send({
+                entryIds: [workbookEntryId, notExistingEntryId, workbook2EntryId],
+                fields: ['description'],
+            })
+            .expect(400);
+    });
+
     test('Get workbook entry annotation, not existing entry annotation and access denied workbook entry annotation', async () => {
         const response = await auth(request(app).post(routes.getEntriesAnnotation), {
             accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],

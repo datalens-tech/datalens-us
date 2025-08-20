@@ -9,11 +9,13 @@ import {getJoinedEntriesRevisionsByIds} from '../../services/new/entry';
 import {entriesAnnotationModel} from './response-models';
 
 const requestSchema = {
-    body: z.object({
-        entryIds: zc.encodedIdArray({min: 1, max: 1000}),
-        scope: z.nativeEnum(EntryScope).optional(),
-        type: z.string().optional(),
-    }),
+    body: z
+        .object({
+            entryIds: zc.encodedIdArray({min: 1, max: 1000}),
+            scope: z.nativeEnum(EntryScope).optional(),
+            type: z.string().optional(),
+        })
+        .strict(),
 };
 
 const parseReq = makeReqParser(requestSchema);
