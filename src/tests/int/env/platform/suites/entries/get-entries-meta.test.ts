@@ -33,7 +33,7 @@ describe('Get entries meta', () => {
 
         workbookId = workbook.workbookId;
 
-        const worbookEntry = await createMockWorkbookEntry({
+        const workbookEntry = await createMockWorkbookEntry({
             name: 'Workbook entry',
             workbookId: workbook.workbookId,
             scope: 'dataset',
@@ -41,7 +41,7 @@ describe('Get entries meta', () => {
             meta: workbookEntryMeta,
         });
 
-        workbookEntryId = worbookEntry.entryId;
+        workbookEntryId = workbookEntry.entryId;
     });
 
     test('[Setup test data] Create workbook2 and entry', async () => {
@@ -49,7 +49,7 @@ describe('Get entries meta', () => {
 
         workbook2Id = workbook.workbookId;
 
-        const worbookEntry = await createMockWorkbookEntry({
+        const workbookEntry = await createMockWorkbookEntry({
             name: 'Workbook entry',
             workbookId: workbook.workbookId,
             scope: 'widget',
@@ -57,7 +57,7 @@ describe('Get entries meta', () => {
             meta: workbook2EntryMeta,
         });
 
-        workbook2EntryId = worbookEntry.entryId;
+        workbook2EntryId = workbookEntry.entryId;
     });
 
     test('Get entry meta without auth error', async () => {
