@@ -34,6 +34,7 @@ type CreateMockWorkbookEntryArgs = {
     workbookId: string;
     meta?: Record<string, string>;
     data?: Record<string, unknown>;
+    description?: string;
     mode?: 'save' | 'publish';
 };
 
@@ -48,6 +49,7 @@ export const createMockWorkbookEntry = async (
     const data = args.data ?? mockWorkbookEntry.data;
     const meta = args.meta ?? mockWorkbookEntry.meta;
     const mode = args.mode ?? mockWorkbookEntry.mode;
+    const description = args?.description;
 
     const response = await auth(request(app).post(routes.entries), {
         ...options?.authArgs,
@@ -64,6 +66,7 @@ export const createMockWorkbookEntry = async (
             type,
             data,
             meta,
+            description,
             workbookId,
             mode,
         })

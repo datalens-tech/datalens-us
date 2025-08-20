@@ -26,6 +26,10 @@ export const RevisionModelColumnRaw = {
     Links: 'links',
 } as const;
 
+export enum RevisionAnnotationFields {
+    Description = 'description',
+}
+
 export class RevisionModel extends Model {
     static get tableName() {
         return 'revisions';
