@@ -9,13 +9,11 @@ import {getJoinedEntriesRevisionsByIds} from '../../services/new/entry';
 import {entriesAnnotationModel} from './response-models';
 
 const requestSchema = {
-    body: z
-        .object({
-            entryIds: zc.encodedIdArray({min: 1, max: 1000}),
-            scope: z.nativeEnum(EntryScope).optional(),
-            type: z.string().optional(),
-        })
-        .strict(),
+    body: z.object({
+        entryIds: zc.encodedIdArray({min: 1, max: 1000}),
+        scope: z.nativeEnum(EntryScope).optional(),
+        type: z.string().optional(),
+    }),
 };
 
 const parseReq = makeReqParser(requestSchema);
@@ -31,8 +29,6 @@ export const getEntriesAnnotationController: AppRouteHandler = async (req, res) 
             type: body.type,
         },
     );
-
-    req.ctx.log('FILTERED_FIELDS');
 
     const response = entriesAnnotationModel.format({
         result,

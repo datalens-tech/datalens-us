@@ -1,5 +1,4 @@
 import {z} from '../../../components/zod';
-import {ANNOTATION_DESCRIPTION_MAX_LENGTH} from '../../../const';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import {RevisionAnnotationFields} from '../../../db/models/new/revision';
 import type {GetJoinedEntriesRevisionsByIdsResult} from '../../../services/new/entry';
@@ -14,10 +13,7 @@ const schema = z
             scope: z.nativeEnum(EntryScope),
             type: z.string(),
             annotation: z.object({
-                [RevisionAnnotationFields.Description]: z
-                    .string()
-                    .max(ANNOTATION_DESCRIPTION_MAX_LENGTH)
-                    .optional(),
+                [RevisionAnnotationFields.Description]: z.string().optional(),
             }),
         }),
     })

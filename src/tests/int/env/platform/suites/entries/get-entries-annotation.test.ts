@@ -72,8 +72,8 @@ describe('Get entries annotation', () => {
             accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
         })
             .send({
-                entryIds: [workbookEntryId, notExistingEntryId, workbook2EntryId],
-                fields: ['description'],
+                scope: 'dash',
+                type: 'wizard-widget',
             })
             .expect(400);
     });
