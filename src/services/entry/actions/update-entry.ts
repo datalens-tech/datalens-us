@@ -5,6 +5,7 @@ import {Optional} from 'utility-types';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {
     AJV_PATTERN_KEYS_NOT_OBJECT,
+    ANNOTATION_DESCRIPTION_SCHEMA,
     BiTrackingLogs,
     CURRENT_TIMESTAMP,
     DEFAULT_QUERY_TIMEOUT,
@@ -82,6 +83,7 @@ const validateUpdateEntry = makeSchemaValidator({
         checkServicePlan: {
             type: 'string',
         },
+        description: ANNOTATION_DESCRIPTION_SCHEMA,
     },
 });
 
@@ -93,6 +95,7 @@ type UpdateEntryData = {
     mirrored?: EntryColumns['mirrored'];
     meta?: RevisionColumns['meta'];
     data?: RevisionColumns['data'];
+    description?: string;
     revId?: RevisionColumns['revId'];
     mode?: Mode;
     links?: SyncLinks;
@@ -111,6 +114,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         entryId,
         meta,
         data,
+        description,
         unversionedData,
         links,
         mode = 'save',
@@ -224,10 +228,20 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         let revision: Revision;
 
         if (isPrivateRoute && updateRevision) {
+            const annotation =
+                typeof description === 'string'
+                    ? {
+                          annotation: raw(
+                              `jsonb_set(COALESCE(??, '{}'::jsonb), '{description}', to_jsonb(?::text))`,
+                              ['annotation', description],
+                          ),
+                      }
+                    : {};
             const updatedRevision = await Revision.query(trx)
                 .patch({
                     data,
                     meta,
+                    ...annotation,
                     links: syncedLinks,
                     updatedBy,
                     updatedAt: raw(CURRENT_TIMESTAMP),
@@ -254,6 +268,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                     entryId,
                     data,
                     meta,
+                    ...(description ? {annotation: {description}} : {}),
                     links: syncedLinks,
                     createdBy: updatedBy,
                     updatedBy: updatedBy,

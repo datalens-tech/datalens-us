@@ -20,6 +20,7 @@ export const ALL_COLUMNS = [
     'revId',
     'data',
     'meta',
+    'annotation',
     'innerMeta',
     'hidden',
     'mirrored',
@@ -43,6 +44,7 @@ export const RETURN_COLUMNS = [
     'entries.tenantId',
     'data',
     'meta',
+    'annotation',
     'hidden',
     'mirrored',
     'public',
@@ -67,6 +69,7 @@ export const RETURN_RELATION_COLUMNS = [
     'type',
     'display_key as key',
     'meta',
+    'annotation',
     'tenantId',
     'public',
     'workbookId',
@@ -82,6 +85,7 @@ export const RETURN_NAVIGATION_COLUMNS = [
     'entries.createdAt',
     'revisions.updatedBy',
     'revisions.updatedAt',
+    'revisions.annotation',
     'savedId',
     'publishedId',
     'hidden',
@@ -246,3 +250,10 @@ export const ALLOWED_ENTRIES_SCOPE = [
 ] as const;
 
 export const CONTENT_TYPE_JSON = 'application/json';
+
+export const ANNOTATION_DESCRIPTION_MAX_LENGTH = 36000;
+
+export const ANNOTATION_DESCRIPTION_SCHEMA = {
+    type: 'string',
+    maxLength: ANNOTATION_DESCRIPTION_MAX_LENGTH,
+};

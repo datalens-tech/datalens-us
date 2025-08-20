@@ -208,6 +208,7 @@ export const copyEntryToWorkbook = async (
             entryId: newEntryId,
             meta: copingRevision.meta,
             data: copingRevision.data,
+            annotation: copingRevision.annotation,
             links: syncedLinks,
             createdBy: copiedBy,
             updatedBy: copiedBy,
