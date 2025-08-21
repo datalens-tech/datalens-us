@@ -1,4 +1,5 @@
 import {WorkbookStatus} from '../../../db/models/new/workbook/types';
+import type {Permissions} from '../../../entities/workbook/types';
 import {testTenantId} from '../auth';
 
 export const WORKBOOK_DEFAULT_FIELDS = {
@@ -15,7 +16,7 @@ export const WORKBOOK_DEFAULT_FIELDS = {
     status: WorkbookStatus.Active,
 };
 
-export const WORKBOOKS_DEFAULT_PERMISSIONS = {
+export const WORKBOOKS_DEFAULT_PERMISSIONS: Permissions = {
     listAccessBindings: false,
     updateAccessBindings: false,
     limitedView: false,

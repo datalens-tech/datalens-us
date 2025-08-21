@@ -54,6 +54,7 @@ export const formatGetEntryResponse = async (ctx: CTX, result: GetEntryResult) =
         hidden: joinedEntryRevisionFavoriteTenant.hidden,
         public: joinedEntryRevisionFavoriteTenant.public,
         workbookId: joinedEntryRevisionFavoriteTenant.workbookId,
+        collectionId: joinedEntryRevisionFavoriteTenant.collectionId,
         links: includeLinks ? joinedEntryRevisionFavoriteTenant.links : undefined,
         isFavorite: isHiddenIsFavorite ? undefined : joinedEntryRevisionFavoriteTenant.isFavorite,
         permissions: includePermissionsInfo ? permissions : undefined,

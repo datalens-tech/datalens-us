@@ -5,6 +5,7 @@ import {DLS} from './components/dls/dls';
 import {checkOrganizationPermission} from './components/iam/utils';
 import {Collection} from './entities/collection/collection';
 import {bulkFetchCollectionsAllPermissions} from './entities/collection/utils';
+import {SharedEntry} from './entities/shared-entry/shared-entry';
 import {bulkFetchWorkbooksAllPermissions} from './entities/workbook/utils';
 import {Workbook} from './entities/workbook/workbook';
 import {colorPalettesAdminValidator} from './utils/color-palettes/utils';
@@ -23,6 +24,7 @@ export const registerCommonPlugins = () => {
         DLS,
         Workbook,
         Collection,
+        SharedEntry,
     });
 
     registry.common.functions.register({

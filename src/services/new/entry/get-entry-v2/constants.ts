@@ -24,6 +24,7 @@ export const entryColumns = [
     EntryColumn.UnversionedData,
     EntryColumn.WorkbookId,
     EntryColumn.Mirrored,
+    EntryColumn.CollectionId,
 ];
 
 export const selectedEntryColumns = entryColumns.map((column) => `${Entry.tableName}.${column}`);

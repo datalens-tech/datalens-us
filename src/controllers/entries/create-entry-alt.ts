@@ -12,6 +12,7 @@ export const createEntryAltController: AppRouteHandler = async (req, res) => {
 
     const logEventReqParams = {
         workbookId: body.workbookId,
+        collectionId: body.collectionId,
         name: body.name,
         scope: body.scope,
         type: body.type,
@@ -22,6 +23,7 @@ export const createEntryAltController: AppRouteHandler = async (req, res) => {
     try {
         const result = await EntryService._create({
             workbookId: body.workbookId,
+            collectionId: body.collectionId,
             name: body.name,
             scope: body.scope,
             type: body.type,
