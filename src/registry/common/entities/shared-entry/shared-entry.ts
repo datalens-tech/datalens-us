@@ -31,7 +31,7 @@ export const SharedEntry: SharedEntryConstructor<SharedEntryInstance> = class Sh
             });
         }
 
-        return Promise.resolve(getMockedOperation(Utils.encodeId(this.model.workbookId)));
+        return Promise.resolve(getMockedOperation(Utils.encodeId(this.model.entryId)));
     }
 
     async checkPermission(args: {
