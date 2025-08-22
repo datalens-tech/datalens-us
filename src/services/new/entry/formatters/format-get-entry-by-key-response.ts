@@ -40,6 +40,7 @@ export const formatGetEntryByKeyResponse = (
         hidden: joinedEntryRevision.hidden,
         public: joinedEntryRevision.public,
         workbookId: joinedEntryRevision.workbookId,
+        collectionId: joinedEntryRevision.collectionId,
         links: includeLinks ? joinedEntryRevision.links : undefined,
         permissions: includePermissionsInfo ? permissions : undefined,
     };

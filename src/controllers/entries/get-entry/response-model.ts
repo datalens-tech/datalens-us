@@ -25,6 +25,7 @@ const schema = z
         hidden: z.boolean(),
         public: z.boolean(),
         workbookId: z.string().nullable(),
+        collectionId: z.string().nullable(),
         links: z.record(z.string(), z.unknown()).optional().nullable(),
         isFavorite: z.boolean().optional(),
         permissions: z
@@ -94,6 +95,7 @@ const format = (
         hidden: entry.hidden,
         public: entry.public,
         workbookId: entry.workbookId ? Utils.encodeId(entry.workbookId) : null,
+        collectionId: entry.collectionId ? Utils.encodeId(entry.collectionId) : null,
         links: includeLinks ? revision.links : undefined,
         isFavorite,
         permissions: includePermissionsInfo ? permissions : undefined,
