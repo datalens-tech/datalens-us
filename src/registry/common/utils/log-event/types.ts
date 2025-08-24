@@ -411,6 +411,7 @@ export interface LogEventCopyEntryToWorkbookFailParams extends EventParams {
 
 type CreateEntryReqParams = {
     workbookId?: string;
+    collectionId?: string;
     name?: string;
     scope?: string;
     type?: string;
@@ -422,7 +423,7 @@ export interface LogEventCreateEntrySuccessParams extends EventParams {
     type: LogEventType.CreateEntrySuccess;
 
     reqParams: CreateEntryReqParams;
-    data: OldEntry | OldEntry[] | undefined;
+    data: OldEntry | Entry | OldEntry[] | Entry[] | undefined;
 }
 
 export interface LogEventCreateEntryFailParams extends EventParams {
@@ -434,6 +435,7 @@ export interface LogEventCreateEntryFailParams extends EventParams {
 
 type CreateEntryAltReqParams = {
     workbookId?: string;
+    collectionId?: string;
     name?: string;
     scope?: string;
     type?: string;

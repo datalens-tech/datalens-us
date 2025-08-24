@@ -3,20 +3,21 @@ import {AppError} from '@gravity-ui/nodekit';
 
 import {UserRole} from '../../../../components/auth/constants/role';
 import {US_ERRORS} from '../../../../const';
-import type {CollectionModel} from '../../../../db/models/new/collection';
-import {CollectionPermission, Permissions} from '../../../../entities/collection/types';
+import type {Entry as EntryModel} from '../../../../db/models/new/entry';
+import {Permissions, SharedEntryPermission} from '../../../../entities/shared-entry/types';
 import {getMockedOperation} from '../../../../entities/utils';
-import {ZitadelUserRole} from '../../../../types/zitadel';
 import Utils from '../../../../utils';
 
-import {CollectionConstructor, CollectionInstance} from './types';
+import {SharedEntryConstructor, SharedEntryInstance} from './types';
 
-export const Collection: CollectionConstructor = class Collection implements CollectionInstance {
+export const SharedEntry: SharedEntryConstructor<SharedEntryInstance> = class SharedEntry
+    implements SharedEntryInstance
+{
     ctx: AppContext;
-    model: CollectionModel;
+    model: EntryModel;
     permissions?: Permissions;
 
-    constructor({ctx, model}: {ctx: AppContext; model: CollectionModel}) {
+    constructor({ctx, model}: {ctx: AppContext; model: EntryModel}) {
         this.ctx = ctx;
         this.model = model;
     }
@@ -30,12 +31,12 @@ export const Collection: CollectionConstructor = class Collection implements Col
             });
         }
 
-        return Promise.resolve(getMockedOperation(Utils.encodeId(this.model.collectionId)));
+        return Promise.resolve(getMockedOperation(Utils.encodeId(this.model.entryId)));
     }
 
     async checkPermission(args: {
         parentIds: string[];
-        permission: CollectionPermission;
+        permission: SharedEntryPermission;
     }): Promise<void> {
         const permissions = this.getAllPermissions();
 
@@ -48,20 +49,9 @@ export const Collection: CollectionConstructor = class Collection implements Col
         return Promise.resolve();
     }
 
-    enableAllPermissions() {
-        this.permissions = {
-            listAccessBindings: true,
-            updateAccessBindings: true,
-            createCollection: true,
-            createWorkbook: true,
-            createSharedEntry: true,
-            limitedView: true,
-            view: true,
-            update: true,
-            copy: true,
-            move: true,
-            delete: true,
-        };
+    async fetchAllPermissions(): Promise<void> {
+        this.permissions = this.getAllPermissions();
+        return Promise.resolve();
     }
 
     setPermissions(permissions: Permissions) {
@@ -72,21 +62,29 @@ export const Collection: CollectionConstructor = class Collection implements Col
         this.permissions = undefined;
     }
 
-    async fetchAllPermissions() {
-        this.permissions = this.getAllPermissions();
-        return Promise.resolve();
+    enableAllPermissions() {
+        this.permissions = {
+            listAccessBindings: true,
+            updateAccessBindings: true,
+            limitedView: true,
+            view: true,
+            update: true,
+            copy: true,
+            move: true,
+            delete: true,
+            createEntryBinding: true,
+            createLimitedEntryBinding: true,
+        };
     }
 
     private isEditorOrAdmin() {
         const {isAuthEnabled} = this.ctx.config;
         const user = this.ctx.get('user');
-        const {zitadelUserRole} = this.ctx.get('info');
         return isAuthEnabled
             ? (user?.roles || []).some(
                   (role) => role === UserRole.Editor || role === UserRole.Admin,
               )
-            : zitadelUserRole === ZitadelUserRole.Editor ||
-                  zitadelUserRole === ZitadelUserRole.Admin;
+            : true;
     }
 
     private getAllPermissions() {
@@ -95,15 +93,14 @@ export const Collection: CollectionConstructor = class Collection implements Col
         const permissions = {
             listAccessBindings: true,
             updateAccessBindings: isEditorOrAdmin,
-            createCollection: isEditorOrAdmin,
-            createWorkbook: isEditorOrAdmin,
-            createSharedEntry: isEditorOrAdmin,
             limitedView: true,
             view: true,
             update: isEditorOrAdmin,
             copy: isEditorOrAdmin,
             move: isEditorOrAdmin,
             delete: isEditorOrAdmin,
+            createEntryBinding: isEditorOrAdmin,
+            createLimitedEntryBinding: isEditorOrAdmin,
         };
 
         return permissions;

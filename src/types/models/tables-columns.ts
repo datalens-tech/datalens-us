@@ -49,6 +49,7 @@ export interface EntryColumns {
     public: boolean;
     unversionedData: Record<string, unknown>;
     workbookId: string | null;
+    collectionId: string | null;
     // tsv: string;
     // sortName: string;
     // name: string; it is a service field, should be removed form the table

@@ -64,3 +64,7 @@ export type {
     WorkbookInstance,
 } from '../../src/registry/common/entities/workbook/types';
 export type {StructureItemInstance} from '../../src/registry/common/entities/structure-item/types';
+export type {
+    SharedEntryConstructor,
+    SharedEntryInstance,
+} from '../../src/registry/common/entities/shared-entry/types';

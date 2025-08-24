@@ -24,6 +24,7 @@ export const formatGetEntryMetaResponse = (joinedEntryRevision: JoinedEntryRevis
         publishedId: joinedEntryRevision.publishedId,
         tenantId: joinedEntryRevision.tenantId,
         workbookId: joinedEntryRevision.workbookId,
+        collectionId: joinedEntryRevision.collectionId,
         supportDescription,
         accessDescription,
     };

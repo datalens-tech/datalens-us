@@ -6,20 +6,15 @@ import {createMockWorkbook, createMockWorkbookEntry} from '../../helpers';
 
 let workbookId: string;
 let workbookEntryId: string;
-const workbookEntryData = {
-    shared: {
-        inner: 'shared inner',
-    },
-    someArray: [1, 2, 3],
+const workbook1EntryAnnotation = {
+    description: 'workbook1 test 1',
 };
 
 let workbook2Id: string;
 let workbook2EntryId: string;
-const workbook2EntryData = {
-    shared: {
-        inner: 'another shared inner',
-    },
-    someArray: [3, 4, 5],
+
+const workbook2EntryAnnotation = {
+    description: 'workbook2 test 1',
 };
 
 const notExistingEntryId = 'fvsb9zbfkqos2';
@@ -31,7 +26,7 @@ const NOT_FOUND_ERROR = {
     code: 'NOT_FOUND',
 };
 
-describe('Get entries data', () => {
+describe('Get entries annotation', () => {
     test('[Setup test data] Create workbook and entry', async () => {
         const workbook = await createMockWorkbook({title: 'My workbook'});
 
@@ -40,12 +35,14 @@ describe('Get entries data', () => {
         const workbookEntry = await createMockWorkbookEntry({
             name: 'Workbook entry',
             workbookId: workbook.workbookId,
-            scope: 'dataset',
-            type: 'wizard-dataset',
-            data: workbookEntryData,
+            scope: 'dash',
+            type: 'wizard-widget',
+            description: workbook1EntryAnnotation.description,
         });
 
         workbookEntryId = workbookEntry.entryId;
+
+        expect(workbookEntry.annotation).toEqual(workbook1EntryAnnotation);
     });
 
     test('[Setup test data] Create workbook2 and entry', async () => {
@@ -56,25 +53,37 @@ describe('Get entries data', () => {
         const workbookEntry = await createMockWorkbookEntry({
             name: 'Workbook entry',
             workbookId: workbook.workbookId,
-            scope: 'widget',
+            scope: 'dash',
             type: 'wizard-widget',
-            data: workbook2EntryData,
+            description: workbook2EntryAnnotation.description,
         });
 
         workbook2EntryId = workbookEntry.entryId;
+
+        expect(workbookEntry.annotation).toEqual(workbook2EntryAnnotation);
     });
 
-    test('Get entry data without auth error', async () => {
-        await request(app).post(routes.getEntriesData).expect(401);
+    test('Get entry annotation without auth error', async () => {
+        await request(app).post(routes.getEntriesAnnotation).expect(401);
     });
 
-    test('Get workbook entry data, not existing entry data and access denied workbook entry data', async () => {
-        const response = await auth(request(app).post(routes.getEntriesData), {
+    test('Get folder entry annotation validation error', async () => {
+        await auth(request(app).post(routes.getEntriesAnnotation), {
+            accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
+        })
+            .send({
+                scope: 'dash',
+                type: 'wizard-widget',
+            })
+            .expect(400);
+    });
+
+    test('Get workbook entry annotation, not existing entry annotation and access denied workbook entry annotation', async () => {
+        const response = await auth(request(app).post(routes.getEntriesAnnotation), {
             accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
         })
             .send({
                 entryIds: [workbookEntryId, notExistingEntryId, workbook2EntryId],
-                fields: ['shared.inner', 'someArray[0]', 'shared.notExistingfield'],
             })
             .expect(200);
 
@@ -82,12 +91,9 @@ describe('Get entries data', () => {
             {
                 entryId: workbookEntryId,
                 result: {
-                    data: {
-                        'shared.inner': workbookEntryData.shared.inner,
-                        'someArray[0]': workbookEntryData.someArray[0],
-                    },
-                    scope: 'dataset',
-                    type: 'wizard-dataset',
+                    annotation: workbook1EntryAnnotation,
+                    scope: 'dash',
+                    type: 'wizard-widget',
                 },
             },
             {
@@ -101,8 +107,8 @@ describe('Get entries data', () => {
         ]);
     });
 
-    test('Get data of entries from different workbooks', async () => {
-        const response = await auth(request(app).post(routes.getEntriesData), {
+    test('Get annotation of entries from different workbooks', async () => {
+        const response = await auth(request(app).post(routes.getEntriesAnnotation), {
             accessBindings: [
                 getWorkbookBinding(workbookId, 'limitedView'),
                 getWorkbookBinding(workbook2Id, 'limitedView'),
@@ -110,7 +116,6 @@ describe('Get entries data', () => {
         })
             .send({
                 entryIds: [workbookEntryId, workbook2EntryId],
-                fields: ['shared.inner', 'someArray[0]', 'shared.notExistingfield'],
             })
             .expect(200);
 
@@ -118,22 +123,16 @@ describe('Get entries data', () => {
             {
                 entryId: workbookEntryId,
                 result: {
-                    data: {
-                        'shared.inner': workbookEntryData.shared.inner,
-                        'someArray[0]': workbookEntryData.someArray[0],
-                    },
-                    scope: 'dataset',
-                    type: 'wizard-dataset',
+                    annotation: workbook1EntryAnnotation,
+                    scope: 'dash',
+                    type: 'wizard-widget',
                 },
             },
             {
                 entryId: workbook2EntryId,
                 result: {
-                    data: {
-                        'shared.inner': workbook2EntryData.shared.inner,
-                        'someArray[0]': workbook2EntryData.someArray[0],
-                    },
-                    scope: 'widget',
+                    annotation: workbook2EntryAnnotation,
+                    scope: 'dash',
                     type: 'wizard-widget',
                 },
             },

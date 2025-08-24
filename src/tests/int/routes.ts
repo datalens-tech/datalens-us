@@ -21,6 +21,7 @@ export const routes = {
     workbooks: '/v2/workbooks',
     privateWorkbooks: '/private/v2/workbooks',
     getEntriesData: '/v1/get-entries-data',
+    getEntriesAnnotation: '/v1/get-entries-annotation',
     getEntriesMeta: '/v1/get-entries-meta',
     setDefaultColorPalette: '/v1/tenants/set-default-color-palette',
     updateTenantSettings: '/v1/tenants/settings',

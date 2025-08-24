@@ -26,6 +26,7 @@ export const ALL_COLUMNS = [
     'mirrored',
     'links',
     'workbookId',
+    'collectionId',
 ];
 
 export const RETURN_COLUMNS = [
@@ -49,6 +50,7 @@ export const RETURN_COLUMNS = [
     'mirrored',
     'public',
     'workbookId',
+    'collectionId',
 ];
 
 export const RETURN_META_COLUMNS = [
@@ -61,6 +63,7 @@ export const RETURN_META_COLUMNS = [
     'publishedId',
     'tenantId',
     'workbookId',
+    'collectionId',
 ];
 
 export const RETURN_RELATION_COLUMNS = [
@@ -73,6 +76,7 @@ export const RETURN_RELATION_COLUMNS = [
     'tenantId',
     'public',
     'workbookId',
+    'collectionId',
 ];
 
 export const RETURN_NAVIGATION_COLUMNS = [
@@ -90,6 +94,7 @@ export const RETURN_NAVIGATION_COLUMNS = [
     'publishedId',
     'hidden',
     'entries.workbookId',
+    'entries.collectionId',
 ];
 
 export const RETURN_FAVORITES_COLUMNS = [
@@ -105,6 +110,7 @@ export const RETURN_FAVORITES_COLUMNS = [
     'workbooks.title as workbookTitle',
     'hidden',
     'entries.workbookId',
+    'entries.collectionId',
 ];
 
 export const RETURN_WORKBOOK_COLUMNS = [
