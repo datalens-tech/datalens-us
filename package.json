@@ -70,7 +70,7 @@
     "dev": "node ./scripts/setup-dev-env.js opensource && npm run clear:dist && APP_DEV_MODE=1 tsc-watch --onSuccess 'node dist/server'",
     "test:unit": "jest -c './jest/unit/jest.config.js'",
     "build:test:unit": "npm run build && npm run test:unit",
-    "test:int:run": "CHUNK_SIZE=5 APP_INSTALLATION=opensource APP_ENV=int-testing node ./jest/int/run.js",
+    "test:int:run": "APP_INSTALLATION=opensource APP_ENV=int-testing node ./jest/int/run.js",
     "test:int": "npm run build && npm run test:int:run",
     "test": "npm run build && npm run test:unit && npm run test:int:run",
     "db:migrate": "node dist/server/db/scripts/migrate.js",
