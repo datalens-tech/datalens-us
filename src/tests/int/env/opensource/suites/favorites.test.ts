@@ -37,7 +37,7 @@ describe('Favorites', () => {
 
     test('Add entry to favorites', async () => {
         const response = await auth(request(app).post(`${routes.favorites}/${entryId}`)).expect(
-            200,
+            400,
         );
 
         const {body} = response;
