@@ -23,7 +23,7 @@ import {checkWorkbookEntry} from './utils';
 
 const ENTRY_QUERY_TIMEOUT = 3000;
 
-interface GetEntryV2Args {
+interface GetEntryArgs {
     entryId: string;
     revId?: string;
     branch?: 'saved' | 'published';
@@ -35,7 +35,7 @@ interface GetEntryV2Args {
     includeTenantSettings?: boolean;
 }
 
-export type GetEntryV2Result = {
+export type GetEntryResult = {
     entry: SelectedEntry;
     revision: SelectedRevision;
     includePermissionsInfo?: boolean;
@@ -51,10 +51,10 @@ export type GetEntryV2Result = {
 };
 
 // eslint-disable-next-line complexity
-export const getEntryV2 = async (
+export const getEntry = async (
     {ctx, trx}: ServiceArgs,
-    args: GetEntryV2Args,
-): Promise<GetEntryV2Result> => {
+    args: GetEntryArgs,
+): Promise<GetEntryResult> => {
     const {
         entryId,
         revId,
@@ -67,7 +67,7 @@ export const getEntryV2 = async (
         includeTenantSettings,
     } = args;
 
-    ctx.log('GET_ENTRY_V2_REQUEST', {
+    ctx.log('GET_ENTRY_REQUEST', {
         entryId: Utils.encodeId(entryId),
         revId: Utils.encodeId(revId),
         branch,
@@ -269,7 +269,7 @@ export const getEntryV2 = async (
         });
     }
 
-    ctx.log('GET_ENTRY_V2_SUCCESS');
+    ctx.log('GET_ENTRY_SUCCESS');
 
     return {
         entry,
