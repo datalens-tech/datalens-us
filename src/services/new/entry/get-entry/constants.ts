@@ -37,6 +37,7 @@ export const revisionColumns = [
     RevisionModelColumn.RevId,
     RevisionModelColumn.Links,
     RevisionModelColumn.EntryId,
+    RevisionModelColumn.Annotation,
 ] as const;
 
 export const selectedRevisionColumns = revisionColumns.map(
