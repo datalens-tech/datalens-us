@@ -36,7 +36,7 @@ export {default as EntryService} from '../src/services/entry.service';
 export {default as NavigationService} from '../src/services/navigation.service';
 
 export {getEntryByKey, GetEntryByKeyArgs} from '../src/services/new/entry';
-export {getEntry, GetEntryArgs, GetEntryResult} from '../src/services/new/entry';
+export {getEntry, GetEntryResult} from '../src/services/new/entry';
 export {getEntriesByKeyPattern} from '../src/services/entry';
 export {
     formatGetEntryByKeyResponse,
