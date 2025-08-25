@@ -2,7 +2,7 @@ import {AppContext} from '@gravity-ui/nodekit';
 
 import {z} from '../../../components/zod';
 import {EntryScope} from '../../../db/models/new/entry/types';
-import {GetEntryV2Result} from '../../../services/new/entry';
+import {GetEntryResult} from '../../../services/new/entry';
 import Utils from '../../../utils';
 
 const schema = z
@@ -57,7 +57,7 @@ const format = (
         includeFavorite,
         includeTenantSettings,
         tenantSettings,
-    }: GetEntryV2Result,
+    }: GetEntryResult,
 ): z.infer<typeof schema> => {
     const {privatePermissions, onlyPublic} = ctx.get('info');
 
