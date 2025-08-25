@@ -12,7 +12,7 @@ const run = async () => {
             throw new Error(`Unknown appInstallation – ${appInstallation}`);
         }
 
-        const chunkSize = parseInt(process.env.CHUNK_SIZE, 10) || 50;
+        const chunkSize = parseInt(process.env.TEST_CHUNK_SIZE, 10) || 50;
 
         console.log(`${chalk.bold.hex('#ff6928')('Integration tests')}\n`);
 
