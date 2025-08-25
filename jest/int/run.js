@@ -45,7 +45,7 @@ const run = async () => {
         for (let i = 0; i < chunkedSuites.length; i++) {
             if (manyChunks) {
                 const message = `Chunk №${i + 1} started`;
-                console.log(`${chalk.bold(message)}\n${Array(message.length + 1).join('-')}\n`);
+                console.log(`${chalk.bold(message)}\n${'-'.repeat(message.length)}\n`);
             }
 
             execSync(
