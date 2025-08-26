@@ -3,7 +3,7 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-// import {LogEventType} from '../../registry/common/utils/log-event/types';
+import {LogEventType} from '../../registry/common/utils/log-event/types';
 import {updateTenantSettings} from '../../services/new/tenants';
 
 import {briefTenantWithSettingsModel} from './response-models';
@@ -20,32 +20,33 @@ const parseReq = makeReqParser(requestSchema);
 
 export const updateTenantSettingsController: AppRouteHandler = async (req, res) => {
     const {body} = await parseReq(req);
-    // const registry = req.ctx.get('registry');
-    // const {logEvent} = registry.common.functions.get();
+    const registry = req.ctx.get('registry');
+    const {logEvent} = registry.common.functions.get();
+    try {
+        const result = await updateTenantSettings(
+            {
+                ctx: req.ctx,
+            },
+            {key: body.key, value: body.value},
+        );
 
-    const result = await updateTenantSettings(
-        {
+        logEvent({
+            type: LogEventType.UpdateTenantSettingsSuccess,
             ctx: req.ctx,
-        },
-        {key: body.key, value: body.value},
-    );
-    res.status(200).send(briefTenantWithSettingsModel.format(result));
-    // try {
-    //     logEvent({
-    //         type: LogEventType.SetDefaultColorPaletteSuccess,
-    //         ctx: req.ctx,
-    //         reqBody: body,
-    //         tenant: result,
-    //     });
-    // } catch (error) {
-    //     logEvent({
-    //         type: LogEventType.SetDefaultColorPaletteFail,
-    //         ctx: req.ctx,
-    //         reqBody: body,
-    //         error,
-    //     });
-    //     throw error;
-    // }
+            reqBody: body,
+            tenant: result,
+        });
+
+        res.status(200).send(briefTenantWithSettingsModel.format(result));
+    } catch (error) {
+        logEvent({
+            type: LogEventType.UpdateTenantSettingsFail,
+            ctx: req.ctx,
+            reqBody: body,
+            error,
+        });
+        throw error;
+    }
 };
 
 updateTenantSettingsController.api = {
