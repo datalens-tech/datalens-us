@@ -2,7 +2,8 @@ import {AppContext} from '@gravity-ui/nodekit';
 
 import {z} from '../../../components/zod';
 import {EntryScope} from '../../../db/models/new/entry/types';
-import {GetEntryV2Result} from '../../../services/new/entry';
+import {RevisionAnnotationFields} from '../../../db/models/new/revision';
+import {GetEntryResult} from '../../../services/new/entry';
 import Utils from '../../../utils';
 
 const schema = z
@@ -22,6 +23,11 @@ const schema = z
         tenantId: z.string().nullable(),
         data: z.record(z.string(), z.unknown()).nullable(),
         meta: z.record(z.string(), z.unknown()).nullable(),
+        annotation: z
+            .object({
+                [RevisionAnnotationFields.Description]: z.string().optional(),
+            })
+            .nullable(),
         hidden: z.boolean(),
         public: z.boolean(),
         workbookId: z.string().nullable(),
@@ -57,7 +63,7 @@ const format = (
         includeFavorite,
         includeTenantSettings,
         tenantSettings,
-    }: GetEntryV2Result,
+    }: GetEntryResult,
 ): z.infer<typeof schema> => {
     const {privatePermissions, onlyPublic} = ctx.get('info');
 
@@ -92,6 +98,7 @@ const format = (
         tenantId: entry.tenantId,
         data: revision.data,
         meta: revision.meta,
+        annotation: revision.annotation,
         hidden: entry.hidden,
         public: entry.public,
         workbookId: entry.workbookId ? Utils.encodeId(entry.workbookId) : null,
@@ -102,6 +109,7 @@ const format = (
         servicePlan: includeServicePlan ? servicePlan : undefined,
         tenantFeatures: includeTenantFeatures ? tenantFeatures : undefined,
         tenantSettings: includeTenantSettings ? tenantSettings : undefined,
+
         ...additionalFields,
     };
 };
