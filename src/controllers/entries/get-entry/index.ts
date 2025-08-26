@@ -9,11 +9,11 @@ import {getEntryResult} from './response-model';
 
 const requestSchema = {
     params: z.object({
-        entryId: z.string(),
+        entryId: zc.encodedId(),
     }),
     query: z.object({
         branch: z.enum(['saved', 'published']).optional(),
-        revId: z.string().optional(),
+        revId: zc.encodedId().optional(),
         includePermissionsInfo: zc.stringBoolean().optional(),
         includeLinks: zc.stringBoolean().optional(),
         includeServicePlan: zc.stringBoolean().optional(),
@@ -64,3 +64,5 @@ getEntryController.api = {
         },
     },
 };
+
+getEntryController.manualDecodeId = true;
