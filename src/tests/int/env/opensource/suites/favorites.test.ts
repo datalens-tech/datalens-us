@@ -30,7 +30,7 @@ describe('Favorites', () => {
 
     test('New entry is not favorite', async () => {
         const response = await auth(
-            request(app).get(`${routes.entries}/${entryId}?includeFavorite=true`),
+            request(app).get(`${routes.entries}/${entryId}`).query({includeFavorite: true}),
         ).expect(200);
 
         const {body} = response;
@@ -51,7 +51,7 @@ describe('Favorites', () => {
         });
 
         const entryResponse = await auth(
-            request(app).get(`${routes.entries}/${entryId}?includeFavorite=true`),
+            request(app).get(`${routes.entries}/${entryId}`).query({includeFavorite: true}),
         ).expect(200);
 
         const {body: entryBody} = entryResponse;
@@ -141,7 +141,7 @@ describe('Favorites', () => {
         });
 
         const entryResponse = await auth(
-            request(app).get(`${routes.entries}/${entryId}?includeFavorite=true`),
+            request(app).get(`${routes.entries}/${entryId}`).query({includeFavorite: true}),
         ).expect(200);
 
         const {body: entryBody} = entryResponse;
