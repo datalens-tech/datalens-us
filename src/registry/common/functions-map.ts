@@ -13,7 +13,7 @@ import type {
     IsNeedBypassEntryByKey,
 } from './utils/entry/types';
 import type {LogEvent} from './utils/log-event/types';
-import type {CheckTenant, GetServicePlan} from './utils/tenant/types';
+import type {CheckTenant, GetServicePlan, ProcessTenantSettings} from './utils/tenant/types';
 
 export const commonFunctionsMap = {
     bulkFetchWorkbooksAllPermissions: makeFunctionTemplate<BulkFetchWorkbooksAllPermissions>(),
@@ -29,4 +29,5 @@ export const commonFunctionsMap = {
     logEvent: makeFunctionTemplate<LogEvent>(),
     checkTenant: makeFunctionTemplate<CheckTenant>(),
     getServicePlan: makeFunctionTemplate<GetServicePlan>(),
+    processTenantSettings: makeFunctionTemplate<ProcessTenantSettings>(),
 } as const;
