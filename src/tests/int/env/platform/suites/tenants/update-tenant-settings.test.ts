@@ -5,12 +5,12 @@ import {app, auth} from '../../auth';
 import {PlatformRole} from '../../roles';
 
 const testSettings = {
-    key: 'test key',
+    key: 'defaultColorPaletteId',
     value: 'test value',
 };
 
 const updateTestSettings = {
-    key: 'test key',
+    key: 'defaultColorPaletteId',
     value: null,
 };
 
@@ -20,7 +20,7 @@ describe('Update tenant settings', () => {
     });
 
     test('Update tenant settings without permission error', async () => {
-        await auth(request(app).post(routes.updateTenantSettings)).send(testSettings).expect(403);
+        await auth(request(app).post(routes.updateTenantSettings)).send(testSettings).expect(401);
     });
 
     test('Update tenant settings with wrong role error', async () => {
@@ -28,13 +28,13 @@ describe('Update tenant settings', () => {
             role: PlatformRole.Visitor,
         })
             .send(testSettings)
-            .expect(403);
+            .expect(401);
 
         await auth(request(app).post(routes.updateTenantSettings), {
             role: PlatformRole.Creator,
         })
             .send(testSettings)
-            .expect(403);
+            .expect(401);
     });
 
     test('Update tenant settings validation error', async () => {

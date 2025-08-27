@@ -1,5 +1,3 @@
-import {update} from 'lodash';
-
 export const routes = {
     entries: '/v1/entries',
     privateEntries: '/private/entries',
