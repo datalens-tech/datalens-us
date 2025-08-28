@@ -12,5 +12,5 @@ export const filterEntriesByPermission = async <T extends PartialEntry>(
 ): Promise<EntryWithPermissions<T>[]> => {
     const entries = await checkEntriesByPermission({ctx, trx}, args);
 
-    return entries.filter((entry) => entry.workbookId && entry.isLocked);
+    return entries.filter((entry) => !(entry.workbookId && entry.isLocked));
 };
