@@ -47,7 +47,7 @@ export {formatWorkbookModel} from '../src/services/new/workbook/formatters';
 
 export {crossSyncCopiedJoinedEntryRevisions} from '../src/services/new/workbook';
 
-export {filterEntriesByPermission} from '../src/services/new/entry/utils';
+export {filterEntriesByPermission, checkEntriesByPermission} from '../src/services/new/entry/utils';
 
 export {
     setDefaultColorPalette,
