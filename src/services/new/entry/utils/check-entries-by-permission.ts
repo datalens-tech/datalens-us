@@ -154,16 +154,18 @@ export const checkEntriesByPermission = async <T extends PartialEntry>(
         }
     });
 
-    const result: EntryWithPermissions<T>[] = [
-        ...(await checkFolderEntriesByPermission(
+    const [folderEntriesResult, workbookEntriesResult] = await Promise.all([
+        checkFolderEntriesByPermission(
             {ctx, trx},
             {entries: folderEntries, permission, includePermissionsInfo},
-        )),
-        ...(await checkWorkbookEntriesByPermission(
+        ),
+        checkWorkbookEntriesByPermission(
             {ctx, trx},
             {entries: workbookEntries, permission, includePermissionsInfo},
-        )),
-    ];
+        ),
+    ]);
+
+    const result: EntryWithPermissions<T>[] = [...folderEntriesResult, ...workbookEntriesResult];
 
     const mapResult = new Map<string, T>(result.map((entry) => [entry.entryId, entry]));
     const orderedResult: T[] = [];
