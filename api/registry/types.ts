@@ -48,10 +48,13 @@ export type {
     LogEventRenameEntrySuccessParams,
     LogEventUpdateEntryFailParams,
     LogEventUpdateEntrySuccessParams,
+    LogEventSetDefaultColorPaletteFailParams,
+    LogEventSetDefaultColorPaletteSuccessParams,
 } from '../../src/registry/common/utils/log-event/types';
 export {LogEventType} from '../../src/registry/common/utils/log-event/types';
 export type {GatewayApi} from '../../src/registry';
 export type {CheckTenant, GetServicePlan} from '../../src/registry/common/utils/tenant/types';
+export type {GetEntryResolveUserLogin} from '../../src/registry/common/utils/entry/types';
 export type {
     CollectionConstructor,
     CollectionInstance,
@@ -61,3 +64,7 @@ export type {
     WorkbookInstance,
 } from '../../src/registry/common/entities/workbook/types';
 export type {StructureItemInstance} from '../../src/registry/common/entities/structure-item/types';
+export type {
+    SharedEntryConstructor,
+    SharedEntryInstance,
+} from '../../src/registry/common/entities/shared-entry/types';

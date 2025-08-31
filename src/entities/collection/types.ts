@@ -3,6 +3,9 @@ export enum CollectionRole {
     Viewer = 'viewer',
     Editor = 'editor',
     Admin = 'admin',
+    // TODO: add roles
+    // EntryBindingCreator = 'entryBindingCreator',
+    // LimitedEntryBindingCreator = 'limitedEntryBindingCreator',
 }
 
 export enum CollectionPermission {
@@ -10,6 +13,7 @@ export enum CollectionPermission {
     UpdateAccessBindings = 'updateAccessBindings',
     CreateCollection = 'createCollection',
     CreateWorkbook = 'createWorkbook',
+    CreateSharedEntry = 'createSharedEntry',
     LimitedView = 'limitedView',
     View = 'view',
     Update = 'update',

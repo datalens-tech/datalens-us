@@ -22,6 +22,7 @@ export const GET_FAVORITES_ENTRY_DEFAULT_FIELDS = {
     updatedAt: expect.any(String),
     hidden: false,
     workbookId: expect.any(String),
+    collectionId: null,
     workbookTitle: expect.any(String),
     isLocked: false,
 };

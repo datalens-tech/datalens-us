@@ -3,6 +3,7 @@ import {Model} from '../../..';
 export const RevisionModelColumn = {
     Data: 'data',
     Meta: 'meta',
+    Annotation: 'annotation',
     CreatedBy: 'createdBy',
     CreatedAt: 'createdAt',
     UpdatedBy: 'updatedBy',
@@ -15,6 +16,7 @@ export const RevisionModelColumn = {
 export const RevisionModelColumnRaw = {
     Data: 'data',
     Meta: 'meta',
+    Annotation: 'annotation',
     CreatedBy: 'created_by',
     CreatedAt: 'created_at',
     UpdatedBy: 'updated_by',
@@ -23,6 +25,10 @@ export const RevisionModelColumnRaw = {
     EntryId: 'entry_id',
     Links: 'links',
 } as const;
+
+export enum RevisionAnnotationFields {
+    Description = 'description',
+}
 
 export class RevisionModel extends Model {
     static get tableName() {
@@ -35,6 +41,7 @@ export class RevisionModel extends Model {
 
     [RevisionModelColumn.Data]!: Nullable<Record<string, unknown>>;
     [RevisionModelColumn.Meta]!: Nullable<Record<string, unknown>>;
+    [RevisionModelColumn.Annotation]!: Nullable<{description?: string}>;
     [RevisionModelColumn.CreatedBy]!: string;
     [RevisionModelColumn.CreatedAt]!: string;
     [RevisionModelColumn.UpdatedBy]!: string;

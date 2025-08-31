@@ -9,6 +9,7 @@ import type {CheckEmbedding} from './utils/embedding/types';
 import type {
     GetEntryAddFormattedFieldsHook,
     GetEntryBeforeDbRequestHook,
+    GetEntryResolveUserLogin,
     IsNeedBypassEntryByKey,
 } from './utils/entry/types';
 import type {LogEvent} from './utils/log-event/types';
@@ -23,6 +24,7 @@ export const commonFunctionsMap = {
     getZitadelUserRole: makeFunctionTemplate<GetZitadelUserRole>(),
     getEntryBeforeDbRequestHook: makeFunctionTemplate<GetEntryBeforeDbRequestHook>(),
     getEntryAddFormattedFieldsHook: makeFunctionTemplate<GetEntryAddFormattedFieldsHook>(),
+    getEntryResolveUserLogin: makeFunctionTemplate<GetEntryResolveUserLogin>(),
     checkEmbedding: makeFunctionTemplate<CheckEmbedding>(),
     logEvent: makeFunctionTemplate<LogEvent>(),
     checkTenant: makeFunctionTemplate<CheckTenant>(),

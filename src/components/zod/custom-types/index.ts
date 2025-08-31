@@ -5,3 +5,4 @@ export * from './string-number';
 export * from './limited-object';
 export * from './json-string';
 export * from './entry-name';
+export * from './entity-name';

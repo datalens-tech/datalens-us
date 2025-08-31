@@ -37,7 +37,7 @@ describe('Get entries data', () => {
 
         workbookId = workbook.workbookId;
 
-        const worbookEntry = await createMockWorkbookEntry({
+        const workbookEntry = await createMockWorkbookEntry({
             name: 'Workbook entry',
             workbookId: workbook.workbookId,
             scope: 'dataset',
@@ -45,7 +45,7 @@ describe('Get entries data', () => {
             data: workbookEntryData,
         });
 
-        workbookEntryId = worbookEntry.entryId;
+        workbookEntryId = workbookEntry.entryId;
     });
 
     test('[Setup test data] Create workbook2 and entry', async () => {
@@ -53,7 +53,7 @@ describe('Get entries data', () => {
 
         workbook2Id = workbook.workbookId;
 
-        const worbookEntry = await createMockWorkbookEntry({
+        const workbookEntry = await createMockWorkbookEntry({
             name: 'Workbook entry',
             workbookId: workbook.workbookId,
             scope: 'widget',
@@ -61,7 +61,11 @@ describe('Get entries data', () => {
             data: workbook2EntryData,
         });
 
-        workbook2EntryId = worbookEntry.entryId;
+        workbook2EntryId = workbookEntry.entryId;
+    });
+
+    test('Get entry data without auth error', async () => {
+        await request(app).post(routes.getEntriesData).expect(401);
     });
 
     test('Get workbook entry data, not existing entry data and access denied workbook entry data', async () => {

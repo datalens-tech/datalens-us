@@ -10,7 +10,6 @@ import {
     RevisionColumns,
     SyncLinks,
     TemplateData,
-    WorkbookColumns,
 } from './models';
 
 export interface ServiceResponse<T extends any = any> {
@@ -28,11 +27,13 @@ export interface PrivateGetEntriesByKey extends StdServiceParams {
 
 export interface CreateEntry extends StdServiceParams {
     name?: string;
-    workbookId?: WorkbookColumns['workbookId'];
+    workbookId?: NonNullable<EntryColumns['workbookId']>;
+    collectionId?: NonNullable<EntryColumns['collectionId']>;
     scope: EntryScope;
     type?: EntryColumns['type'];
     key?: EntryColumns['key'];
     meta?: RevisionColumns['meta'];
+    description?: string;
     hidden?: EntryColumns['hidden'];
     mirrored?: EntryColumns['mirrored'];
     mode?: 'save' | 'publish';

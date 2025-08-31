@@ -19,10 +19,12 @@ export const formatGetEntryMetaResponse = (joinedEntryRevision: JoinedEntryRevis
         type: joinedEntryRevision.type,
         key: joinedEntryRevision.displayKey,
         meta: joinedEntryRevision.meta,
+        annotation: joinedEntryRevision.annotation,
         savedId: joinedEntryRevision.savedId,
         publishedId: joinedEntryRevision.publishedId,
         tenantId: joinedEntryRevision.tenantId,
         workbookId: joinedEntryRevision.workbookId,
+        collectionId: joinedEntryRevision.collectionId,
         supportDescription,
         accessDescription,
     };

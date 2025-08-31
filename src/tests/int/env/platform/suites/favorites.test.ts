@@ -28,9 +28,12 @@ describe('Favorites', () => {
     });
 
     test('New entry is not favorite', async () => {
-        const response = await auth(request(app).get(`${routes.entries}/${entryId}`), {
-            accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
-        }).expect(200);
+        const response = await auth(
+            request(app).get(`${routes.entries}/${entryId}`).query({includeFavorite: true}),
+            {
+                accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
+            },
+        ).expect(200);
 
         const {body} = response;
         expect(body.isFavorite).toBe(false);
@@ -49,9 +52,12 @@ describe('Favorites', () => {
             tenantId: testTenantId,
         });
 
-        const entryResponse = await auth(request(app).get(`${routes.entries}/${entryId}`), {
-            accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
-        }).expect(200);
+        const entryResponse = await auth(
+            request(app).get(`${routes.entries}/${entryId}`).query({includeFavorite: true}),
+            {
+                accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
+            },
+        ).expect(200);
 
         const {body: entryBody} = entryResponse;
 
@@ -151,9 +157,12 @@ describe('Favorites', () => {
             tenantId: testTenantId,
         });
 
-        const entryResponse = await auth(request(app).get(`${routes.entries}/${entryId}`), {
-            accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
-        }).expect(200);
+        const entryResponse = await auth(
+            request(app).get(`${routes.entries}/${entryId}`).query({includeFavorite: true}),
+            {
+                accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
+            },
+        ).expect(200);
 
         const {body: entryBody} = entryResponse;
 

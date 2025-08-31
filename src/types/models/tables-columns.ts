@@ -49,6 +49,7 @@ export interface EntryColumns {
     public: boolean;
     unversionedData: Record<string, unknown>;
     workbookId: string | null;
+    collectionId: string | null;
     // tsv: string;
     // sortName: string;
     // name: string; it is a service field, should be removed form the table
@@ -59,6 +60,7 @@ export interface RevisionColumns {
     entryId: string;
     data: Record<string, unknown> | null;
     meta: Record<string, unknown> | null;
+    annotation: Nullable<{description?: string}>;
     links: SyncLinks | null;
     createdBy: string;
     createdAt: string;

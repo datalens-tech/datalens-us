@@ -1,8 +1,10 @@
 import {SYSTEM_USER} from '../const';
 import Entry from '../db/models/entry';
+import {EntryScope} from '../db/models/new/entry/types';
 import * as ST from '../types/services.types';
 
 import {createEntryInWorkbook} from './entry';
+import {createEntryInCollection} from './new/entry/create-in-collection';
 
 export default class EntryService {
     static async _getEntriesByKey({key, branch, ctx}: ST.PrivateGetEntriesByKey) {
@@ -23,11 +25,13 @@ export default class EntryService {
 
     static async create({
         workbookId,
+        collectionId,
         name,
         scope,
         type,
         key,
         meta,
+        description,
         recursion,
         hidden,
         mirrored,
@@ -69,8 +73,30 @@ export default class EntryService {
                 unversionedData,
                 meta,
                 data,
+                description,
                 includePermissionsInfo,
             });
+        }
+
+        if (collectionId) {
+            return await createEntryInCollection(
+                {ctx},
+                {
+                    collectionId,
+                    name: name as string,
+                    scope: scope as EntryScope,
+                    type,
+                    links,
+                    hidden,
+                    mirrored,
+                    mode,
+                    unversionedData,
+                    meta,
+                    data,
+                    description,
+                    includePermissionsInfo,
+                },
+            );
         }
 
         return await Entry.create(
@@ -87,6 +113,7 @@ export default class EntryService {
                 mode,
                 requestedBy: user,
                 data,
+                description,
                 unversionedData,
                 links,
                 permissionsMode,
@@ -102,6 +129,7 @@ export default class EntryService {
 
     static async _create({
         workbookId,
+        collectionId,
         name,
         scope,
         type,
@@ -112,6 +140,7 @@ export default class EntryService {
         mirrored,
         mode,
         data,
+        description,
         unversionedData,
         links,
         permissionsMode,
@@ -152,8 +181,30 @@ export default class EntryService {
                 unversionedData,
                 meta,
                 data,
+                description,
                 includePermissionsInfo: false,
             });
+        }
+
+        if (collectionId) {
+            return await createEntryInCollection(
+                {ctx},
+                {
+                    collectionId,
+                    name: name as string,
+                    scope: scope as EntryScope,
+                    type,
+                    links,
+                    hidden,
+                    mirrored,
+                    mode,
+                    unversionedData,
+                    meta,
+                    data,
+                    description,
+                    includePermissionsInfo: false,
+                },
+            );
         }
 
         const requestedBy = {
@@ -175,6 +226,7 @@ export default class EntryService {
                 mode,
                 requestedBy,
                 data,
+                description,
                 unversionedData: unversionedData,
                 links,
                 permissionsMode,

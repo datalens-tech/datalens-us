@@ -13,6 +13,7 @@ export const createEntryController: AppRouteHandler = async (req, res) => {
 
     const logEventReqParams = {
         workbookId: body.workbookId,
+        collectionId: body.collectionId,
         name: body.name,
         scope: body.scope,
         type: body.type,
@@ -23,11 +24,13 @@ export const createEntryController: AppRouteHandler = async (req, res) => {
     try {
         const result = await EntryService.create({
             workbookId: body.workbookId,
+            collectionId: body.collectionId,
             name: body.name,
             scope: body.scope,
             type: body.type,
             key: body.key,
             meta: body.meta,
+            description: body.description,
             recursion: body.recursion,
             hidden: body.hidden,
             mirrored: body.mirrored,

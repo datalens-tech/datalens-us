@@ -294,6 +294,7 @@ describe('Entries in workboooks managment', () => {
             key: expect.any(String),
             links: null,
             meta: {},
+            annotation: null,
             public: false,
             publishedId: null,
             revId: expect.any(String),
@@ -305,6 +306,7 @@ describe('Entries in workboooks managment', () => {
             updatedAt: expect.any(String),
             updatedBy: expect.any(String),
             workbookId: testWorkbookId,
+            collectionId: null,
         });
 
         const responseEntry2 = await auth(request(app).post(routes.entries), {
@@ -332,6 +334,7 @@ describe('Entries in workboooks managment', () => {
             key: expect.any(String),
             links: null,
             meta: {},
+            annotation: null,
             public: false,
             publishedId: null,
             revId: expect.any(String),
@@ -343,6 +346,7 @@ describe('Entries in workboooks managment', () => {
             updatedAt: expect.any(String),
             updatedBy: expect.any(String),
             workbookId: testWorkbookId,
+            collectionId: null,
         });
     });
 

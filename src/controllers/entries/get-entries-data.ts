@@ -1,4 +1,4 @@
-import {AppRouteHandler, Request, Response} from '@gravity-ui/expresskit';
+import {AppRouteHandler} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
@@ -7,7 +7,6 @@ import {EntryScope} from '../../db/models/new/entry/types';
 import {getJoinedEntriesRevisionsByIds} from '../../services/new/entry';
 
 import {entriesDataModel} from './response-models';
-import type {GetEntriesDataResponseBody} from './response-models';
 
 const requestSchema = {
     body: z.object({
@@ -18,14 +17,9 @@ const requestSchema = {
     }),
 };
 
-export type GetEntriesDataRequestBody = z.infer<typeof requestSchema.body>;
-
 const parseReq = makeReqParser(requestSchema);
 
-export const getEntriesDataController: AppRouteHandler = async (
-    req: Request,
-    res: Response<GetEntriesDataResponseBody>,
-) => {
+export const getEntriesDataController: AppRouteHandler = async (req, res) => {
     const {body} = await parseReq(req);
 
     const result = await getJoinedEntriesRevisionsByIds(

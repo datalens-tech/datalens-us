@@ -223,6 +223,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
                     {
                         data: originJoinedEntryRevision.data,
                         meta: originJoinedEntryRevision.meta,
+                        annotation: originJoinedEntryRevision.annotation,
                         createdBy: createdBy,
                         updatedBy: createdBy,
                         revId: newRevId,

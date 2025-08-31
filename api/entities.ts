@@ -9,5 +9,10 @@ export {
     WorkbookRole,
     Permissions as WorkbookPermissions,
 } from '../src/entities/workbook';
+export {
+    SharedEntryPermission,
+    SharedEntryRole,
+    Permissions as SharedEntryPermissions,
+} from '../src/entities/shared-entry';
 export {getMockedOperation} from '../src/entities/utils';
 export type {Operation} from '../src/entities/types';

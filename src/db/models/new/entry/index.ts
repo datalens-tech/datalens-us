@@ -2,6 +2,7 @@ import {Model} from '../../..';
 import {EntryPermissions} from '../../../../services/new/entry/types';
 import {Favorite} from '../favorite';
 import {RevisionModel} from '../revision';
+import {Tenant, TenantColumn} from '../tenant';
 import {WorkbookModel} from '../workbook';
 
 import {EntryScope} from './types';
@@ -29,6 +30,7 @@ export const EntryColumn = {
     UnversionedData: 'unversionedData',
     WorkbookId: 'workbookId',
     Mirrored: 'mirrored',
+    CollectionId: 'collectionId',
 } as const;
 
 export const EntryColumnRaw = {
@@ -54,6 +56,7 @@ export const EntryColumnRaw = {
     UnversionedData: 'unversioned_data',
     WorkbookId: 'workbook_id',
     Mirrored: 'mirrored',
+    CollectionId: 'collection_id',
 } as const;
 
 export class Entry extends Model {
@@ -101,10 +104,18 @@ export class Entry extends Model {
             },
             favorite: {
                 relation: Model.HasOneRelation,
-                modelClass: RevisionModel,
+                modelClass: Favorite,
                 join: {
                     from: `${Entry.tableName}.${EntryColumn.EntryId}`,
                     to: `${Favorite.tableName}.entryId`,
+                },
+            },
+            tenant: {
+                relation: Model.BelongsToOneRelation,
+                modelClass: Tenant,
+                join: {
+                    from: `${Entry.tableName}.${EntryColumn.TenantId}`,
+                    to: `${Tenant.tableName}.${TenantColumn.TenantId}`,
                 },
             },
         };
@@ -132,12 +143,14 @@ export class Entry extends Model {
     [EntryColumn.UnversionedData]!: Record<string, unknown>;
     [EntryColumn.WorkbookId]!: Nullable<string>;
     [EntryColumn.Mirrored]!: boolean;
+    [EntryColumn.CollectionId]!: Nullable<string>;
 
     revisions?: RevisionModel[];
     savedRevision?: RevisionModel;
     publishedRevision?: RevisionModel;
     workbook?: WorkbookModel;
     favorite?: Favorite;
+    tenant?: Tenant;
 
     permissions?: EntryPermissions;
     isLocked?: boolean;

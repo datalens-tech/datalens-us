@@ -212,6 +212,29 @@ describe('Workbooks managment', () => {
         });
     });
 
+    test('Update workbook validation error', async () => {
+        workbooksData[0].title = 'Renamed test workbook title 1';
+        workbooksData[0].description = 'Renamed test workbook description 1';
+
+        await auth(request(app).post(`${routes.workbooks}/${workbooksData[0].id}/update`), {
+            accessBindings: [getWorkbookBinding(workbooksData[0].id, 'update')],
+        })
+            .send({
+                title: `${workbooksData[0].title}/${workbooksData[0].title}`,
+                description: workbooksData[0].description,
+            })
+            .expect(400);
+
+        await auth(request(app).post(`${routes.workbooks}/${workbooksData[0].id}/update`), {
+            accessBindings: [getWorkbookBinding(workbooksData[0].id, 'update')],
+        })
+            .send({
+                title: `${workbooksData[0].title}\u206a`,
+                description: workbooksData[0].description,
+            })
+            .expect(400);
+    });
+
     test('Update workbook by workbookId', async () => {
         workbooksData[0].title = 'Renamed test workbook title 1';
         workbooksData[0].description = 'Renamed test workbook description 1';
@@ -320,6 +343,7 @@ describe('Entries in workboooks managment', () => {
             key: expect.any(String),
             links: null,
             meta: {},
+            annotation: null,
             public: false,
             publishedId: null,
             revId: expect.any(String),
@@ -331,6 +355,7 @@ describe('Entries in workboooks managment', () => {
             updatedAt: expect.any(String),
             updatedBy: expect.any(String),
             workbookId: testWorkbookId,
+            collectionId: null,
         });
 
         const responseEntry2 = await auth(request(app).post(routes.entries), {
@@ -361,6 +386,7 @@ describe('Entries in workboooks managment', () => {
             key: expect.any(String),
             links: null,
             meta: {},
+            annotation: null,
             public: false,
             publishedId: null,
             revId: expect.any(String),
@@ -372,6 +398,7 @@ describe('Entries in workboooks managment', () => {
             updatedAt: expect.any(String),
             updatedBy: expect.any(String),
             workbookId: testWorkbookId,
+            collectionId: null,
         });
     });
 
@@ -434,6 +461,28 @@ describe('Entries in workboooks managment', () => {
                 },
             ]),
         });
+    });
+
+    test('Copy workbook validation error', async () => {
+        const testNewTitle = 'Copied test workbook with entries title';
+
+        await auth(request(app).post(`${routes.workbooks}/${testWorkbookId}/copy`), {
+            role: PlatformRole.Creator,
+            accessBindings: [getWorkbookBinding(testWorkbookId, 'copy')],
+        })
+            .send({
+                title: `${testNewTitle}/${testNewTitle}`,
+            })
+            .expect(400);
+
+        await auth(request(app).post(`${routes.workbooks}/${testWorkbookId}/copy`), {
+            role: PlatformRole.Creator,
+            accessBindings: [getWorkbookBinding(testWorkbookId, 'copy')],
+        })
+            .send({
+                title: `${testNewTitle}\u206a${testNewTitle}`,
+            })
+            .expect(400);
     });
 
     test('Copy workbook with entries', async () => {
