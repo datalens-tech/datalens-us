@@ -97,17 +97,6 @@ export interface DeleteAllDraftsByEntry extends StdServiceParams {
     entryId: string;
 }
 
-export interface GetFavorite extends StdServiceParams {
-    orderBy?: EntriesOrderByFilter;
-    filters?: EntriesFilters;
-    createdBy?: string;
-    page?: number;
-    pageSize?: number;
-    scope?: string | string[];
-    includePermissionsInfo?: boolean;
-    ignoreWorkbookEntries?: boolean;
-}
-
 export interface VerifyLockExistence extends StdServiceParams {
     entryId: string;
 }

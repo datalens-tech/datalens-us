@@ -16,6 +16,7 @@ const requestSchema = {
         force: zc.stringBoolean().optional(),
     }),
 };
+
 const parseReq = makeReqParser(requestSchema);
 
 export const unlockController: AppRouteHandler = async (req, res) => {

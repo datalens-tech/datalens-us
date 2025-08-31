@@ -16,6 +16,7 @@ const requestSchema = {
         force: z.boolean().optional(),
     }),
 };
+
 const parseReq = makeReqParser(requestSchema);
 
 export const lockController: AppRouteHandler = async (req, res) => {
