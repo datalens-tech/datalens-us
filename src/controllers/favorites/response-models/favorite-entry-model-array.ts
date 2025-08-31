@@ -20,7 +20,7 @@ const format = async (data: {
     };
 };
 
-export const favoritesModel = {
+export const favoriteEntryModelArray = {
     schema,
     format,
 };

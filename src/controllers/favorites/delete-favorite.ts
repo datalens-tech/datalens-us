@@ -5,7 +5,7 @@ import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {deleteFavorite} from '../../services/new/favorites/delete-favorite';
 
-import {favoriteModel} from './response-models/favorite-model';
+import {favoriteModelArray} from './response-models';
 
 const requestSchema = {
     params: z.object({
@@ -21,7 +21,7 @@ export const deleteFavoriteController: AppRouteHandler = async (req, res) => {
 
     const result = await deleteFavorite({ctx: req.ctx}, {entryId});
 
-    res.status(200).send([favoriteModel.format(result[0])]);
+    res.status(200).send(await favoriteModelArray.format(result));
 };
 
 deleteFavoriteController.api = {
@@ -32,10 +32,10 @@ deleteFavoriteController.api = {
     },
     responses: {
         200: {
-            description: `${favoriteModel.schema.description}`,
+            description: `${favoriteModelArray.schema.description}`,
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: favoriteModel.schema.array(),
+                    schema: favoriteModelArray.schema,
                 },
             },
         },

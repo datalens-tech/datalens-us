@@ -5,7 +5,7 @@ import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {addFavorite} from '../../services/new/favorites/add-favorite';
 
-import {favoriteModel} from './response-models/favorite-model';
+import {favoriteModel} from './response-models';
 
 const requestSchema = {
     params: z.object({

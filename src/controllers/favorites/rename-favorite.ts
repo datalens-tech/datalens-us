@@ -5,8 +5,7 @@ import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {renameFavorite} from '../../services/new/favorites/rename-favorite';
 
-import {favoriteEntryModel} from './response-models/favorite-entry-model';
-import {favoriteModel} from './response-models/favorite-model';
+import {favoriteModel} from './response-models';
 
 const requestSchema = {
     params: z.object({
@@ -44,10 +43,10 @@ renameFavoriteController.api = {
     },
     responses: {
         200: {
-            description: `${favoriteEntryModel.schema.description}`,
+            description: `${favoriteModel.schema.description}`,
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: favoriteEntryModel.schema,
+                    schema: favoriteModel.schema,
                 },
             },
         },

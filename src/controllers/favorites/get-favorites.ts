@@ -6,7 +6,7 @@ import {CONTENT_TYPE_JSON} from '../../const';
 import {EntryScope} from '../../db/models/new/entry/types';
 import {getFavorites} from '../../services/new/favorites/get-favorites';
 
-import {favoritesModel} from './response-models/favorite-entry-model-array';
+import {favoriteEntryModelArray} from './response-models';
 
 const requestSchema = {
     query: z.object({
@@ -54,7 +54,7 @@ export const getFavoritesController: AppRouteHandler = async (req, res) => {
         },
     );
 
-    res.status(200).send(await favoritesModel.format(result));
+    res.status(200).send(await favoriteEntryModelArray.format(result));
 };
 
 getFavoritesController.api = {
@@ -65,10 +65,10 @@ getFavoritesController.api = {
     },
     responses: {
         200: {
-            description: `${favoritesModel.schema.description}`,
+            description: `${favoriteEntryModelArray.schema.description}`,
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: favoritesModel.schema,
+                    schema: favoriteEntryModelArray.schema,
                 },
             },
         },
