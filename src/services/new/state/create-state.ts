@@ -1,6 +1,7 @@
 import hashGenerator from '../../../components/hash-generator';
-import {State} from '../../../db/models/new/state';
+import {State, StateColumn} from '../../../db/models/new/state';
 import {ServiceArgs} from '../types';
+import {getPrimary} from '../utils';
 
 interface CreateStateArgs {
     entryId: string;
@@ -8,7 +9,7 @@ interface CreateStateArgs {
 }
 
 export const createState = async ({ctx, trx}: ServiceArgs, args: CreateStateArgs) => {
-    const targetTrx = trx ?? State.primary;
+    const targetTrx = getPrimary(trx);
 
     const {entryId, data} = args;
 
@@ -29,9 +30,9 @@ export const createState = async ({ctx, trx}: ServiceArgs, args: CreateStateArgs
 
     const state = await State.query(targetTrx)
         .insert({
-            hash,
-            entryId,
-            data,
+            [StateColumn.Hash]: hash,
+            [StateColumn.EntryId]: entryId,
+            [StateColumn.Data]: data,
         })
         .returning('*')
         .timeout(State.DEFAULT_QUERY_TIMEOUT);

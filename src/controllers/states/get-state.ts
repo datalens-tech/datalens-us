@@ -5,7 +5,7 @@ import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {getState} from '../../services/new/state/get-state';
 
-import {stateModel} from './response-models/state-model';
+import {stateModel} from './response-models';
 
 const requestSchema = {
     params: z.object({
@@ -29,15 +29,16 @@ export const getStateController: AppRouteHandler = async (req, res) => {
 
     res.status(200).send(stateModel.format(result));
 };
+
 getStateController.api = {
     tags: [ApiTag.States],
-    summary: 'Get state for entry',
+    summary: 'Get state',
     request: {
         params: requestSchema.params,
     },
     responses: {
         200: {
-            description: stateModel.schema.description ?? '',
+            description: `${stateModel.schema.description}`,
             content: {
                 [CONTENT_TYPE_JSON]: {
                     schema: stateModel.schema,
@@ -46,4 +47,5 @@ getStateController.api = {
         },
     },
 };
+
 getStateController.manualDecodeId = true;

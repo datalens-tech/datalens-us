@@ -5,11 +5,11 @@ const schema = z
     .object({
         lockToken: z.string(),
     })
-    .describe('Lock token response');
+    .describe('Lock token');
 
 export type LockTokenModel = z.infer<typeof schema>;
 
-const format = (data: Pick<Lock, 'lockToken'>): LockTokenModel => {
+const format = (data: Pick<Lock, 'lockToken'>): z.infer<typeof schema> => {
     return {
         lockToken: data.lockToken,
     };

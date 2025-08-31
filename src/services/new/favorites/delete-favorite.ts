@@ -1,50 +1,51 @@
 import {AppError} from '@gravity-ui/nodekit';
 
-import {Model} from '../../../db';
-import {Entry} from '../../../db/models/new/entry';
-import {Favorite} from '../../../db/models/new/favorite';
+import {US_ERRORS} from '../../../const';
+import {Entry, EntryColumn} from '../../../db/models/new/entry';
+import {Favorite, FavoriteColumn} from '../../../db/models/new/favorite';
 import {ServiceArgs} from '../types';
-import {getReplica} from '../utils';
+import {getPrimary, getReplica} from '../utils';
 
 export interface DeleteFavoriteArgs {
     entryId: string;
 }
 
-export const deleteFavoriteService = async (
-    {ctx, trx}: ServiceArgs,
-    {entryId}: DeleteFavoriteArgs,
-) => {
+export const deleteFavorite = async ({ctx, trx}: ServiceArgs, {entryId}: DeleteFavoriteArgs) => {
     const {tenantId, user, dlContext} = ctx.get('info');
+    const {login, userId} = user;
+
     ctx.log('DELETE_FROM_FAVORITES_REQUEST', {
         entryId,
+        userId,
         tenantId,
-        requestedBy: user,
         dlContext,
     });
-    const {login} = user;
-    const targetTrx = getReplica(trx);
 
-    const entry = await Entry.query(targetTrx)
+    const entry = await Entry.query(getReplica(trx))
         .select()
         .where({
-            entryId,
-            tenantId,
-            isDeleted: false,
+            [EntryColumn.EntryId]: entryId,
+            [EntryColumn.TenantId]: tenantId,
+            [EntryColumn.IsDeleted]: false,
         })
         .first()
-        .timeout(Model.DEFAULT_QUERY_TIMEOUT);
+        .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
     if (!entry) {
-        throw new AppError('NOT_EXIST_ENTRY', {
-            code: 'NOT_EXIST_ENTRY',
+        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
+            code: US_ERRORS.NOT_EXIST_ENTRY,
         });
     }
 
-    const result = await Favorite.query(targetTrx)
+    const result = await Favorite.query(getPrimary(trx))
         .delete()
-        .where({entryId, tenantId, login})
+        .where({
+            [FavoriteColumn.EntryId]: entryId,
+            [FavoriteColumn.TenantId]: tenantId,
+            [FavoriteColumn.Login]: login,
+        })
         .returning('*')
-        .timeout(Model.DEFAULT_QUERY_TIMEOUT);
+        .timeout(Favorite.DEFAULT_QUERY_TIMEOUT);
 
     ctx.log('DELETE_FROM_FAVORITES_SUCCESS');
 

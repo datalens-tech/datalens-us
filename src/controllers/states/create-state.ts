@@ -5,7 +5,7 @@ import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {createState} from '../../services/new/state';
 
-import {stateHashModel} from './response-models/state-hash-model';
+import {stateHashModel} from './response-models';
 
 const requestSchema = {
     params: z.object({
@@ -15,6 +15,7 @@ const requestSchema = {
         data: z.record(z.string(), z.unknown()),
     }),
 };
+
 const parseReq = makeReqParser(requestSchema);
 
 export const createStateController: AppRouteHandler = async (req, res) => {
@@ -30,9 +31,10 @@ export const createStateController: AppRouteHandler = async (req, res) => {
 
     res.status(200).send(stateHashModel.format(result));
 };
+
 createStateController.api = {
     tags: [ApiTag.States],
-    summary: 'Create state for entry',
+    summary: 'Create state',
     request: {
         params: requestSchema.params,
         body: {
@@ -45,7 +47,7 @@ createStateController.api = {
     },
     responses: {
         200: {
-            description: stateHashModel.schema.description ?? '',
+            description: `${stateHashModel.schema.description}`,
             content: {
                 [CONTENT_TYPE_JSON]: {
                     schema: stateHashModel.schema,
@@ -54,4 +56,5 @@ createStateController.api = {
         },
     },
 };
+
 createStateController.manualDecodeId = true;

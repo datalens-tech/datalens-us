@@ -3,7 +3,7 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-import {renameFavoriteService} from '../../services/new/favorites/rename-favorites';
+import {renameFavorite} from '../../services/new/favorites/rename-favorite';
 
 import {favoriteEntryModel} from './response-models/favorite-entry-model';
 import {favoriteModel} from './response-models/favorite-model';
@@ -13,9 +13,10 @@ const requestSchema = {
         entryId: zc.encodedId(),
     }),
     body: z.object({
-        name: zc.entryName().nullable(),
+        name: zc.entityName().nullable(),
     }),
 };
+
 const parseReq = makeReqParser(requestSchema);
 
 export const renameFavoriteController: AppRouteHandler = async (req, res) => {
@@ -23,7 +24,7 @@ export const renameFavoriteController: AppRouteHandler = async (req, res) => {
     const {entryId} = params;
     const {name} = body;
 
-    const result = await renameFavoriteService({ctx: req.ctx}, {entryId, name});
+    const result = await renameFavorite({ctx: req.ctx}, {entryId, name});
 
     res.status(200).send(favoriteModel.format(result));
 };
@@ -43,7 +44,7 @@ renameFavoriteController.api = {
     },
     responses: {
         200: {
-            description: favoriteEntryModel.schema.description ?? '',
+            description: `${favoriteEntryModel.schema.description}`,
             content: {
                 [CONTENT_TYPE_JSON]: {
                     schema: favoriteEntryModel.schema,
@@ -52,4 +53,5 @@ renameFavoriteController.api = {
         },
     },
 };
+
 renameFavoriteController.manualDecodeId = true;

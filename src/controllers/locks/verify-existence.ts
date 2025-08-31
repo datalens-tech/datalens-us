@@ -5,13 +5,14 @@ import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import LockService from '../../services/lock.service';
 
-import {lockEntryModel} from './response-models/lock-entry-model';
+import {lockModel} from './response-models';
 
 const requestSchema = {
     params: z.object({
         entryId: zc.encodedId(),
     }),
 };
+
 const parseReq = makeReqParser(requestSchema);
 
 export const verifyExistenceController: AppRouteHandler = async (req, res) => {
@@ -24,21 +25,21 @@ export const verifyExistenceController: AppRouteHandler = async (req, res) => {
         ctx: req.ctx,
     });
 
-    res.status(200).send(lockEntryModel.format(result));
+    res.status(200).send(lockModel.format(result));
 };
 
 verifyExistenceController.api = {
     tags: [ApiTag.Locks],
-    summary: 'Verify lock existence for entry',
+    summary: 'Verify lock existence',
     request: {
         params: requestSchema.params,
     },
     responses: {
         200: {
-            description: lockEntryModel.schema.description ?? '',
+            description: `${lockModel.schema.description}`,
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: lockEntryModel.schema,
+                    schema: lockModel.schema,
                 },
             },
         },

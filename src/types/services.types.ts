@@ -123,8 +123,8 @@ export interface UnlockEntry extends StdServiceParams {
 }
 export interface ExtendLock extends StdServiceParams {
     entryId: string;
-    duration: number;
-    lockToken: string;
+    duration?: number;
+    lockToken?: string;
     force?: boolean;
 }
 

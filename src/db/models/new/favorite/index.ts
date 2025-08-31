@@ -1,5 +1,4 @@
 import {Model} from '../../..';
-import {Entry} from '../entry';
 
 export const FavoriteColumn = {
     EntryId: 'entryId',
@@ -27,29 +26,14 @@ export class Favorite extends Model {
     }
 
     static get idColumn() {
-        return 'entryId';
-    }
-
-    static get relationMappings() {
-        return {
-            entry: {
-                relation: Model.BelongsToOneRelation,
-                modelClass: Entry,
-                join: {
-                    from: `${Favorite.tableName}.entryId`,
-                    to: `${Entry.tableName}.entryId`,
-                },
-            },
-        };
+        return [FavoriteColumn.EntryId, FavoriteColumn.Login];
     }
 
     [FavoriteColumn.EntryId]!: string;
     [FavoriteColumn.TenantId]!: string;
     [FavoriteColumn.Login]!: string;
-    [FavoriteColumn.Alias]!: string | null;
-    [FavoriteColumn.DisplayAlias]!: string | null;
-    [FavoriteColumn.SortAlias]!: string | null;
     [FavoriteColumn.CreatedAt]!: string;
-
-    entry?: Entry;
+    [FavoriteColumn.Alias]!: Nullable<string>;
+    [FavoriteColumn.DisplayAlias]!: Nullable<string>;
+    [FavoriteColumn.SortAlias]!: Nullable<string>;
 }

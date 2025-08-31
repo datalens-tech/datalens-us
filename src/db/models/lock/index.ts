@@ -116,6 +116,12 @@ class Lock extends Model {
             dlContext,
         });
 
+        if (duration > 600000) {
+            throw new AppError('The max duration is 600000', {
+                code: 'DURATION_IS_LIMITED',
+            });
+        }
+
         if (!isPrivateRoute) {
             await Lock.checkLockPermission({
                 ctx,
@@ -246,12 +252,6 @@ class Lock extends Model {
                     .timeout(Model.DEFAULT_QUERY_TIMEOUT);
             }
 
-            if (!result) {
-                throw new AppError(US_ERRORS.ENTRY_LOCK_FORCE_CONFLICT, {
-                    code: US_ERRORS.ENTRY_LOCK_FORCE_CONFLICT,
-                });
-            }
-
             return result;
         });
 
@@ -281,6 +281,12 @@ class Lock extends Model {
             force,
             dlContext,
         });
+
+        if (duration > 600000) {
+            throw new AppError('The max duration is 600000', {
+                code: 'DURATION_IS_LIMITED',
+            });
+        }
 
         if (!isPrivateRoute) {
             await Lock.checkLockPermission({
@@ -325,12 +331,6 @@ class Lock extends Model {
                     .returning('*')
                     .first()
                     .timeout(Model.DEFAULT_QUERY_TIMEOUT);
-            }
-
-            if (!result) {
-                throw new AppError(US_ERRORS.NOT_EXIST_LOCKED_ENTRY, {
-                    code: US_ERRORS.NOT_EXIST_LOCKED_ENTRY,
-                });
             }
 
             return result;

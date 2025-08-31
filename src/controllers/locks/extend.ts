@@ -5,15 +5,15 @@ import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import LockService from '../../services/lock.service';
 
-import {lockEntryModel} from './response-models/lock-entry-model';
+import {lockModel} from './response-models';
 
 const requestSchema = {
     params: z.object({
         entryId: zc.encodedId(),
     }),
     body: z.object({
-        duration: z.number().min(1).max(600000),
-        lockToken: z.string(),
+        duration: z.number().min(1).optional(),
+        lockToken: z.string().optional(),
         force: z.boolean().optional(),
     }),
 };
@@ -33,12 +33,12 @@ export const extendController: AppRouteHandler = async (req, res) => {
         ctx: req.ctx,
     });
 
-    res.status(200).send(lockEntryModel.format(result));
+    res.status(200).send(result ? lockModel.format(result) : undefined);
 };
 
 extendController.api = {
     tags: [ApiTag.Locks],
-    summary: 'Extend lock duration for entry',
+    summary: 'Extend lock duration',
     request: {
         params: requestSchema.params,
         body: {
@@ -51,10 +51,10 @@ extendController.api = {
     },
     responses: {
         200: {
-            description: lockEntryModel.schema.description ?? '',
+            description: `${lockModel.schema.description}`,
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: lockEntryModel.schema,
+                    schema: lockModel.schema,
                 },
             },
         },

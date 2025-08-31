@@ -12,11 +12,9 @@ const schema = z
         displayAlias: z.string().nullable().optional(),
         sortAlias: z.string().nullable().optional(),
     })
-    .describe('Favorite instance model');
+    .describe('Favorite model');
 
-export type FavoriteModel = z.infer<typeof schema>;
-
-const format = (data: Favorite): FavoriteModel => {
+const format = (data: Favorite): z.infer<typeof schema> => {
     return {
         entryId: Utils.encodeId(data.entryId),
         login: data.login,

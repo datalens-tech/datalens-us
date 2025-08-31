@@ -4,9 +4,9 @@ import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {EntryScope} from '../../db/models/new/entry/types';
-import {getFavoritesService} from '../../services/new/favorites/get-favorites';
+import {getFavorites} from '../../services/new/favorites/get-favorites';
 
-import {favoritesModel} from './response-models/favorites-model';
+import {favoritesModel} from './response-models/favorite-entry-model-array';
 
 const requestSchema = {
     query: z.object({
@@ -38,7 +38,8 @@ export const getFavoritesController: AppRouteHandler = async (req, res) => {
     const {query} = await parseReq(req);
     const {orderBy, filters, page, pageSize, scope, includePermissionsInfo, ignoreWorkbookEntries} =
         query;
-    const result = await getFavoritesService(
+
+    const result = await getFavorites(
         {
             ctx: req.ctx,
         },
@@ -64,7 +65,7 @@ getFavoritesController.api = {
     },
     responses: {
         200: {
-            description: favoritesModel.schema.description ?? '',
+            description: `${favoritesModel.schema.description}`,
             content: {
                 [CONTENT_TYPE_JSON]: {
                     schema: favoritesModel.schema,
@@ -73,4 +74,5 @@ getFavoritesController.api = {
         },
     },
 };
+
 getFavoritesController.manualDecodeId = true;

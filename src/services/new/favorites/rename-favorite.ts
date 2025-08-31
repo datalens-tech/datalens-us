@@ -3,28 +3,28 @@ import {AppError} from '@gravity-ui/nodekit';
 import {US_ERRORS} from '../../../const';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {Favorite, FavoriteColumn} from '../../../db/models/new/favorite';
-import {getWorkbook} from '../../../services/new/workbook';
-import {DlsActions} from '../../../types/models';
 import {ServiceArgs} from '../types';
 import {getPrimary, getReplica} from '../utils';
 
-interface AddFavoriteArgs {
+interface RenameFavoriteArgs {
     entryId: string;
+    name: string | null;
 }
 
-export const addFavorite = async ({ctx, trx}: ServiceArgs, {entryId}: AddFavoriteArgs) => {
+export const renameFavorite = async (
+    {ctx, trx}: ServiceArgs,
+    {entryId, name}: RenameFavoriteArgs,
+) => {
     const {tenantId, user, dlContext} = ctx.get('info');
     const {login, userId} = user;
 
-    ctx.log('ADD_TO_FAVORITES_REQUEST', {
+    ctx.log('RENAME_FAVORITE_REQUEST', {
         entryId,
         userId,
         tenantId,
+        name,
         dlContext,
     });
-
-    const registry = ctx.get('registry');
-    const {DLS} = registry.common.classes.get();
 
     const entry = await Entry.query(getReplica(trx))
         .select()
@@ -42,28 +42,27 @@ export const addFavorite = async ({ctx, trx}: ServiceArgs, {entryId}: AddFavorit
         });
     }
 
-    if (entry.workbookId) {
-        await getWorkbook({ctx}, {workbookId: entry.workbookId});
-    } else if (ctx.config.dlsEnabled) {
-        await DLS.checkPermission(
-            {ctx},
-            {
-                entryId,
-                action: DlsActions.Read,
-            },
-        );
-    }
+    const displayAlias = name ? name : null;
+    const alias = displayAlias ? displayAlias.toLowerCase() : null;
 
     const result = await Favorite.query(getPrimary(trx))
-        .insert({
-            [FavoriteColumn.TenantId]: tenantId,
+        .patch({[FavoriteColumn.Alias]: alias, [FavoriteColumn.DisplayAlias]: displayAlias})
+        .where({
             [FavoriteColumn.EntryId]: entryId,
+            [FavoriteColumn.TenantId]: tenantId,
             [FavoriteColumn.Login]: login,
         })
         .returning('*')
+        .first()
         .timeout(Favorite.DEFAULT_QUERY_TIMEOUT);
 
-    ctx.log('ADD_TO_FAVORITES_SUCCESS');
+    if (!result) {
+        throw new AppError(US_ERRORS.FAVORITE_NOT_EXISTS, {
+            code: US_ERRORS.FAVORITE_NOT_EXISTS,
+        });
+    }
+
+    ctx.log('RENAME_FAVORITE_SUCCESS');
 
     return result;
 };

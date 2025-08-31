@@ -11,11 +11,9 @@ const schema = z
         startDate: z.string(),
         login: z.string().nullable(),
     })
-    .describe('Lock entry information');
+    .describe('Lock model');
 
-export type LockEntryModel = z.infer<typeof schema>;
-
-const format = (data: Lock): LockEntryModel => {
+const format = (data: Lock): z.infer<typeof schema> => {
     return {
         lockId: Utils.encodeId(data.lockId),
         entryId: Utils.encodeId(data.entryId),
@@ -26,7 +24,7 @@ const format = (data: Lock): LockEntryModel => {
     };
 };
 
-export const lockEntryModel = {
+export const lockModel = {
     schema,
     format,
 };

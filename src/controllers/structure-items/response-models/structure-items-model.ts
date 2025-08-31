@@ -2,6 +2,7 @@ import {z} from '../../../components/zod';
 import {CollectionInstance} from '../../../registry/common/entities/collection/types';
 import {isWorkbookInstance} from '../../../registry/common/entities/structure-item/types';
 import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+import Utils from '../../../utils';
 import {collectionInstance} from '../../collections/response-models';
 import {workbookInstance} from '../../workbooks/response-models';
 
@@ -19,10 +20,12 @@ const format = async (data: {
     nextPageToken: Nullable<string>;
 }) => {
     return {
-        items: data.items.map((structureItem: CollectionInstance | WorkbookInstance) =>
-            isWorkbookInstance(structureItem)
-                ? workbookInstance.format(structureItem)
-                : collectionInstance.format(structureItem),
+        items: await Utils.macrotasksMap(
+            data.items,
+            (structureItem: CollectionInstance | WorkbookInstance) =>
+                isWorkbookInstance(structureItem)
+                    ? workbookInstance.format(structureItem)
+                    : collectionInstance.format(structureItem),
         ),
         nextPageToken: data.nextPageToken,
     };

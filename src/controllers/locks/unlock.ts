@@ -5,7 +5,7 @@ import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import LockService from '../../services/lock.service';
 
-import {lockEntryModel} from './response-models/lock-entry-model';
+import {lockModel} from './response-models';
 
 const requestSchema = {
     params: z.object({
@@ -31,7 +31,7 @@ export const unlockController: AppRouteHandler = async (req, res) => {
         ctx: req.ctx,
     });
 
-    res.status(200).send(lockEntryModel.format(result));
+    res.status(200).send(result ? lockModel.format(result) : undefined);
 };
 
 unlockController.api = {
@@ -43,10 +43,10 @@ unlockController.api = {
     },
     responses: {
         200: {
-            description: lockEntryModel.schema.description ?? '',
+            description: `${lockModel.schema.description}`,
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: lockEntryModel.schema,
+                    schema: lockModel.schema,
                 },
             },
         },

@@ -7,13 +7,12 @@ const schema = z
     })
     .describe('State hash model');
 
-export type StateHashModel = z.infer<typeof schema>;
-
-const format = (data: State): StateHashModel => {
+const format = (data: State): z.infer<typeof schema> => {
     return {
         hash: data.hash,
     };
 };
+
 export const stateHashModel = {
     schema,
     format,

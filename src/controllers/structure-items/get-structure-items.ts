@@ -20,6 +20,7 @@ const requestSchema = {
         mode: z.enum(['all', 'onlyCollections', 'onlyWorkbooks']).optional(),
     }),
 };
+
 const parseReq = makeReqParser(requestSchema);
 
 export const getStructureItemsController: AppRouteHandler = async (req, res) => {
@@ -42,15 +43,16 @@ export const getStructureItemsController: AppRouteHandler = async (req, res) => 
 
     res.status(200).send(await structureItemsModel.format(result));
 };
+
 getStructureItemsController.api = {
-    tags: [ApiTag.StructureItems],
+    tags: [ApiTag.Structure],
     summary: 'Get structure items',
     request: {
         query: requestSchema.query,
     },
     responses: {
         200: {
-            description: structureItemsModel.schema.description ?? '',
+            description: `${structureItemsModel.schema.description}`,
             content: {
                 [CONTENT_TYPE_JSON]: {
                     schema: structureItemsModel.schema,
@@ -59,4 +61,5 @@ getStructureItemsController.api = {
         },
     },
 };
+
 getStructureItemsController.manualDecodeId = true;

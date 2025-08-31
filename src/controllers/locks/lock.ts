@@ -5,14 +5,14 @@ import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import LockService from '../../services/lock.service';
 
-import {lockTokenModel} from './response-models/lock-token-model';
+import {lockTokenModel} from './response-models';
 
 const requestSchema = {
     params: z.object({
         entryId: zc.encodedId(),
     }),
     body: z.object({
-        duration: z.number().min(1).max(600000),
+        duration: z.number().min(1),
         force: z.boolean().optional(),
     }),
 };
@@ -36,7 +36,7 @@ export const lockController: AppRouteHandler = async (req, res) => {
 
 lockController.api = {
     tags: [ApiTag.Locks],
-    summary: 'Create lock for entry',
+    summary: 'Create lock',
     request: {
         params: requestSchema.params,
         body: {
@@ -49,7 +49,7 @@ lockController.api = {
     },
     responses: {
         200: {
-            description: lockTokenModel.schema.description ?? '',
+            description: `${lockTokenModel.schema.description}`,
             content: {
                 [CONTENT_TYPE_JSON]: {
                     schema: lockTokenModel.schema,
