@@ -1,29 +1,39 @@
 import {EntryScope} from '../../../../db/models/new/entry/types';
-import {Permissions} from '../../../../entities/workbook';
 import type {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
+import {UsPermissions} from '../../../../types/models';
 import type {EntryScope as EntryScopeType} from '../../../../types/models';
+
+type Params = {
+    workbook: WorkbookInstance;
+    scope?: EntryScopeType | null;
+};
+
+type Permissions = {
+    [UsPermissions.Execute]: boolean;
+    [UsPermissions.Read]: boolean;
+    [UsPermissions.Edit]: boolean;
+    [UsPermissions.Admin]: boolean;
+};
 
 export const getEntryPermissionsByWorkbook = ({
     workbook,
     scope,
-}: {
-    workbook: WorkbookInstance;
-    scope?: EntryScopeType | null;
-}) => {
-    const permissions = workbook.permissions as Permissions;
+}: Params): Permissions | undefined => {
+    const permissions = workbook.permissions;
 
-    const view = permissions.limitedView;
-
-    const mappedPermission = {
-        execute: view,
-        read: permissions.view,
-        edit: permissions.update,
-        admin: permissions.updateAccessBindings,
-    };
-
-    if (scope === EntryScope.Dash || scope === EntryScope.Widget || scope === EntryScope.Report) {
-        mappedPermission.read = view;
+    if (!permissions) {
+        return undefined;
     }
 
-    return mappedPermission;
+    const read =
+        scope === EntryScope.Dash || scope === EntryScope.Widget || scope === EntryScope.Report
+            ? permissions.limitedView
+            : permissions.view;
+
+    return {
+        [UsPermissions.Execute]: permissions.limitedView,
+        [UsPermissions.Read]: read,
+        [UsPermissions.Edit]: permissions.update,
+        [UsPermissions.Admin]: permissions.updateAccessBindings,
+    };
 };
