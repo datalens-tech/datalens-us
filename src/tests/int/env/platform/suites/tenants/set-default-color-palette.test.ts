@@ -41,6 +41,8 @@ describe('Set default color palette', () => {
     test('Set defaultColorPaletteId', async () => {
         const updateResponse = await auth(request(app).post(routes.setDefaultColorPalette), {
             role: PlatformRole.Admin,
+            userId: 'test-dls-admin-id',
+            login: 'test-dls-admin-login',
         })
             .send({
                 defaultColorPaletteId,
@@ -55,6 +57,8 @@ describe('Set default color palette', () => {
     test('Update defaultColorPaletteId', async () => {
         const updateResponse = await auth(request(app).post(routes.setDefaultColorPalette), {
             role: PlatformRole.Admin,
+            userId: 'test-dls-admin-id',
+            login: 'test-dls-admin-login',
         })
             .send({
                 defaultColorPaletteId: updatedDefaultColorPaletteId,
