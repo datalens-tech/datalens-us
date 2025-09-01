@@ -53,8 +53,7 @@ export const getFavorites = async (
 
     const {login} = user;
 
-    const entries = await FavoriteEntryPresentation.query(getReplica(trx))
-        .select()
+    const entries = await FavoriteEntryPresentation.getSelectQuery(getReplica(trx))
         .where({
             [`${Favorite.tableName}.${FavoriteColumn.TenantId}`]: tenantId,
             [`${Favorite.tableName}.${FavoriteColumn.Login}`]: login,

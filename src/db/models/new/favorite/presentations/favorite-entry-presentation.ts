@@ -15,21 +15,33 @@ export class FavoriteEntryPresentation extends Model {
         return Favorite.idColumn;
     }
 
-    static _joinEntry(builder: Knex.JoinClause) {
+    static getSelectQuery(trx: TransactionOrKnex) {
+        const query = Favorite.query(trx)
+            .select(this.selectedColumns)
+            .join(Entry.tableName, this.joinEntry)
+            .leftJoin(Workbook.tableName, this.leftJoinWorkbook);
+
+        return query as unknown as QueryBuilder<
+            FavoriteEntryPresentation,
+            FavoriteEntryPresentation[]
+        >;
+    }
+
+    protected static joinEntry(builder: Knex.JoinClause) {
         builder.on(
             `${Favorite.tableName}.${FavoriteColumn.EntryId}`,
             `${Entry.tableName}.${EntryColumn.EntryId}`,
         );
     }
 
-    static _leftJoinWorkbook(builder: Knex.JoinClause) {
+    protected static leftJoinWorkbook(builder: Knex.JoinClause) {
         builder.on(
             `${Entry.tableName}.${EntryColumn.WorkbookId}`,
             `${Workbook.tableName}.${WorkbookColumn.WorkbookId}`,
         );
     }
 
-    static get _selectedColumns() {
+    protected static get selectedColumns() {
         return [
             `${Favorite.tableName}.${FavoriteColumn.EntryId}`,
             `${Favorite.tableName}.${FavoriteColumn.Alias}`,
@@ -48,18 +60,6 @@ export class FavoriteEntryPresentation extends Model {
 
             raw(`${Workbook.tableName}.${WorkbookColumn.Title} AS workbook_title`),
         ];
-    }
-
-    static query(trx: TransactionOrKnex) {
-        const query = Favorite.query(trx)
-            .select(this._selectedColumns)
-            .join(Entry.tableName, this._joinEntry)
-            .leftJoin(Workbook.tableName, this._leftJoinWorkbook);
-
-        return query as unknown as QueryBuilder<
-            FavoriteEntryPresentation,
-            FavoriteEntryPresentation[]
-        >;
     }
 
     [FavoriteColumn.EntryId]!: Favorite[typeof FavoriteColumn.EntryId];
