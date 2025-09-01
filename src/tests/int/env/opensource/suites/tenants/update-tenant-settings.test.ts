@@ -5,13 +5,13 @@ import {app, auth} from '../../auth';
 import {OpensourceRole} from '../../roles';
 
 const testSettings = {
-    key: 'test key',
-    value: 'test value',
+    key: 'defaultColorPaletteId',
+    value: 'Ocean20',
 };
 
 const updateTestSettings = {
-    key: 'test key',
-    value: null,
+    key: 'defaultColorPaletteId',
+    value: 'Sunset32',
 };
 
 describe('Update tenant settings', () => {

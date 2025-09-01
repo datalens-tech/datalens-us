@@ -6,12 +6,12 @@ import {PlatformRole} from '../../roles';
 
 const testSettings = {
     key: 'defaultColorPaletteId',
-    value: 'test value',
+    value: 'Ocean20',
 };
 
 const updateTestSettings = {
     key: 'defaultColorPaletteId',
-    value: null,
+    value: 'Sunset32',
 };
 
 describe('Update tenant settings', () => {

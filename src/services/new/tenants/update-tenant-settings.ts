@@ -10,7 +10,7 @@ import {getPrimary} from '../utils';
 
 type UpdateTenantSettingsArgs = {
     key: string;
-    value: Nullable<string | boolean>;
+    value: string | boolean | number;
 };
 
 export const updateTenantSettings = async (
@@ -44,11 +44,14 @@ export const updateTenantSettings = async (
         const updatedTenant = await Tenant.query(transactionTrx)
             .where({tenantId})
             .patch({
-                settings: raw(`jsonb_set(??, '{${key}}', ?)`, ['settings', JSON.stringify(value)]),
+                settings: raw(`jsonb_set(??::jsonb, ?::text[], ?)`, [
+                    'settings',
+                    `{${key}}`,
+                    JSON.stringify(value),
+                ]),
             })
             .returning('*')
-            .first()
-            .timeout(Tenant.DEFAULT_QUERY_TIMEOUT);
+            .first();
 
         if (!updatedTenant) {
             throw new AppError(US_ERRORS.NOT_EXIST_TENANT, {

@@ -1,7 +1,7 @@
 import {AppRouteHandler} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
-import {makeReqParser, z} from '../../components/zod';
+import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {LogEventType} from '../../registry/common/utils/log-event/types';
 import {updateTenantSettings} from '../../services/new/tenants';
@@ -11,7 +11,7 @@ import {briefTenantWithSettingsModel} from './response-models';
 const requestSchema = {
     body: z.object({
         key: z.string(),
-        value: z.string().or(z.boolean()).nullable(),
+        value: zc.primitive(),
     }),
 };
 export type UpdateTenantSettingsRequestBodySchema = z.infer<typeof requestSchema.body>;
