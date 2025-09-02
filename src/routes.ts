@@ -209,23 +209,23 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         verifyLockExistence: makeRoute({
             route: 'GET /v1/locks/:entryId',
-            handler: locks.verifyExistence,
+            handler: locks.verifyExistenceController,
         }),
         privateVerifyLockExistence: makeRoute({
             route: 'GET /private/locks/:entryId',
-            handler: locks.verifyExistence,
+            handler: locks.verifyExistenceController,
             authPolicy: AuthPolicy.disabled,
             private: true,
         }),
 
         createLock: makeRoute({
             route: 'POST /v1/locks/:entryId',
-            handler: locks.lock,
+            handler: locks.lockController,
             write: true,
         }),
         privateCreateLock: makeRoute({
             route: 'POST /private/locks/:entryId',
-            handler: locks.lock,
+            handler: locks.lockController,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
@@ -233,12 +233,12 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         deleteLock: makeRoute({
             route: 'DELETE /v1/locks/:entryId',
-            handler: locks.unlock,
+            handler: locks.unlockController,
             write: true,
         }),
         privateDeleteLock: makeRoute({
             route: 'DELETE /private/locks/:entryId',
-            handler: locks.unlock,
+            handler: locks.unlockController,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
@@ -246,12 +246,12 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         extendLock: makeRoute({
             route: 'POST /v1/locks/:entryId/extend',
-            handler: locks.extend,
+            handler: locks.extendController,
             write: true,
         }),
         privateExtendLock: makeRoute({
             route: 'POST /private/locks/:entryId/extend',
-            handler: locks.extend,
+            handler: locks.extendController,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
@@ -259,31 +259,31 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         getState: makeRoute({
             route: 'GET /v1/states/:entryId/:hash',
-            handler: states.getState,
+            handler: states.getStateController,
         }),
         createState: makeRoute({
             route: 'POST /v1/states/:entryId',
-            handler: states.createState,
+            handler: states.createStateController,
             write: true,
         }),
 
         getFavorites: makeRoute({
             route: 'GET /v1/favorites',
-            handler: favorites.getFavorites,
+            handler: favorites.getFavoritesController,
         }),
         addFavorite: makeRoute({
             route: 'POST /v1/favorites/:entryId',
-            handler: favorites.addFavorite,
+            handler: favorites.addFavoriteController,
             write: true,
         }),
         deleteFavorite: makeRoute({
             route: 'DELETE /v1/favorites/:entryId',
-            handler: favorites.deleteFavorite,
+            handler: favorites.deleteFavoriteController,
             write: true,
         }),
         renameFavorite: makeRoute({
             route: 'POST /v1/favorites/:entryId/rename',
-            handler: favorites.renameFavorite,
+            handler: favorites.renameFavoriteController,
             write: true,
         }),
 
@@ -453,7 +453,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
         }),
         getStructureItems: makeRoute({
             route: 'GET /v1/structure-items',
-            handler: structureItems.getStructureItems,
+            handler: structureItems.getStructureItemsController,
             features: [Feature.CollectionsEnabled],
         }),
         getRootCollectionPermissions: makeRoute({

@@ -1,42 +1,21 @@
 import hashGenerator from '../../../components/hash-generator';
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {State} from '../../../db/models/new/state';
+import {State, StateColumn} from '../../../db/models/new/state';
 import {ServiceArgs} from '../types';
-
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['entryId', 'data'],
-    properties: {
-        entryId: {
-            type: 'string',
-        },
-        data: {
-            type: 'object',
-        },
-    },
-});
+import {getPrimary} from '../utils';
 
 interface CreateStateArgs {
     entryId: string;
     data: Record<string, unknown>;
 }
 
-export const createState = async (
-    {ctx, trx}: ServiceArgs,
-    args: CreateStateArgs,
-    skipValidation = false,
-) => {
-    const targetTrx = trx ?? State.primary;
+export const createState = async ({ctx, trx}: ServiceArgs, args: CreateStateArgs) => {
+    const targetTrx = getPrimary(trx);
 
     const {entryId, data} = args;
 
     const {tenantId} = ctx.get('info');
 
     ctx.log('CREATE_STATE_REQUEST', {tenantId, entryId});
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const hash = hashGenerator({entryId, data});
 
@@ -51,9 +30,9 @@ export const createState = async (
 
     const state = await State.query(targetTrx)
         .insert({
-            hash,
-            entryId,
-            data,
+            [StateColumn.Hash]: hash,
+            [StateColumn.EntryId]: entryId,
+            [StateColumn.Data]: data,
         })
         .returning('*')
         .timeout(State.DEFAULT_QUERY_TIMEOUT);

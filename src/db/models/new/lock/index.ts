@@ -1,5 +1,22 @@
 import {Model} from '../../..';
-import {Entry} from '../entry';
+
+export const LockColumn = {
+    LockId: 'lockId',
+    EntryId: 'entryId',
+    LockToken: 'lockToken',
+    ExpiryDate: 'expiryDate',
+    StartDate: 'startDate',
+    Login: 'login',
+} as const;
+
+export const LockColumnRaw = {
+    LockId: 'lock_id',
+    EntryId: 'entry_id',
+    LockToken: 'lock_token',
+    ExpiryDate: 'expiry_date',
+    StartDate: 'start_date',
+    Login: 'login',
+} as const;
 
 export class Lock extends Model {
     static get tableName() {
@@ -7,28 +24,13 @@ export class Lock extends Model {
     }
 
     static get idColumn() {
-        return 'lockId';
+        return LockColumn.LockId;
     }
 
-    static get relationMappings() {
-        return {
-            entry: {
-                relation: Model.BelongsToOneRelation,
-                modelClass: Entry,
-                join: {
-                    from: `${Lock.tableName}.entryId`,
-                    to: `${Entry.tableName}.entryId`,
-                },
-            },
-        };
-    }
-
-    lockId!: string;
-    entryId!: string;
-    lockToken!: string;
-    expiryDate!: string;
-    startDate!: string;
-    login!: Nullable<string>;
-
-    entry?: Entry;
+    [LockColumn.LockId]!: string;
+    [LockColumn.EntryId]!: string;
+    [LockColumn.LockToken]!: string;
+    [LockColumn.ExpiryDate]!: string;
+    [LockColumn.StartDate]!: string;
+    [LockColumn.Login]!: Nullable<string>;
 }
