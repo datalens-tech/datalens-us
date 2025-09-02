@@ -272,8 +272,10 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                     entryId,
                     data,
                     meta,
-                    ...(description ? {annotation: {description}} : {}),
-                    ...(annotation ?? {}),
+                    ...(typeof description === 'string' ? {annotation: {description}} : {}),
+                    ...(typeof annotation?.description === 'string'
+                        ? {annotation: {description: annotation.description}}
+                        : {}),
                     links: syncedLinks,
                     createdBy: updatedBy,
                     updatedBy: updatedBy,

@@ -475,8 +475,10 @@ class Entry extends Model {
                 entryId,
                 meta,
                 data,
-                ...(description ? {annotation: {description}} : {}),
-                ...(annotation ?? {}),
+                ...(typeof description === 'string' ? {annotation: {description}} : {}),
+                ...(typeof annotation?.description === 'string'
+                    ? {annotation: {description: annotation.description}}
+                    : {}),
                 links: syncedLinks,
                 createdBy: createdBy,
                 updatedBy: createdBy,

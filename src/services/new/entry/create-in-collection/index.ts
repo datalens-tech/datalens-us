@@ -103,8 +103,10 @@ export async function createEntryInCollection(
                 links: syncedLinks,
                 createdBy: createdBy,
                 updatedBy: createdBy,
-                ...(description ? {annotation: {description}} : {}),
-                ...(annotation ?? {}),
+                ...(typeof description === 'string' ? {annotation: {description}} : {}),
+                ...(typeof annotation?.description === 'string'
+                    ? {annotation: {description: annotation.description}}
+                    : {}),
             })
             .timeout(RevisionModel.DEFAULT_QUERY_TIMEOUT);
 
