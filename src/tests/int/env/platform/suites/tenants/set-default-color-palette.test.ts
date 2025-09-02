@@ -8,6 +8,17 @@ const defaultColorPaletteId = 'test1';
 const updatedDefaultColorPaletteId = 'test2';
 
 describe('Set default color palette', () => {
+    test('Create folder to init user', async () => {
+        await auth(request(app).post('/v1/entries'))
+            .send({
+                key: 'entries-basic-tests',
+                scope: 'folder',
+                type: '',
+                meta: {},
+            })
+            .expect(200);
+    });
+
     test('Auth error', async () => {
         await request(app).post(routes.setDefaultColorPalette).expect(401);
     });
