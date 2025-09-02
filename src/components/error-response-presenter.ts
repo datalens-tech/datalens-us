@@ -411,6 +411,15 @@ export default (error: AppError | DBError) => {
             };
         }
 
+        case US_ERRORS.FAVORITE_NOT_EXISTS: {
+            return {
+                code: 404,
+                response: {
+                    message: "The favorite doesn't exist",
+                },
+            };
+        }
+
         default:
             return {
                 code: 500,
