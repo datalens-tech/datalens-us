@@ -5,3 +5,6 @@ export const testUserId = 'test-user-id';
 export const testUserLogin = 'test-user-login';
 
 export const testOtherUserId = 'test-other-user-id';
+
+export const testDlsAdminLogin = 'test-dls-admin-login';
+export const testDlsAdminId = 'test-dls-admin-id';
