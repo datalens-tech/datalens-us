@@ -34,6 +34,7 @@ export async function createEntryInCollection(
         data,
         includePermissionsInfo,
         description,
+        annotation,
     } = await parseArgs(args);
 
     const registry = ctx.get('registry');
@@ -103,6 +104,7 @@ export async function createEntryInCollection(
                 createdBy: createdBy,
                 updatedBy: createdBy,
                 ...(description ? {annotation: {description}} : {}),
+                ...(annotation ?? {}),
             })
             .timeout(RevisionModel.DEFAULT_QUERY_TIMEOUT);
 

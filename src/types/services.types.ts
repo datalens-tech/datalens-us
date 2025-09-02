@@ -34,6 +34,7 @@ export interface CreateEntry extends StdServiceParams {
     key?: EntryColumns['key'];
     meta?: RevisionColumns['meta'];
     description?: string;
+    annotation?: {description: string};
     hidden?: EntryColumns['hidden'];
     mirrored?: EntryColumns['mirrored'];
     mode?: 'save' | 'publish';

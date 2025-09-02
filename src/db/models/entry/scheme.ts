@@ -3,6 +3,7 @@ import {
     AJV_PATTERN_KEYS_NOT_OBJECT,
     ALLOWED_SCOPE_VALUES,
     ANNOTATION_DESCRIPTION_SCHEMA,
+    ANNOTATION_SCHEMA,
     ModeValues,
 } from '../../../const';
 
@@ -61,6 +62,7 @@ export const validateCreateEntry = compileSchema({
             enum: ModeValues,
         },
         description: ANNOTATION_DESCRIPTION_SCHEMA,
+        annotation: ANNOTATION_SCHEMA,
     },
 });
 
