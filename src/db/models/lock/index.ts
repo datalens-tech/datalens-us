@@ -13,13 +13,6 @@ import * as MT from '../../../types/models';
 import Utils from '../../../utils';
 import {Entry} from '../new/entry';
 
-import {
-    validateExtendLockEntry,
-    validateLockEntry,
-    validateUnlockEntry,
-    validateVerifyExistenceEntry,
-} from './scheme';
-
 interface Lock extends MT.LockColumns {}
 class Lock extends Model {
     static get tableName() {
@@ -82,15 +75,6 @@ class Lock extends Model {
             dlContext,
         });
 
-        const {isValid, validationErrors} = validateVerifyExistenceEntry({entryId, requestedBy});
-
-        if (!isValid) {
-            throw new AppError('Validation error', {
-                code: US_ERRORS.VALIDATION_ERROR,
-                details: {validationErrors},
-            });
-        }
-
         if (!isPrivateRoute) {
             await Lock.checkLockPermission({
                 ctx,
@@ -131,20 +115,6 @@ class Lock extends Model {
             duration,
             dlContext,
         });
-
-        const {isValid, validationErrors} = validateLockEntry({
-            entryId,
-            duration,
-            force,
-            requestedBy,
-        });
-
-        if (!isValid) {
-            throw new AppError('Validation error', {
-                code: US_ERRORS.VALIDATION_ERROR,
-                details: {validationErrors},
-            });
-        }
 
         if (duration > 600000) {
             throw new AppError('The max duration is 600000', {
@@ -235,27 +205,10 @@ class Lock extends Model {
     }
 
     static async unlock(
-        {
-            tenantId,
-            entryId,
-            lockToken,
-            force = false,
-            requestedBy,
-            isPrivateRoute,
-            dlContext,
-        }: MT.UnlockConfig,
+        {tenantId, entryId, lockToken, force = false, isPrivateRoute, dlContext}: MT.UnlockConfig,
         ctx: MT.CTX,
     ) {
         ctx.log('UNLOCK_ENTRY_REQUEST', {tenantId, entryId, dlContext});
-
-        const {isValid, validationErrors} = validateUnlockEntry({entryId, requestedBy});
-
-        if (!isValid) {
-            throw new AppError('Validation error', {
-                code: US_ERRORS.VALIDATION_ERROR,
-                details: {validationErrors},
-            });
-        }
 
         if (!isPrivateRoute) {
             await Lock.checkLockPermission({
@@ -329,21 +282,6 @@ class Lock extends Model {
             dlContext,
         });
 
-        const {isValid, validationErrors} = validateExtendLockEntry({
-            entryId,
-            duration,
-            lockToken,
-            force,
-            requestedBy,
-        });
-
-        if (!isValid) {
-            throw new AppError('Validation error', {
-                code: US_ERRORS.VALIDATION_ERROR,
-                details: {validationErrors},
-            });
-        }
-
         if (duration > 600000) {
             throw new AppError('The max duration is 600000', {
                 code: 'DURATION_IS_LIMITED',
@@ -390,8 +328,8 @@ class Lock extends Model {
                         expiryDate,
                         login: requestedBy.login,
                     })
-                    .first()
                     .returning('*')
+                    .first()
                     .timeout(Model.DEFAULT_QUERY_TIMEOUT);
             }
 

@@ -1,4 +1,3 @@
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CollectionModel} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
 import Utils from '../../../utils';
@@ -8,39 +7,6 @@ import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 
 import {getCollectionsQuery, getWorkbooksQuery, processPermissions} from './utils';
-
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['collectionId'],
-    properties: {
-        collectionId: {
-            type: ['string', 'null'],
-        },
-        includePermissionsInfo: {
-            type: 'boolean',
-        },
-        filterString: {
-            type: 'string',
-        },
-        page: {
-            type: 'number',
-            minimum: 0,
-        },
-        pageSize: {
-            type: 'number',
-            minimum: 1,
-            maximum: 200,
-        },
-        orderField: {
-            type: 'string',
-            enum: ['title', 'createdAt', 'updatedAt'],
-        },
-        orderDirection: {
-            type: 'string',
-            enum: ['asc', 'desc'],
-        },
-    },
-});
 
 export type OrderField = 'title' | 'createdAt' | 'updatedAt';
 
@@ -62,7 +28,7 @@ export interface GetStructureItemsContentArgs {
 
 // eslint-disable-next-line complexity
 export const getStructureItems = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: GetStructureItemsContentArgs,
 ) => {
     const {
@@ -88,10 +54,6 @@ export const getStructureItems = async (
         onlyMy,
         mode,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const {accessServiceEnabled} = ctx.config;
     const registry = ctx.get('registry');
