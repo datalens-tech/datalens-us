@@ -1,5 +1,6 @@
 import request from 'supertest';
 
+import {testDlsAdminId, testDlsAdminLogin, testUserId} from '../../../../constants';
 import {routes} from '../../../../routes';
 import {app, auth} from '../../auth';
 import {PlatformRole} from '../../roles';
@@ -15,6 +16,20 @@ const updateTestSettings = {
 };
 
 describe('Update tenant settings', () => {
+    test('Create folder to init user', async () => {
+        await auth(request(app).post('/v1/entries'), {
+            role: PlatformRole.Visitor,
+            userId: testUserId,
+            login: testUserId,
+        })
+            .send({
+                key: 'create-dash-for-tests',
+                scope: 'dash',
+                type: '',
+                meta: {},
+            })
+            .expect(200);
+    });
     test('Auth error', async () => {
         await request(app).post(routes.updateTenantSettings).expect(401);
     });
@@ -26,12 +41,16 @@ describe('Update tenant settings', () => {
     test('Update tenant settings with wrong role error', async () => {
         await auth(request(app).post(routes.updateTenantSettings), {
             role: PlatformRole.Visitor,
+            userId: testUserId,
+            login: testUserId,
         })
             .send(testSettings)
             .expect(403);
 
         await auth(request(app).post(routes.updateTenantSettings), {
             role: PlatformRole.Creator,
+            userId: testUserId,
+            login: testUserId,
         })
             .send(testSettings)
             .expect(403);
@@ -40,6 +59,8 @@ describe('Update tenant settings', () => {
     test('Update tenant settings validation error', async () => {
         await auth(request(app).post(routes.updateTenantSettings), {
             role: PlatformRole.Admin,
+            userId: testDlsAdminId,
+            login: testDlsAdminLogin,
         })
             .send({
                 key: 1,
@@ -49,6 +70,8 @@ describe('Update tenant settings', () => {
 
         await auth(request(app).post(routes.updateTenantSettings), {
             role: PlatformRole.Admin,
+            userId: testDlsAdminId,
+            login: testDlsAdminLogin,
         })
             .send({
                 key: 'key',
@@ -60,6 +83,8 @@ describe('Update tenant settings', () => {
     test('Set settings', async () => {
         const updateResponse = await auth(request(app).post(routes.updateTenantSettings), {
             role: PlatformRole.Admin,
+            userId: testDlsAdminId,
+            login: testDlsAdminLogin,
         })
             .send(testSettings)
             .expect(200);
@@ -74,6 +99,8 @@ describe('Update tenant settings', () => {
     test('Update settings', async () => {
         const updateResponse = await auth(request(app).post(routes.updateTenantSettings), {
             role: PlatformRole.Admin,
+            userId: testDlsAdminId,
+            login: testDlsAdminLogin,
         })
             .send(updateTestSettings)
             .expect(200);
