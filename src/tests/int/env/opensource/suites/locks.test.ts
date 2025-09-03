@@ -229,7 +229,7 @@ describe('Locks', () => {
                 duration,
                 force: true,
             }),
-            auth(request(app).post(`${routes.locks}/${entryId}`).query({force: 'true'}), {
+            auth(request(app).post(`${routes.locks}/${entryId}`), {
                 role: OpensourceRole.Editor,
             }).send({
                 duration,

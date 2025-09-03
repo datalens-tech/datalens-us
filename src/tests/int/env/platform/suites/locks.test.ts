@@ -244,7 +244,7 @@ describe('Locks', () => {
                 duration,
                 force: true,
             }),
-            auth(request(app).post(`${routes.locks}/${entryId}`).query({force: 'true'}), {
+            auth(request(app).post(`${routes.locks}/${entryId}`), {
                 accessBindings: [getWorkbookBinding(workbookId, 'update')],
             }).send({
                 duration,
