@@ -12,7 +12,7 @@ const requestSchema = {
         entryId: zc.encodedId(),
     }),
     body: z.object({
-        duration: z.number().min(1),
+        duration: z.number().min(1).optional(),
         force: z.boolean().optional(),
     }),
 };
