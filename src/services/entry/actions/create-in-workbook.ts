@@ -4,6 +4,7 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {
     AJV_PATTERN_KEYS_NOT_OBJECT,
     ANNOTATION_DESCRIPTION_SCHEMA,
+    ANNOTATION_SCHEMA,
     BiTrackingLogs,
     DEFAULT_QUERY_TIMEOUT,
     ModeValues,
@@ -74,6 +75,7 @@ export const validateCreateEntryInWorkbook = makeSchemaValidator({
             type: 'boolean',
         },
         description: ANNOTATION_DESCRIPTION_SCHEMA,
+        annotation: ANNOTATION_SCHEMA,
     },
 });
 
@@ -90,6 +92,7 @@ export type CreateEntryInWorkbookData = {
     meta?: RevisionColumns['meta'];
     data?: RevisionColumns['data'];
     description?: string;
+    annotation?: {description: string};
     includePermissionsInfo?: boolean;
 };
 
@@ -108,6 +111,7 @@ export async function createEntryInWorkbook(
         meta,
         data,
         description,
+        annotation,
         includePermissionsInfo,
     }: CreateEntryInWorkbookData,
 ) {
@@ -126,6 +130,7 @@ export async function createEntryInWorkbook(
         meta,
         data,
         description,
+        annotation,
         includePermissionsInfo,
     });
 
@@ -190,6 +195,7 @@ export async function createEntryInWorkbook(
             createdBy: createdBy,
             updatedBy: createdBy,
             ...(description ? {annotation: {description}} : {}),
+            ...(annotation ? {annotation} : {}),
         });
 
         return await Entry.query(trx)
