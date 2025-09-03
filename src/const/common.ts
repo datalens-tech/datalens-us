@@ -265,7 +265,7 @@ export const ANNOTATION_DESCRIPTION_SCHEMA = {
 };
 
 export const ANNOTATION_SCHEMA = {
-    type: ['object', 'null'],
+    type: ['object'],
     required: ['description'],
     properties: {
         description: ANNOTATION_DESCRIPTION_SCHEMA,
