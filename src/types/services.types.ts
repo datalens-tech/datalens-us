@@ -103,7 +103,7 @@ export interface VerifyLockExistence extends StdServiceParams {
 }
 export interface LockEntry extends StdServiceParams {
     entryId: string;
-    duration: number;
+    duration?: number;
     force?: boolean;
 }
 export interface UnlockEntry extends StdServiceParams {
