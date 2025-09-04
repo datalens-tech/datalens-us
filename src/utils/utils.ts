@@ -284,7 +284,7 @@ export class Utils {
             decodedId = new PowerRadix(encodedLongPart, rotatedCodingBase).toString(10);
 
             // recheck
-            if (Number(encodedRotationNumber) !== Utils.getRotationNumber(decodedId)) {
+            if (Number(decodedRotationNumber) !== Utils.getRotationNumber(decodedId)) {
                 throw new AppError('The ID is incorrect.', {
                     code: US_ERRORS.DECODE_ID_FAILED,
                 });
