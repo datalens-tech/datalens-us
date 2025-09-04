@@ -240,13 +240,17 @@ export class Utils {
         });
     };
 
+    static getRotationNumber = (bigIntId: string): number => {
+        const bigIntIdShortPart = Number(bigIntId.slice(-2));
+
+        return bigIntIdShortPart % CODING_BASE.length;
+    };
+
     static encodeId(bigIntId: any) {
         let encodedId = '';
 
         if (bigIntId) {
-            const bigIntIdShortPart: any = bigIntId.slice(-2);
-
-            const rotationNumber = bigIntIdShortPart % CODING_BASE.length;
+            const rotationNumber = Utils.getRotationNumber(bigIntId);
             const rotatedCodingBase = Utils.rotate(CODING_BASE, rotationNumber);
 
             const encodedLongPart = new PowerRadix(bigIntId, 10).toString(rotatedCodingBase);
@@ -277,9 +281,14 @@ export class Utils {
             ).toString(10);
             const rotatedCodingBase = Utils.rotate(CODING_BASE, decodedRotationNumber);
 
-            const decodedLongPart = new PowerRadix(encodedLongPart, rotatedCodingBase).toString(10);
+            decodedId = new PowerRadix(encodedLongPart, rotatedCodingBase).toString(10);
 
-            decodedId = decodedLongPart;
+            // recheck
+            if (Number(encodedRotationNumber) !== Utils.getRotationNumber(decodedId)) {
+                throw new AppError('The ID is incorrect.', {
+                    code: US_ERRORS.DECODE_ID_FAILED,
+                });
+            }
         }
 
         return decodedId;
