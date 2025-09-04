@@ -41,9 +41,11 @@ describe('Set default color palette', () => {
     test('Set defaultColorPaletteId', async () => {
         const updateResponse = await auth(request(app).post(routes.setDefaultColorPalette), {
             role: PlatformRole.Admin,
-        }).send({
-            defaultColorPaletteId,
-        });
+        })
+            .send({
+                defaultColorPaletteId,
+            })
+            .expect(200);
 
         const {settings} = updateResponse.body;
 
