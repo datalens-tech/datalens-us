@@ -13,15 +13,15 @@ import {EntryPermissions} from '../types';
 import {checkWorkbookIsolation} from '../utils';
 
 import {
+    ENTITY_BINDING_QUERY_TIMEOUT,
+    ENTRY_QUERY_TIMEOUT,
     selectedEntryColumns,
     selectedFavoriteColumns,
     selectedRevisionColumns,
     selectedTenantColumns,
 } from './constants';
 import type {SelectedEntry, SelectedRevision} from './types';
-import {checkWorkbookEntry} from './utils';
-
-const ENTRY_QUERY_TIMEOUT = 3000;
+import {checkCollectionEntry, checkWorkbookEntry} from './utils';
 
 interface GetEntryArgs {
     entryId: string;
@@ -182,10 +182,10 @@ export const getEntry = async (
         isEnabledFeature(ctx, Feature.WorkbookIsolationEnabled);
 
     if (checkWorkbookIsolationEnabled) {
-        checkWorkbookIsolation({
-            ctx,
-            workbookId: entry.workbookId,
-        });
+        await checkWorkbookIsolation(
+            {ctx, trx},
+            {entry, getEntityBindingsQueryTimeout: ENTITY_BINDING_QUERY_TIMEOUT},
+        );
     }
 
     const {isNeedBypassEntryByKey, getServicePlan} = registry.common.functions.get();
@@ -217,6 +217,18 @@ export const getEntry = async (
                 trx,
                 entry,
                 workbook: entry.workbook,
+                includePermissionsInfo,
+            });
+        }
+    } else if (entry.collectionId) {
+        const checkPermissionEnabled =
+            !isPrivateRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
+
+        if (checkPermissionEnabled) {
+            iamPermissions = await checkCollectionEntry({
+                ctx,
+                trx,
+                entry,
                 includePermissionsInfo,
             });
         }
