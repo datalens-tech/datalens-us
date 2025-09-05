@@ -36,7 +36,6 @@ export const updateTenantSettings = async (
         await processTenantSettings({
             ctx,
             trx: transactionTrx,
-            tenantId,
             key,
             value,
         });

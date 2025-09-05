@@ -1,5 +1,5 @@
 import type {AppContext} from '@gravity-ui/nodekit';
-import {Transaction} from 'objection';
+import {TransactionOrKnex} from 'objection';
 
 import {Tenant, TenantColumn} from '../../../../db/models/new/tenant';
 
@@ -17,8 +17,7 @@ export type GetServicePlan = (
 
 export type ProcessTenantSettings = (args: {
     ctx: AppContext;
-    trx: Transaction;
-    tenantId: string;
+    trx: TransactionOrKnex;
     key: string;
-    value: unknown;
+    value: string | boolean | number;
 }) => Promise<void>;

@@ -556,8 +556,6 @@ export type LogEventParams =
     | LogEventMoveWorkbooksListFailParams
     | LogEventCreateColorPaletteSuccessParams
     | LogEventCreateColorPaletteFailParams
-    | LogEventUpdateColorPaletteSuccessParams
-    | LogEventUpdateColorPaletteFailParams
     | LogEventDeleteColorPaletteSuccessParams
     | LogEventDeleteColorPaletteFailParams
     | LogEventCopyEntriesToWorkbookSuccessParams

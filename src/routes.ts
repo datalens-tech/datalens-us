@@ -551,6 +551,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
         updateTenantSettings: makeRoute({
             route: 'POST /v1/tenants/settings',
             handler: tenants.updateTenantSettingsController,
+            features: [Feature.TenantsEnabled],
             write: true,
         }),
         getTenantDetails: makeRoute({
