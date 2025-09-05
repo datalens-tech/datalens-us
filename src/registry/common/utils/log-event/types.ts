@@ -21,6 +21,7 @@ import type {
 import type {CopyEntriesToWorkbookReqBody} from '../../../../controllers/entries/copy-entries-to-workbook';
 import type {DeleteEntryReqParams} from '../../../../controllers/entries/delete-entry';
 import {SetDefaultColorPaletteRequestBodySchema} from '../../../../controllers/tenants/set-default-color-palette';
+import {UpdateTenantSettingsRequestBodySchema} from '../../../../controllers/tenants/update-tenant-settings';
 import type {
     CopyWorkbookReqBody,
     CopyWorkbookReqParams,
@@ -117,6 +118,9 @@ export enum LogEventType {
 
     SetDefaultColorPaletteSuccess = 'setDefaultColorPaletteSuccess',
     SetDefaultColorPaletteFail = 'setDefaultColorPaletteFail',
+
+    UpdateTenantSettingsSuccess = 'updateTenantSettingsSuccess',
+    UpdateTenantSettingsFail = 'updateTenantSettingsFail',
 }
 
 interface EventParams {
@@ -509,6 +513,20 @@ export interface LogEventSetDefaultColorPaletteFailParams extends EventParams {
     error: unknown;
 }
 
+export interface LogEventUpdateTenantSettingsSuccessParams extends EventParams {
+    type: LogEventType.UpdateTenantSettingsSuccess;
+
+    reqBody: UpdateTenantSettingsRequestBodySchema;
+    tenant: Tenant;
+}
+
+export interface LogEventUpdateTenantSettingsFailParams extends EventParams {
+    type: LogEventType.UpdateTenantSettingsFail;
+
+    reqBody: UpdateTenantSettingsRequestBodySchema;
+    error: unknown;
+}
+
 export type LogEventParams =
     | LogEventCreateCollectionSuccessParams
     | LogEventCreateCollectionFailParams
@@ -538,8 +556,6 @@ export type LogEventParams =
     | LogEventMoveWorkbooksListFailParams
     | LogEventCreateColorPaletteSuccessParams
     | LogEventCreateColorPaletteFailParams
-    | LogEventUpdateColorPaletteSuccessParams
-    | LogEventUpdateColorPaletteFailParams
     | LogEventDeleteColorPaletteSuccessParams
     | LogEventDeleteColorPaletteFailParams
     | LogEventCopyEntriesToWorkbookSuccessParams
@@ -557,6 +573,10 @@ export type LogEventParams =
     | LogEventUpdateEntrySuccessParams
     | LogEventUpdateEntryFailParams
     | LogEventSetDefaultColorPaletteSuccessParams
-    | LogEventSetDefaultColorPaletteFailParams;
+    | LogEventSetDefaultColorPaletteFailParams
+    | LogEventUpdateColorPaletteSuccessParams
+    | LogEventUpdateColorPaletteFailParams
+    | LogEventUpdateTenantSettingsSuccessParams
+    | LogEventUpdateTenantSettingsFailParams;
 
 export type LogEvent = (params: LogEventParams) => void;
