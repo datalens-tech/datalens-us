@@ -5,6 +5,7 @@ import {Feature, isEnabledFeature} from '../../components/features';
 import {DL_WORKBOOK_ID_HEADER, US_ERRORS} from '../../const';
 import Utils from '../../utils';
 
+/** @deprecated use resolveIsolationIds */
 export const resolveWorkbookId = (req: Request, res: Response, next: NextFunction) => {
     if (isEnabledFeature(req.ctx, Feature.WorkbookIsolationEnabled)) {
         try {

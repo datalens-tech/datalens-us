@@ -353,6 +353,15 @@ export default (error: AppError | DBError) => {
             };
         }
 
+        case US_ERRORS.INCORRECT_DATASET_ID_HEADER: {
+            return {
+                code: 400,
+                response: {
+                    code,
+                    message: 'Dataset id header is incorrect',
+                },
+            };
+        }
         case US_ERRORS.INCORRECT_WORKBOOK_ID_HEADER: {
             return {
                 code: 400,

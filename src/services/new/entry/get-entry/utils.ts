@@ -2,15 +2,21 @@ import {AppContext, AppError} from '@gravity-ui/nodekit';
 import {TransactionOrKnex} from 'objection';
 
 import {US_ERRORS} from '../../../../const';
+import {Entry as EntryModel} from '../../../../db/models/new/entry';
 import {WorkbookModel} from '../../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../../entities/workbook';
 import {getParentIds} from '../../collection/utils';
 import {getReplica} from '../../utils';
 import {getEntryPermissionsByWorkbook} from '../../workbook/utils';
+import {checkCollectionEntryPermission} from '../utils/check-collection-entry-permission';
 
+import {
+    ENTITY_BINDING_QUERY_TIMEOUT,
+    ENTRY_QUERY_TIMEOUT,
+    GET_PARENTS_QUERY_TIMEOUT,
+    WORKBOOK_QUERY_TIMEOUT,
+} from './constants';
 import {SelectedEntry} from './types';
-
-const GET_PARENTS_QUERY_TIMEOUT = 3000;
 
 export const checkWorkbookEntry = async ({
     ctx,
@@ -74,4 +80,36 @@ export const checkWorkbookEntry = async ({
     }
 
     return undefined;
+};
+
+export const checkCollectionEntry = async ({
+    ctx,
+    trx,
+    entry,
+    includePermissionsInfo,
+}: {
+    ctx: AppContext;
+    trx?: TransactionOrKnex;
+    entry: SelectedEntry;
+    includePermissionsInfo?: boolean;
+}) => {
+    const registry = ctx.get('registry');
+    const {SharedEntry} = registry.common.classes.get();
+
+    const sharedEntryInstance = new SharedEntry({
+        ctx,
+        model: entry as EntryModel,
+    });
+
+    return await checkCollectionEntryPermission(
+        {ctx, trx},
+        {
+            sharedEntryInstance,
+            includePermissions: includePermissionsInfo,
+            getEntityBindingsQueryTimeout: ENTITY_BINDING_QUERY_TIMEOUT,
+            getParentsQueryTimeout: GET_PARENTS_QUERY_TIMEOUT,
+            getEntryQueryTimeout: ENTRY_QUERY_TIMEOUT,
+            getWorkbookQueryTimeout: WORKBOOK_QUERY_TIMEOUT,
+        },
+    );
 };

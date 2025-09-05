@@ -58,3 +58,8 @@ export const favoriteColumns = [FavoriteColumn.EntryId, FavoriteColumn.Login] as
 export const selectedFavoriteColumns = favoriteColumns.map(
     (column) => `${Favorite.tableName}.${column}`,
 );
+
+export const ENTRY_QUERY_TIMEOUT = 3000;
+export const ENTITY_BINDING_QUERY_TIMEOUT = 3000;
+export const GET_PARENTS_QUERY_TIMEOUT = 3000;
+export const WORKBOOK_QUERY_TIMEOUT = 3000;

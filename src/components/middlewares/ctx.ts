@@ -7,6 +7,7 @@ export const ctx = async (req: Request, res: Response, next: NextFunction) => {
     const {
         tenantId,
         workbookId,
+        datasetId,
         userToken,
         userId,
         login,
@@ -27,6 +28,7 @@ export const ctx = async (req: Request, res: Response, next: NextFunction) => {
         requestId: req.id,
         tenantId,
         workbookId,
+        datasetId,
         userToken,
         user,
         isPrivateRoute,
