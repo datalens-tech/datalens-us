@@ -263,3 +263,12 @@ export const ANNOTATION_DESCRIPTION_SCHEMA = {
     type: 'string',
     maxLength: ANNOTATION_DESCRIPTION_MAX_LENGTH,
 };
+
+export const ANNOTATION_SCHEMA = {
+    type: ['object'],
+    required: ['description'],
+    additionalProperties: false,
+    properties: {
+        description: ANNOTATION_DESCRIPTION_SCHEMA,
+    },
+};

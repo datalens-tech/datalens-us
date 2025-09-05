@@ -18,6 +18,7 @@ export const updateEntryController: AppRouteHandler = async (req, res) => {
             meta: body.meta,
             data: body.data,
             description: body.description,
+            annotation: body.annotation,
             unversionedData: body.unversionedData,
             links: body.links,
             mode: body.mode,
