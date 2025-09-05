@@ -22,6 +22,7 @@ import type {SelectedEntry, SelectedRevision} from './types';
 import {checkWorkbookEntry} from './utils';
 
 const ENTRY_QUERY_TIMEOUT = 3000;
+const ENTITY_BINDING_QUERY_TIMEOUT = 3000;
 
 interface GetEntryArgs {
     entryId: string;
@@ -182,10 +183,10 @@ export const getEntry = async (
         isEnabledFeature(ctx, Feature.WorkbookIsolationEnabled);
 
     if (checkWorkbookIsolationEnabled) {
-        checkWorkbookIsolation({
-            ctx,
-            workbookId: entry.workbookId,
-        });
+        await checkWorkbookIsolation(
+            {ctx, trx},
+            {entry, getEntityBindingsTimeout: ENTITY_BINDING_QUERY_TIMEOUT},
+        );
     }
 
     const {isNeedBypassEntryByKey, getServicePlan} = registry.common.functions.get();
