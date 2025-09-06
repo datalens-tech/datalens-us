@@ -17,7 +17,7 @@ export type GetServicePlan = (
 
 export type ProcessTenantSettings = (args: {
     ctx: AppContext;
-    trx: TransactionOrKnex;
+    trx?: TransactionOrKnex;
     key: string;
     value: string | boolean | number;
 }) => Promise<void>;
