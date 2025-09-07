@@ -547,6 +547,13 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             write: true,
             features: [Feature.ColorPalettesEnabled, Feature.DefaultColorPaletteEnabled],
         }),
+
+        updateTenantSettings: makeRoute({
+            route: 'POST /v1/tenants/settings',
+            handler: tenants.updateTenantSettingsController,
+            features: [Feature.TenantsEnabled],
+            write: true,
+        }),
         getTenantDetails: makeRoute({
             route: 'GET /v1/tenants/details',
             handler: tenants.getTenantDetailsController,

@@ -2,7 +2,7 @@ import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
 import {OrganizationPermission} from '../../../components/iam';
-import {TenantSettingsKey, US_ERRORS} from '../../../const';
+import {TenantSettings, US_ERRORS} from '../../../const';
 import {Tenant} from '../../../db/models/new/tenant';
 import {registry} from '../../../registry';
 import {ServiceArgs} from '../types';
@@ -35,7 +35,7 @@ export const setDefaultColorPalette = async (
         .where({tenantId})
         .patch({
             settings: raw(
-                `jsonb_set(??, '{${TenantSettingsKey.DefaultColorPaletteId}}', to_jsonb(?::text))`,
+                `jsonb_set(??, '{${TenantSettings.DefaultColorPaletteId}}', to_jsonb(?::text))`,
                 ['settings', defaultColorPaletteId],
             ),
         })
