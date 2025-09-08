@@ -30,6 +30,7 @@ export const createEntryAltController: AppRouteHandler = async (req, res) => {
             key: body.key,
             meta: body.meta,
             description: body.description,
+            annotation: body.annotation,
             recursion: body.recursion,
             hidden: body.hidden,
             mirrored: body.mirrored,

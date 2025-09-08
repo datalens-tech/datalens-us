@@ -34,6 +34,7 @@ export interface CreateEntry extends StdServiceParams {
     key?: EntryColumns['key'];
     meta?: RevisionColumns['meta'];
     description?: string;
+    annotation?: {description: string};
     hidden?: EntryColumns['hidden'];
     mirrored?: EntryColumns['mirrored'];
     mode?: 'save' | 'publish';
@@ -102,7 +103,7 @@ export interface VerifyLockExistence extends StdServiceParams {
 }
 export interface LockEntry extends StdServiceParams {
     entryId: string;
-    duration: number;
+    duration?: number;
     force?: boolean;
 }
 export interface UnlockEntry extends StdServiceParams {

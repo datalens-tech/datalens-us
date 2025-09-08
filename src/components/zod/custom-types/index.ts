@@ -5,3 +5,5 @@ export * from './string-number';
 export * from './limited-object';
 export * from './json-string';
 export * from './entity-name';
+export * from './tenant-settings';
+export * from './primitive';

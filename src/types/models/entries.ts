@@ -42,6 +42,7 @@ export interface CreationEntryConfig extends BasicRequestParams {
     recursion?: any;
     data?: any;
     description?: string;
+    annotation?: {description: string};
     links?: SyncLinks;
     includePermissionsInfo?: boolean;
     permissionsMode?: any;

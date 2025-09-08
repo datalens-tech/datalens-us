@@ -131,13 +131,16 @@ describe('Locks', () => {
     });
 
     test('Delete lock auth error', async () => {
-        await request(app).delete(`${routes.locks}/${entryId}?force=true`).expect(401);
+        await request(app).delete(`${routes.locks}/${entryId}`).query({force: 'true'}).expect(401);
     });
 
     test('Delete lock', async () => {
-        const response = await auth(request(app).delete(`${routes.locks}/${entryId}?force=true`), {
-            role: OpensourceRole.Editor,
-        }).expect(200);
+        const response = await auth(
+            request(app).delete(`${routes.locks}/${entryId}`).query({force: 'true'}),
+            {
+                role: OpensourceRole.Editor,
+            },
+        ).expect(200);
 
         const {body} = response;
 
@@ -213,7 +216,7 @@ describe('Locks', () => {
             });
         }
 
-        await auth(request(app).delete(`${routes.locks}/${entryId}?force=true`), {
+        await auth(request(app).delete(`${routes.locks}/${entryId}`).query({force: 'true'}), {
             role: OpensourceRole.Editor,
         }).expect(200);
     });
@@ -226,7 +229,7 @@ describe('Locks', () => {
                 duration,
                 force: true,
             }),
-            auth(request(app).post(`${routes.locks}/${entryId}?force=true`), {
+            auth(request(app).post(`${routes.locks}/${entryId}`), {
                 role: OpensourceRole.Editor,
             }).send({
                 duration,
@@ -255,8 +258,29 @@ describe('Locks', () => {
             message: entryLockedMessage,
         });
 
-        await auth(request(app).delete(`${routes.locks}/${entryId}?force=true`), {
+        await auth(request(app).delete(`${routes.locks}/${entryId}`).query({force: 'true'}), {
             role: OpensourceRole.Editor,
         }).expect(200);
+    });
+
+    test('Create lock for entry without duration', async () => {
+        const response = await auth(request(app).post(`${routes.locks}/${entryId}`), {
+            role: OpensourceRole.Editor,
+        })
+            .send({})
+            .expect(200);
+
+        const {body} = response;
+
+        expect(body).toStrictEqual({lockToken: expect.any(String)});
+
+        testLockToken = body.lockToken;
+
+        await auth(
+            request(app).delete(`${routes.locks}/${entryId}`).query({lockToken: testLockToken}),
+            {
+                role: OpensourceRole.Editor,
+            },
+        ).expect(200);
     });
 });
