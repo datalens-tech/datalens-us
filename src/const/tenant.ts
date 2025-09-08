@@ -1,3 +1,3 @@
-export enum TenantSettingsKey {
-    DefaultColorPaletteId = 'defaultColorPaletteId',
-}
+export const TenantSettings = {
+    DefaultColorPaletteId: 'defaultColorPaletteId',
+} as const;
