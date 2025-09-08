@@ -1,0 +1,76 @@
+import {AppRouteHandler} from '@gravity-ui/expresskit';
+
+import {ApiTag} from '../../components/api-docs';
+import {makeReqParser, z, zc} from '../../components/zod';
+import {CONTENT_TYPE_JSON} from '../../const';
+import {LogEventType} from '../../registry/common/utils/log-event/types';
+import {updateTenantSettings} from '../../services/new/tenants';
+
+import {briefTenantWithSettingsModel} from './response-models';
+
+const requestSchema = {
+    body: z.object({
+        key: z.string(),
+        value: zc.primitive(),
+    }),
+};
+export type UpdateTenantSettingsRequestBodySchema = z.infer<typeof requestSchema.body>;
+
+const parseReq = makeReqParser(requestSchema);
+
+export const updateTenantSettingsController: AppRouteHandler = async (req, res) => {
+    const {body} = await parseReq(req);
+    const registry = req.ctx.get('registry');
+    const {logEvent} = registry.common.functions.get();
+    try {
+        const result = await updateTenantSettings(
+            {
+                ctx: req.ctx,
+            },
+            {key: body.key, value: body.value},
+        );
+
+        logEvent({
+            type: LogEventType.UpdateTenantSettingsSuccess,
+            ctx: req.ctx,
+            reqBody: body,
+            tenant: result,
+        });
+
+        res.status(200).send(briefTenantWithSettingsModel.format(result));
+    } catch (error) {
+        logEvent({
+            type: LogEventType.UpdateTenantSettingsFail,
+            ctx: req.ctx,
+            reqBody: body,
+            error,
+        });
+        throw error;
+    }
+};
+
+updateTenantSettingsController.api = {
+    summary: 'Update tenant settings',
+    tags: [ApiTag.Tenants],
+    request: {
+        body: {
+            content: {
+                [CONTENT_TYPE_JSON]: {
+                    schema: requestSchema.body,
+                },
+            },
+        },
+    },
+    responses: {
+        200: {
+            description: briefTenantWithSettingsModel.schema.description ?? '',
+            content: {
+                [CONTENT_TYPE_JSON]: {
+                    schema: briefTenantWithSettingsModel.schema,
+                },
+            },
+        },
+    },
+};
+
+updateTenantSettingsController.manualDecodeId = true;
