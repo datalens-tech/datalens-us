@@ -61,8 +61,18 @@ export async function checkEntityBindings(
         );
     }
 
+    if (isDatasetScope && requestDatasetId) {
+        throwAccessError(ctx, `Inconsistent check entry scope ${checkEntryScope} with dataset id`);
+    }
+
+    const withDatasetAndWorkbookContext =
+        isConnectionScope && requestWorkbookId && requestDatasetId;
     const targetFilters: TargetFilter[] = [];
     const sourceIds: string[] = [checkEntryId];
+
+    if (withDatasetAndWorkbookContext) {
+        sourceIds.push(requestDatasetId);
+    }
 
     if (requestWorkbookId) {
         targetFilters.push({
@@ -76,7 +86,6 @@ export async function checkEntityBindings(
             targetType: EntityBindingTargetType.Entries,
             targetId: requestDatasetId,
         });
-        sourceIds.push(requestDatasetId);
     }
 
     const entityBindings = await EntityBindingEntryPresentation.getSelectQuery(getReplica(trx), {
@@ -89,7 +98,7 @@ export async function checkEntityBindings(
         throwAccessError(ctx, 'Not found entity bindings');
     }
 
-    if (isConnectionScope && requestWorkbookId && requestDatasetId) {
+    if (withDatasetAndWorkbookContext) {
         await checkConnectionWithWorkbookAndDataset(
             {ctx, trx},
             {
@@ -103,6 +112,10 @@ export async function checkEntityBindings(
             },
         );
         return;
+    }
+
+    if (entityBindings.length !== 1) {
+        throwAccessError(ctx, 'Inconsistent entity bindings count');
     }
 
     const binding = entityBindings[0];
@@ -168,8 +181,15 @@ async function checkConnectionWithWorkbookAndDataset(
     }
 
     const connectionToDatasetBinding = entityBindings.find(
-        (binding) => binding.entryId === datasetId && binding.targetId === connectionId,
+        (binding) => binding.entryId === connectionId && binding.targetId === datasetId,
     );
+
+    if (!connectionToDatasetBinding) {
+        throwAccessError(
+            ctx,
+            `Not found entity binding from source ${connectionId} to target ${datasetId}`,
+        );
+    }
 
     await Promise.all([
         checkWorkbookPermissionById({
@@ -180,7 +200,7 @@ async function checkConnectionWithWorkbookAndDataset(
             getWorkbookQueryTimeout,
             getParentsQueryTimeout,
         }),
-        connectionToDatasetBinding?.isDelegated
+        connectionToDatasetBinding.isDelegated
             ? Promise.resolve()
             : checkCollectionEntry({ctx, trx}, {sharedEntryInstance, getParentsQueryTimeout}),
     ]);
