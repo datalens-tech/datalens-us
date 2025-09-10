@@ -14,7 +14,6 @@ const requestSchema = {
     body: z.object({
         data: zc.limitedObject({
             limit: MAX_STATE_DATA_OBJECT_SYMBOLS,
-            customCode: 'limit exceeded',
         }),
     }),
 };
