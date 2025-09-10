@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-export const limitedObject = ({limit}: {limit: number; customCode?: string}) =>
+export const limitedObject = ({limit}: {limit: number}) =>
     z.record(z.string(), z.unknown()).refine(
         (val) => {
             if (JSON.stringify(val).length <= limit) {
