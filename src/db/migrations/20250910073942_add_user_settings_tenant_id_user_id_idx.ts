@@ -8,7 +8,7 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
     await knex.raw(`
-    DROP INDEX CONCURRENTLY IF EXISTS user_settings_tenant_id_user_id_idx;
+    DROP INDEX CONCURRENTLY user_settings_tenant_id_user_id_idx;
  `);
 }
 
