@@ -24,3 +24,4 @@ export {
     resolveTenantController,
     requestSchema as resolveTenantRequestSchema,
 } from '../src/controllers/tenants/resolve-tenant';
+export {operation as operationModel} from '../src/controllers/response-models/operation';
