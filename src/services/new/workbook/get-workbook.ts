@@ -12,13 +12,20 @@ import {getReplica} from '../utils';
 export interface GetWorkbookArgs {
     workbookId: string;
     includePermissionsInfo?: boolean;
+    getParentsQueryTimeout?: number;
+    getWorkbookQueryTimeout?: number;
 }
 
 export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>(
     {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: GetWorkbookArgs,
 ): Promise<T> => {
-    const {workbookId, includePermissionsInfo = false} = args;
+    const {
+        workbookId,
+        includePermissionsInfo = false,
+        getParentsQueryTimeout,
+        getWorkbookQueryTimeout = WorkbookModel.DEFAULT_QUERY_TIMEOUT,
+    } = args;
 
     ctx.log('GET_WORKBOOK_START', {
         workbookId: Utils.encodeId(workbookId),
@@ -42,7 +49,7 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
                   }),
         })
         .first()
-        .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
+        .timeout(getWorkbookQueryTimeout);
 
     if (!model) {
         throw new AppError(US_ERRORS.WORKBOOK_NOT_EXISTS, {
@@ -66,6 +73,7 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
                 ctx,
                 trx: targetTrx,
                 collectionId: workbook.model.collectionId,
+                getParentsQueryTimeout,
             });
         }
 

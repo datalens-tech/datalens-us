@@ -99,6 +99,86 @@ export const createPrivateMockWorkbookEntry = async (args: CreateMockWorkbookEnt
     return response.body;
 };
 
+export const mockCollectionEntry = {
+    name: 'Collection Entry Name',
+    scope: 'dataset',
+    type: '',
+    data: null,
+    meta: null,
+    mode: undefined,
+};
+
+type CreateMockCollectionEntryArgs = {
+    name?: string;
+    scope?: string;
+    type?: string;
+    collectionId: string;
+    meta?: Record<string, string>;
+    data?: Record<string, unknown>;
+    description?: string;
+    mode?: 'save' | 'publish';
+};
+
+export const createMockCollectionEntry = async (
+    args: CreateMockCollectionEntryArgs,
+    options?: OptionsArgs,
+) => {
+    const name = args.name ?? mockCollectionEntry.name;
+    const scope = args.scope ?? mockCollectionEntry.scope;
+    const type = args.type ?? mockCollectionEntry.type;
+    const collectionId = args.collectionId;
+    const data = args.data ?? mockCollectionEntry.data;
+    const meta = args.meta ?? mockCollectionEntry.meta;
+    const mode = args.mode ?? mockCollectionEntry.mode;
+    const description = args?.description;
+
+    const response = await auth(request(app).post(routes.entries), {
+        ...options?.authArgs,
+        role: PlatformRole.Creator,
+        accessBindings: [
+            getCollectionBinding(collectionId, 'createSharedEntry'),
+            ...(options?.authArgs?.accessBindings ?? []),
+        ],
+    })
+        .send({
+            name,
+            scope,
+            type,
+            data,
+            meta,
+            description,
+            collectionId,
+            mode,
+        })
+        .expect(200);
+
+    return response.body;
+};
+
+export const createPrivateMockCollectionEntry = async (args: CreateMockCollectionEntryArgs) => {
+    const name = args.name ?? mockCollectionEntry.name;
+    const scope = args.scope ?? mockCollectionEntry.scope;
+    const type = args.type ?? mockCollectionEntry.type;
+    const collectionId = args.collectionId;
+    const data = args.data ?? mockCollectionEntry.data;
+    const meta = args.meta ?? mockCollectionEntry.meta;
+    const mode = args.mode ?? mockCollectionEntry.mode;
+
+    const response = await authMasterToken(request(app).post(routes.privateCreateEntry))
+        .send({
+            name,
+            scope,
+            type,
+            data,
+            meta,
+            collectionId,
+            mode,
+        })
+        .expect(200);
+
+    return response.body;
+};
+
 export const mockCollection = {
     title: 'Collection title',
     parentId: null,

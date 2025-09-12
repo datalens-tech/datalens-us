@@ -169,6 +169,7 @@ export const DL_AUTH_HEADER_KEY = 'bearer';
 export const US_MASTER_TOKEN_HEADER = 'x-us-master-token';
 export const DL_COMPONENT_HEADER = 'x-dl-component';
 export const DL_WORKBOOK_ID_HEADER = 'x-dl-workbookid';
+export const DL_DATASET_ID_HEADER = 'x-dl-datasetid';
 export const DL_SERVICE_USER_ACCESS_TOKEN = 'x-dl-service-user-access-token';
 
 export const COMPARISON_OPERATORS: {[key: string]: string} = {
