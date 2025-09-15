@@ -79,13 +79,19 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
 
         ctx.log('CHECK_VIEW_PERMISSION');
 
-        await workbook.checkPermission({
-            parentIds,
-            permission: WorkbookPermission.LimitedView,
-        });
-
         if (includePermissionsInfo) {
             await workbook.fetchAllPermissions({parentIds});
+
+            if (!workbook.permissions?.[WorkbookPermission.LimitedView]) {
+                throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
+                    code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
+                });
+            }
+        } else {
+            await workbook.checkPermission({
+                parentIds,
+                permission: WorkbookPermission.LimitedView,
+            });
         }
     } else if (includePermissionsInfo) {
         workbook.enableAllPermissions();

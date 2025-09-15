@@ -5,10 +5,7 @@ import {ServiceArgs} from '../../../types';
 import type {EntryPermissions} from '../../types';
 
 import {checkEntityBindings} from './check-entity-bindings';
-import {
-    getReadOnlyCollectionEntryPermissions,
-    mapCollectionEntryPermissions,
-} from './map-collection-entry-permissions';
+import {mapCollectionEntryPermissions} from './map-collection-entry-permissions';
 
 export interface CheckCollectionEntryPermissionArgs {
     sharedEntryInstance: SharedEntryInstance;
@@ -51,7 +48,7 @@ export async function checkCollectionEntryPermission(
         if (requestWorkbookId || requestDatasetId) {
             ctx.log('CHECK_COLLECTION_ENTRY_BINDINGS');
 
-            await checkEntityBindings(
+            const entryPermissions = await checkEntityBindings(
                 {ctx, trx},
                 {
                     sharedEntryInstance,
@@ -63,7 +60,7 @@ export async function checkCollectionEntryPermission(
             );
 
             if (includePermissions) {
-                permissions = getReadOnlyCollectionEntryPermissions();
+                permissions = entryPermissions;
             }
         } else {
             const parentIds = await getParentIds({

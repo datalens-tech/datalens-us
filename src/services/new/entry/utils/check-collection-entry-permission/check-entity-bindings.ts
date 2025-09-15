@@ -16,6 +16,12 @@ import {getParentIds} from '../../../collection/utils';
 import {ServiceArgs} from '../../../types';
 import {getReplica} from '../../../utils';
 import {checkWorkbookPermissionById} from '../../../workbook/utils/check-workbook-permission';
+import type {EntryPermissions} from '../../types';
+
+import {
+    getReadOnlyCollectionEntryPermissions,
+    mapReadOnlyCollectionEntryPermissions,
+} from './map-collection-entry-permissions';
 
 function throwAccessError(ctx: AppContext, logMessage?: string): never {
     if (logMessage) {
@@ -43,7 +49,7 @@ export async function checkEntityBindings(
         getParentsQueryTimeout,
         getWorkbookQueryTimeout,
     }: CheckEntityBindingsArgs,
-) {
+): Promise<EntryPermissions> {
     const {workbookId: requestWorkbookId, datasetId: requestDatasetId} = ctx.get('info');
     const checkEntryScope = sharedEntryInstance.model.scope;
     const checkEntryId = sharedEntryInstance.model.entryId;
@@ -112,7 +118,7 @@ export async function checkEntityBindings(
     }
 
     if (checkEntryScope === EntryScope.Connection && requestWorkbookId && requestDatasetId) {
-        await checkConnectionWithWorkbookAndDataset(
+        return await checkConnectionWithWorkbookAndDataset(
             {ctx, trx},
             {
                 entityBindings,
@@ -124,7 +130,6 @@ export async function checkEntityBindings(
                 getWorkbookQueryTimeout,
             },
         );
-        return;
     }
 
     if (entityBindings.length !== 1) {
@@ -140,7 +145,10 @@ export async function checkEntityBindings(
         );
     }
 
-    await Promise.all([
+    const [collectionEntryPermissions] = await Promise.all([
+        binding.isDelegated
+            ? Promise.resolve(getReadOnlyCollectionEntryPermissions())
+            : checkCollectionEntry({ctx, trx}, {sharedEntryInstance, getParentsQueryTimeout}),
         getTargetPermissionPromise(
             {ctx, trx},
             {
@@ -150,10 +158,8 @@ export async function checkEntityBindings(
                 getEntryQueryTimeout,
             },
         ),
-        binding.isDelegated
-            ? Promise.resolve()
-            : checkCollectionEntry({ctx, trx}, {sharedEntryInstance, getParentsQueryTimeout}),
     ]);
+    return collectionEntryPermissions;
 }
 
 type CheckConnectionWithWorkbookAndDatasetArgs = {
@@ -204,7 +210,10 @@ async function checkConnectionWithWorkbookAndDataset(
         );
     }
 
-    await Promise.all([
+    const [collectionEntryPermissions] = await Promise.all([
+        connectionToDatasetBinding.isDelegated
+            ? Promise.resolve(getReadOnlyCollectionEntryPermissions())
+            : checkCollectionEntry({ctx, trx}, {sharedEntryInstance, getParentsQueryTimeout}),
         checkWorkbookPermissionById({
             ctx,
             trx,
@@ -213,10 +222,8 @@ async function checkConnectionWithWorkbookAndDataset(
             getWorkbookQueryTimeout,
             getParentsQueryTimeout,
         }),
-        connectionToDatasetBinding.isDelegated
-            ? Promise.resolve()
-            : checkCollectionEntry({ctx, trx}, {sharedEntryInstance, getParentsQueryTimeout}),
     ]);
+    return collectionEntryPermissions;
 }
 
 function getTargetPermissionPromise(
@@ -270,10 +277,17 @@ async function checkCollectionEntry(
         getParentsQueryTimeout,
     });
 
-    await sharedEntryInstance.checkPermission({
+    await sharedEntryInstance.fetchAllPermissions({
         parentIds,
-        permission: SharedEntryPermission.LimitedView,
     });
+
+    if (!sharedEntryInstance.permissions?.[SharedEntryPermission.LimitedView]) {
+        throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
+            code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
+        });
+    }
+
+    return mapReadOnlyCollectionEntryPermissions({sharedEntry: sharedEntryInstance, ctx});
 }
 
 async function checkCollectionEntryById(
