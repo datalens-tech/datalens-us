@@ -3,8 +3,10 @@ import {AppError} from '@gravity-ui/nodekit';
 import {Feature, isEnabledFeature} from '../../../../components/features';
 import {US_ERRORS} from '../../../../const';
 import OldEntry from '../../../../db/models/entry';
+import {CollectionModelColumn} from '../../../../db/models/new/collection';
 import {Entry, EntryColumn} from '../../../../db/models/new/entry';
 import {TenantColumn} from '../../../../db/models/new/tenant';
+import {WorkbookModelColumn} from '../../../../db/models/new/workbook';
 import {DlsActions} from '../../../../types/models';
 import Utils, {withTimeout} from '../../../../utils';
 import {ServiceArgs} from '../../types';
@@ -13,8 +15,8 @@ import {EntryPermissions} from '../types';
 import {checkWorkbookIsolation} from '../utils';
 
 import {
-    ENTITY_BINDING_QUERY_TIMEOUT,
     ENTRY_QUERY_TIMEOUT,
+    selectedCollectionColumns,
     selectedEntryColumns,
     selectedFavoriteColumns,
     selectedRevisionColumns,
@@ -102,7 +104,7 @@ export const getEntry = async (
 
     const isEmbedding = checkEmbedding({ctx});
 
-    const graphRelations = ['workbook', 'tenant(tenantModifier)'];
+    const graphRelations = ['workbook', 'tenant(tenantModifier)', 'collection(collectionModifier)'];
 
     if (revId) {
         graphRelations.push('revisions(revisionsModifier)');
@@ -145,6 +147,10 @@ export const getEntry = async (
                 builder.select(selectedTenantColumns);
             },
 
+            collectionModifier(builder) {
+                builder.select(selectedCollectionColumns);
+            },
+
             revisionsModifier(builder) {
                 builder.select(selectedRevisionColumns).where({revId});
             },
@@ -182,10 +188,7 @@ export const getEntry = async (
         isEnabledFeature(ctx, Feature.WorkbookIsolationEnabled);
 
     if (checkWorkbookIsolationEnabled) {
-        await checkWorkbookIsolation(
-            {ctx, trx},
-            {entry, getEntityBindingsQueryTimeout: ENTITY_BINDING_QUERY_TIMEOUT},
-        );
+        checkWorkbookIsolation({ctx, trx}, {entry});
     }
 
     const {isNeedBypassEntryByKey, getServicePlan} = registry.common.functions.get();
@@ -196,7 +199,7 @@ export const getEntry = async (
     let iamPermissions: Optional<EntryPermissions>;
 
     if (entry.workbookId) {
-        if (!entry.workbook) {
+        if (!entry.workbook || entry.workbook[WorkbookModelColumn.DeletedAt] !== null) {
             throw new AppError(US_ERRORS.WORKBOOK_NOT_EXISTS, {
                 code: US_ERRORS.WORKBOOK_NOT_EXISTS,
             });
@@ -221,6 +224,18 @@ export const getEntry = async (
             });
         }
     } else if (entry.collectionId) {
+        if (!entry.collection || entry.collection[CollectionModelColumn.DeletedAt] !== null) {
+            throw new AppError(US_ERRORS.COLLECTION_NOT_EXISTS, {
+                code: US_ERRORS.COLLECTION_NOT_EXISTS,
+            });
+        }
+
+        if (entry.tenantId !== entry.collection.tenantId) {
+            throw new AppError(US_ERRORS.ENTRY_AND_COLLECTION_TENANT_MISMATCH, {
+                code: US_ERRORS.ENTRY_AND_COLLECTION_TENANT_MISMATCH,
+            });
+        }
+
         const checkPermissionEnabled =
             !isPrivateRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
 

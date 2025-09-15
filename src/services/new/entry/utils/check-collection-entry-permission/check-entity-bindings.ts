@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import {AppContext, AppError} from '@gravity-ui/nodekit';
 
 import {US_ERRORS} from '../../../../../const/errors';
@@ -47,45 +48,57 @@ export async function checkEntityBindings(
     const checkEntryScope = sharedEntryInstance.model.scope;
     const checkEntryId = sharedEntryInstance.model.entryId;
 
-    const isConnectionScope = checkEntryScope === EntryScope.Connection;
-    const isDatasetScope = checkEntryScope === EntryScope.Dataset;
-
-    if (!isConnectionScope && !isDatasetScope) {
-        throwAccessError(ctx, `Entry scope is not supported: ${checkEntryScope}`);
-    }
-
-    if (isDatasetScope && !requestWorkbookId) {
-        throwAccessError(
-            ctx,
-            `Inconsistent check entry scope ${checkEntryScope} without workbook id`,
-        );
-    }
-
-    if (isDatasetScope && requestDatasetId) {
-        throwAccessError(ctx, `Inconsistent check entry scope ${checkEntryScope} with dataset id`);
-    }
-
-    const withDatasetAndWorkbookContext =
-        isConnectionScope && requestWorkbookId && requestDatasetId;
     const targetFilters: TargetFilter[] = [];
     const sourceIds: string[] = [checkEntryId];
 
-    if (withDatasetAndWorkbookContext) {
-        sourceIds.push(requestDatasetId);
-    }
-
-    if (requestWorkbookId) {
-        targetFilters.push({
-            targetType: EntityBindingTargetType.Workbooks,
-            targetId: requestWorkbookId,
-        });
-    }
-
-    if (requestDatasetId && isConnectionScope) {
-        targetFilters.push({
-            targetType: EntityBindingTargetType.Entries,
-            targetId: requestDatasetId,
-        });
+    switch (checkEntryScope) {
+        case EntryScope.Connection: {
+            if (!(requestWorkbookId || requestDatasetId)) {
+                throwAccessError(
+                    ctx,
+                    `Inconsistent check entry scope ${checkEntryScope} without workbook id or dataset id`,
+                );
+            }
+            if (requestWorkbookId && requestDatasetId) {
+                sourceIds.push(requestDatasetId);
+            }
+            if (requestDatasetId) {
+                targetFilters.push({
+                    targetType: EntityBindingTargetType.Entries,
+                    targetId: requestDatasetId,
+                });
+            }
+            if (requestWorkbookId) {
+                targetFilters.push({
+                    targetType: EntityBindingTargetType.Workbooks,
+                    targetId: requestWorkbookId,
+                });
+            }
+            break;
+        }
+        case EntryScope.Dataset: {
+            if (!requestWorkbookId) {
+                throwAccessError(
+                    ctx,
+                    `Inconsistent check entry scope ${checkEntryScope} without workbook id`,
+                );
+            }
+            if (requestDatasetId) {
+                throwAccessError(
+                    ctx,
+                    `Inconsistent check entry scope ${checkEntryScope} with dataset id`,
+                );
+            }
+            if (requestWorkbookId) {
+                targetFilters.push({
+                    targetType: EntityBindingTargetType.Workbooks,
+                    targetId: requestWorkbookId,
+                });
+            }
+            break;
+        }
+        default:
+            throwAccessError(ctx, `Entry scope is not supported: ${checkEntryScope}`);
     }
 
     const entityBindings = await EntityBindingEntryPresentation.getSelectQuery(getReplica(trx), {
@@ -98,7 +111,7 @@ export async function checkEntityBindings(
         throwAccessError(ctx, 'Not found entity bindings');
     }
 
-    if (withDatasetAndWorkbookContext) {
+    if (checkEntryScope === EntryScope.Connection && requestWorkbookId && requestDatasetId) {
         await checkConnectionWithWorkbookAndDataset(
             {ctx, trx},
             {
@@ -240,7 +253,7 @@ function getTargetPermissionPromise(
         );
     }
 
-    return Promise.resolve();
+    return Promise.reject('No workbook or dataset id');
 }
 
 async function checkCollectionEntry(
