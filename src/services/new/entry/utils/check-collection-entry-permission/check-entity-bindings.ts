@@ -189,7 +189,7 @@ async function checkConnectionWithWorkbookAndDataset(
     }: CheckConnectionWithWorkbookAndDatasetArgs,
 ) {
     const datasetToWorkbookBinding = entityBindings.find(
-        (binding) => binding.entryId === datasetId && binding.targetId === workbookId,
+        (binding) => binding.entryId === datasetId,
     );
 
     if (!datasetToWorkbookBinding) {
