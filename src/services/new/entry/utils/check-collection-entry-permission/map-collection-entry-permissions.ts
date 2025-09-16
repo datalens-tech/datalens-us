@@ -57,3 +57,16 @@ export const getReadOnlyCollectionEntryPermissions = (): EntryPermissions => {
         [UsPermissions.Admin]: false,
     };
 };
+
+export const getMinimumReadOnlyCollectionEntryPermissions = (
+    permissions: EntryPermissions[],
+): EntryPermissions => {
+    return {
+        [UsPermissions.Execute]: permissions.every(
+            (permission) => permission[UsPermissions.Execute],
+        ),
+        [UsPermissions.Read]: permissions.every((permission) => permission[UsPermissions.Read]),
+        [UsPermissions.Edit]: false,
+        [UsPermissions.Admin]: false,
+    };
+};

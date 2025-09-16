@@ -1,3 +1,6 @@
+import {AppError} from '@gravity-ui/nodekit';
+
+import {US_ERRORS} from '../../../../../const/errors';
 import {SharedEntryPermission} from '../../../../../entities/shared-entry';
 import {SharedEntryInstance} from '../../../../../registry/common/entities/shared-entry/types';
 import {getParentIds} from '../../../collection/utils';
@@ -69,14 +72,21 @@ export async function checkCollectionEntryPermission(
                 collectionId: sharedEntryInstance.model.collectionId as string,
                 getParentsQueryTimeout,
             });
-            await sharedEntryInstance.checkPermission({
-                parentIds,
-                permission: SharedEntryPermission.LimitedView,
-            });
 
             if (includePermissions) {
                 await sharedEntryInstance.fetchAllPermissions({parentIds});
+
+                if (!sharedEntryInstance.permissions?.[SharedEntryPermission.LimitedView]) {
+                    throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
+                        code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
+                    });
+                }
                 permissions = mapCollectionEntryPermissions({sharedEntry: sharedEntryInstance});
+            } else {
+                await sharedEntryInstance.checkPermission({
+                    parentIds,
+                    permission: SharedEntryPermission.LimitedView,
+                });
             }
         }
     } else {

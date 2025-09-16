@@ -19,6 +19,7 @@ import {checkWorkbookPermissionById} from '../../../workbook/utils/check-workboo
 import type {EntryPermissions} from '../../types';
 
 import {
+    getMinimumReadOnlyCollectionEntryPermissions,
     getReadOnlyCollectionEntryPermissions,
     mapReadOnlyCollectionEntryPermissions,
 } from './map-collection-entry-permissions';
@@ -128,6 +129,7 @@ export async function checkEntityBindings(
                 sharedEntryInstance,
                 getParentsQueryTimeout,
                 getWorkbookQueryTimeout,
+                getEntryQueryTimeout,
             },
         );
     }
@@ -170,6 +172,7 @@ type CheckConnectionWithWorkbookAndDatasetArgs = {
     sharedEntryInstance: SharedEntryInstance;
     getParentsQueryTimeout?: number;
     getWorkbookQueryTimeout?: number;
+    getEntryQueryTimeout?: number;
 };
 
 async function checkConnectionWithWorkbookAndDataset(
@@ -182,20 +185,28 @@ async function checkConnectionWithWorkbookAndDataset(
         sharedEntryInstance,
         getParentsQueryTimeout,
         getWorkbookQueryTimeout,
+        getEntryQueryTimeout,
     }: CheckConnectionWithWorkbookAndDatasetArgs,
 ) {
     const datasetToWorkbookBinding = entityBindings.find(
         (binding) => binding.entryId === datasetId && binding.targetId === workbookId,
     );
 
-    if (
-        !datasetToWorkbookBinding ||
-        (datasetToWorkbookBinding.workbookId !== workbookId &&
-            datasetToWorkbookBinding.targetId !== workbookId)
-    ) {
+    if (!datasetToWorkbookBinding) {
         throwAccessError(
             ctx,
             `Not found entity binding from source ${datasetId} to target ${workbookId}`,
+        );
+    }
+
+    // The dataset should have binding to workbook or should be contained in the workbook
+    if (
+        datasetToWorkbookBinding.workbookId !== workbookId &&
+        datasetToWorkbookBinding.targetId !== workbookId
+    ) {
+        throwAccessError(
+            ctx,
+            `Dataset ${datasetId} is not properly bound to workbook ${workbookId}`,
         );
     }
 
@@ -210,10 +221,16 @@ async function checkConnectionWithWorkbookAndDataset(
         );
     }
 
-    const [collectionEntryPermissions] = await Promise.all([
+    const [collectionEntryPermissions, datasetEntryPermissions] = await Promise.all([
         connectionToDatasetBinding.isDelegated
             ? Promise.resolve(getReadOnlyCollectionEntryPermissions())
             : checkCollectionEntry({ctx, trx}, {sharedEntryInstance, getParentsQueryTimeout}),
+        datasetToWorkbookBinding.isDelegated || datasetToWorkbookBinding.workbookId === workbookId
+            ? Promise.resolve(getReadOnlyCollectionEntryPermissions())
+            : checkCollectionEntryById(
+                  {ctx, trx},
+                  {entryId: datasetId, getEntryQueryTimeout, getParentsQueryTimeout},
+              ),
         checkWorkbookPermissionById({
             ctx,
             trx,
@@ -223,7 +240,10 @@ async function checkConnectionWithWorkbookAndDataset(
             getParentsQueryTimeout,
         }),
     ]);
-    return collectionEntryPermissions;
+    return getMinimumReadOnlyCollectionEntryPermissions([
+        collectionEntryPermissions,
+        datasetEntryPermissions,
+    ]);
 }
 
 function getTargetPermissionPromise(
@@ -241,7 +261,7 @@ function getTargetPermissionPromise(
         getParentsQueryTimeout?: number;
         getWorkbookQueryTimeout?: number;
     },
-): Promise<void> {
+): Promise<unknown> {
     if (workbookId) {
         return checkWorkbookPermissionById({
             ctx,
@@ -324,7 +344,7 @@ async function checkCollectionEntryById(
         model: entryModel,
     });
 
-    await checkCollectionEntry(
+    return await checkCollectionEntry(
         {ctx, trx},
         {sharedEntryInstance: entryInstance, getParentsQueryTimeout},
     );
