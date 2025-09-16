@@ -2,7 +2,7 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
-import {CONTENT_TYPE_JSON} from '../../const';
+import {CONTENT_TYPE_JSON, MAX_STATE_DATA_OBJECT_SYMBOLS} from '../../const';
 import {createState} from '../../services/new/state';
 
 import {stateHashModel} from './response-models';
@@ -12,7 +12,9 @@ const requestSchema = {
         entryId: zc.encodedId(),
     }),
     body: z.object({
-        data: z.record(z.string(), z.unknown()),
+        data: zc.limitedObject({
+            limit: MAX_STATE_DATA_OBJECT_SYMBOLS,
+        }),
     }),
 };
 
