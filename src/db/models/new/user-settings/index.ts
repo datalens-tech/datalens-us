@@ -10,6 +10,7 @@ export class UserSettings extends Model {
     }
 
     userId!: string;
+    tenantId!: string;
     settings!: Record<string, unknown>;
     updatedAt!: string;
 }

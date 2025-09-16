@@ -10,5 +10,6 @@ export const limitedObject = ({limit}: {limit: number}) =>
         },
         {
             message: `Object can't contain more than ${limit} characters`,
+            params: {code: 'OBJECT_SIZE_LIMIT_EXCEEDED'},
         },
     );
