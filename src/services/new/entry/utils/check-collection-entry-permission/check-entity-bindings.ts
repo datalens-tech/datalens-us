@@ -210,22 +210,30 @@ async function checkConnectionWithWorkbookAndDataset(
         );
     }
 
+    const isDatasetInsideWorkbook = datasetToWorkbookBinding.workbookId === workbookId;
+
     const connectionToDatasetBinding = entityBindings.find(
         (binding) => binding.entryId === connectionId && binding.targetId === datasetId,
     );
+    const connectionToWorkbookBinding = entityBindings.find(
+        (binding) => binding.entryId === connectionId && binding.targetId === workbookId,
+    );
+    const connectionToTargetBinding = isDatasetInsideWorkbook
+        ? connectionToWorkbookBinding
+        : connectionToDatasetBinding;
 
-    if (!connectionToDatasetBinding) {
+    if (!connectionToTargetBinding) {
         throwAccessError(
             ctx,
-            `Not found entity binding from source ${connectionId} to target ${datasetId}`,
+            `Not found entity binding from source ${connectionId} to target ${isDatasetInsideWorkbook ? workbookId : datasetId}`,
         );
     }
 
     const [collectionEntryPermissions, datasetEntryPermissions] = await Promise.all([
-        connectionToDatasetBinding.isDelegated
+        connectionToTargetBinding.isDelegated
             ? Promise.resolve(getReadOnlyCollectionEntryPermissions())
             : checkCollectionEntry({ctx, trx}, {sharedEntryInstance, getParentsQueryTimeout}),
-        datasetToWorkbookBinding.isDelegated || datasetToWorkbookBinding.workbookId === workbookId
+        datasetToWorkbookBinding.isDelegated || isDatasetInsideWorkbook
             ? Promise.resolve(getReadOnlyCollectionEntryPermissions())
             : checkCollectionEntryById(
                   {ctx, trx},
