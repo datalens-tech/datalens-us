@@ -1,4 +1,3 @@
-/* eslint-disable complexity */
 import {AppContext, AppError} from '@gravity-ui/nodekit';
 
 import {US_ERRORS} from '../../../../../const/errors';
@@ -10,12 +9,12 @@ import {EntityBindingTargetType} from '../../../../../db/models/new/entity-bindi
 import {EntryColumn, Entry as EntryModel} from '../../../../../db/models/new/entry';
 import {EntryScope} from '../../../../../db/models/new/entry/types';
 import {SharedEntryPermission} from '../../../../../entities/shared-entry';
-import {WorkbookPermission} from '../../../../../entities/workbook';
 import {SharedEntryInstance} from '../../../../../registry/common/entities/shared-entry/types';
 import {getParentIds} from '../../../collection/utils';
 import {ServiceArgs} from '../../../types';
 import {getReplica} from '../../../utils';
-import {checkWorkbookPermissionById} from '../../../workbook/utils/check-workbook-permission';
+import {getWorkbook} from '../../../workbook/get-workbook';
+import {getEntryPermissionsByWorkbook} from '../../../workbook/utils';
 import type {EntryPermissions} from '../../types';
 
 import {
@@ -147,7 +146,7 @@ export async function checkEntityBindings(
         );
     }
 
-    const [collectionEntryPermissions] = await Promise.all([
+    const [collectionEntryPermissions, targetPermissions] = await Promise.all([
         binding.isDelegated
             ? Promise.resolve(getReadOnlyCollectionEntryPermissions())
             : checkCollectionEntry({ctx, trx}, {sharedEntryInstance, getParentsQueryTimeout}),
@@ -156,12 +155,16 @@ export async function checkEntityBindings(
             {
                 workbookId: requestWorkbookId,
                 datasetId: requestDatasetId,
+                sharedEntryInstance,
                 getParentsQueryTimeout,
                 getEntryQueryTimeout,
             },
         ),
     ]);
-    return collectionEntryPermissions;
+    return getMinimumReadOnlyCollectionEntryPermissions([
+        collectionEntryPermissions,
+        targetPermissions,
+    ]);
 }
 
 type CheckConnectionWithWorkbookAndDatasetArgs = {
@@ -229,56 +232,62 @@ async function checkConnectionWithWorkbookAndDataset(
         );
     }
 
-    const [collectionEntryPermissions, datasetEntryPermissions] = await Promise.all([
-        connectionToTargetBinding.isDelegated
-            ? Promise.resolve(getReadOnlyCollectionEntryPermissions())
-            : checkCollectionEntry({ctx, trx}, {sharedEntryInstance, getParentsQueryTimeout}),
-        datasetToWorkbookBinding.isDelegated || isDatasetInsideWorkbook
-            ? Promise.resolve(getReadOnlyCollectionEntryPermissions())
-            : checkCollectionEntryById(
-                  {ctx, trx},
-                  {entryId: datasetId, getEntryQueryTimeout, getParentsQueryTimeout},
-              ),
-        checkWorkbookPermissionById({
-            ctx,
-            trx,
-            workbookId,
-            permission: WorkbookPermission.LimitedView,
-            getWorkbookQueryTimeout,
-            getParentsQueryTimeout,
-        }),
-    ]);
+    const [collectionEntryPermissions, datasetEntryPermissions, workbookEntryPermissions] =
+        await Promise.all([
+            connectionToTargetBinding.isDelegated
+                ? Promise.resolve(getReadOnlyCollectionEntryPermissions())
+                : checkCollectionEntry({ctx, trx}, {sharedEntryInstance, getParentsQueryTimeout}),
+            datasetToWorkbookBinding.isDelegated || isDatasetInsideWorkbook
+                ? Promise.resolve(getReadOnlyCollectionEntryPermissions())
+                : checkCollectionEntryById(
+                      {ctx, trx},
+                      {entryId: datasetId, getEntryQueryTimeout, getParentsQueryTimeout},
+                  ),
+            checkEntryByWorkbook(
+                {ctx, trx},
+                {
+                    workbookId,
+                    scope: sharedEntryInstance.model.scope,
+                    getParentsQueryTimeout,
+                    getWorkbookQueryTimeout,
+                },
+            ),
+        ]);
     return getMinimumReadOnlyCollectionEntryPermissions([
         collectionEntryPermissions,
         datasetEntryPermissions,
+        workbookEntryPermissions,
     ]);
 }
 
 function getTargetPermissionPromise(
     {ctx, trx}: ServiceArgs,
     {
+        sharedEntryInstance,
         workbookId,
         datasetId,
         getEntryQueryTimeout,
         getParentsQueryTimeout,
         getWorkbookQueryTimeout,
     }: {
+        sharedEntryInstance: SharedEntryInstance;
         workbookId?: string;
         datasetId?: string;
         getEntryQueryTimeout?: number;
         getParentsQueryTimeout?: number;
         getWorkbookQueryTimeout?: number;
     },
-): Promise<unknown> {
+): Promise<EntryPermissions> {
     if (workbookId) {
-        return checkWorkbookPermissionById({
-            ctx,
-            trx,
-            workbookId,
-            permission: WorkbookPermission.LimitedView,
-            getWorkbookQueryTimeout,
-            getParentsQueryTimeout,
-        });
+        return checkEntryByWorkbook(
+            {ctx, trx},
+            {
+                workbookId,
+                scope: sharedEntryInstance.model.scope,
+                getParentsQueryTimeout,
+                getWorkbookQueryTimeout,
+            },
+        );
     }
 
     if (datasetId) {
@@ -356,4 +365,26 @@ async function checkCollectionEntryById(
         {ctx, trx},
         {sharedEntryInstance: entryInstance, getParentsQueryTimeout},
     );
+}
+
+async function checkEntryByWorkbook(
+    {ctx, trx}: ServiceArgs,
+    {
+        workbookId,
+        scope,
+        getParentsQueryTimeout,
+        getWorkbookQueryTimeout,
+    }: {
+        workbookId: string;
+        scope: EntryScope;
+        getParentsQueryTimeout?: number;
+        getWorkbookQueryTimeout?: number;
+    },
+) {
+    const workbook = await getWorkbook(
+        {ctx, trx},
+        {workbookId, getParentsQueryTimeout, getWorkbookQueryTimeout, includePermissionsInfo: true},
+    );
+    const permissions = getEntryPermissionsByWorkbook({workbook, scope}) as EntryPermissions;
+    return permissions;
 }
