@@ -2,6 +2,7 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 
 import {prepareResponseAsync} from '../../components/response-presenter';
 import {makeReqParser, z, zc} from '../../components/zod';
+import {EntryScope} from '../../db/models/new/entry/types';
 import {LogEventType} from '../../registry/common/utils/log-event/types';
 import {deleteEntry} from '../../services/entry';
 
@@ -11,6 +12,8 @@ const requestSchema = {
     }),
     query: z.object({
         lockToken: z.string().optional(),
+        scope: z.nativeEnum(EntryScope).optional(),
+        types: zc.stringArray({min: 1, max: 100}).optional(),
     }),
 };
 
@@ -30,6 +33,8 @@ export const deleteEntryController: AppRouteHandler = async (req, res) => {
             {
                 entryId: params.entryId,
                 lockToken: query.lockToken,
+                scope: query.scope,
+                types: query.types,
             },
         );
 
