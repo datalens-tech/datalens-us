@@ -7,3 +7,4 @@ export * from './json-string';
 export * from './entity-name';
 export * from './tenant-settings';
 export * from './primitive';
+export * from './string-array';

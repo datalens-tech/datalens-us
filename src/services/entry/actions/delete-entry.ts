@@ -2,11 +2,18 @@ import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {BiTrackingLogs, DEFAULT_QUERY_TIMEOUT, RETURN_COLUMNS, US_ERRORS} from '../../../const';
+import {
+    ALLOWED_SCOPE_VALUES,
+    BiTrackingLogs,
+    DEFAULT_QUERY_TIMEOUT,
+    RETURN_COLUMNS,
+    US_ERRORS,
+} from '../../../const';
 import Entry from '../../../db/models/entry';
 import Lock from '../../../db/models/lock';
+import {EntryColumn} from '../../../db/models/new/entry';
 import {WorkbookPermission} from '../../../entities/workbook';
-import {DlsActions, EntryColumns, UsPermissions} from '../../../types/models';
+import {DlsActions, EntryColumns, EntryScope, UsPermissions} from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
 import {ServiceArgs} from '../../new/types';
 import {getWorkbook} from '../../new/workbook/get-workbook';
@@ -28,6 +35,16 @@ const validateArgs = makeSchemaValidator({
         useLegacyLogin: {
             type: 'boolean',
         },
+        scope: {
+            type: 'string',
+            enum: ALLOWED_SCOPE_VALUES,
+        },
+        types: {
+            type: 'array',
+            items: {
+                type: 'string',
+            },
+        },
     },
 });
 
@@ -35,13 +52,15 @@ export type DeleteEntryData = {
     entryId: string;
     lockToken?: string;
     useLegacyLogin?: boolean;
+    scope?: EntryScope;
+    types?: string[];
 };
 
 export async function deleteEntry(
     {ctx, skipValidation = false}: ServiceArgs,
     args: DeleteEntryData,
 ) {
-    const {entryId, lockToken, useLegacyLogin = false} = args;
+    const {entryId, lockToken, useLegacyLogin = false, scope, types} = args;
 
     ctx.log('DELETE_ENTRY_REQUEST', {
         entryId: Utils.encodeId(entryId),
@@ -65,6 +84,15 @@ export async function deleteEntry(
             .where({
                 entryId,
                 isDeleted: false,
+            })
+            .where((builder) => {
+                if (scope) {
+                    builder.andWhere({[`${Entry.tableName}.${EntryColumn.Scope}`]: scope});
+                }
+
+                if (types) {
+                    builder.whereIn([`${Entry.tableName}.${EntryColumn.Type}`], types);
+                }
             })
             .first()
             .timeout(DEFAULT_QUERY_TIMEOUT);
