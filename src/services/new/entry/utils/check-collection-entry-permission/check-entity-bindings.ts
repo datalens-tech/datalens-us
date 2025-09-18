@@ -10,6 +10,7 @@ import {EntryColumn, Entry as EntryModel} from '../../../../../db/models/new/ent
 import {EntryScope} from '../../../../../db/models/new/entry/types';
 import {SharedEntryPermission} from '../../../../../entities/shared-entry';
 import {SharedEntryInstance} from '../../../../../registry/common/entities/shared-entry/types';
+import Utils from '../../../../../utils';
 import {getParentIds} from '../../../collection/utils';
 import {ServiceArgs} from '../../../types';
 import {getReplica} from '../../../utils';
@@ -53,6 +54,12 @@ export async function checkEntityBindings(
     const {workbookId: requestWorkbookId, datasetId: requestDatasetId} = ctx.get('info');
     const checkEntryScope = sharedEntryInstance.model.scope;
     const checkEntryId = sharedEntryInstance.model.entryId;
+
+    ctx.log('CHECK_ENTITY_BINDINGS_START', {
+        entryId: Utils.encodeId(sharedEntryInstance.model.entryId),
+        requestWorkbookId: Utils.encodeId(requestWorkbookId),
+        requestDatasetId: Utils.encodeId(requestDatasetId),
+    });
 
     const targetFilters: TargetFilter[] = [];
     const sourceIds: string[] = [checkEntryId];
@@ -118,6 +125,8 @@ export async function checkEntityBindings(
     }
 
     if (checkEntryScope === EntryScope.Connection && requestWorkbookId && requestDatasetId) {
+        ctx.log('CHECK_CONNECTION_WITH_WORKBOOK_AND_DATASET_START');
+
         return await checkConnectionWithWorkbookAndDataset(
             {ctx, trx},
             {
@@ -142,7 +151,7 @@ export async function checkEntityBindings(
         const targetId = requestWorkbookId || requestDatasetId;
         throwAccessError(
             ctx,
-            `Not found entity binding from source ${binding.sourceId} to target ${targetId}`,
+            `Not found entity binding from source ${Utils.encodeId(binding.sourceId)} to target ${Utils.encodeId(targetId)}`,
         );
     }
 
@@ -198,7 +207,7 @@ async function checkConnectionWithWorkbookAndDataset(
     if (!datasetToWorkbookBinding) {
         throwAccessError(
             ctx,
-            `Not found entity binding from source ${datasetId} to target ${workbookId}`,
+            `Not found entity binding from source ${Utils.encodeId(datasetId)} to target ${Utils.encodeId(workbookId)}`,
         );
     }
 
@@ -209,7 +218,7 @@ async function checkConnectionWithWorkbookAndDataset(
     ) {
         throwAccessError(
             ctx,
-            `Dataset ${datasetId} is not properly bound to workbook ${workbookId}`,
+            `Dataset ${Utils.encodeId(datasetId)} is not properly bound to workbook ${Utils.encodeId(workbookId)}`,
         );
     }
 
@@ -228,7 +237,7 @@ async function checkConnectionWithWorkbookAndDataset(
     if (!connectionToTargetBinding) {
         throwAccessError(
             ctx,
-            `Not found entity binding from source ${connectionId} to target ${isDatasetInsideWorkbook ? workbookId : datasetId}`,
+            `Not found entity binding from source ${Utils.encodeId(connectionId)} to target ${isDatasetInsideWorkbook ? Utils.encodeId(workbookId) : Utils.encodeId(datasetId)}`,
         );
     }
 
@@ -278,6 +287,11 @@ function getTargetPermissionPromise(
         getWorkbookQueryTimeout?: number;
     },
 ): Promise<EntryPermissions> {
+    ctx.log('GET_TARGET_PERMISSION_START', {
+        workbookId: Utils.encodeId(workbookId),
+        datasetId: Utils.encodeId(datasetId),
+    });
+
     if (workbookId) {
         return checkEntryByWorkbook(
             {ctx, trx},
@@ -307,6 +321,10 @@ async function checkCollectionEntry(
         getParentsQueryTimeout,
     }: {sharedEntryInstance: SharedEntryInstance; getParentsQueryTimeout?: number},
 ) {
+    ctx.log('CHECK_COLLECTION_ENTRY_START', {
+        entryId: Utils.encodeId(sharedEntryInstance.model.entryId),
+    });
+
     const parentIds = await getParentIds({
         ctx,
         trx,
@@ -338,6 +356,10 @@ async function checkCollectionEntryById(
     const {tenantId} = ctx.get('info');
     const registry = ctx.get('registry');
     const {SharedEntry} = registry.common.classes.get();
+
+    ctx.log('CHECK_COLLECTION_ENTRY_BY_ID_START', {
+        entryId: Utils.encodeId(entryId),
+    });
 
     const entryModel = await EntryModel.query(getReplica(trx))
         .select()

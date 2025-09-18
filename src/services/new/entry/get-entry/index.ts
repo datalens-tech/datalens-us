@@ -188,7 +188,7 @@ export const getEntry = async (
         isEnabledFeature(ctx, Feature.WorkbookIsolationEnabled);
 
     if (checkWorkbookIsolationEnabled) {
-        checkWorkbookIsolation({ctx, trx}, {entry});
+        checkWorkbookIsolation({ctx}, {entry});
     }
 
     const {isNeedBypassEntryByKey, getServicePlan} = registry.common.functions.get();
