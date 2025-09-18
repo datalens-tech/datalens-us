@@ -11,11 +11,13 @@ export const checkWorkbookPermission = async ({
     trx,
     workbook,
     permission,
+    getParentsQueryTimeout,
 }: {
     ctx: AppContext;
     trx?: TransactionOrKnex;
     workbook: WorkbookInstance;
     permission: WorkbookPermission;
+    getParentsQueryTimeout?: number;
 }) => {
     let parentIds: string[] = [];
 
@@ -24,6 +26,7 @@ export const checkWorkbookPermission = async ({
             ctx,
             trx,
             collectionId: workbook.model.collectionId,
+            getParentsQueryTimeout,
         });
     }
 
@@ -38,16 +41,20 @@ export const checkWorkbookPermissionById = async ({
     trx,
     workbookId,
     permission,
+    getParentsQueryTimeout,
+    getWorkbookQueryTimeout,
 }: {
     ctx: AppContext;
     trx?: TransactionOrKnex;
     workbookId: string;
     permission: WorkbookPermission;
+    getParentsQueryTimeout?: number;
+    getWorkbookQueryTimeout?: number;
 }) => {
     const workbook = await getWorkbook(
         {ctx, skipValidation: true, skipCheckPermissions: true},
-        {workbookId},
+        {workbookId, getParentsQueryTimeout, getWorkbookQueryTimeout},
     );
 
-    await checkWorkbookPermission({ctx, trx, workbook, permission});
+    await checkWorkbookPermission({ctx, trx, workbook, permission, getParentsQueryTimeout});
 };

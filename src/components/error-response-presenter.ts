@@ -318,6 +318,7 @@ export default (error: AppError | DBError) => {
         }
 
         case US_ERRORS.ENTRY_AND_WORKBOOK_TENANT_MISMATCH:
+        case US_ERRORS.ENTRY_AND_COLLECTION_TENANT_MISMATCH:
         case US_ERRORS.TOO_MANY_COLOR_PALETTES: {
             return {
                 code: 500,
@@ -353,6 +354,15 @@ export default (error: AppError | DBError) => {
             };
         }
 
+        case US_ERRORS.INCORRECT_DATASET_ID_HEADER: {
+            return {
+                code: 400,
+                response: {
+                    code,
+                    message: 'Dataset id header is incorrect',
+                },
+            };
+        }
         case US_ERRORS.INCORRECT_WORKBOOK_ID_HEADER: {
             return {
                 code: 400,

@@ -9,4 +9,5 @@ export {
     setCiEnv,
     authZitadel,
     checkCtxTenantId,
+    resolveIsolationIds,
 } from '../src/components/middlewares';

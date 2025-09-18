@@ -1,3 +1,4 @@
+import {CollectionModel, CollectionModelColumn} from '../../../../db/models/new/collection';
 import {Entry, EntryColumn} from '../../../../db/models/new/entry';
 import {Favorite, FavoriteColumn} from '../../../../db/models/new/favorite';
 import {RevisionModel, RevisionModelColumn} from '../../../../db/models/new/revision';
@@ -58,3 +59,18 @@ export const favoriteColumns = [FavoriteColumn.EntryId, FavoriteColumn.Login] as
 export const selectedFavoriteColumns = favoriteColumns.map(
     (column) => `${Favorite.tableName}.${column}`,
 );
+
+export const collectionColumns = [
+    CollectionModelColumn.CollectionId,
+    CollectionModelColumn.DeletedAt,
+    CollectionModelColumn.TenantId,
+] as const;
+
+export const selectedCollectionColumns = collectionColumns.map(
+    (column) => `${CollectionModel.tableName}.${column}`,
+);
+
+export const ENTRY_QUERY_TIMEOUT = 3000;
+export const ENTITY_BINDING_QUERY_TIMEOUT = 3000;
+export const GET_PARENTS_QUERY_TIMEOUT = 3000;
+export const WORKBOOK_QUERY_TIMEOUT = 3000;

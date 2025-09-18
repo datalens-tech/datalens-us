@@ -1,5 +1,6 @@
 import {Model} from '../../..';
 import {EntryPermissions} from '../../../../services/new/entry/types';
+import {CollectionModel, CollectionModelColumn} from '../collection';
 import {Favorite} from '../favorite';
 import {RevisionModel} from '../revision';
 import {Tenant, TenantColumn} from '../tenant';
@@ -102,6 +103,14 @@ export class Entry extends Model {
                     to: `${WorkbookModel.tableName}.workbookId`,
                 },
             },
+            collection: {
+                relation: Model.BelongsToOneRelation,
+                modelClass: CollectionModel,
+                join: {
+                    from: `${Entry.tableName}.${EntryColumn.CollectionId}`,
+                    to: `${CollectionModel.tableName}.${CollectionModelColumn.CollectionId}`,
+                },
+            },
             favorite: {
                 relation: Model.HasOneRelation,
                 modelClass: Favorite,
@@ -151,6 +160,7 @@ export class Entry extends Model {
     workbook?: WorkbookModel;
     favorite?: Favorite;
     tenant?: Tenant;
+    collection?: CollectionModel;
 
     permissions?: EntryPermissions;
     isLocked?: boolean;
