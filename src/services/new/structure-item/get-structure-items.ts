@@ -1,3 +1,6 @@
+import {AppError} from '@gravity-ui/nodekit';
+
+import {US_ERRORS} from '../../../const';
 import {CollectionModel} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
 import Utils from '../../../utils';
@@ -6,13 +9,13 @@ import {getParentIds} from '../collection/utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 
-import {getCollectionsQuery, getWorkbooksQuery, processPermissions} from './utils';
+import {getCollectionsQuery, getEntryQuery, getWorkbooksQuery, processPermissions} from './utils';
 
 export type OrderField = 'title' | 'createdAt' | 'updatedAt';
 
 export type OrderDirection = 'asc' | 'desc';
 
-export type Mode = 'all' | 'onlyCollections' | 'onlyWorkbooks';
+export type Mode = 'all' | 'onlyCollections' | 'onlyWorkbooks' | 'onlyEntries';
 
 export interface GetStructureItemsContentArgs {
     collectionId: Nullable<string>;
@@ -26,7 +29,6 @@ export interface GetStructureItemsContentArgs {
     mode?: Mode;
 }
 
-// eslint-disable-next-line complexity
 export const getStructureItems = async (
     {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: GetStructureItemsContentArgs,
@@ -57,7 +59,7 @@ export const getStructureItems = async (
 
     const {accessServiceEnabled} = ctx.config;
     const registry = ctx.get('registry');
-    const {Workbook, Collection} = registry.common.classes.get();
+    const {Workbook, Collection, SharedEntry} = registry.common.classes.get();
 
     const targetTrx = getReplica(trx);
 
@@ -84,7 +86,7 @@ export const getStructureItems = async (
         }
     }
 
-    let items: InstanceType<typeof Collection | typeof Workbook>[] = [];
+    let items: InstanceType<typeof Collection | typeof Workbook | typeof SharedEntry>[] = [];
     let nextPageToken: Optional<string>;
 
     if (page !== null) {
@@ -95,11 +97,22 @@ export const getStructureItems = async (
             query = getWorkbooksQuery({ctx, trx}, queryArgs);
         } else if (mode === 'onlyCollections') {
             query = getCollectionsQuery({ctx, trx}, queryArgs);
+        } else if (mode === 'onlyEntries') {
+            if (!collectionId) {
+                throw new AppError('Collection ID is required for entries', {
+                    code: US_ERRORS.ENTRIES_REQUIRE_COLLECTION_ID,
+                });
+            }
+            query = getEntryQuery({ctx, trx}, {...queryArgs, collectionId});
         } else {
             // All
-            query = getCollectionsQuery({ctx, trx}, queryArgs)
-                .unionAll(getWorkbooksQuery({ctx, trx}, queryArgs))
-                .orderBy('type', 'asc');
+            query = getCollectionsQuery({ctx, trx}, queryArgs).unionAll(
+                getWorkbooksQuery({ctx, trx}, queryArgs),
+            );
+            if (collectionId) {
+                query = query.unionAll(getEntryQuery({ctx, trx}, {...queryArgs, collectionId}));
+            }
+            query = query.orderBy('rank', 'asc');
         }
 
         const curPage = await query

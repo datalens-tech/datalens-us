@@ -13,6 +13,18 @@ import {SharedEntryConstructor, SharedEntryInstance} from './types';
 export const SharedEntry: SharedEntryConstructor<SharedEntryInstance> = class SharedEntry
     implements SharedEntryInstance
 {
+    static bulkFetchAllPermissions = async (ctx, items) => {
+        return items.map(({model}) => {
+            const sharedEntry = new SharedEntry({ctx, model});
+            if (ctx.config.accessServiceEnabled) {
+                sharedEntry.fetchAllPermissions({parentIds: []});
+            } else {
+                sharedEntry.enableAllPermissions();
+            }
+            return sharedEntry;
+        });
+    };
+
     ctx: AppContext;
     model: EntryModel;
     permissions?: Permissions;
@@ -49,7 +61,7 @@ export const SharedEntry: SharedEntryConstructor<SharedEntryInstance> = class Sh
         return Promise.resolve();
     }
 
-    async fetchAllPermissions(): Promise<void> {
+    async fetchAllPermissions(_args: {parentIds: string[]}): Promise<void> {
         this.permissions = this.getAllPermissions();
         return Promise.resolve();
     }

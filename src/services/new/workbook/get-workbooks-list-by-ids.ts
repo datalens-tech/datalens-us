@@ -75,8 +75,6 @@ export const getWorkbooksListByIds = async (
     let workbooks = await Promise.all(checkPermissionPromises);
 
     if (includePermissionsInfo) {
-        const {bulkFetchWorkbooksAllPermissions} = registry.common.functions.get();
-
         const mappedWorkbooks: {model: WorkbookModel; parentIds: string[]}[] = [];
 
         acceptedWorkbooksMap.forEach((parentIds, workbookModel) => {
@@ -86,7 +84,7 @@ export const getWorkbooksListByIds = async (
             });
         });
 
-        workbooks = await bulkFetchWorkbooksAllPermissions(ctx, mappedWorkbooks);
+        workbooks = await Workbook.bulkFetchAllPermissions(ctx, mappedWorkbooks);
     }
 
     const result = workbooks.filter((item) => Boolean(item)) as WorkbookInstance[];

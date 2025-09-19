@@ -5,6 +5,7 @@ import type {CollectionPermission, Permissions} from '../../../../entities/colle
 import {StructureItemInstance} from '../structure-item/types';
 
 export interface CollectionConstructor<T extends CollectionInstance = CollectionInstance> {
+    bulkFetchAllPermissions: BulkFetchCollectionsAllPermissions;
     new (args: {ctx: AppContext; model: CollectionModel}): T;
 }
 

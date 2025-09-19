@@ -4,3 +4,4 @@ export * from './collections';
 export * from './favorites';
 export * from './states';
 export * from './locks';
+export * from './shared-entries';

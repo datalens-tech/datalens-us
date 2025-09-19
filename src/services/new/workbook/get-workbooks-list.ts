@@ -52,7 +52,6 @@ export const getWorkbooksList = async (
     const {accessServiceEnabled} = ctx.config;
     const registry = ctx.get('registry');
     const {Workbook, Collection} = registry.common.classes.get();
-    const {bulkFetchWorkbooksAllPermissions} = registry.common.functions.get();
 
     const {
         tenantId,
@@ -157,7 +156,7 @@ export const getWorkbooksList = async (
             >[];
 
             if (includePermissionsInfo) {
-                workbooks = await bulkFetchWorkbooksAllPermissions(
+                workbooks = await Workbook.bulkFetchAllPermissions(
                     ctx,
                     workbooks.map((workbook) => ({
                         model: workbook.model,

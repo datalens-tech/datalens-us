@@ -64,13 +64,16 @@ export type {GetEntryResolveUserLogin} from '../../src/registry/common/utils/ent
 export type {
     CollectionConstructor,
     CollectionInstance,
+    BulkFetchCollectionsAllPermissions,
 } from '../../src/registry/common/entities/collection/types';
 export type {
     WorkbookConstructor,
     WorkbookInstance,
+    BulkFetchWorkbooksAllPermissions,
 } from '../../src/registry/common/entities/workbook/types';
 export type {StructureItemInstance} from '../../src/registry/common/entities/structure-item/types';
 export type {
     SharedEntryConstructor,
     SharedEntryInstance,
+    BulkFetchSharedEntriesAllPermissions,
 } from '../../src/registry/common/entities/shared-entry/types';

@@ -105,6 +105,7 @@ describe('Getting root content', () => {
             items: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
+                    entity: 'collection',
                     collectionId: rootCollection.collectionId,
                     parentId: null,
                 },
@@ -127,11 +128,13 @@ describe('Getting root content', () => {
             items: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
+                    entity: 'collection',
                     collectionId: rootCollection.collectionId,
                     parentId: null,
                 },
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
+                    entity: 'workbook',
                     workbookId: rootWorkbook.workbookId,
                     collectionId: null,
                 },
@@ -166,6 +169,7 @@ describe('Getting structure items', () => {
             items: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
+                    entity: 'collection',
                     collectionId: nestedCollection.collectionId,
                     parentId: rootCollection.collectionId,
                 },
@@ -192,11 +196,13 @@ describe('Getting structure items', () => {
             items: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
+                    entity: 'collection',
                     collectionId: nestedCollection.collectionId,
                     parentId: rootCollection.collectionId,
                 },
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
+                    entity: 'workbook',
                     workbookId: nestedWorkbook.workbookId,
                     collectionId: rootCollection.collectionId,
                 },
@@ -223,6 +229,7 @@ describe('Getting root content with "includePermissionsInfo" param', () => {
             items: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
+                    entity: 'collection',
                     collectionId: rootCollection.collectionId,
                     parentId: null,
                     permissions: {
@@ -232,6 +239,7 @@ describe('Getting root content with "includePermissionsInfo" param', () => {
                 },
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
+                    entity: 'workbook',
                     workbookId: rootWorkbook.workbookId,
                     collectionId: null,
                     permissions: {
@@ -262,6 +270,7 @@ describe('Getting root content with "filterString" param', () => {
             items: expect.arrayContaining([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
+                    entity: 'collection',
                     collectionId: rootCollection.collectionId,
                     parentId: null,
                 },
@@ -307,11 +316,13 @@ describe('Getting root content with "onlyMy" param', () => {
             items: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
+                    entity: 'collection',
                     collectionId: rootCollection.collectionId,
                     parentId: null,
                 },
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
+                    entity: 'workbook',
                     workbookId: rootWorkbook.workbookId,
                     collectionId: null,
                 },
@@ -338,6 +349,7 @@ describe('Getting root content with "mode" param', () => {
             items: expect.toIncludeSameMembers([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
+                    entity: 'collection',
                     collectionId: rootCollection.collectionId,
                     parentId: null,
                 },
@@ -362,6 +374,7 @@ describe('Getting root content with "mode" param', () => {
             items: expect.toIncludeSameMembers([
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
+                    entity: 'workbook',
                     workbookId: rootWorkbook.workbookId,
                     collectionId: null,
                 },
@@ -394,16 +407,19 @@ describe('Getting root content with pagination', () => {
             items: expect.arrayContaining([
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
+                    entity: 'collection',
                     collectionId: rootCollection.collectionId,
                     parentId: null,
                 },
                 {
                     ...COLLECTIONS_DEFAULT_FIELDS,
+                    entity: 'collection',
                     collectionId: rootCollection2.collectionId,
                     parentId: null,
                 },
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
+                    entity: 'workbook',
                     workbookId: rootWorkbook.workbookId,
                     collectionId: null,
                 },
@@ -432,6 +448,7 @@ describe('Getting root content with pagination', () => {
             items: expect.arrayContaining([
                 {
                     ...WORKBOOK_DEFAULT_FIELDS,
+                    entity: 'workbook',
                     workbookId: rootWorkbook2.workbookId,
                     collectionId: null,
                 },
