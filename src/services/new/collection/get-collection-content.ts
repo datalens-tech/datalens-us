@@ -64,7 +64,6 @@ export const getCollectionContent = async (
     const registry = ctx.get('registry');
     const {accessServiceEnabled} = ctx.config;
     const {Workbook, Collection} = registry.common.classes.get();
-    const {bulkFetchCollectionsAllPermissions} = registry.common.functions.get();
 
     const {
         tenantId,
@@ -167,7 +166,7 @@ export const getCollectionContent = async (
                 ) as InstanceType<typeof Collection>[];
 
                 if (includePermissionsInfo) {
-                    collections = await bulkFetchCollectionsAllPermissions(
+                    collections = await Collection.bulkFetchAllPermissions(
                         ctx,
                         collections.map((collection) => ({
                             model: collection.model,

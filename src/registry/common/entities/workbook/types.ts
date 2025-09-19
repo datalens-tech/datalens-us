@@ -4,8 +4,9 @@ import type {WorkbookModel} from '../../../../db/models/new/workbook';
 import type {Permissions, WorkbookPermission} from '../../../../entities/workbook/types';
 import {StructureItemInstance} from '../structure-item/types';
 
-export interface WorkbookConstructor<T = void> {
-    new (args: {ctx: AppContext; model: WorkbookModel}): T extends void ? WorkbookInstance : T;
+export interface WorkbookConstructor<T extends WorkbookInstance = WorkbookInstance> {
+    bulkFetchAllPermissions: BulkFetchWorkbooksAllPermissions;
+    new (args: {ctx: AppContext; model: WorkbookModel}): T;
 }
 
 export interface WorkbookInstance extends StructureItemInstance {

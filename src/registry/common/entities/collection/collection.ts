@@ -11,7 +11,21 @@ import Utils from '../../../../utils';
 
 import {CollectionConstructor, CollectionInstance} from './types';
 
-export const Collection: CollectionConstructor = class Collection implements CollectionInstance {
+export const Collection: CollectionConstructor<CollectionInstance> = class Collection
+    implements CollectionInstance
+{
+    static bulkFetchAllPermissions = async (ctx, items) => {
+        return items.map(({model}) => {
+            const collection = new Collection({ctx, model});
+            if (ctx.config.accessServiceEnabled) {
+                collection.fetchAllPermissions({parentIds: []});
+            } else {
+                collection.enableAllPermissions();
+            }
+            return collection;
+        });
+    };
+
     ctx: AppContext;
     model: CollectionModel;
     permissions?: Permissions;
@@ -72,7 +86,7 @@ export const Collection: CollectionConstructor = class Collection implements Col
         this.permissions = undefined;
     }
 
-    async fetchAllPermissions() {
+    async fetchAllPermissions(_args: {parentIds: string[]}) {
         this.permissions = this.getAllPermissions();
         return Promise.resolve();
     }

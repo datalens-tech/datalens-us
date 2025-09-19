@@ -74,8 +74,6 @@ export const getCollectionsListByIds = async (
     let collections = await Promise.all(checkPermissionPromises);
 
     if (includePermissionsInfo) {
-        const {bulkFetchCollectionsAllPermissions} = registry.common.functions.get();
-
         const mappedCollections: {model: CollectionModel; parentIds: string[]}[] = [];
 
         acceptedCollectionsMap.forEach((parentIds, collectionModel) => {
@@ -85,7 +83,7 @@ export const getCollectionsListByIds = async (
             });
         });
 
-        collections = await bulkFetchCollectionsAllPermissions(ctx, mappedCollections);
+        collections = await Collection.bulkFetchAllPermissions(ctx, mappedCollections);
     }
 
     const result = collections.filter((item) => Boolean(item)) as CollectionInstance[];
