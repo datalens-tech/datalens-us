@@ -15,9 +15,9 @@ import {sharedEntryInstance} from './structure-shared-entry-instance';
 const schema = z
     .object({
         items: collectionInstance.schema
-            .merge(z.object({entity: z.string()}))
-            .or(workbookInstance.schema.merge(z.object({entity: z.string()})))
-            .or(sharedEntryInstance.schema.merge(z.object({entity: z.string()})))
+            .merge(z.object({entity: z.literal('collection')}))
+            .or(workbookInstance.schema.merge(z.object({entity: z.literal('workbook')})))
+            .or(sharedEntryInstance.schema.merge(z.object({entity: z.literal('entry')})))
             .array(),
         nextPageToken: z.string().nullable(),
     })
@@ -36,17 +36,17 @@ const format = async (data: {
                 if (isSharedEntryInstance(structureItem)) {
                     return {
                         ...sharedEntryInstance.format(structureItem),
-                        entity: 'entry',
+                        entity: 'entry' as const,
                     };
                 } else if (isWorkbookInstance(structureItem)) {
                     return {
                         ...workbookInstance.format(structureItem),
-                        entity: 'workbook',
+                        entity: 'workbook' as const,
                     };
                 } else {
                     return {
                         ...collectionInstance.format(structureItem),
-                        entity: 'collection',
+                        entity: 'collection' as const,
                     };
                 }
             },
