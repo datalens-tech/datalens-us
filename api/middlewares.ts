@@ -5,7 +5,6 @@ export {
     finalRequestHandler,
     logError,
     checkReadOnlyMode,
-    resolveWorkbookId,
     setCiEnv,
     authZitadel,
     checkCtxTenantId,
