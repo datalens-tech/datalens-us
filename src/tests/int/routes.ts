@@ -23,6 +23,7 @@ export const routes = {
     getEntriesMeta: '/v1/get-entries-meta',
     setDefaultColorPalette: '/v1/tenants/set-default-color-palette',
     updateTenantSettings: '/v1/tenants/settings',
+    colorPalettes: '/v1/color-palettes',
     privateSetIsTemplateWorkbook: (workbookId: string) =>
         `/private/v2/workbooks/${workbookId}/setIsTemplate`,
 } as const;

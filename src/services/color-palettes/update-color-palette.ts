@@ -17,6 +17,12 @@ export interface UpdateColorPaletteArgs {
 }
 
 export const updateColorPalette = async ({ctx, trx}: ServiceArgs, args: UpdateColorPaletteArgs) => {
+    const registry = ctx.get('registry');
+
+    const {checkPalettesAdmin} = registry.common.functions.get();
+
+    await checkPalettesAdmin(ctx);
+
     const {colorPaletteId, displayName, colors, isGradient, isDefault} = args;
 
     ctx.log('UPDATE_COLOR_PALETTE_START', {
