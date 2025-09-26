@@ -14,7 +14,14 @@ describe('Color palette basic tests', () => {
     test('Create with wrong role', async () => {
         await auth(request(app).post(routes.colorPalettes), {
             role: PlatformRole.Creator,
-        }).expect([401, 403]);
+        })
+            .send({
+                displayName: 'Test',
+                colors: ['#000', '#fff'],
+                isGradient: false,
+                isDefault: false,
+            })
+            .expect([401, 403]);
     });
 
     test('Create', async () => {
@@ -47,7 +54,14 @@ describe('Color palette basic tests', () => {
     test('Update with wrong role', async () => {
         await auth(request(app).post(`${routes.colorPalettes}/${colorPaletteId}/update`), {
             role: PlatformRole.Creator,
-        }).expect([401, 403]);
+        })
+            .send({
+                displayName: 'Update test',
+                colors: ['#fff', '#000'],
+                isGradient: false,
+                isDefault: false,
+            })
+            .expect([401, 403]);
     });
 
     test('Update', async () => {
