@@ -10,7 +10,7 @@ export interface TargetFilter {
     targetId: string;
 }
 
-export class EntityBindingEntryPresentation extends Model {
+export class EntityBindingEntryCheckPresentation extends Model {
     static getSelectQuery(
         trx: TransactionOrKnex,
         {targetFilters}: {targetFilters: TargetFilter[]},
@@ -45,8 +45,8 @@ export class EntityBindingEntryPresentation extends Model {
             );
 
         return query as unknown as QueryBuilder<
-            EntityBindingEntryPresentation,
-            EntityBindingEntryPresentation[]
+            EntityBindingEntryCheckPresentation,
+            EntityBindingEntryCheckPresentation[]
         >;
     }
 

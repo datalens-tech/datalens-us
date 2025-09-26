@@ -34,6 +34,7 @@ type GetRelatedEntriesResult = {
     public: boolean;
     tenantId: string;
     workbookId: string | null;
+    collectionId: string | null;
     depth: number;
 };
 
