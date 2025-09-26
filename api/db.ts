@@ -38,6 +38,7 @@ export {
 } from '../src/db/models/new/operation';
 export {EntityBindingModel, EntityBindingModelColumn} from '../src/db/models/new/entity-binding';
 export {EntityBindingTargetType} from '../src/db/models/new/entity-binding/types';
+export {EntityBindingEntriesPresentation} from '../src/db/models/new/entity-binding/presentations/entity-binding-entries-presentation';
 
 export {
     JoinedEntryRevision,
