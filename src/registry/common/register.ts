@@ -6,7 +6,7 @@ import {checkOrganizationPermission} from './components/iam/utils';
 import {Collection} from './entities/collection/collection';
 import {SharedEntry} from './entities/shared-entry/shared-entry';
 import {Workbook} from './entities/workbook/workbook';
-import {colorPalettesAdminValidator} from './utils/color-palettes/utils';
+import {checkPalettesAdmin} from './utils/color-palettes/utils';
 import {checkEmbedding} from './utils/embedding/utils';
 import {
     getEntryAddFormattedFieldsHook,
@@ -28,7 +28,7 @@ export const registerCommonPlugins = () => {
     registry.common.functions.register({
         checkOrganizationPermission,
         isNeedBypassEntryByKey,
-        colorPalettesAdminValidator,
+        checkPalettesAdmin,
         getZitadelUserRole,
         getEntryBeforeDbRequestHook,
         getEntryAddFormattedFieldsHook,
