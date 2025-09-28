@@ -14,7 +14,7 @@ import {
     isNeedBypassEntryByKey,
 } from './utils/entry/utils';
 import {logEvent} from './utils/log-event/utils';
-import {checkTenant, getServicePlan} from './utils/tenant/utils';
+import {checkTenant, getServicePlan, processTenantSettings} from './utils/tenant/utils';
 import {getZitadelUserRole} from './zitadel/utils';
 
 export const setupCommonPlugin = () => {
@@ -37,5 +37,6 @@ export const setupCommonPlugin = () => {
         logEvent,
         checkTenant,
         getServicePlan,
+        processTenantSettings,
     });
 };
