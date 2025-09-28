@@ -29,7 +29,6 @@ export const setupCommonPlugin = () => {
         checkOrganizationPermission,
         isNeedBypassEntryByKey,
         colorPalettesAdminValidator,
-        getZitadelUserRole,
         getEntryBeforeDbRequestHook,
         getEntryAddFormattedFieldsHook,
         getEntryResolveUserLogin,
@@ -38,5 +37,6 @@ export const setupCommonPlugin = () => {
         checkTenant,
         getServicePlan,
         processTenantSettings,
+        getZitadelUserRole,
     });
 };

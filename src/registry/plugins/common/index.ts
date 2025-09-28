@@ -33,7 +33,6 @@ export const commonPlugin = {
         checkOrganizationPermission: makeFunctionTemplate<CheckOrganizationPermission>(),
         isNeedBypassEntryByKey: makeFunctionTemplate<IsNeedBypassEntryByKey>(),
         colorPalettesAdminValidator: makeFunctionTemplate<ColorPalettesAdminValidator>(),
-        getZitadelUserRole: makeFunctionTemplate<GetZitadelUserRole>(),
         getEntryBeforeDbRequestHook: makeFunctionTemplate<GetEntryBeforeDbRequestHook>(),
         getEntryAddFormattedFieldsHook: makeFunctionTemplate<GetEntryAddFormattedFieldsHook>(),
         getEntryResolveUserLogin: makeFunctionTemplate<GetEntryResolveUserLogin>(),
@@ -42,5 +41,6 @@ export const commonPlugin = {
         checkTenant: makeFunctionTemplate<CheckTenant>(),
         getServicePlan: makeFunctionTemplate<GetServicePlan>(),
         processTenantSettings: makeFunctionTemplate<ProcessTenantSettings>(),
+        getZitadelUserRole: makeFunctionTemplate<GetZitadelUserRole>(),
     }),
 };
