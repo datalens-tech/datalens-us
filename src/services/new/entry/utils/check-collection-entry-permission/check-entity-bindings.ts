@@ -9,7 +9,7 @@ import {EntityBindingTargetType} from '../../../../../db/models/new/entity-bindi
 import {EntryColumn, Entry as EntryModel} from '../../../../../db/models/new/entry';
 import {EntryScope} from '../../../../../db/models/new/entry/types';
 import {SharedEntryPermission} from '../../../../../entities/shared-entry';
-import {SharedEntryInstance} from '../../../../../registry/common/entities/shared-entry/types';
+import {SharedEntryInstance} from '../../../../../registry/plugins/common/entities/shared-entry/types';
 import Utils from '../../../../../utils';
 import {getParentIds} from '../../../collection/utils';
 import {ServiceArgs} from '../../../types';

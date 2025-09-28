@@ -1,7 +1,7 @@
 import {AppRouteHandler} from '@gravity-ui/expresskit';
 
 import {prepareResponseAsync} from '../../components/response-presenter';
-import {LogEventType} from '../../registry/common/utils/log-event/types';
+import {LogEventType} from '../../registry/plugins/common/utils/log-event/types';
 import {renameEntry} from '../../services/entry';
 
 export const renameEntryController: AppRouteHandler = async (req, res) => {

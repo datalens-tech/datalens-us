@@ -3,7 +3,7 @@ import {AppError} from '@gravity-ui/nodekit';
 import {US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../entities/workbook';
-import type {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+import type {WorkbookInstance} from '../../../registry/plugins/common/entities/workbook/types';
 import Utils from '../../../utils';
 import {getParentIds} from '../collection/utils';
 import {ServiceArgs} from '../types';

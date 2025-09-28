@@ -1,4 +1,4 @@
-export type {DLSConstructor} from '../../src/registry/common/components/dls/types';
+export type {DLSConstructor} from '../../src/registry/plugins/common/components/dls/types';
 export type {
     LogEvent,
     LogEventParams,
@@ -52,28 +52,28 @@ export type {
     LogEventSetDefaultColorPaletteSuccessParams,
     LogEventUpdateTenantSettingsFailParams,
     LogEventUpdateTenantSettingsSuccessParams,
-} from '../../src/registry/common/utils/log-event/types';
-export {LogEventType} from '../../src/registry/common/utils/log-event/types';
+} from '../../src/registry/plugins/common/utils/log-event/types';
+export {LogEventType} from '../../src/registry/plugins/common/utils/log-event/types';
 export type {GatewayApi} from '../../src/registry';
 export type {
     CheckTenant,
     GetServicePlan,
     ProcessTenantSettings,
-} from '../../src/registry/common/utils/tenant/types';
-export type {GetEntryResolveUserLogin} from '../../src/registry/common/utils/entry/types';
+} from '../../src/registry/plugins/common/utils/tenant/types';
+export type {GetEntryResolveUserLogin} from '../../src/registry/plugins/common/utils/entry/types';
 export type {
     CollectionConstructor,
     CollectionInstance,
     BulkFetchCollectionsAllPermissions,
-} from '../../src/registry/common/entities/collection/types';
+} from '../../src/registry/plugins/common/entities/collection/types';
 export type {
     WorkbookConstructor,
     WorkbookInstance,
     BulkFetchWorkbooksAllPermissions,
-} from '../../src/registry/common/entities/workbook/types';
-export type {StructureItemInstance} from '../../src/registry/common/entities/structure-item/types';
+} from '../../src/registry/plugins/common/entities/workbook/types';
+export type {StructureItemInstance} from '../../src/registry/plugins/common/entities/structure-item/types';
 export type {
     SharedEntryConstructor,
     SharedEntryInstance,
     BulkFetchSharedEntriesAllPermissions,
-} from '../../src/registry/common/entities/shared-entry/types';
+} from '../../src/registry/plugins/common/entities/shared-entry/types';

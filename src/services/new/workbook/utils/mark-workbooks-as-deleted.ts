@@ -2,7 +2,7 @@ import {raw} from 'objection';
 
 import {CURRENT_TIMESTAMP} from '../../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../../db/models/new/workbook';
-import {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
+import {WorkbookInstance} from '../../../../registry/plugins/common/entities/workbook/types';
 import {ServiceArgs} from '../../types';
 import {getPrimary} from '../../utils';
 

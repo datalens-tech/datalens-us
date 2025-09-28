@@ -1,5 +1,5 @@
 import {CollectionPermission} from '../../../../entities/collection';
-import {CollectionInstance} from '../../../../registry/common/entities/collection/types';
+import {CollectionInstance} from '../../../../registry/plugins/common/entities/collection/types';
 import {ServiceArgs} from '../../types';
 import {getReplica} from '../../utils';
 

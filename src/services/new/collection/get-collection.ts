@@ -3,7 +3,7 @@ import {AppError} from '@gravity-ui/nodekit';
 import {US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
-import type {CollectionInstance} from '../../../registry/common/entities/collection/types';
+import type {CollectionInstance} from '../../../registry/plugins/common/entities/collection/types';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';

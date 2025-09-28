@@ -1,6 +1,6 @@
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
-import {CollectionInstance} from '../../../registry/common/entities/collection/types';
+import {CollectionInstance} from '../../../registry/plugins/common/entities/collection/types';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';

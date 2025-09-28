@@ -1,4 +1,4 @@
-import {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
+import {WorkbookInstance} from '../../../../registry/plugins/common/entities/workbook/types';
 import {DlsActions, UsPermissions} from '../../../../types/models';
 import {ServiceArgs} from '../../types';
 import {getReplica} from '../../utils';

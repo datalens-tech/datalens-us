@@ -4,7 +4,7 @@ import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {WorkbookStatus} from '../../db/models/new/workbook/types';
-import {LogEventType} from '../../registry/common/utils/log-event/types';
+import {LogEventType} from '../../registry/plugins/common/utils/log-event/types';
 import {updateWorkbook} from '../../services/new/workbook';
 
 import {WorkbookResponseModel, workbookModel} from './response-models';
