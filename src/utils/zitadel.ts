@@ -6,6 +6,26 @@ import {ZitadelUserRole} from '../types/zitadel';
 
 import {Utils} from './utils';
 
+export const getZitadelUserRole = (data: any): ZitadelUserRole => {
+    const scope = 'urn:zitadel:iam:org:project:roles';
+
+    const roles = data[scope];
+
+    if (!roles) {
+        return ZitadelUserRole.Viewer;
+    }
+
+    if (roles[ZitadelUserRole.Admin]) {
+        return ZitadelUserRole.Admin;
+    }
+
+    if (roles[ZitadelUserRole.Editor]) {
+        return ZitadelUserRole.Editor;
+    }
+
+    return ZitadelUserRole.Viewer;
+};
+
 type IntrospectionResult = {
     active: boolean;
     userId?: string;
@@ -51,9 +71,6 @@ export const introspect = async (ctx: AppContext, token?: string): Promise<Intro
         ctx.log(`Token introspected successfully within: ${Utils.getDuration(hrStart)} ms`);
 
         const {active, username, sub} = response.data;
-
-        const registry = ctx.get('registry');
-        const {getZitadelUserRole} = registry.common.functions.get();
 
         const role = getZitadelUserRole(response.data);
 
