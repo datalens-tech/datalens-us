@@ -15,6 +15,7 @@ import {
 } from './utils/entry/utils';
 import {logEvent} from './utils/log-event/utils';
 import {checkTenant, getServicePlan, processTenantSettings} from './utils/tenant/utils';
+import {getZitadelUserRole} from './zitadel/utils';
 
 export const setupCommonPlugin = () => {
     registry.common.classes.register({
@@ -28,6 +29,7 @@ export const setupCommonPlugin = () => {
         checkOrganizationPermission,
         isNeedBypassEntryByKey,
         colorPalettesAdminValidator,
+        getZitadelUserRole,
         getEntryBeforeDbRequestHook,
         getEntryAddFormattedFieldsHook,
         getEntryResolveUserLogin,
