@@ -15,5 +15,6 @@ export {
     Permissions as SharedEntryPermissions,
     ALLOWED_SHARED_ENTRY_SCOPES,
 } from '../src/entities/shared-entry';
+export {getSharedEntryDisabledPermissions} from '../src/entities/shared-entry/utils';
 export {getMockedOperation} from '../src/entities/utils';
 export type {Operation} from '../src/entities/types';

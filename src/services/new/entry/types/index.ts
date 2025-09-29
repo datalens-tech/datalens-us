@@ -11,7 +11,7 @@ export interface EntryPermissions {
 export type EntryWithPermissions<T> = T & {
     isLocked?: boolean;
     permissions?: EntryPermissions;
-    accessBindings?: SharedEntryPermissions;
+    fullPermissions?: SharedEntryPermissions;
 };
 
 export type PartialEntry = {

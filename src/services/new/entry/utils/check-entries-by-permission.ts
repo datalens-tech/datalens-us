@@ -162,7 +162,7 @@ const checkCollectionEntriesByPermission = async <T extends PartialEntry>(
             sharedEntry.enableAllPermissions();
             return {
                 ...makeEntryWithFullPermissions(entry, includePermissionsInfo),
-                accessBindings: includePermissionsInfo ? sharedEntry.permissions : undefined,
+                fullPermissions: includePermissionsInfo ? sharedEntry.permissions : undefined,
             };
         });
     }
@@ -192,7 +192,7 @@ const checkCollectionEntriesByPermission = async <T extends PartialEntry>(
         if (!sharedEntry) {
             return {
                 ...makeEntryWithNoPermissions(entry, includePermissionsInfo),
-                accessBindings: includePermissionsInfo
+                fullPermissions: includePermissionsInfo
                     ? getSharedEntryDisabledPermissions()
                     : undefined,
             };
@@ -204,7 +204,7 @@ const checkCollectionEntriesByPermission = async <T extends PartialEntry>(
             ...entry,
             isLocked: !(permissions && permissions[permission]),
             permissions: includePermissionsInfo ? permissions : undefined,
-            accessBindings: includePermissionsInfo ? sharedEntry.permissions : undefined,
+            fullPermissions: includePermissionsInfo ? sharedEntry.permissions : undefined,
         };
     });
 };
