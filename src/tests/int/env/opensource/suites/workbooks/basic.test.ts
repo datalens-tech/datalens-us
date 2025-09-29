@@ -378,6 +378,7 @@ describe('Entries in workboooks managment', () => {
                     updatedAt: expect.any(String),
                     updatedBy: expect.any(String),
                     workbookId: testWorkbookId,
+                    collectionId: null,
                     tenantId: testTenantId,
                 },
                 {
@@ -399,6 +400,7 @@ describe('Entries in workboooks managment', () => {
                     updatedAt: expect.any(String),
                     updatedBy: expect.any(String),
                     workbookId: testWorkbookId,
+                    collectionId: null,
                     tenantId: testTenantId,
                 },
             ]),
@@ -463,6 +465,7 @@ describe('Entries in workboooks managment', () => {
                     updatedAt: expect.any(String),
                     updatedBy: expect.any(String),
                     workbookId: testCopiedWorkbookId,
+                    collectionId: null,
                     tenantId: testTenantId,
                 },
                 {
@@ -484,6 +487,7 @@ describe('Entries in workboooks managment', () => {
                     updatedAt: expect.any(String),
                     updatedBy: expect.any(String),
                     workbookId: testCopiedWorkbookId,
+                    collectionId: null,
                     tenantId: testTenantId,
                 },
             ]),
