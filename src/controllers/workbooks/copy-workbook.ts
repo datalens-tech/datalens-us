@@ -3,7 +3,7 @@ import {AppRouteHandler, Response} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-import {LogEventType} from '../../registry/common/utils/log-event/types';
+import {LogEventType} from '../../registry/plugins/common/utils/log-event/types';
 import {copyWorkbook} from '../../services/new/workbook';
 
 import {

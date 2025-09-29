@@ -1,5 +1,5 @@
 import {z} from '../../../components/zod';
-import type {CollectionInstance} from '../../../registry/common/entities/collection/types';
+import type {CollectionInstance} from '../../../registry/plugins/common/entities/collection/types';
 import Utils from '../../../utils';
 
 import {collectionInstance} from './collection-instance';

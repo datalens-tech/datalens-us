@@ -1,6 +1,6 @@
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../entities/workbook';
-import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+import {WorkbookInstance} from '../../../registry/plugins/common/entities/workbook/types';
 import Utils from '../../../utils';
 import {makeWorkbooksWithParentsMap} from '../collection/utils';
 import {ServiceArgs} from '../types';

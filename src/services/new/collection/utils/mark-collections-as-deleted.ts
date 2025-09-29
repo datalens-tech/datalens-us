@@ -2,7 +2,7 @@ import {raw} from 'objection';
 
 import {CURRENT_TIMESTAMP} from '../../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../../db/models/new/collection';
-import {CollectionInstance} from '../../../../registry/common/entities/collection/types';
+import {CollectionInstance} from '../../../../registry/plugins/common/entities/collection/types';
 import {ServiceArgs} from '../../types';
 import {getPrimary} from '../../utils';
 

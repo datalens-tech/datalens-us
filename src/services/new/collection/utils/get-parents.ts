@@ -3,8 +3,8 @@ import {TransactionOrKnex} from 'objection';
 
 import {CollectionModel, CollectionModelColumn} from '../../../../db/models/new/collection';
 import {WorkbookModel} from '../../../../db/models/new/workbook';
-import {CollectionInstance} from '../../../../registry/common/entities/collection/types';
-import {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
+import {CollectionInstance} from '../../../../registry/plugins/common/entities/collection/types';
+import {WorkbookInstance} from '../../../../registry/plugins/common/entities/workbook/types';
 import {ServiceArgs} from '../../types';
 import {getReplica} from '../../utils';
 

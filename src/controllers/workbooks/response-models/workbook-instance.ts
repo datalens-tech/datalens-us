@@ -1,5 +1,5 @@
 import {z} from '../../../components/zod';
-import type {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+import type {WorkbookInstance} from '../../../registry/plugins/common/entities/workbook/types';
 
 import {workbookModel} from './workbook-model';
 

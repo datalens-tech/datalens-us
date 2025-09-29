@@ -1,5 +1,9 @@
 import {objectKeys} from '../../utils/utility-types';
 
+export const makeFunctionTemplate = <T extends (...args: any[]) => unknown>(): T => {
+    return (() => {}) as T;
+};
+
 export const createFunctionsRegistry = function <FunctionsMap extends Record<string, any>>(
     functionsMap: FunctionsMap,
 ) {

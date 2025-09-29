@@ -9,7 +9,7 @@ import type {AppContext} from '@gravity-ui/nodekit';
 
 import type {initDB} from '../db/init-db';
 
-import {commonRegistry} from './common';
+import {commonPlugin} from './plugins';
 
 type DbInstance = ReturnType<typeof initDB>;
 
@@ -73,7 +73,8 @@ export const registry = {
             gatewayApi: GatewayApi<TSchema>;
         };
     },
-    common: commonRegistry,
+
+    common: commonPlugin,
 };
 
 export type Registry = typeof registry;

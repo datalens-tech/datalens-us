@@ -2,7 +2,7 @@ import {AppContext} from '@gravity-ui/nodekit';
 import {TransactionOrKnex} from 'objection';
 
 import {WorkbookPermission} from '../../../../entities/workbook';
-import type {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
+import type {WorkbookInstance} from '../../../../registry/plugins/common/entities/workbook/types';
 import {getWorkbook} from '../../../../services/new/workbook';
 import {getParentIds} from '../../collection/utils';
 

@@ -55,6 +55,15 @@ describe('Update tenant settings', () => {
                 value: {lvl: '2'},
             })
             .expect(400);
+
+        await auth(request(app).post(routes.updateTenantSettings), {
+            role: OpensourceRole.Admin,
+        })
+            .send({
+                key: 'someKey',
+                value: 'asd',
+            })
+            .expect(400);
     });
 
     test('Set settings', async () => {
