@@ -9,12 +9,15 @@ import {
     RETURN_COLUMNS,
     US_ERRORS,
 } from '../../../const';
-import Entry from '../../../db/models/entry';
+import {default as OldEntry} from '../../../db/models/entry';
 import Lock from '../../../db/models/lock';
-import {EntryColumn} from '../../../db/models/new/entry';
+import {Entry, EntryColumn} from '../../../db/models/new/entry';
+import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {DlsActions, EntryColumns, EntryScope, UsPermissions} from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
+import {getParentIds} from '../../new/collection/utils/get-parents';
+import {checkSharedEntryPermission} from '../../new/entry/utils/check-collection-entry-permission/check-permission';
 import {ServiceArgs} from '../../new/types';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission} from '../../new/workbook/utils';
@@ -68,7 +71,7 @@ export async function deleteEntry(
     });
 
     const registry = ctx.get('registry');
-    const {DLS} = registry.common.classes.get();
+    const {DLS, SharedEntry} = registry.common.classes.get();
 
     if (!skipValidation) {
         validateArgs(args);
@@ -78,8 +81,8 @@ export async function deleteEntry(
     const {tenantId, isPrivateRoute, user} = ctx.get('info');
     const deletedBy = useLegacyLogin ? user.login : makeUserId(user.userId);
 
-    const result = await transaction(Entry.primary, async (trx) => {
-        const entry = await Entry.query(trx)
+    const result = await transaction(OldEntry.primary, async (trx) => {
+        const entry = await OldEntry.query(trx)
             .select()
             .where({
                 entryId,
@@ -87,11 +90,11 @@ export async function deleteEntry(
             })
             .where((builder) => {
                 if (scope) {
-                    builder.andWhere({[`${Entry.tableName}.${EntryColumn.Scope}`]: scope});
+                    builder.andWhere({[`${OldEntry.tableName}.${EntryColumn.Scope}`]: scope});
                 }
 
                 if (types) {
-                    builder.whereIn([`${Entry.tableName}.${EntryColumn.Type}`], types);
+                    builder.whereIn([`${OldEntry.tableName}.${EntryColumn.Type}`], types);
                 }
             })
             .first()
@@ -111,13 +114,16 @@ export async function deleteEntry(
 
         const entryObj: EntryColumns = entry.toJSON();
 
-        if (entryObj.workbookId) {
-            if (!isPrivateRoute) {
+        if (!entryObj.workbookId) {
+            await checkEntry(ctx, trx, {verifiableEntry: entryObj});
+        }
+
+        if (!isPrivateRoute) {
+            if (entryObj.workbookId) {
                 const workbook = await getWorkbook(
-                    {ctx, trx: Entry.replica},
+                    {ctx, trx: OldEntry.replica},
                     {workbookId: entryObj.workbookId},
                 );
-
                 if (accessServiceEnabled) {
                     await checkWorkbookPermission({
                         ctx,
@@ -126,18 +132,15 @@ export async function deleteEntry(
                         permission: WorkbookPermission.Update,
                     });
                 }
-            }
-        } else {
-            await checkEntry(ctx, trx, {verifiableEntry: entryObj});
-
-            if (!isPrivateRoute && ctx.config.dlsEnabled) {
-                await DLS.checkPermission(
-                    {ctx, trx},
-                    {
-                        entryId,
-                        action: DlsActions.SetPermissions,
-                    },
-                );
+            } else if (entryObj.collectionId) {
+                if (accessServiceEnabled) {
+                    await checkSharedEntryPermission(
+                        {ctx, trx},
+                        {entry: entryObj, permission: SharedEntryPermission.Delete},
+                    );
+                }
+            } else if (ctx.config.dlsEnabled) {
+                await DLS.checkPermission({ctx, trx}, {entryId, action: DlsActions.SetPermissions});
             }
         }
 
@@ -148,7 +151,7 @@ export async function deleteEntry(
             const newFolderName = `${entryObj.entryId}_${
                 entryObj.displayKey.split('/').splice(-2, 1)[0]
             }/`;
-            const children = await Entry.query(trx)
+            const children = await OldEntry.query(trx)
                 .select()
                 .where('key', 'like', `${Utils.escapeStringForLike(entryObjKey)}%`)
                 .where({tenantId})
@@ -156,7 +159,7 @@ export async function deleteEntry(
 
             if (!isPrivateRoute && ctx.config.dlsEnabled) {
                 const haveEntriesWithPermissionsLess =
-                    await Entry.checkExistenceEntriesWithInsufficientPermissions({
+                    await OldEntry.checkExistenceEntriesWithInsufficientPermissions({
                         entries: children,
                         permission: UsPermissions.Admin,
                         ctx,
@@ -216,9 +219,25 @@ export async function deleteEntry(
                 newInnerMeta,
                 updatedBy: deletedBy,
             });
+
+            if (entry.collectionId) {
+                const parentIds = await getParentIds({
+                    ctx,
+                    trx,
+                    collectionId: entry.collectionId,
+                });
+                const sharedEntry = new SharedEntry({
+                    ctx,
+                    model: entry as Entry,
+                });
+                await sharedEntry.deletePermissions({
+                    parentIds,
+                    skipCheckPermissions: true,
+                });
+            }
         }
 
-        return await Entry.query(trx)
+        return await OldEntry.query(trx)
             .select([...RETURN_COLUMNS, 'isDeleted', 'deletedAt'])
             .join('revisions', 'entries.savedId', 'revisions.revId')
             .where({

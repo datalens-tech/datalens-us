@@ -2,6 +2,10 @@ import type {Knex} from 'knex';
 import {QueryBuilder, TransactionOrKnex, raw} from 'objection';
 
 import {Model} from '../../../..';
+import {
+    CollectionModel as Collection,
+    CollectionModelColumn as CollectionColumn,
+} from '../../collection';
 import {Entry, EntryColumn} from '../../entry';
 import {WorkbookModel as Workbook, WorkbookModelColumn as WorkbookColumn} from '../../workbook';
 import {Favorite, FavoriteColumn} from '../index';
@@ -19,7 +23,8 @@ export class FavoriteEntryPresentation extends Model {
         const query = Favorite.query(trx)
             .select(this.selectedColumns)
             .join(Entry.tableName, this.joinEntry)
-            .leftJoin(Workbook.tableName, this.leftJoinWorkbook);
+            .leftJoin(Workbook.tableName, this.leftJoinWorkbook)
+            .leftJoin(Collection.tableName, this.leftJoinCollection);
 
         return query as unknown as QueryBuilder<
             FavoriteEntryPresentation,
@@ -41,6 +46,13 @@ export class FavoriteEntryPresentation extends Model {
         );
     }
 
+    protected static leftJoinCollection(builder: Knex.JoinClause) {
+        builder.on(
+            `${Entry.tableName}.${EntryColumn.CollectionId}`,
+            `${Collection.tableName}.${CollectionColumn.CollectionId}`,
+        );
+    }
+
     protected static get selectedColumns() {
         return [
             `${Favorite.tableName}.${FavoriteColumn.EntryId}`,
@@ -59,6 +71,7 @@ export class FavoriteEntryPresentation extends Model {
             `${Entry.tableName}.${EntryColumn.CollectionId}`,
 
             raw(`${Workbook.tableName}.${WorkbookColumn.Title} AS workbook_title`),
+            raw(`${Collection.tableName}.${CollectionColumn.Title} AS collection_title`),
         ];
     }
 
@@ -78,4 +91,5 @@ export class FavoriteEntryPresentation extends Model {
     [EntryColumn.CollectionId]!: Entry[typeof EntryColumn.CollectionId];
 
     workbookTitle!: Nullable<Workbook[typeof WorkbookColumn.Title]>;
+    collectionTitle!: Nullable<Collection[typeof CollectionColumn.Title]>;
 }
