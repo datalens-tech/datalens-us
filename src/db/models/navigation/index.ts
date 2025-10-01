@@ -62,6 +62,7 @@ class Navigation extends Model {
             requestedBy,
             includePermissionsInfo,
             ignoreWorkbookEntries,
+            ignoreSharedEntries,
             includeData,
             includeLinks,
             excludeLocked,
@@ -83,6 +84,7 @@ class Navigation extends Model {
             requestedBy,
             includePermissionsInfo,
             ignoreWorkbookEntries,
+            ignoreSharedEntries,
             includeData,
             includeLinks,
             dlContext,
@@ -96,6 +98,7 @@ class Navigation extends Model {
         const selectColumnNames = [
             ...returnColumnNames,
             'workbooks.title as workbookTitle',
+            'collections.title as collectionTitle',
             raw('CASE sub.entry_id WHEN sub.entry_id THEN TRUE ELSE FALSE END AS is_favorite'),
             'unversionedData',
         ];
@@ -108,6 +111,7 @@ class Navigation extends Model {
             .select(selectColumnNames)
             .join('revisions', 'entries.savedId', 'revisions.revId')
             .leftJoin('workbooks', 'workbooks.workbookId', 'entries.workbookId')
+            .leftJoin('collections', 'collections.collectionId', 'entries.collectionId')
             .leftJoin(
                 Favorite.query(this.replica)
                     .select('favorites.entryId')
@@ -142,6 +146,10 @@ class Navigation extends Model {
 
                 if (ignoreWorkbookEntries) {
                     builder.where('entries.workbookId', null);
+                }
+
+                if (ignoreSharedEntries) {
+                    builder.where('entries.collectionId', null);
                 }
 
                 if (metaFilters) {

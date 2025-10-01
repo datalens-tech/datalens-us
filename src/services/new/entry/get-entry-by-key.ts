@@ -6,6 +6,7 @@ import OldEntry from '../../../db/models/entry';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {RevisionModel} from '../../../db/models/new/revision';
 import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
+import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {DlsActions} from '../../../types/models';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
@@ -15,6 +16,7 @@ import {getEntryPermissionsByWorkbook} from '../workbook/utils';
 
 import {EntryPermissions} from './types';
 import {checkFetchedEntry} from './utils';
+import {checkSharedEntryPermission} from './utils/check-collection-entry-permission/check-permission';
 import {validateTenantId} from './validators';
 
 const validateGetEntryByKey = makeSchemaValidator({
@@ -129,6 +131,20 @@ export const getEntryByKey = async (
                         scope: joinedEntryRevision[EntryColumn.Scope],
                     });
                 }
+            }
+        } else if (joinedEntryRevision.collectionId) {
+            if (!isPrivateRoute) {
+                await checkFetchedEntry(ctx, joinedEntryRevision, getReplica(trx));
+
+                const {permissions} = await checkSharedEntryPermission(
+                    {ctx, trx},
+                    {
+                        entry: joinedEntryRevision,
+                        permission: SharedEntryPermission.View,
+                        includePermissionsInfo,
+                    },
+                );
+                iamPermissions = permissions;
             }
         } else {
             await checkFetchedEntry(ctx, joinedEntryRevision, getReplica(trx));

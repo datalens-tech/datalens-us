@@ -29,6 +29,7 @@ const requestSchema = {
             .optional(),
         includePermissionsInfo: zc.stringBoolean().optional(),
         ignoreWorkbookEntries: zc.stringBoolean().optional(),
+        ignoreSharedEntries: zc.stringBoolean().optional(),
     }),
 };
 
@@ -36,21 +37,20 @@ const parseReq = makeReqParser(requestSchema);
 
 export const getFavoritesController: AppRouteHandler = async (req, res) => {
     const {query} = await parseReq(req);
-    const {orderBy, filters, page, pageSize, scope, includePermissionsInfo, ignoreWorkbookEntries} =
-        query;
 
     const result = await getFavorites(
         {
             ctx: req.ctx,
         },
         {
-            orderBy,
-            filters,
-            page,
-            pageSize,
-            scope,
-            includePermissionsInfo,
-            ignoreWorkbookEntries,
+            orderBy: query.orderBy,
+            filters: query.filters,
+            page: query.page,
+            pageSize: query.pageSize,
+            scope: query.scope,
+            includePermissionsInfo: query.includePermissionsInfo,
+            ignoreWorkbookEntries: query.ignoreWorkbookEntries,
+            ignoreSharedEntries: query.ignoreSharedEntries,
         },
     );
 

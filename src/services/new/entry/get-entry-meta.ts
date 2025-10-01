@@ -4,6 +4,7 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {US_ERRORS} from '../../../const';
 import {Entry} from '../../../db/models/new/entry';
 import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
+import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {DlsActions} from '../../../types/models';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
@@ -11,6 +12,7 @@ import {getReplica} from '../utils';
 import {getWorkbook} from '../workbook';
 
 import {checkFetchedEntry} from './utils';
+import {checkSharedEntryPermission} from './utils/check-collection-entry-permission/check-permission';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -62,18 +64,29 @@ export const getEntryMeta = async (
     });
 
     if (joinedEntryRevision) {
-        const {isNeedBypassEntryByKey} = registry.common.functions.get();
-
-        const dlsBypassByKeyEnabled = isNeedBypassEntryByKey(
-            ctx,
-            joinedEntryRevision.key as string,
-        );
+        if (!isPrivateRoute && !joinedEntryRevision.workbookId) {
+            await checkFetchedEntry(ctx, joinedEntryRevision, getReplica(trx));
+        }
 
         if (joinedEntryRevision.workbookId) {
             if (!isPrivateRoute) {
                 await getWorkbook({ctx, trx}, {workbookId: joinedEntryRevision.workbookId});
             }
+        } else if (joinedEntryRevision.collectionId) {
+            if (!isPrivateRoute) {
+                await checkSharedEntryPermission(
+                    {ctx, trx},
+                    {entry: joinedEntryRevision, permission: SharedEntryPermission.View},
+                );
+            }
         } else {
+            const {isNeedBypassEntryByKey} = registry.common.functions.get();
+
+            const dlsBypassByKeyEnabled = isNeedBypassEntryByKey(
+                ctx,
+                joinedEntryRevision.key as string,
+            );
+
             const checkPermissionEnabled =
                 !isPrivateRoute && ctx.config.dlsEnabled && !dlsBypassByKeyEnabled;
 
@@ -85,10 +98,6 @@ export const getEntryMeta = async (
                         action: DlsActions.Read,
                     },
                 );
-            }
-
-            if (!isPrivateRoute) {
-                await checkFetchedEntry(ctx, joinedEntryRevision, getReplica(trx));
             }
         }
 
