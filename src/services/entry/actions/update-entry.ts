@@ -18,6 +18,7 @@ import Lock from '../../../db/models/lock';
 import {EntryColumn} from '../../../db/models/new/entry';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import Revision from '../../../db/models/revision';
+import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {
     CTX,
@@ -28,6 +29,7 @@ import {
     SyncLinksConf,
 } from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
+import {checkSharedEntryPermission} from '../../new/entry/utils/check-collection-entry-permission/check-permission';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission} from '../../new/workbook/utils';
 
@@ -184,11 +186,9 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         });
     }
 
-    let updatedBy: string;
+    let updatedBy: string = makeUserId(user.userId);
 
     if (entry.workbookId) {
-        updatedBy = makeUserId(user.userId);
-
         if (!isPrivateRoute) {
             const workbook = await getWorkbook(
                 {ctx, trx: Entry.replica},
@@ -204,8 +204,17 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                 });
             }
         }
+    } else if (entry.collectionId) {
+        if (!isPrivateRoute && accessServiceEnabled) {
+            await checkSharedEntryPermission(
+                {ctx},
+                {entry, permission: SharedEntryPermission.Update},
+            );
+        }
     } else {
-        updatedBy = useLegacyLogin ? user.login : makeUserId(user.userId);
+        if (useLegacyLogin) {
+            updatedBy = user.login;
+        }
 
         const {isNeedBypassEntryByKey} = registry.common.functions.get();
 

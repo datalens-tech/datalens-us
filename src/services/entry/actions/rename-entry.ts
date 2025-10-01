@@ -10,9 +10,11 @@ import {
     US_ERRORS,
 } from '../../../const';
 import Entry from '../../../db/models/entry';
+import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {CTX, DlsActions} from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
+import {checkSharedEntryPermission} from '../../new/entry/utils/check-collection-entry-permission/check-permission';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission} from '../../new/workbook/utils';
 
@@ -94,6 +96,13 @@ export const renameEntry = async (ctx: CTX, renameEntryData: RenameEntryData) =>
                         permission: WorkbookPermission.Update,
                     });
                 }
+            }
+        } else if (renamingEntry.collectionId) {
+            if (!isPrivateRoute && accessServiceEnabled) {
+                await checkSharedEntryPermission(
+                    {ctx, trx},
+                    {entry: renamingEntry, permission: SharedEntryPermission.Update},
+                );
             }
         } else if (!isPrivateRoute && ctx.config.dlsEnabled) {
             await DLS.checkPermission(

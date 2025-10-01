@@ -6,7 +6,9 @@ import PG_ERRORS from 'pg-error-constants';
 import {Model} from '../..';
 import {CURRENT_TIMESTAMP} from '../../../const';
 import {US_ERRORS} from '../../../const/errors';
+import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {WorkbookPermission} from '../../../entities/workbook';
+import {checkSharedEntryPermission} from '../../../services/new/entry/utils/check-collection-entry-permission/check-permission';
 import {getWorkbook} from '../../../services/new/workbook';
 import {checkWorkbookPermission} from '../../../services/new/workbook/utils/check-workbook-permission';
 import * as MT from '../../../types/models';
@@ -377,18 +379,27 @@ class Lock extends Model {
                     {workbookId: entry.workbookId},
                 );
 
-                let workbookPermission: WorkbookPermission;
-                if (permission === 'edit') {
-                    workbookPermission = WorkbookPermission.Update;
-                } else {
-                    workbookPermission = WorkbookPermission.LimitedView;
-                }
-
                 await checkWorkbookPermission({
                     ctx,
                     workbook,
-                    permission: workbookPermission,
+                    permission:
+                        permission === 'read'
+                            ? WorkbookPermission.LimitedView
+                            : WorkbookPermission.Update,
                 });
+            }
+        } else if (entry.collectionId) {
+            if (accessServiceEnabled) {
+                await checkSharedEntryPermission(
+                    {ctx},
+                    {
+                        entry,
+                        permission:
+                            permission === 'read'
+                                ? SharedEntryPermission.View
+                                : SharedEntryPermission.Update,
+                    },
+                );
             }
         } else if (ctx.config.dlsEnabled) {
             const {DLS} = registry.common.classes.get();

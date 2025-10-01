@@ -70,6 +70,7 @@ export interface GetEntries extends NavigationServiceParams {
     isPrivateRoute?: any;
     includePermissionsInfo?: boolean;
     ignoreWorkbookEntries?: boolean;
+    ignoreSharedEntries?: boolean;
     includeData?: boolean;
     includeLinks?: boolean;
     excludeLocked?: boolean;

@@ -10,8 +10,10 @@ import {
     US_ERRORS,
 } from '../../../const';
 import Entry from '../../../db/models/entry';
+import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {CTX, DlsActions} from '../../../types/models';
 import Utils from '../../../utils';
+import {checkSharedEntryPermission} from '../../new/entry/utils/check-collection-entry-permission/check-permission';
 import {ServiceArgs} from '../../new/types';
 import {getWorkbook} from '../../new/workbook';
 
@@ -89,26 +91,20 @@ export async function getEntryRevisions(
         });
     }
 
-    if (entry.workbookId) {
-        if (!isPrivateRoute) {
-            await getWorkbook(
-                {ctx},
-                {
-                    workbookId: entry.workbookId,
-                },
-            );
+    if (!isPrivateRoute) {
+        if (!entry.workbookId) {
+            await checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
         }
-    } else if (!isPrivateRoute) {
-        await checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
 
-        if (ctx.config.dlsEnabled) {
-            await DLS.checkPermission(
+        if (entry.workbookId) {
+            await getWorkbook({ctx}, {workbookId: entry.workbookId});
+        } else if (entry.collectionId) {
+            await checkSharedEntryPermission(
                 {ctx},
-                {
-                    entryId,
-                    action: DlsActions.Read,
-                },
+                {entry, permission: SharedEntryPermission.View},
             );
+        } else if (ctx.config.dlsEnabled) {
+            await DLS.checkPermission({ctx}, {entryId, action: DlsActions.Read});
         }
     }
 
