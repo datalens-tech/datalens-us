@@ -105,7 +105,11 @@ export async function getRelatedEntries(
 
     const relatedEntriesQuery = Entry.query(getReplica(trx))
         .select([...RETURN_RELATION_COLUMNS, 'entries.created_at'])
-        .join('revisions', 'entries.savedId', 'revisions.revId')
+        .join(
+            'revisions',
+            raw('COALESCE(entries.published_id, entries.saved_id)'),
+            'revisions.revId',
+        )
         .whereIn('entries.entryId', entryIdList)
         .orderBy('entries.createdAt');
 
