@@ -60,7 +60,13 @@ export {
 } from '../src/services/new/entry/formatters';
 export {formatWorkbookModel} from '../src/services/new/workbook/formatters';
 
-export {filterEntriesByPermission, checkEntriesByPermission} from '../src/services/new/entry/utils';
+export {
+    filterEntriesByPermission,
+    checkEntriesByPermission,
+    checkWorkbookEntriesByPermission,
+    checkFolderEntriesByPermission,
+    checkCollectionEntriesByPermission,
+} from '../src/services/new/entry/utils';
 export {
     mapCollectionEntryPermissions,
     mapReadOnlyCollectionEntryPermissions,
