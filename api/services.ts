@@ -14,12 +14,17 @@ export {
     makeCollectionsWithParentsMap,
 } from '../src/services/new/collection/utils/get-parents';
 
-export {getWorkbook, createWorkbook, setWorkbookIsTemplate} from '../src/services/new/workbook';
+export {
+    getWorkbook,
+    createWorkbook,
+    setWorkbookIsTemplate,
+    crossSyncCopiedJoinedEntryRevisions,
+} from '../src/services/new/workbook';
+export {getEntryPermissionsByWorkbook} from '../src/services/new/workbook/utils';
 export {
     checkWorkbookPermission,
     checkWorkbookPermissionById,
 } from '../src/services/new/workbook/utils/check-workbook-permission';
-export {copyEntriesToWorkbook} from '../src/services/new/entry';
 
 export {formatOperation} from '../src/services/new/formatters';
 
@@ -35,8 +40,18 @@ export {
 export {default as EntryService} from '../src/services/entry.service';
 export {default as NavigationService} from '../src/services/navigation.service';
 
-export {getEntryByKey, GetEntryByKeyArgs} from '../src/services/new/entry';
-export {getEntry, GetEntryResult} from '../src/services/new/entry';
+export {
+    getEntryByKey,
+    GetEntryByKeyArgs,
+    getEntry,
+    GetEntryResult,
+    copyEntriesToWorkbook,
+} from '../src/services/new/entry';
+export {
+    EntryPermissions,
+    EntryWithPermissions,
+    PartialEntry,
+} from '../src/services/new/entry/types';
 export {getEntriesByKeyPattern} from '../src/services/entry';
 export {
     formatGetEntryByKeyResponse,
@@ -45,9 +60,13 @@ export {
 } from '../src/services/new/entry/formatters';
 export {formatWorkbookModel} from '../src/services/new/workbook/formatters';
 
-export {crossSyncCopiedJoinedEntryRevisions} from '../src/services/new/workbook';
-
 export {filterEntriesByPermission, checkEntriesByPermission} from '../src/services/new/entry/utils';
+export {
+    mapCollectionEntryPermissions,
+    mapReadOnlyCollectionEntryPermissions,
+    getReadOnlyCollectionEntryPermissions,
+    getMinimumReadOnlyCollectionEntryPermissions,
+} from '../src/services/new/entry/utils/check-collection-entry-permission/map-collection-entry-permissions';
 
 export {
     setDefaultColorPalette,

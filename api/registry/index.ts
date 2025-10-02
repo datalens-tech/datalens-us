@@ -1,6 +1,10 @@
 export {registry, Registry} from '../../src/registry';
+export {setupRegistryPlugins} from '../../src/registry/setup';
 
-export {makeFunctionTemplate} from '../../src/registry/utils/make-function-template';
-export {makeClassTemplate} from '../../src/registry/utils/make-class-template';
-export {createFunctionsRegistry} from '../../src/registry/utils/functions-registry';
-export {createClassesRegistry} from '../../src/registry/utils/classes-registry';
+export {
+    makeFunctionTemplate,
+    createFunctionsRegistry,
+    makeClassTemplate,
+    createClassesRegistry,
+    setRegistryToContext,
+} from '../../src/registry/utils';

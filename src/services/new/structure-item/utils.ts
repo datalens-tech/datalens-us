@@ -8,9 +8,9 @@ import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workboo
 import {CollectionPermission} from '../../../entities/collection';
 import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {WorkbookPermission} from '../../../entities/workbook';
-import {CollectionInstance} from '../../../registry/common/entities/collection/types';
-import {SharedEntryInstance} from '../../../registry/common/entities/shared-entry/types';
-import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+import {CollectionInstance} from '../../../registry/plugins/common/entities/collection/types';
+import {SharedEntryInstance} from '../../../registry/plugins/common/entities/shared-entry/types';
+import {WorkbookInstance} from '../../../registry/plugins/common/entities/workbook/types';
 import Utils, {makeUserId} from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';

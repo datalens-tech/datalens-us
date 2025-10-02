@@ -2,7 +2,7 @@ import {AppError} from '@gravity-ui/nodekit';
 
 import {US_ERRORS} from '../../../../../const/errors';
 import {SharedEntryPermission} from '../../../../../entities/shared-entry';
-import {SharedEntryInstance} from '../../../../../registry/common/entities/shared-entry/types';
+import {SharedEntryInstance} from '../../../../../registry/plugins/common/entities/shared-entry/types';
 import {getParentIds} from '../../../collection/utils';
 import {ServiceArgs} from '../../../types';
 import type {EntryPermissions} from '../../types';

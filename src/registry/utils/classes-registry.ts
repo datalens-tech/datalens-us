@@ -1,5 +1,9 @@
 import {objectKeys} from '../../utils/utility-types';
 
+export const makeClassTemplate = <T extends new (...args: any[]) => unknown>(): T => {
+    return class Template {} as T;
+};
+
 export const createClassesRegistry = function <ClassesMap extends Record<string, any>>(
     classesMap: ClassesMap,
 ) {

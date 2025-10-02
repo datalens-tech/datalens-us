@@ -3,7 +3,7 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-import {LogEventType} from '../../registry/common/utils/log-event/types';
+import {LogEventType} from '../../registry/plugins/common/utils/log-event/types';
 import {setDefaultColorPalette} from '../../services/new/tenants';
 
 import {briefTenantWithSettingsModel} from './response-models';

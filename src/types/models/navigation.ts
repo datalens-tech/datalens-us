@@ -23,6 +23,7 @@ export interface GetEntriesConfig extends BasicRequestParams {
     isPrivateRoute?: any;
     includePermissionsInfo?: boolean;
     ignoreWorkbookEntries?: boolean;
+    ignoreSharedEntries?: boolean;
     includeData?: boolean;
     includeLinks?: boolean;
     excludeLocked?: boolean;

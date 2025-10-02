@@ -3,8 +3,10 @@ import {AppError} from '@gravity-ui/nodekit';
 import {US_ERRORS} from '../../../const';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {Favorite, FavoriteColumn} from '../../../db/models/new/favorite';
+import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {getWorkbook} from '../../../services/new/workbook';
 import {DlsActions} from '../../../types/models';
+import {checkSharedEntryPermission} from '../entry/utils/check-collection-entry-permission/check-permission';
 import {ServiceArgs} from '../types';
 import {getPrimary, getReplica} from '../utils';
 
@@ -44,6 +46,11 @@ export const addFavorite = async ({ctx, trx}: ServiceArgs, {entryId}: AddFavorit
 
     if (entry.workbookId) {
         await getWorkbook({ctx}, {workbookId: entry.workbookId});
+    } else if (entry.collectionId) {
+        await checkSharedEntryPermission(
+            {ctx, trx},
+            {entry, permission: SharedEntryPermission.View},
+        );
     } else if (ctx.config.dlsEnabled) {
         await DLS.checkPermission(
             {ctx},

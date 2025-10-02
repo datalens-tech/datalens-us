@@ -1,11 +1,11 @@
 import {z} from '../../../components/zod';
-import {CollectionInstance} from '../../../registry/common/entities/collection/types';
-import {SharedEntryInstance} from '../../../registry/common/entities/shared-entry/types';
+import {CollectionInstance} from '../../../registry/plugins/common/entities/collection/types';
+import {SharedEntryInstance} from '../../../registry/plugins/common/entities/shared-entry/types';
 import {
     isSharedEntryInstance,
     isWorkbookInstance,
-} from '../../../registry/common/entities/structure-item/types';
-import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+} from '../../../registry/plugins/common/entities/structure-item/types';
+import {WorkbookInstance} from '../../../registry/plugins/common/entities/workbook/types';
 import Utils from '../../../utils';
 import {collectionInstance} from '../../collections/response-models';
 import {workbookInstance} from '../../workbooks/response-models';

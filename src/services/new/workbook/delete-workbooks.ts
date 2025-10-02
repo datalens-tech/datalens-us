@@ -5,7 +5,7 @@ import {US_ERRORS} from '../../../const';
 import Lock from '../../../db/models/lock';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {WorkbookPermission} from '../../../entities/workbook';
-import {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+import {WorkbookInstance} from '../../../registry/plugins/common/entities/workbook/types';
 import Utils, {makeUserId} from '../../../utils';
 import {markEntryAsDeleted} from '../../entry/crud';
 import {getParentIds} from '../collection/utils/get-parents';

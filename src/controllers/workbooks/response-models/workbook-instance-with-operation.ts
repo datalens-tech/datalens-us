@@ -1,6 +1,6 @@
 import {z} from '../../../components/zod';
 import type {Operation} from '../../../entities/types';
-import type {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+import type {WorkbookInstance} from '../../../registry/plugins/common/entities/workbook/types';
 import {operation as operationResponseModel} from '../../response-models';
 
 import {workbookInstance as originalWorkbookInstance} from './workbook-instance';

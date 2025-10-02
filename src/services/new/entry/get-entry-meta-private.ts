@@ -1,6 +1,7 @@
 import {AppError} from '@gravity-ui/nodekit';
 
 import {US_ERRORS} from '../../../const';
+import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {DlsActions} from '../../../types/models';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
@@ -8,6 +9,7 @@ import {getReplica} from '../utils';
 import {getWorkbook} from '../workbook';
 
 import {getEntryMeta} from './get-entry-meta';
+import {checkSharedEntryPermission} from './utils/check-collection-entry-permission/check-permission';
 
 export type GetEntryMetaPrivateArgs = {
     entryId: string;
@@ -47,6 +49,22 @@ export const getEntryMetaPrivate = async (
     if (entryMeta.workbookId) {
         try {
             await getWorkbook({ctx, trx}, {workbookId: entryMeta.workbookId});
+        } catch (error) {
+            const err = error as AppError;
+            if (err.code === US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED) {
+                statusCode = 403;
+            } else {
+                throw new AppError('PRIVATE_GET_ENTRY_META_FAILED', {
+                    code: 'PRIVATE_GET_ENTRY_META_FAILED',
+                });
+            }
+        }
+    } else if (entryMeta.collectionId) {
+        try {
+            await checkSharedEntryPermission(
+                {ctx, trx},
+                {entry: entryMeta, permission: SharedEntryPermission.View},
+            );
         } catch (error) {
             const err = error as AppError;
             if (err.code === US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED) {

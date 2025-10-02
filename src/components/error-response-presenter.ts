@@ -65,6 +65,7 @@ export default (error: AppError | DBError) => {
         case US_ERRORS.DECODE_ID_FAILED:
         case US_ERRORS.VALIDATION_ERROR:
         case US_ERRORS.ENTRIES_REQUIRE_COLLECTION_ID:
+        case US_ERRORS.SHARED_ENTRY_REQUIRE_COLLECTION_ID:
         case US_ERRORS.INCORRECT_LINK_ERROR: {
             return {
                 code: 400,
