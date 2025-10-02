@@ -133,6 +133,7 @@ describe('Private Entries in workboooks managment', () => {
                     updatedAt: expect.any(String),
                     updatedBy: expect.any(String),
                     workbookId: testWorkbookId,
+                    collectionId: null,
                     tenantId: testTenantId,
                 },
             ]),

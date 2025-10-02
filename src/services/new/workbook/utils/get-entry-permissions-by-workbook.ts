@@ -1,5 +1,5 @@
 import {EntryScope} from '../../../../db/models/new/entry/types';
-import type {WorkbookInstance} from '../../../../registry/common/entities/workbook/types';
+import type {WorkbookInstance} from '../../../../registry/plugins/common/entities/workbook/types';
 import {UsPermissions} from '../../../../types/models';
 import type {EntryScope as EntryScopeType} from '../../../../types/models';
 

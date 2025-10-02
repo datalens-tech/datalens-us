@@ -1,4 +1,4 @@
-import type {CollectionInstance} from '../../../../registry/common/entities/collection/types';
+import type {CollectionInstance} from '../../../../registry/plugins/common/entities/collection/types';
 
 export const formatCollection = (collection: CollectionInstance) => {
     return {

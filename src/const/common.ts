@@ -72,7 +72,7 @@ export const RETURN_RELATION_COLUMNS = [
     'type',
     'display_key as key',
     'meta',
-    'annotation',
+    'links',
     'tenantId',
     'public',
     'workbookId',

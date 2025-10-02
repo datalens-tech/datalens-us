@@ -1,6 +1,6 @@
 import {z} from '../../../components/zod';
 import {EntryScope} from '../../../db/models/new/entry/types';
-import type {SharedEntryInstance} from '../../../registry/common/entities/shared-entry/types';
+import type {SharedEntryInstance} from '../../../registry/plugins/common/entities/shared-entry/types';
 import Utils from '../../../utils';
 import {sharedEntryPermissionsModel} from '../../entries/response-models';
 

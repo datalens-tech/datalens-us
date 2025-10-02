@@ -22,6 +22,7 @@ interface GetFavoritesArgs {
     scope?: string | string[];
     includePermissionsInfo?: boolean;
     ignoreWorkbookEntries?: boolean;
+    ignoreSharedEntries?: boolean;
 }
 
 export const getFavorites = async (
@@ -34,6 +35,7 @@ export const getFavorites = async (
         scope,
         includePermissionsInfo,
         ignoreWorkbookEntries,
+        ignoreSharedEntries,
     }: GetFavoritesArgs,
 ) => {
     const {tenantId, user, dlContext} = ctx.get('info');
@@ -48,6 +50,7 @@ export const getFavorites = async (
         scope,
         includePermissionsInfo,
         ignoreWorkbookEntries,
+        ignoreSharedEntries,
         dlContext,
     });
 
@@ -81,6 +84,9 @@ export const getFavorites = async (
 
             if (ignoreWorkbookEntries) {
                 builder.where(`${Entry.tableName}.${EntryColumn.WorkbookId}`, null);
+            }
+            if (ignoreSharedEntries) {
+                builder.where(`${Entry.tableName}.${EntryColumn.CollectionId}`, null);
             }
         })
         .orderByRaw('CASE WHEN ?? = ? THEN 0 ELSE 1 END', [

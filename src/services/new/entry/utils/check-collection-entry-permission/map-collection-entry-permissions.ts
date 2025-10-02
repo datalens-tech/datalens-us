@@ -1,6 +1,6 @@
 import {AppContext, AppError} from '@gravity-ui/nodekit';
 
-import type {SharedEntryInstance} from '../../../../../registry/common/entities/shared-entry/types';
+import type {SharedEntryInstance} from '../../../../../registry/plugins/common/entities/shared-entry/types';
 import {UsPermissions} from '../../../../../types/models';
 import type {EntryPermissions} from '../../types';
 

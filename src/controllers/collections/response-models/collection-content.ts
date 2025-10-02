@@ -1,6 +1,6 @@
 import {z} from '../../../components/zod';
-import type {CollectionInstance} from '../../../registry/common/entities/collection/types';
-import type {WorkbookInstance} from '../../../registry/common/entities/workbook/types';
+import type {CollectionInstance} from '../../../registry/plugins/common/entities/collection/types';
+import type {WorkbookInstance} from '../../../registry/plugins/common/entities/workbook/types';
 import Utils from '../../../utils';
 import {workbookInstance} from '../../workbooks/response-models/workbook-instance';
 

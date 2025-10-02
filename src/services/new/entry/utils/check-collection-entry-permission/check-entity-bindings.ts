@@ -2,14 +2,14 @@ import {AppContext, AppError} from '@gravity-ui/nodekit';
 
 import {US_ERRORS} from '../../../../../const/errors';
 import {
-    EntityBindingEntryPresentation,
+    EntityBindingEntryCheckPresentation,
     TargetFilter,
-} from '../../../../../db/models/new/entity-binding/presentations/entity-binding-entry-presentation';
+} from '../../../../../db/models/new/entity-binding/presentations/entity-binding-entry-check-presentation';
 import {EntityBindingTargetType} from '../../../../../db/models/new/entity-binding/types';
 import {EntryColumn, Entry as EntryModel} from '../../../../../db/models/new/entry';
 import {EntryScope} from '../../../../../db/models/new/entry/types';
 import {SharedEntryPermission} from '../../../../../entities/shared-entry';
-import {SharedEntryInstance} from '../../../../../registry/common/entities/shared-entry/types';
+import {SharedEntryInstance} from '../../../../../registry/plugins/common/entities/shared-entry/types';
 import Utils from '../../../../../utils';
 import {getParentIds} from '../../../collection/utils';
 import {ServiceArgs} from '../../../types';
@@ -45,7 +45,7 @@ export async function checkEntityBindings(
     {ctx, trx}: ServiceArgs,
     {
         sharedEntryInstance,
-        getEntityBindingsQueryTimeout = EntityBindingEntryPresentation.DEFAULT_QUERY_TIMEOUT,
+        getEntityBindingsQueryTimeout = EntityBindingEntryCheckPresentation.DEFAULT_QUERY_TIMEOUT,
         getEntryQueryTimeout,
         getParentsQueryTimeout,
         getWorkbookQueryTimeout,
@@ -114,9 +114,12 @@ export async function checkEntityBindings(
             throwAccessError(ctx, `Entry scope is not supported: ${checkEntryScope}`);
     }
 
-    const entityBindings = await EntityBindingEntryPresentation.getSelectQuery(getReplica(trx), {
-        targetFilters,
-    })
+    const entityBindings = await EntityBindingEntryCheckPresentation.getSelectQuery(
+        getReplica(trx),
+        {
+            targetFilters,
+        },
+    )
         .whereIn(`${EntryModel.tableName}.${EntryColumn.EntryId}`, sourceIds)
         .timeout(getEntityBindingsQueryTimeout);
 
@@ -177,7 +180,7 @@ export async function checkEntityBindings(
 }
 
 type CheckConnectionWithWorkbookAndDatasetArgs = {
-    entityBindings: EntityBindingEntryPresentation[];
+    entityBindings: EntityBindingEntryCheckPresentation[];
     workbookId: string;
     datasetId: string;
     connectionId: string;

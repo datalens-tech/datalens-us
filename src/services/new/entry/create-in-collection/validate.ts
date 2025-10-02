@@ -4,15 +4,10 @@ import {
     MAX_META_OBJECT_SYMBOLS,
     MAX_UNVERSIONED_DATA_OBJECT_SYMBOLS,
 } from '../../../../const/common';
-import {EntryScope} from '../../../../db/models/new/entry/types';
-
-const allowedScopes = [EntryScope.Connection, EntryScope.Dataset];
 
 const requestSchema = z.object({
     collectionId: z.string(),
-    scope: z.nativeEnum(EntryScope).refine((val) => allowedScopes.includes(val), {
-        message: `Must be one of the values: ${allowedScopes.join(', ')}`,
-    }),
+    scope: zc.sharedEntryScope(),
     name: zc.entityName(),
     type: z.string().optional(),
     links: z.record(z.string(), z.string()).optional(),
