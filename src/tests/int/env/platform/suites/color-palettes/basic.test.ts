@@ -21,7 +21,7 @@ describe('Color palette basic tests', () => {
                 isGradient: false,
                 isDefault: false,
             })
-            .expect([401, 403]);
+            .expect(403);
     });
 
     test('Create', async () => {
@@ -61,7 +61,7 @@ describe('Color palette basic tests', () => {
                 isGradient: false,
                 isDefault: false,
             })
-            .expect([401, 403]);
+            .expect(403);
     });
 
     test('Update', async () => {
@@ -179,7 +179,7 @@ describe('Color palette basic tests', () => {
     test('Delete with wrong role', async () => {
         await auth(request(app).delete(`${routes.colorPalettes}/${colorPaletteId}`), {
             role: PlatformRole.Creator,
-        }).expect([401, 403]);
+        }).expect(403);
     });
 
     test('Delete', async () => {

@@ -2,7 +2,7 @@ import {makeFunctionTemplate} from '../utils/make-function-template';
 import type {GetZitadelUserRole} from '../zitadel/types';
 
 import type {CheckOrganizationPermission} from './components/iam/types';
-import type {CheckPalettesAdmin} from './utils/color-palettes/types';
+import type {CheckColorPalettesAdmin} from './utils/color-palettes/types';
 import type {CheckEmbedding} from './utils/embedding/types';
 import type {
     GetEntryAddFormattedFieldsHook,
@@ -16,7 +16,7 @@ import type {CheckTenant, GetServicePlan, ProcessTenantSettings} from './utils/t
 export const commonFunctionsMap = {
     checkOrganizationPermission: makeFunctionTemplate<CheckOrganizationPermission>(),
     isNeedBypassEntryByKey: makeFunctionTemplate<IsNeedBypassEntryByKey>(),
-    checkPalettesAdmin: makeFunctionTemplate<CheckPalettesAdmin>(),
+    checkColorPalettesAdmin: makeFunctionTemplate<CheckColorPalettesAdmin>(),
     getZitadelUserRole: makeFunctionTemplate<GetZitadelUserRole>(),
     getEntryBeforeDbRequestHook: makeFunctionTemplate<GetEntryBeforeDbRequestHook>(),
     getEntryAddFormattedFieldsHook: makeFunctionTemplate<GetEntryAddFormattedFieldsHook>(),

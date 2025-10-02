@@ -19,9 +19,9 @@ export const deleteColorPalette = async (
     });
 
     const registry = ctx.get('registry');
-    const {checkPalettesAdmin} = registry.common.functions.get();
+    const {checkColorPalettesAdmin} = registry.common.functions.get();
 
-    await checkPalettesAdmin(ctx);
+    await checkColorPalettesAdmin(ctx);
 
     const {tenantId} = ctx.get('info');
 

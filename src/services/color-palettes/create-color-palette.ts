@@ -28,9 +28,9 @@ export const createColorPalette = async ({ctx}: ServiceArgs, args: CreateColorPa
     });
 
     const registry = ctx.get('registry');
-    const {checkPalettesAdmin} = registry.common.functions.get();
+    const {checkColorPalettesAdmin} = registry.common.functions.get();
 
-    await checkPalettesAdmin(ctx);
+    await checkColorPalettesAdmin(ctx);
 
     const colorPalettesCount = await getColorPalettesCount(
         {ctx},
