@@ -17,10 +17,7 @@ export interface CreateColorPaletteArgs {
     isDefault: boolean;
 }
 
-export const createColorPalette = async (
-    {ctx, skipValidation = false}: ServiceArgs,
-    args: CreateColorPaletteArgs,
-) => {
+export const createColorPalette = async ({ctx}: ServiceArgs, args: CreateColorPaletteArgs) => {
     const {displayName, colors, isGradient, isDefault} = args;
 
     ctx.log('CREATE_COLOR_PALETTE_START', {
@@ -31,14 +28,12 @@ export const createColorPalette = async (
     });
 
     const registry = ctx.get('registry');
-    const {colorPalettesAdminValidator} = registry.common.functions.get();
+    const {checkColorPalettesAdmin} = registry.common.functions.get();
 
-    if (!skipValidation) {
-        colorPalettesAdminValidator(ctx);
-    }
+    await checkColorPalettesAdmin(ctx);
 
     const colorPalettesCount = await getColorPalettesCount(
-        {ctx, skipValidation},
+        {ctx},
         {
             isGradient,
         },
