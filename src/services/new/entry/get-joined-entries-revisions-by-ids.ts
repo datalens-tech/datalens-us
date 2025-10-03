@@ -7,20 +7,22 @@ import {
     JoinedEntryRevision,
     JoinedEntryRevisionColumns,
 } from '../../../db/presentations/joined-entry-revision';
-import {WorkbookPermission} from '../../../entities/workbook';
-import {checkWorkbookPermissionById} from '../../../services/new/workbook/utils/check-workbook-permission';
-import {DlsActions} from '../../../types/models';
+import {UsPermissions} from '../../../types/models';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 
+import {
+    checkCollectionEntriesByPermission,
+    checkFolderEntriesByPermission,
+    checkWorkbookEntriesByPermission,
+} from './utils/check-entries-by-permission';
+
 const checkWorkbookEntriesPermissions = async ({
     ctx,
-    workbookIds,
     entries,
 }: {
     ctx: AppContext;
-    workbookIds: string[];
     entries: JoinedEntryRevisionColumns[];
 }): Promise<{
     permittedWorkbookEntries: JoinedEntryRevisionColumns[];
@@ -28,41 +30,59 @@ const checkWorkbookEntriesPermissions = async ({
 }> => {
     const {accessServiceEnabled} = ctx.config;
 
-    if (workbookIds.length === 0 || !accessServiceEnabled) {
+    if (entries.length === 0 || !accessServiceEnabled) {
         return {permittedWorkbookEntries: entries, accessDeniedWorkbookEntryIds: []};
     }
-
-    const workbookPermissionMapping = new Map(
-        await Promise.all(
-            workbookIds.map(async (workbookId): Promise<[string, boolean]> => {
-                try {
-                    await checkWorkbookPermissionById({
-                        ctx,
-                        workbookId,
-                        permission: WorkbookPermission.LimitedView,
-                    });
-                    return [workbookId, true];
-                } catch {
-                    return [workbookId, false];
-                }
-            }),
-        ),
-    );
 
     const permittedWorkbookEntries: JoinedEntryRevisionColumns[] = [];
     const accessDeniedWorkbookEntryIds: string[] = [];
 
-    entries.forEach((entry) => {
-        const {workbookId} = entry;
+    const checkedEntries = await checkWorkbookEntriesByPermission(
+        {ctx},
+        {entries, permission: UsPermissions.Execute},
+    );
 
-        if (workbookId && workbookPermissionMapping.get(workbookId)) {
-            permittedWorkbookEntries.push(entry);
-        } else {
+    checkedEntries.forEach((entry) => {
+        if (entry.isLocked) {
             accessDeniedWorkbookEntryIds.push(entry.entryId);
+        } else {
+            permittedWorkbookEntries.push(entry);
         }
     });
 
     return {permittedWorkbookEntries, accessDeniedWorkbookEntryIds};
+};
+
+const checkSharedEntriesPermissions = async ({
+    ctx,
+    entries,
+}: {
+    ctx: AppContext;
+    entries: JoinedEntryRevisionColumns[];
+}): Promise<{
+    permittedSharedEntries: JoinedEntryRevisionColumns[];
+    accessDeniedSharedEntryIds: string[];
+}> => {
+    const {accessServiceEnabled} = ctx.config;
+
+    if (entries.length === 0 || !accessServiceEnabled) {
+        return {permittedSharedEntries: entries, accessDeniedSharedEntryIds: []};
+    }
+
+    const checkedEntries = await checkCollectionEntriesByPermission({ctx}, {entries});
+
+    const permittedSharedEntries: JoinedEntryRevisionColumns[] = [];
+    const accessDeniedSharedEntryIds: string[] = [];
+
+    checkedEntries.forEach((entry) => {
+        if (entry.isLocked) {
+            accessDeniedSharedEntryIds.push(entry.entryId);
+        } else {
+            permittedSharedEntries.push(entry);
+        }
+    });
+
+    return {permittedSharedEntries, accessDeniedSharedEntryIds};
 };
 
 const checkFolderEntriesPermissions = async ({
@@ -84,21 +104,12 @@ const checkFolderEntriesPermissions = async ({
         };
     }
 
-    const registry = ctx.get('registry');
-    const {DLS} = registry.common.classes.get();
-
-    const entriesWithPermissions = await DLS.checkBulkPermission(
-        {ctx},
-        {
-            entities: entries,
-            action: DlsActions.Read,
-        },
-    );
+    const checkedEntries = await checkFolderEntriesByPermission({ctx}, {entries});
 
     const permittedFolderEntries: JoinedEntryRevisionColumns[] = [];
     const accessDeniedFolderEntryIds: string[] = [];
 
-    entriesWithPermissions.forEach((entry) => {
+    checkedEntries.forEach((entry) => {
         if (entry.isLocked) {
             accessDeniedFolderEntryIds.push(entry.entryId);
         } else {
@@ -155,17 +166,15 @@ export const getJoinedEntriesRevisionsByIds = async (
         trx: getReplica(trx),
     });
 
-    const workbookIds = new Set<string>();
     const workbookEntries: JoinedEntryRevisionColumns[] = [];
     const folderEntries: JoinedEntryRevisionColumns[] = [];
+    const sharedEntries: JoinedEntryRevisionColumns[] = [];
 
     joinedEntriesRevisions.forEach((joinedEntryRevision) => {
-        const {workbookId} = joinedEntryRevision;
-
-        if (workbookId) {
-            workbookIds.add(workbookId);
-
+        if (joinedEntryRevision.workbookId) {
             workbookEntries.push(joinedEntryRevision);
+        } else if (joinedEntryRevision.collectionId) {
+            sharedEntries.push(joinedEntryRevision);
         } else {
             folderEntries.push(joinedEntryRevision);
         }
@@ -174,17 +183,15 @@ export const getJoinedEntriesRevisionsByIds = async (
     const [
         {permittedWorkbookEntries, accessDeniedWorkbookEntryIds},
         {permittedFolderEntries, accessDeniedFolderEntryIds},
+        {permittedSharedEntries, accessDeniedSharedEntryIds},
     ] = await Promise.all([
-        checkWorkbookEntriesPermissions({
-            ctx,
-            workbookIds: [...workbookIds],
-            entries: workbookEntries,
-        }),
+        checkWorkbookEntriesPermissions({ctx, entries: workbookEntries}),
         checkFolderEntriesPermissions({ctx, entries: folderEntries}),
+        checkSharedEntriesPermissions({ctx, entries: sharedEntries}),
     ]);
 
     const entriesMap = _.keyBy<JoinedEntryRevisionColumns>(
-        [...permittedWorkbookEntries, ...permittedFolderEntries],
+        [...permittedWorkbookEntries, ...permittedFolderEntries, ...permittedSharedEntries],
         (item) => item.entryId,
     );
 
@@ -195,6 +202,7 @@ export const getJoinedEntriesRevisionsByIds = async (
         accessDeniedEntryIds: new Set([
             ...accessDeniedWorkbookEntryIds,
             ...accessDeniedFolderEntryIds,
+            ...accessDeniedSharedEntryIds,
         ]),
     };
 };

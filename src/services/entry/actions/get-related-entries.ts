@@ -24,7 +24,7 @@ type GetRelatedEntriesData = {
     pageSize?: number;
 };
 
-type GetRelatedEntriesResult = {
+export type GetRelatedEntriesResult = {
     entryId: string;
     key: string;
     scope: EntryScope;
