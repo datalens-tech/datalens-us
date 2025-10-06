@@ -160,7 +160,7 @@ export async function getEntryRelations(
         const sharedEntriesRelations = await checkCollectionEntriesByPermission(
             {ctx},
             {
-                entries: relations.filter((item) => item.collectionId === entry.collectionId),
+                entries: relations.filter((item) => item.collectionId),
                 includePermissionsInfo,
             },
         );
@@ -181,7 +181,7 @@ export async function getEntryRelations(
         const sharedEntriesRelations = await checkCollectionEntriesByPermission(
             {ctx},
             {
-                entries: relations.filter((item) => item.collectionId === entry.collectionId),
+                entries: relations.filter((item) => item.collectionId),
                 includePermissionsInfo,
             },
         );
