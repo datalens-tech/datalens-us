@@ -18,6 +18,8 @@ export async function checkSharedEntryPermission(
         includePermissionsInfo = false,
     }: {entry: PartialEntry; permission?: SharedEntryPermission; includePermissionsInfo?: boolean},
 ) {
+    const {accessServiceEnabled} = ctx.config;
+    const {isPrivateRoute} = ctx.get('info');
     const registry = ctx.get('registry');
     const {SharedEntry} = registry.common.classes.get();
 
@@ -31,31 +33,34 @@ export async function checkSharedEntryPermission(
             code: US_ERRORS.SHARED_ENTRY_REQUIRE_COLLECTION_ID,
         });
     }
-
-    const parentIds = await getParentIds({
-        ctx,
-        trx,
-        collectionId: entry.collectionId,
-    });
-
     const sharedEntry = new SharedEntry({
         ctx,
         model: entry as unknown as Entry,
     });
 
-    if (includePermissionsInfo) {
-        await sharedEntry.fetchAllPermissions({parentIds});
+    if (accessServiceEnabled && !isPrivateRoute) {
+        const parentIds = await getParentIds({
+            ctx,
+            trx,
+            collectionId: entry.collectionId,
+        });
 
-        if (!sharedEntry.permissions?.[permission]) {
-            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
+        if (includePermissionsInfo) {
+            await sharedEntry.fetchAllPermissions({parentIds});
+
+            if (!sharedEntry.permissions?.[permission]) {
+                throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
+                    code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
+                });
+            }
+        } else {
+            await sharedEntry.checkPermission({
+                parentIds,
+                permission,
             });
         }
-    } else {
-        await sharedEntry.checkPermission({
-            parentIds,
-            permission,
-        });
+    } else if (includePermissionsInfo) {
+        sharedEntry.enableAllPermissions();
     }
 
     ctx.log('CHECK_SHARED_ENTRY_PERMISSION_FINISH', {

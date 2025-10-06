@@ -60,13 +60,20 @@ export {
 } from '../src/services/new/entry/formatters';
 export {formatWorkbookModel} from '../src/services/new/workbook/formatters';
 
-export {filterEntriesByPermission, checkEntriesByPermission} from '../src/services/new/entry/utils';
+export {
+    filterEntriesByPermission,
+    checkEntriesByPermission,
+    checkWorkbookEntriesByPermission,
+    checkFolderEntriesByPermission,
+    checkCollectionEntriesByPermission,
+} from '../src/services/new/entry/utils';
 export {
     mapCollectionEntryPermissions,
     mapReadOnlyCollectionEntryPermissions,
     getReadOnlyCollectionEntryPermissions,
     getMinimumReadOnlyCollectionEntryPermissions,
 } from '../src/services/new/entry/utils/check-collection-entry-permission/map-collection-entry-permissions';
+export {checkSharedEntryPermission} from '../src/services/new/entry/utils/check-collection-entry-permission/check-permission';
 
 export {
     setDefaultColorPalette,

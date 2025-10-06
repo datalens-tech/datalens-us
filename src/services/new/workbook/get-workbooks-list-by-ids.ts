@@ -1,6 +1,5 @@
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../entities/workbook';
-import {WorkbookInstance} from '../../../registry/plugins/common/entities/workbook/types';
 import Utils from '../../../utils';
 import {makeWorkbooksWithParentsMap} from '../collection/utils';
 import {ServiceArgs} from '../types';
@@ -51,43 +50,28 @@ export const getWorkbooksListByIds = async (
         return workbookList.map((model) => new Workbook({ctx, model}));
     }
 
-    const workbooksMap = await makeWorkbooksWithParentsMap({ctx, trx}, {models: workbookList});
-    const acceptedWorkbooksMap = new Map<WorkbookModel, string[]>();
+    const workbooksWithParentsMap = await makeWorkbooksWithParentsMap(
+        {ctx, trx},
+        {models: workbookList},
+    );
 
-    const checkPermissionPromises: Promise<WorkbookInstance | void>[] = [];
+    const workbooksForBulk: {model: WorkbookModel; parentIds: string[]}[] = [];
 
-    workbooksMap.forEach((parentIds, workbook) => {
-        const promise = workbook
-            .checkPermission({
-                parentIds,
-                permission: WorkbookPermission.LimitedView,
-            })
-            .then(() => {
-                acceptedWorkbooksMap.set(workbook.model, parentIds);
-
-                return workbook;
-            })
-            .catch(() => {});
-
-        checkPermissionPromises.push(promise);
+    workbooksWithParentsMap.forEach((parentIds, workbook) => {
+        workbooksForBulk.push({model: workbook.model, parentIds});
     });
 
-    let workbooks = await Promise.all(checkPermissionPromises);
+    let workbooks = await Workbook.bulkFetchAllPermissions(ctx, workbooksForBulk);
 
-    if (includePermissionsInfo) {
-        const mappedWorkbooks: {model: WorkbookModel; parentIds: string[]}[] = [];
+    workbooks = workbooks.filter(
+        (workbook) => workbook.permissions?.[WorkbookPermission.LimitedView] === true,
+    );
 
-        acceptedWorkbooksMap.forEach((parentIds, workbookModel) => {
-            mappedWorkbooks.push({
-                model: workbookModel,
-                parentIds,
-            });
+    if (!includePermissionsInfo) {
+        workbooks = workbooks.map((workbook) => {
+            return new Workbook({ctx, model: workbook.model});
         });
-
-        workbooks = await Workbook.bulkFetchAllPermissions(ctx, mappedWorkbooks);
     }
-
-    const result = workbooks.filter((item) => Boolean(item)) as WorkbookInstance[];
 
     ctx.log('GET_WORKBOOKS_LIST_BY_IDS_FINISHED', {
         workbookIds: await Utils.macrotasksMap(workbookList, (workbook) =>
@@ -95,5 +79,5 @@ export const getWorkbooksListByIds = async (
         ),
     });
 
-    return result;
+    return workbooks;
 };

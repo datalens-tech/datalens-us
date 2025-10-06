@@ -4,14 +4,22 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {ALLOWED_ENTRIES_SCOPE, US_ERRORS} from '../../../const';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {EntryScope} from '../../../db/models/new/entry/types';
-import {DlsActions} from '../../../types/models';
+import {SharedEntryPermission} from '../../../entities/shared-entry';
+import {UsPermissions} from '../../../types/models';
 import Utils from '../../../utils';
+import {EntryWithPermissions} from '../../new/entry/types';
+import {checkSharedEntryPermission} from '../../new/entry/utils/check-collection-entry-permission/check-permission';
+import {
+    checkCollectionEntriesByPermission,
+    checkFolderEntriesByPermission,
+    checkWorkbookEntriesByPermission,
+} from '../../new/entry/utils/check-entries-by-permission';
 import {ServiceArgs} from '../../new/types';
 import {getReplica} from '../../new/utils';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {getEntryPermissionsByWorkbook} from '../../new/workbook/utils';
 
-import {RelationDirection, getRelatedEntries} from './get-related-entries';
+import {GetRelatedEntriesResult, RelationDirection, getRelatedEntries} from './get-related-entries';
 
 export type GetEntryRelationsArgs = {
     entryId: string;
@@ -21,6 +29,8 @@ export type GetEntryRelationsArgs = {
     page?: number;
     pageSize?: number;
 };
+
+type RelationItem = EntryWithPermissions<GetRelatedEntriesResult>;
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -56,10 +66,7 @@ export async function getEntryRelations(
     {ctx, trx, skipValidation = false}: ServiceArgs,
     args: GetEntryRelationsArgs,
 ) {
-    const registry = ctx.get('registry');
     const {tenantId, isPrivateRoute} = ctx.get('info');
-
-    const {DLS} = registry.common.classes.get();
 
     const {
         entryId,
@@ -98,7 +105,7 @@ export async function getEntryRelations(
         });
     }
 
-    let relations = await getRelatedEntries(
+    const relatedEntries = await getRelatedEntries(
         {ctx, trx: getReplica(trx)},
         {
             entryIds: [entryId],
@@ -117,11 +124,13 @@ export async function getEntryRelations(
         nextPageToken = Utils.getOptimisticNextPageToken({
             page: page,
             pageSize: pageSize,
-            curPage: relations,
+            curPage: relatedEntries,
         });
     }
 
-    relations = relations.filter((item) => item.tenantId === entry.tenantId);
+    let relations: RelationItem[] = relatedEntries.filter(
+        (item) => item.tenantId === entry.tenantId,
+    );
 
     if (entry.workbookId) {
         const workbook = await getWorkbook(
@@ -132,12 +141,12 @@ export async function getEntryRelations(
             {workbookId: entry.workbookId, includePermissionsInfo},
         );
 
-        relations = relations
+        let workbookRelations: RelationItem[] = relations
             .filter((item) => item.workbookId === entry.workbookId)
             .map((item) => ({...item, isLocked: false}));
 
         if (includePermissionsInfo) {
-            relations = relations.map((item) => {
+            workbookRelations = workbookRelations.map((item) => {
                 return {
                     ...item,
                     permissions: getEntryPermissionsByWorkbook({
@@ -147,36 +156,41 @@ export async function getEntryRelations(
                 };
             });
         }
-    } else {
-        const skipDLS = isPrivateRoute || !ctx.config.dlsEnabled;
 
-        if (skipDLS) {
-            relations = relations.map((item) => {
-                return {
-                    ...item,
-                    isLocked: false,
-                    ...(includePermissionsInfo
-                        ? {
-                              permissions: {
-                                  execute: true,
-                                  read: true,
-                                  edit: true,
-                                  admin: true,
-                              },
-                          }
-                        : {}),
-                };
-            });
-        } else {
-            relations = await DLS.checkBulkPermission(
-                {ctx},
-                {
-                    entities: relations,
-                    action: DlsActions.Read,
-                    includePermissionsInfo,
-                },
-            );
-        }
+        const sharedEntriesRelations = await checkCollectionEntriesByPermission(
+            {ctx},
+            {
+                entries: relations.filter((item) => item.collectionId),
+                includePermissionsInfo,
+            },
+        );
+
+        relations = [...workbookRelations, ...sharedEntriesRelations];
+    } else if (entry.collectionId) {
+        await checkSharedEntryPermission({ctx}, {entry, permission: SharedEntryPermission.View});
+
+        const workbookRelations = await checkWorkbookEntriesByPermission(
+            {ctx},
+            {
+                entries: relations.filter((item) => item.workbookId === entry.workbookId),
+                includePermissionsInfo,
+                permission: UsPermissions.Execute,
+            },
+        );
+
+        const sharedEntriesRelations = await checkCollectionEntriesByPermission(
+            {ctx},
+            {
+                entries: relations.filter((item) => item.collectionId),
+                includePermissionsInfo,
+            },
+        );
+        relations = [...workbookRelations, ...sharedEntriesRelations];
+    } else {
+        relations = await checkFolderEntriesByPermission(
+            {ctx},
+            {entries: relations, includePermissionsInfo},
+        );
     }
 
     ctx.log('GET_ENTRY_RELATIONS_SUCCESS', {count: relations.length});

@@ -57,7 +57,7 @@ export type CheckEntriesByPermissionArgs<T> = {
     includePermissionsInfo?: boolean;
 };
 
-const checkFolderEntriesByPermission = async <T extends PartialEntry>(
+export const checkFolderEntriesByPermission = async <T extends PartialEntry>(
     {ctx, trx}: ServiceArgs,
     args: CheckEntriesByPermissionArgs<T>,
 ): Promise<EntryWithPermissions<T>[]> => {
@@ -87,7 +87,7 @@ const checkFolderEntriesByPermission = async <T extends PartialEntry>(
     return entries.map((entry) => makeEntryWithFullPermissions(entry, includePermissionsInfo));
 };
 
-const checkWorkbookEntriesByPermission = async <T extends PartialEntry>(
+export const checkWorkbookEntriesByPermission = async <T extends PartialEntry>(
     {ctx, trx}: ServiceArgs,
     args: CheckEntriesByPermissionArgs<T>,
 ): Promise<EntryWithPermissions<T>[]> => {
@@ -142,7 +142,7 @@ const checkWorkbookEntriesByPermission = async <T extends PartialEntry>(
     });
 };
 
-const checkCollectionEntriesByPermission = async <T extends PartialEntry>(
+export const checkCollectionEntriesByPermission = async <T extends PartialEntry>(
     {ctx, trx}: ServiceArgs,
     args: CheckEntriesByPermissionArgs<T>,
 ): Promise<EntryWithPermissions<T>[]> => {
