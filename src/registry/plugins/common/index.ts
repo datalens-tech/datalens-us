@@ -10,7 +10,7 @@ import type {CheckOrganizationPermission} from './components/iam/types';
 import type {CollectionConstructor} from './entities/collection/types';
 import type {SharedEntryConstructor} from './entities/shared-entry/types';
 import type {WorkbookConstructor} from './entities/workbook/types';
-import type {ColorPalettesAdminValidator} from './utils/color-palettes/types';
+import type {CheckColorPalettesAdmin} from './utils/color-palettes/types';
 import type {CheckEmbedding} from './utils/embedding/types';
 import type {
     GetEntryAddFormattedFieldsHook,
@@ -32,7 +32,6 @@ export const commonPlugin = {
     functions: createFunctionsRegistry({
         checkOrganizationPermission: makeFunctionTemplate<CheckOrganizationPermission>(),
         isNeedBypassEntryByKey: makeFunctionTemplate<IsNeedBypassEntryByKey>(),
-        colorPalettesAdminValidator: makeFunctionTemplate<ColorPalettesAdminValidator>(),
         getEntryBeforeDbRequestHook: makeFunctionTemplate<GetEntryBeforeDbRequestHook>(),
         getEntryAddFormattedFieldsHook: makeFunctionTemplate<GetEntryAddFormattedFieldsHook>(),
         getEntryResolveUserLogin: makeFunctionTemplate<GetEntryResolveUserLogin>(),
@@ -42,5 +41,6 @@ export const commonPlugin = {
         getServicePlan: makeFunctionTemplate<GetServicePlan>(),
         processTenantSettings: makeFunctionTemplate<ProcessTenantSettings>(),
         getZitadelUserRole: makeFunctionTemplate<GetZitadelUserRole>(),
+        checkColorPalettesAdmin: makeFunctionTemplate<CheckColorPalettesAdmin>(),
     }),
 };

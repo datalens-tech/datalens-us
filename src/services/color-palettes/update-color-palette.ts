@@ -26,6 +26,11 @@ export const updateColorPalette = async ({ctx, trx}: ServiceArgs, args: UpdateCo
         isGradient,
         isDefault,
     });
+    const registry = ctx.get('registry');
+
+    const {checkColorPalettesAdmin} = registry.common.functions.get();
+
+    await checkColorPalettesAdmin(ctx);
 
     const {tenantId} = ctx.get('info');
 

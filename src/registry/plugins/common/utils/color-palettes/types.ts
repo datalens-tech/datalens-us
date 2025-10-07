@@ -1,3 +1,3 @@
 import type {AppContext} from '@gravity-ui/nodekit';
 
-export type ColorPalettesAdminValidator = (ctx: AppContext) => void;
+export type CheckColorPalettesAdmin = (ctx: AppContext) => Promise<void>;

@@ -9,7 +9,7 @@ export interface DeleteColorPaletteArgs {
 }
 
 export const deleteColorPalette = async (
-    {ctx, skipValidation = false}: ServiceArgs,
+    {ctx}: ServiceArgs,
     args: DeleteColorPaletteArgs,
 ): Promise<ColorPaletteModel> => {
     const {colorPaletteId} = args;
@@ -19,11 +19,9 @@ export const deleteColorPalette = async (
     });
 
     const registry = ctx.get('registry');
-    const {colorPalettesAdminValidator} = registry.common.functions.get();
+    const {checkColorPalettesAdmin} = registry.common.functions.get();
 
-    if (!skipValidation) {
-        colorPalettesAdminValidator(ctx);
-    }
+    await checkColorPalettesAdmin(ctx);
 
     const {tenantId} = ctx.get('info');
 

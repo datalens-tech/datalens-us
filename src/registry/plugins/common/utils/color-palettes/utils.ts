@@ -1,5 +1,5 @@
-import type {ColorPalettesAdminValidator} from './types';
+import type {CheckColorPalettesAdmin} from './types';
 
-export const colorPalettesAdminValidator: ColorPalettesAdminValidator = () => {
+export const checkColorPalettesAdmin: CheckColorPalettesAdmin = async () => {
     return;
 };
