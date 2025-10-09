@@ -22,6 +22,7 @@ type GetRelatedEntriesData = {
     scope?: EntryScope;
     page?: number;
     pageSize?: number;
+    workbookId?: string | null;
 };
 
 export type GetRelatedEntriesResult = {
@@ -30,12 +31,13 @@ export type GetRelatedEntriesResult = {
     scope: EntryScope;
     type: string;
     createdAt: string;
-    meta: Record<string, unknown>;
+    meta: Nullable<Record<string, unknown>>;
     public: boolean;
     tenantId: string;
     workbookId: string | null;
     collectionId: string | null;
     depth: number;
+    links: Nullable<Record<string, unknown>>;
 };
 
 export async function getRelatedEntries(
@@ -47,6 +49,7 @@ export async function getRelatedEntries(
         page,
         pageSize,
         extendedTimeout = false,
+        workbookId,
     }: GetRelatedEntriesData,
 ) {
     ctx.log('GET_RELATED_ENTRIES_RUN', {scope, page, pageSize});
@@ -76,6 +79,10 @@ export async function getRelatedEntries(
 
                             if (scope) {
                                 builder.andWhere('entries.scope', scope);
+                            }
+
+                            if (workbookId) {
+                                builder.andWhere('entries.workbookId', workbookId);
                             }
                         });
                 });
