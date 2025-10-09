@@ -3,6 +3,7 @@ export {getPrimary, getReplica} from '../src/services/new/utils';
 
 export {checkEntry} from '../src/services/entry/actions/check-entry';
 export {
+    GetRelatedEntriesResult,
     getRelatedEntries,
     RelationDirection,
 } from '../src/services/entry/actions/get-related-entries';
