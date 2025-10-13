@@ -74,10 +74,10 @@ export const deleteSharedEntries = async (
         }
     }
 
-    await transaction(getPrimary(trx), async (transactionTrx) => {
+    const result = await transaction(getPrimary(trx), async (transactionTrx) => {
         const entryDeletedBy = makeUserId(userId);
 
-        await Promise.all(
+        return await Promise.all(
             entries.map(async (entry) => {
                 const {entryId, displayKey, key} = entry;
 
@@ -111,4 +111,8 @@ export const deleteSharedEntries = async (
     });
 
     ctx.log('DELETE_SHARED_ENTRIES_FINISH');
+
+    const deletedEntries = result.filter((entry) => entry !== undefined);
+
+    return deletedEntries;
 };

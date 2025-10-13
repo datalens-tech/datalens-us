@@ -1,7 +1,7 @@
 import {TransactionOrKnex, raw} from 'objection';
 
 import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, TRASH_FOLDER} from '../../../../const';
-import Entry from '../../../../db/models/entry';
+import {Entry} from '../../../../db/models/new/entry';
 import {EntryColumns} from '../../../../types/models';
 
 export type MarkEntryDeletedData = {
@@ -29,5 +29,7 @@ export async function markEntryAsDeleted(
         .where({
             entryId,
         })
+        .returning('*')
+        .first()
         .timeout(DEFAULT_QUERY_TIMEOUT);
 }
