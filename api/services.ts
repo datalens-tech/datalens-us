@@ -75,6 +75,7 @@ export {
     getMinimumReadOnlyCollectionEntryPermissions,
 } from '../src/services/new/entry/utils/check-collection-entry-permission/map-collection-entry-permissions';
 export {checkSharedEntryPermission} from '../src/services/new/entry/utils/check-collection-entry-permission/check-permission';
+export {deleteSharedEntries} from '../src/services/new/entry/delete-shared-entries';
 
 export {
     setDefaultColorPalette,
