@@ -121,6 +121,8 @@ export const deleteCollections = async (
 
     const sharedEntriesForDeleteIds = sharedEntriesForDelete.map((entry) => entry.entryId);
 
+    const deletePermissionsFunctions: (() => Promise<void>)[] = [];
+
     const result = await transaction(targetTrx, async (transactionTrx) => {
         const deletedCollectionsEntitiesPromises = [];
 
@@ -130,6 +132,7 @@ export const deleteCollections = async (
                     {ctx, trx: transactionTrx, skipCheckPermissions: true},
                     {
                         workbookIds,
+                        skipDeletePermissions: true,
                     },
                 ),
             );
@@ -139,26 +142,38 @@ export const deleteCollections = async (
             deletedCollectionsEntitiesPromises.push(
                 deleteSharedEntries(
                     {ctx, trx: transactionTrx, skipCheckPermissions: true},
-                    {entryIds: sharedEntriesForDeleteIds},
+                    {entryIds: sharedEntriesForDeleteIds, skipDeletePermissions: true},
                 ),
             );
         }
 
-        await Promise.all(deletedCollectionsEntitiesPromises);
+        const deletedEntitiesArray = await Promise.all(deletedCollectionsEntitiesPromises);
+
+        deletedEntitiesArray.forEach(({deletePermissions}) => {
+            if (deletePermissions) {
+                deletePermissionsFunctions.push(deletePermissions);
+            }
+        });
 
         const deletedCollections = await markCollectionsAsDeleted(
             {ctx, trx, skipCheckPermissions: true},
-            {collectionsMap},
+            {collectionsMap, skipDeletePermissions: true},
         );
+
+        if (deletedCollections.deletePermissions) {
+            deletePermissionsFunctions.push(deletedCollections.deletePermissions);
+        }
 
         return deletedCollections;
     });
 
+    await Promise.all(deletePermissionsFunctions.map((func) => func()));
+
     ctx.log('DELETE_COLLECTIONS_FINISH', {
-        collectionIds: await Utils.macrotasksMap(result, (collection) =>
+        collectionIds: await Utils.macrotasksMap(result.collections, (collection) =>
             Utils.encodeId(collection.collectionId),
         ),
     });
 
-    return {collections: result};
+    return {collections: result.collections};
 };
