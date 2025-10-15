@@ -1,49 +1,75 @@
+import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
-import {CURRENT_TIMESTAMP} from '../../../../const';
+import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../../db/models/new/collection';
 import {CollectionInstance} from '../../../../registry/plugins/common/entities/collection/types';
 import {ServiceArgs} from '../../types';
 import {getPrimary} from '../../utils';
 
+type MarkCollectionsAsDeletedArgs = {
+    collectionsMap: Map<CollectionInstance, string[]>;
+    detachDeletePermissions?: boolean;
+};
+
 export const markCollectionsAsDeleted = async (
     {ctx, trx, skipCheckPermissions}: ServiceArgs,
-    {collectionsMap}: {collectionsMap: Map<CollectionInstance, string[]>},
+    {collectionsMap, detachDeletePermissions = false}: MarkCollectionsAsDeletedArgs,
 ) => {
     const collectionIds: string[] = [];
+    const collectionIdsMap = new Map<
+        string,
+        {collectionInstance: CollectionInstance; parentIds: string[]}
+    >();
 
     collectionsMap.forEach((parentIds, collectionInstance) => {
         collectionIds.push(collectionInstance.model.collectionId);
+        collectionIdsMap.set(collectionInstance.model.collectionId, {
+            collectionInstance,
+            parentIds,
+        });
     });
 
     const {
         user: {userId},
     } = ctx.get('info');
 
-    const deletedCollections = await CollectionModel.query(getPrimary(trx))
+    const collections = await CollectionModel.query(getPrimary(trx))
         .patch({
             [CollectionModelColumn.DeletedBy]: userId,
             [CollectionModelColumn.DeletedAt]: raw(CURRENT_TIMESTAMP),
         })
-        .where(CollectionModelColumn.CollectionId, 'in', collectionIds)
+        .whereIn(CollectionModelColumn.CollectionId, collectionIds)
         .andWhere({
             [CollectionModelColumn.DeletedAt]: null,
         })
         .returning('*')
         .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
 
-    const deletePermissionsPromises: Promise<void>[] = [];
-
-    collectionsMap.forEach((parentIds, collectionInstance) => {
-        deletePermissionsPromises.push(
-            collectionInstance.deletePermissions({
-                parentIds,
-                skipCheckPermissions,
+    const deletePermissions = async () => {
+        await Promise.all(
+            collections.map(async ({collectionId}) => {
+                const collectionData = collectionIdsMap.get(collectionId);
+                if (!collectionData) {
+                    throw new AppError(US_ERRORS.COLLECTION_NOT_EXISTS, {
+                        code: US_ERRORS.COLLECTION_NOT_EXISTS,
+                    });
+                }
+                const {collectionInstance, parentIds} = collectionData;
+                await collectionInstance.deletePermissions({
+                    parentIds,
+                    skipCheckPermissions,
+                });
             }),
         );
-    });
+    };
 
-    await Promise.all(deletePermissionsPromises);
+    if (!detachDeletePermissions) {
+        await deletePermissions();
+    }
 
-    return deletedCollections;
+    return {
+        collections,
+        deletePermissions: detachDeletePermissions ? deletePermissions : undefined,
+    };
 };
