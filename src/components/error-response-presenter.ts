@@ -54,6 +54,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 400,
                 response: {
+                    code,
                     message,
                 },
             };
@@ -80,6 +81,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 403,
                 response: {
+                    code,
                     message:
                         "You can't do this action because of you don't have enough permissions for some entries",
                 },
@@ -100,6 +102,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 403,
                 response: {
+                    code,
                     message: "Master token isn't valid",
                 },
             };
@@ -108,6 +111,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 404,
                 response: {
+                    code,
                     message: "The entity isn't locked",
                 },
             };
@@ -117,6 +121,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 404,
                 response: {
+                    code,
                     message: "The draft doesn't exist",
                 },
             };
@@ -126,6 +131,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 404,
                 response: {
+                    code,
                     message: 'Not exists config with this template name',
                 },
             };
@@ -134,6 +140,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 404,
                 response: {
+                    code,
                     message: "A template with this name doesn't exist",
                 },
             };
@@ -144,6 +151,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 404,
                 response: {
+                    code,
                     message: "The entity doesn't exist",
                 },
             };
@@ -152,6 +160,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 403,
                 response: {
+                    code,
                     message: 'Folders cannot be copied',
                 },
             };
@@ -161,6 +170,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 404,
                 response: {
+                    code,
                     message: "The state by this hash has doesn't exist",
                 },
             };
@@ -170,6 +180,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 404,
                 response: {
+                    code,
                     message: "The specified tenant doesn't exist",
                 },
             };
@@ -179,6 +190,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 404,
                 response: {
+                    code,
                     message: "The revision doesn't exist",
                 },
             };
@@ -239,6 +251,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 404,
                 response: {
+                    code,
                     message: "The workbook template doesn't exist",
                 },
             };
@@ -247,6 +260,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 403,
                 response: {
+                    code,
                     message: 'Entry without workbookId, cannot be copied to workbook',
                 },
             };
@@ -255,6 +269,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 403,
                 response: {
+                    code,
                     message: 'Entry with different workbookIds, cannot be copy denied',
                 },
             };
@@ -264,6 +279,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 409,
                 response: {
+                    code,
                     message: 'The collection already exists',
                 },
             };
@@ -272,6 +288,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 409,
                 response: {
+                    code,
                     message: message ?? 'Circular reference error between collections',
                 },
             };
@@ -280,6 +297,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 409,
                 response: {
+                    code,
                     message: 'The workbook already exists',
                 },
             };
@@ -288,6 +306,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 404,
                 response: {
+                    code,
                     message: "The collection doesn't exist",
                 },
             };
@@ -305,6 +324,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 400,
                 response: {
+                    code,
                     message: 'The workbook is already restored',
                 },
             };
@@ -314,6 +334,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 400,
                 response: {
+                    code,
                     message: 'Copying workbooks with file connections is forbidden',
                 },
             };
@@ -325,6 +346,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 500,
                 response: {
+                    code,
                     message,
                     details,
                 },
@@ -334,6 +356,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 404,
                 response: {
+                    code,
                     message: "The pallete doesn't exist",
                 },
             };
@@ -343,6 +366,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 403,
                 response: {
+                    code,
                     message,
                 },
             };
@@ -351,6 +375,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 409,
                 response: {
+                    code,
                     message: 'Circular reference error',
                 },
             };
@@ -427,6 +452,7 @@ export default (error: AppError | DBError) => {
             return {
                 code: 404,
                 response: {
+                    code,
                     message: "The favorite doesn't exist",
                 },
             };
