@@ -132,7 +132,7 @@ export const deleteCollections = async (
                     {ctx, trx: transactionTrx, skipCheckPermissions: true},
                     {
                         workbookIds,
-                        skipDeletePermissions: true,
+                        detachDeletePermissions: true,
                     },
                 ),
             );
@@ -142,7 +142,7 @@ export const deleteCollections = async (
             deletedCollectionsEntitiesPromises.push(
                 deleteSharedEntries(
                     {ctx, trx: transactionTrx, skipCheckPermissions: true},
-                    {entryIds: sharedEntriesForDeleteIds, skipDeletePermissions: true},
+                    {entryIds: sharedEntriesForDeleteIds, detachDeletePermissions: true},
                 ),
             );
         }
@@ -156,8 +156,8 @@ export const deleteCollections = async (
         });
 
         const deletedCollections = await markCollectionsAsDeleted(
-            {ctx, trx, skipCheckPermissions: true},
-            {collectionsMap, skipDeletePermissions: true},
+            {ctx, trx: transactionTrx, skipCheckPermissions: true},
+            {collectionsMap, detachDeletePermissions: true},
         );
 
         if (deletedCollections.deletePermissions) {

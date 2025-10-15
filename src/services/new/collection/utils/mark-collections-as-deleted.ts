@@ -9,12 +9,12 @@ import {getPrimary} from '../../utils';
 
 type MarkCollectionsAsDeletedArgs = {
     collectionsMap: Map<CollectionInstance, string[]>;
-    skipDeletePermissions?: boolean;
+    detachDeletePermissions?: boolean;
 };
 
 export const markCollectionsAsDeleted = async (
     {ctx, trx, skipCheckPermissions}: ServiceArgs,
-    {collectionsMap, skipDeletePermissions = false}: MarkCollectionsAsDeletedArgs,
+    {collectionsMap, detachDeletePermissions = false}: MarkCollectionsAsDeletedArgs,
 ) => {
     const collectionIds: string[] = [];
     const collectionIdsMap = new Map<
@@ -64,12 +64,12 @@ export const markCollectionsAsDeleted = async (
         );
     };
 
-    if (!skipDeletePermissions) {
+    if (!detachDeletePermissions) {
         await deletePermissions();
     }
 
     return {
         collections,
-        deletePermissions: skipDeletePermissions ? deletePermissions : undefined,
+        deletePermissions: detachDeletePermissions ? deletePermissions : undefined,
     };
 };

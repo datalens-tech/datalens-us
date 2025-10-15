@@ -17,14 +17,14 @@ import {markWorkbooksAsDeleted} from './utils';
 
 export interface DeleteWorkbooksArgs {
     workbookIds: string[];
-    skipDeletePermissions?: boolean;
+    detachDeletePermissions?: boolean;
 }
 
 export const deleteWorkbooks = async (
     {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: DeleteWorkbooksArgs,
 ) => {
-    const {workbookIds, skipDeletePermissions = false} = args;
+    const {workbookIds, detachDeletePermissions = false} = args;
 
     ctx.log('DELETE_WORKBOOKS_START', {
         workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.encodeId(id)),
@@ -76,7 +76,7 @@ export const deleteWorkbooks = async (
     const result = await transaction(getPrimary(trx), async (transactionTrx) => {
         const deletedWorkbooks = await markWorkbooksAsDeleted(
             {ctx, trx: transactionTrx, skipCheckPermissions: true},
-            {workbooksMap, skipDeletePermissions: true},
+            {workbooksMap, detachDeletePermissions: true},
         );
 
         const entries = await Entry.query(transactionTrx)
@@ -110,7 +110,7 @@ export const deleteWorkbooks = async (
         return deletedWorkbooks;
     });
 
-    if (!skipDeletePermissions) {
+    if (!detachDeletePermissions) {
         await result.deletePermissions?.();
     }
 
@@ -122,6 +122,6 @@ export const deleteWorkbooks = async (
 
     return {
         workbooks: result.workbooks,
-        deletePermissions: skipDeletePermissions ? result.deletePermissions : undefined,
+        deletePermissions: detachDeletePermissions ? result.deletePermissions : undefined,
     };
 };

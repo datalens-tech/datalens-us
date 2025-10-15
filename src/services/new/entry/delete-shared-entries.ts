@@ -14,14 +14,14 @@ import {getPrimary} from '../utils';
 export interface DeleteSharedEntriesArgs {
     entryIds: string[];
     skipCheckPermissions?: boolean;
-    skipDeletePermissions?: boolean;
+    detachDeletePermissions?: boolean;
 }
 
 export const deleteSharedEntries = async (
     {ctx, trx}: ServiceArgs,
     args: DeleteSharedEntriesArgs,
 ) => {
-    const {entryIds, skipCheckPermissions = false, skipDeletePermissions = false} = args;
+    const {entryIds, skipCheckPermissions = false, detachDeletePermissions = false} = args;
 
     ctx.log('DELETE_SHARED_ENTRIES_START', {
         entryIds: await Utils.macrotasksMap(entryIds, (id) => Utils.encodeId(id)),
@@ -114,7 +114,7 @@ export const deleteSharedEntries = async (
         );
     };
 
-    if (!skipDeletePermissions) {
+    if (!detachDeletePermissions) {
         await deletePermissions();
     }
 
@@ -122,6 +122,6 @@ export const deleteSharedEntries = async (
 
     return {
         entries: deletedEntries,
-        deletePermissions: skipDeletePermissions ? deletePermissions : undefined,
+        deletePermissions: detachDeletePermissions ? deletePermissions : undefined,
     };
 };

@@ -9,12 +9,12 @@ import {getPrimary} from '../../utils';
 
 type MarkWorkbooksAsDeletedArgs = {
     workbooksMap: Map<WorkbookInstance, string[]>;
-    skipDeletePermissions?: boolean;
+    detachDeletePermissions?: boolean;
 };
 
 export const markWorkbooksAsDeleted = async (
     {ctx, trx, skipCheckPermissions}: ServiceArgs,
-    {workbooksMap, skipDeletePermissions = false}: MarkWorkbooksAsDeletedArgs,
+    {workbooksMap, detachDeletePermissions = false}: MarkWorkbooksAsDeletedArgs,
 ) => {
     const workbookIds: string[] = [];
     const workbookIdsMap = new Map<
@@ -61,12 +61,12 @@ export const markWorkbooksAsDeleted = async (
         );
     };
 
-    if (!skipDeletePermissions) {
+    if (!detachDeletePermissions) {
         await deletePermissions();
     }
 
     return {
         workbooks,
-        deletePermissions: skipDeletePermissions ? deletePermissions : undefined,
+        deletePermissions: detachDeletePermissions ? deletePermissions : undefined,
     };
 };
