@@ -1,5 +1,4 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {transaction} from 'objection';
 
 import {US_ERRORS} from '../../../const';
 import Lock from '../../../db/models/lock';
@@ -7,7 +6,7 @@ import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {SharedEntryInstance} from '../../../registry/plugins/common/entities/shared-entry/types';
 import Utils, {makeUserId} from '../../../utils';
-import {markEntryAsDeleted} from '../../entry/crud';
+import {markEntriesAsDeleted} from '../../entry/crud';
 import {makeSharedEntriesWithParentsMap} from '../collection/utils/get-parents';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
@@ -15,13 +14,14 @@ import {getPrimary} from '../utils';
 export interface DeleteSharedEntriesArgs {
     entryIds: string[];
     skipCheckPermissions?: boolean;
+    detachDeletePermissions?: boolean;
 }
 
 export const deleteSharedEntries = async (
     {ctx, trx}: ServiceArgs,
     args: DeleteSharedEntriesArgs,
 ) => {
-    const {entryIds, skipCheckPermissions = false} = args;
+    const {entryIds, skipCheckPermissions = false, detachDeletePermissions = false} = args;
 
     ctx.log('DELETE_SHARED_ENTRIES_START', {
         entryIds: await Utils.macrotasksMap(entryIds, (id) => Utils.encodeId(id)),
@@ -32,6 +32,7 @@ export const deleteSharedEntries = async (
     const {
         user: {userId},
         isPrivateRoute,
+        tenantId,
     } = ctx.get('info');
     const registry = ctx.get('registry');
     const {SharedEntry} = registry.common.classes.get();
@@ -39,7 +40,7 @@ export const deleteSharedEntries = async (
     const entries = await Entry.query(getPrimary(trx))
         .select()
         .whereIn([EntryColumn.EntryId], entryIds)
-        .where({isDeleted: false})
+        .where({[EntryColumn.IsDeleted]: false, [EntryColumn.TenantId]: tenantId})
         .whereNotNull(EntryColumn.CollectionId)
         .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
@@ -74,14 +75,32 @@ export const deleteSharedEntries = async (
         }
     }
 
-    const result = await transaction(getPrimary(trx), async (transactionTrx) => {
-        const entryDeletedBy = makeUserId(userId);
+    await Lock.bulkCheckLock(
+        entries.map((entry) => ({entryId: entry.entryId})),
+        ctx,
+    );
 
-        return await Promise.all(
-            entries.map(async (entry) => {
-                const {entryId, displayKey, key} = entry;
+    const data = entries.map((entry) => ({
+        entryId: entry.entryId,
+        newKey: entry.key as string,
+        newDisplayKey: entry.displayKey as string,
+        updatedBy: makeUserId(userId),
+        newInnerMeta: {
+            ...entry.innerMeta,
+            oldKey: entry.key as string,
+            oldDisplayKey: entry.displayKey as string,
+        },
+        scope: entry.scope,
+        type: entry.type,
+        createdBy: entry.createdBy,
+    }));
 
-                await Lock.checkLock({entryId}, ctx);
+    const deletedEntries = await markEntriesAsDeleted({ctx}, data);
+
+    const deletePermissions = async () => {
+        await Promise.all(
+            deletedEntries.map(async (entry) => {
+                const {entryId} = entry;
 
                 const sharedEntryData = sharedEntriesIdsMap.get(entryId);
                 if (!sharedEntryData) {
@@ -89,30 +108,20 @@ export const deleteSharedEntries = async (
                         code: US_ERRORS.NOT_EXIST_ENTRY,
                     });
                 }
-
                 const {entry: sharedEntry, parentIds} = sharedEntryData;
                 await sharedEntry.deletePermissions({parentIds, skipCheckPermissions: true});
-
-                const newInnerMeta = {
-                    ...entry.innerMeta,
-                    oldKey: key as string,
-                    oldDisplayKey: displayKey as string,
-                };
-
-                return markEntryAsDeleted(transactionTrx, {
-                    entryId,
-                    newKey: key as string,
-                    newDisplayKey: displayKey as string,
-                    newInnerMeta,
-                    updatedBy: entryDeletedBy,
-                });
             }),
         );
-    });
+    };
+
+    if (!detachDeletePermissions) {
+        await deletePermissions();
+    }
 
     ctx.log('DELETE_SHARED_ENTRIES_FINISH');
 
-    const deletedEntries = result.filter((entry) => entry !== undefined);
-
-    return deletedEntries;
+    return {
+        entries: deletedEntries,
+        deletePermissions: detachDeletePermissions ? deletePermissions : undefined,
+    };
 };
