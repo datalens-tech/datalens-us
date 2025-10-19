@@ -4,6 +4,7 @@ export {
     isTenantIdWithOrgId,
     getOrgIdFromTenantId,
     makeTenantIdFromOrgId,
+    mapValuesToSnakeCase,
 } from '../src/utils';
 
 export {normalizedEnv} from '../src/utils/normalized-env';
