@@ -22,15 +22,26 @@ export async function up(knex: Knex): Promise<void> {
             tenant_id TEXT NOT NULL DEFAULT 'common' REFERENCES tenants (tenant_id) ON UPDATE CASCADE ON DELETE CASCADE,
             user_id TEXT NOT NULL,
             license_type LICENSE_TYPE NOT NULL,
-            expired_at TIMESTAMPTZ
+            expired_at TIMESTAMPTZ,
+            created_by TEXT NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            updated_by TEXT NOT NULL,
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
 
         CREATE UNIQUE INDEX license_assignments_tenant_id_user_id_idx ON license_assignments(tenant_id, user_id);
+        CREATE INDEX license_assignments_expired_at_idx ON license_assignments(expired_at);
+        CREATE INDEX license_assignments_created_at_idx ON license_assignments(created_at);
+        CREATE INDEX license_assignments_updated_at_idx ON license_assignments(updated_at);
+
     `);
 }
 
 export async function down(knex: Knex): Promise<void> {
     return knex.raw(`
+        DROP INDEX license_assignments_updated_at_idx;
+        DROP INDEX license_assignments_created_at_idx;
+        DROP INDEX license_assignments_expired_at_idx;
         DROP INDEX license_assignments_tenant_id_user_id_idx;
         DROP TABLE license_assignments;
         DROP TYPE LICENSE_TYPE;

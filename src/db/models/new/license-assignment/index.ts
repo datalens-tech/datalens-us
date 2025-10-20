@@ -9,6 +9,10 @@ export const LicenseAssignmentColumn = {
     UserId: 'userId',
     LicenseType: 'licenseType',
     ExpiredAt: 'expiredAt',
+    CreatedBy: 'createdBy',
+    CreatedAt: 'createdAt',
+    UpdatedBy: 'updatedBy',
+    UpdatedAt: 'updatedAt',
 } as const;
 
 export const LicenseAssignmentColumnRaw = mapValuesToSnakeCase(LicenseAssignmentColumn);
@@ -27,4 +31,8 @@ export class LicenseAssignment extends Model {
     [LicenseAssignmentColumn.UserId]!: string;
     [LicenseAssignmentColumn.LicenseType]!: `${LicenseType}`;
     [LicenseAssignmentColumn.ExpiredAt]!: Nullable<string>;
+    [LicenseAssignmentColumn.CreatedBy]!: string;
+    [LicenseAssignmentColumn.CreatedAt]!: string;
+    [LicenseAssignmentColumn.UpdatedBy]!: string;
+    [LicenseAssignmentColumn.UpdatedAt]!: string;
 }
