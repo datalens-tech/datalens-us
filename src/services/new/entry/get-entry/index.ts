@@ -19,6 +19,7 @@ import {
     selectedCollectionColumns,
     selectedEntryColumns,
     selectedFavoriteColumns,
+    selectedLicenseAssignmentColumns,
     selectedRevisionColumns,
     selectedTenantColumns,
 } from './constants';
@@ -86,8 +87,13 @@ export const getEntry = async (
 
     const {isPrivateRoute, user, onlyPublic, onlyMirrored, tenantId} = ctx.get('info');
 
-    const {getEntryBeforeDbRequestHook, checkEmbedding, getEntryResolveUserLogin} =
-        registry.common.functions.get();
+    const {
+        getEntryBeforeDbRequestHook,
+        checkEmbedding,
+        getEntryResolveUserLogin,
+        isLicenseRequired,
+        checkLicense,
+    } = registry.common.functions.get();
 
     let userLoginPromise: Promise<string | undefined> = Promise.resolve(undefined);
 
@@ -105,6 +111,10 @@ export const getEntry = async (
     const isEmbedding = checkEmbedding({ctx});
 
     const graphRelations = ['workbook', 'tenant(tenantModifier)', 'collection(collectionModifier)'];
+
+    if (isLicenseRequired({ctx})) {
+        graphRelations.push('licenseAssignment(licenseAssignmentModifier)');
+    }
 
     if (revId) {
         graphRelations.push('revisions(revisionsModifier)');
@@ -162,6 +172,15 @@ export const getEntry = async (
             favoriteModifier(builder) {
                 builder.select(selectedFavoriteColumns).where({login: userLogin});
             },
+            licenseAssignmentModifier(builder) {
+                builder
+                    .select(selectedLicenseAssignmentColumns)
+                    .where({
+                        tenantId,
+                        userId: user.userId,
+                    })
+                    .first();
+            },
         })
         .first()
         .timeout(ENTRY_QUERY_TIMEOUT);
@@ -178,6 +197,10 @@ export const getEntry = async (
         throw new AppError(US_ERRORS.NOT_EXIST_TENANT, {
             code: US_ERRORS.NOT_EXIST_TENANT,
         });
+    }
+
+    if (isLicenseRequired({ctx})) {
+        await checkLicense({ctx, licenseAssignment: entry.licenseAssignment});
     }
 
     const checkWorkbookIsolationEnabled =

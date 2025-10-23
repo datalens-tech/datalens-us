@@ -1,6 +1,7 @@
 import {CollectionModel} from '../../../../db/models/new/collection';
 import {Entry} from '../../../../db/models/new/entry';
 import {Favorite} from '../../../../db/models/new/favorite';
+import {LicenseAssignment} from '../../../../db/models/new/license-assignment';
 import {RevisionModel} from '../../../../db/models/new/revision';
 import {Tenant} from '../../../../db/models/new/tenant';
 import {WorkbookModel} from '../../../../db/models/new/workbook';
@@ -9,6 +10,7 @@ import {
     collectionColumns,
     entryColumns,
     favoriteColumns,
+    licenseAssignmentColumns,
     revisionColumns,
     tenantColumns,
 } from './constants';
@@ -29,4 +31,5 @@ export type SelectedEntry = Pick<Entry, ArrayElement<typeof entryColumns>> & {
     collection?: SelectedCollection;
     favorite?: SelectedFavorite;
     tenant?: SelectedTenant;
+    licenseAssignment?: Pick<LicenseAssignment, ArrayElement<typeof licenseAssignmentColumns>>;
 };
