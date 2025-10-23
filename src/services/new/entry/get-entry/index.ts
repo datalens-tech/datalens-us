@@ -112,7 +112,10 @@ export const getEntry = async (
 
     const graphRelations = ['workbook', 'tenant(tenantModifier)', 'collection(collectionModifier)'];
 
-    if (isLicenseRequired({ctx})) {
+    const licenseRequired =
+        !isPrivateRoute && !onlyPublic && !isEmbedding && isLicenseRequired({ctx});
+
+    if (licenseRequired) {
         graphRelations.push('licenseAssignment(licenseAssignmentModifier)');
     }
 
@@ -172,6 +175,7 @@ export const getEntry = async (
             favoriteModifier(builder) {
                 builder.select(selectedFavoriteColumns).where({login: userLogin});
             },
+
             licenseAssignmentModifier(builder) {
                 builder
                     .select(selectedLicenseAssignmentColumns)
@@ -199,7 +203,7 @@ export const getEntry = async (
         });
     }
 
-    if (isLicenseRequired({ctx})) {
+    if (licenseRequired) {
         await checkLicense({ctx, licenseAssignment: entry.licenseAssignment});
     }
 
