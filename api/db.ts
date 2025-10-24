@@ -58,3 +58,15 @@ export {
     JoinedEntryRevisionTenant,
     JoinedEntryRevisionTenantColumns,
 } from '../src/db/presentations/joined-entry-revision-tenant';
+
+export {
+    LicenseLimit,
+    LicenseLimitColumn,
+    LicenseLimitColumnRaw,
+} from '../src/db/models/new/license-limit';
+export {
+    LicenseAssignment,
+    LicenseAssignmentColumnRaw,
+    LicenseAssignmentColumn,
+} from '../src/db/models/new/license-assignment';
+export {LicenseType} from '../src/db/models/new/license-assignment/types';
