@@ -1,10 +1,12 @@
 import {AppError} from '@gravity-ui/nodekit';
+import {raw} from 'objection';
 
 import {Feature, isEnabledFeature} from '../../../../components/features';
-import {US_ERRORS} from '../../../../const';
+import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../../const';
 import OldEntry from '../../../../db/models/entry';
 import {CollectionModelColumn} from '../../../../db/models/new/collection';
 import {Entry, EntryColumn} from '../../../../db/models/new/entry';
+import {LicenseAssignmentColumnRaw} from '../../../../db/models/new/license-assignment';
 import {TenantColumn} from '../../../../db/models/new/tenant';
 import {WorkbookModelColumn} from '../../../../db/models/new/workbook';
 import {DlsActions} from '../../../../types/models';
@@ -178,12 +180,24 @@ export const getEntry = async (
 
             licenseAssignmentModifier(builder) {
                 builder
-                    .select(selectedLicenseAssignmentColumns)
+                    .select([
+                        ...selectedLicenseAssignmentColumns,
+                        raw(`coalesce(?? > ${CURRENT_TIMESTAMP}, true)`, [
+                            LicenseAssignmentColumnRaw.ExpiredAt,
+                        ]).as('is_active'),
+                    ])
                     .where({
                         tenantId,
                         userId: user.userId,
-                    })
-                    .first();
+                    });
+                // .andWhere((qb) => {
+                //     qb.where(raw('?? IS NULL', [LicenseAssignmentColumnRaw.ExpiredAt]))
+                //         .orWhere(
+                //             raw(`?? > ${CURRENT_TIMESTAMP}`, [
+                //                 LicenseAssignmentColumnRaw.ExpiredAt,
+                //             ]),
+                //         );
+                // });
             },
         })
         .first()
@@ -204,7 +218,7 @@ export const getEntry = async (
     }
 
     if (licenseRequired) {
-        await checkLicense({ctx, licenseAssignment: entry.licenseAssignment});
+        checkLicense({ctx, licenseAssignment: entry.licenseAssignment});
     }
 
     const checkWorkbookIsolationEnabled =

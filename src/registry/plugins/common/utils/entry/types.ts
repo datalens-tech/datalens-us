@@ -19,5 +19,6 @@ export type CheckLicense = (args: {
         licenseAssignmentId?: string;
         expiredAt?: string | null;
         licenseType?: string;
+        isActive?: boolean;
     };
-}) => void | Promise<void>;
+}) => void;

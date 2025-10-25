@@ -31,5 +31,12 @@ export type SelectedEntry = Pick<Entry, ArrayElement<typeof entryColumns>> & {
     collection?: SelectedCollection;
     favorite?: SelectedFavorite;
     tenant?: SelectedTenant;
-    licenseAssignment?: Pick<LicenseAssignment, ArrayElement<typeof licenseAssignmentColumns>>;
+    licenseAssignment?: SelectedLicenseAssignment;
+};
+
+export type SelectedLicenseAssignment = Pick<
+    LicenseAssignment,
+    ArrayElement<typeof licenseAssignmentColumns>
+> & {
+    isActive: boolean;
 };
