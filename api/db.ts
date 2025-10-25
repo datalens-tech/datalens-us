@@ -64,9 +64,11 @@ export {
     LicenseLimitColumn,
     LicenseLimitColumnRaw,
 } from '../src/db/models/new/license-limit';
+export {LicenseLimitWithStartedInFuture} from '../src/db/models/new/license-limit/presentations';
 export {
     LicenseAssignment,
     LicenseAssignmentColumnRaw,
     LicenseAssignmentColumn,
 } from '../src/db/models/new/license-assignment';
 export {LicenseType} from '../src/db/models/new/license-assignment/types';
+export {LicenseAssignmentWithIsActive} from '../src/db/models/new/license-assignment/presentations';
