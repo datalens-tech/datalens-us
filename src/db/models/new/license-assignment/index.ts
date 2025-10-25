@@ -8,7 +8,7 @@ export const LicenseAssignmentColumn = {
     TenantId: 'tenantId',
     UserId: 'userId',
     LicenseType: 'licenseType',
-    ExpiredAt: 'expiredAt',
+    ExpiresAt: 'expiresAt',
     CreatedBy: 'createdBy',
     CreatedAt: 'createdAt',
     UpdatedBy: 'updatedBy',
@@ -30,7 +30,7 @@ export class LicenseAssignment extends Model {
     [LicenseAssignmentColumn.TenantId]!: string;
     [LicenseAssignmentColumn.UserId]!: string;
     [LicenseAssignmentColumn.LicenseType]!: `${LicenseType}`;
-    [LicenseAssignmentColumn.ExpiredAt]!: Nullable<string>;
+    [LicenseAssignmentColumn.ExpiresAt]!: Nullable<string>;
     [LicenseAssignmentColumn.CreatedBy]!: string;
     [LicenseAssignmentColumn.CreatedAt]!: string;
     [LicenseAssignmentColumn.UpdatedBy]!: string;
