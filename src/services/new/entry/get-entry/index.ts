@@ -183,21 +183,13 @@ export const getEntry = async (
                     .select([
                         ...selectedLicenseAssignmentColumns,
                         raw(`coalesce(?? > ${CURRENT_TIMESTAMP}, true)`, [
-                            LicenseAssignmentColumnRaw.ExpiredAt,
+                            LicenseAssignmentColumnRaw.ExpiresAt,
                         ]).as('is_active'),
                     ])
                     .where({
                         tenantId,
                         userId: user.userId,
                     });
-                // .andWhere((qb) => {
-                //     qb.where(raw('?? IS NULL', [LicenseAssignmentColumnRaw.ExpiredAt]))
-                //         .orWhere(
-                //             raw(`?? > ${CURRENT_TIMESTAMP}`, [
-                //                 LicenseAssignmentColumnRaw.ExpiredAt,
-                //             ]),
-                //         );
-                // });
             },
         })
         .first()

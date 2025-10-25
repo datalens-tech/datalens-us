@@ -76,7 +76,7 @@ export const selectedCollectionColumns = collectionColumns.map(
 
 export const licenseAssignmentColumns = [
     LicenseAssignmentColumn.LicenseAssignmentId,
-    LicenseAssignmentColumn.ExpiredAt,
+    LicenseAssignmentColumn.ExpiresAt,
     LicenseAssignmentColumn.LicenseType,
 ] as const;
 
