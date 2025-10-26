@@ -60,7 +60,11 @@ export type {
     GetServicePlan,
     ProcessTenantSettings,
 } from '../../src/registry/plugins/common/utils/tenant/types';
-export type {GetEntryResolveUserLogin} from '../../src/registry/plugins/common/utils/entry/types';
+export type {
+    GetEntryResolveUserLogin,
+    IsLicenseRequired,
+    CheckLicense,
+} from '../../src/registry/plugins/common/utils/entry/types';
 export type {
     CollectionConstructor,
     CollectionInstance,
