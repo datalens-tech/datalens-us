@@ -1,5 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 import chunk from 'lodash/chunk';
+import type {z} from 'zod';
 
 import {
     CODING_BASE,
@@ -22,6 +23,8 @@ const MAX_PAGE_LIMIT = 10000;
 const PROFILES: {
     [key: string]: any;
 } = {};
+
+const SPLIT_TOKEN = '|';
 
 export class Utils {
     static get idVariables() {
@@ -511,6 +514,32 @@ export class Utils {
         }
 
         return nextPageToken;
+    }
+
+    static encodeCursorPageToken(updatedAtTimestamp: string, encodedId: string): string {
+        return Buffer.from(`${updatedAtTimestamp}${SPLIT_TOKEN}${encodedId}`).toString('base64');
+    }
+
+    static decodeCursorPageToken<
+        TItems extends [z.ZodTypeAny, ...z.ZodTypeAny[]],
+        TRest extends z.ZodTypeAny | null,
+    >(pageToken: string, schema: z.ZodTuple<TItems, TRest>): z.output<z.ZodTuple<TItems, TRest>> {
+        try {
+            const decodedToken = Buffer.from(pageToken, 'base64').toString('utf-8');
+            const parts = decodedToken.split(SPLIT_TOKEN);
+
+            const parsed = schema.safeParse(parts);
+            if (!parsed.success) {
+                throw new AppError(US_ERRORS.INVALID_PAGE_TOKEN, {
+                    code: US_ERRORS.INVALID_PAGE_TOKEN,
+                });
+            }
+            return parsed.data;
+        } catch {
+            throw new AppError(US_ERRORS.INVALID_PAGE_TOKEN, {
+                code: US_ERRORS.INVALID_PAGE_TOKEN,
+            });
+        }
     }
 
     static escapeStringForLike(str: string) {
