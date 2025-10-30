@@ -6,7 +6,7 @@ import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../../const';
 import OldEntry from '../../../../db/models/entry';
 import {CollectionModelColumn} from '../../../../db/models/new/collection';
 import {Entry, EntryColumn} from '../../../../db/models/new/entry';
-import {LicenseAssignmentColumnRaw} from '../../../../db/models/new/license-assignment';
+import {LicenseColumnRaw} from '../../../../db/models/new/license';
 import {TenantColumn} from '../../../../db/models/new/tenant';
 import {WorkbookModelColumn} from '../../../../db/models/new/workbook';
 import {DlsActions} from '../../../../types/models';
@@ -21,7 +21,7 @@ import {
     selectedCollectionColumns,
     selectedEntryColumns,
     selectedFavoriteColumns,
-    selectedLicenseAssignmentColumns,
+    selectedLicenseColumns,
     selectedRevisionColumns,
     selectedTenantColumns,
 } from './constants';
@@ -118,7 +118,7 @@ export const getEntry = async (
         !isPrivateRoute && !onlyPublic && !isEmbedding && isLicenseRequired({ctx});
 
     if (licenseRequired) {
-        graphRelations.push('licenseAssignment(licenseAssignmentModifier)');
+        graphRelations.push('license(licenseModifier)');
     }
 
     if (revId) {
@@ -178,12 +178,12 @@ export const getEntry = async (
                 builder.select(selectedFavoriteColumns).where({login: userLogin});
             },
 
-            licenseAssignmentModifier(builder) {
+            licenseModifier(builder) {
                 builder
                     .select([
-                        ...selectedLicenseAssignmentColumns,
+                        ...selectedLicenseColumns,
                         raw(`coalesce(?? > ${CURRENT_TIMESTAMP}, true)`, [
-                            LicenseAssignmentColumnRaw.ExpiresAt,
+                            LicenseColumnRaw.ExpiresAt,
                         ]).as('is_active'),
                     ])
                     .where({
@@ -210,7 +210,7 @@ export const getEntry = async (
     }
 
     if (licenseRequired) {
-        checkLicense({ctx, licenseAssignment: entry.licenseAssignment});
+        checkLicense({ctx, license: entry.license});
     }
 
     const checkWorkbookIsolationEnabled =

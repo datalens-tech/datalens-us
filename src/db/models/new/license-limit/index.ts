@@ -3,8 +3,9 @@ import {mapValuesToSnakeCase} from '../../../../utils';
 
 export const LicenseLimitColumn = {
     LicenseLimitId: 'licenseLimitId',
+    Meta: 'meta',
     TenantId: 'tenantId',
-    LimitValue: 'limitValue',
+    CreatorsLimitValue: 'creatorsLimitValue',
     StartedAt: 'startedAt',
     CreatedBy: 'createdBy',
     CreatedAt: 'createdAt',
@@ -24,8 +25,9 @@ export class LicenseLimit extends Model {
     }
 
     [LicenseLimitColumn.LicenseLimitId]!: string;
+    [LicenseLimitColumn.Meta]!: Record<string, unknown>;
     [LicenseLimitColumn.TenantId]!: string;
-    [LicenseLimitColumn.LimitValue]!: number;
+    [LicenseLimitColumn.CreatorsLimitValue]!: number;
     [LicenseLimitColumn.StartedAt]!: string;
     [LicenseLimitColumn.CreatedBy]!: string;
     [LicenseLimitColumn.CreatedAt]!: string;

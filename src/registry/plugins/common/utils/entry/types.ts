@@ -1,6 +1,6 @@
 import type {AppContext} from '@gravity-ui/nodekit';
 
-import type {LicenseType} from '../../../../../db/models/new/license-assignment/types';
+import type {LicenseType} from '../../../../../db/models/new/license/types';
 
 export type IsNeedBypassEntryByKey = (ctx: AppContext, key?: string) => boolean;
 
@@ -17,8 +17,8 @@ export type IsLicenseRequired = (args: {ctx: AppContext}) => boolean;
 
 export type CheckLicense = (args: {
     ctx: AppContext;
-    licenseAssignment?: {
-        licenseAssignmentId: string;
+    license?: {
+        licenseId: string;
         expiresAt: string | null;
         licenseType: `${LicenseType}`;
         isActive: boolean;
