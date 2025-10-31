@@ -15,7 +15,6 @@ export async function up(knex: Knex): Promise<void> {
         );
 
         CREATE INDEX license_limits_tenant_id_started_at_idx ON license_limits(tenant_id, started_at);
-        CREATE INDEX license_limits_tenant_id_value_creators_idx ON license_limits USING gin (tenant_id, (value ->> 'creators'));
 
         CREATE TABLE license_keys (
             license_key_id BIGINT NOT NULL PRIMARY KEY DEFAULT get_id(),
@@ -66,7 +65,6 @@ export async function down(knex: Knex): Promise<void> {
         DROP INDEX license_keys_tenant_id_started_at_idx;
         DROP TABLE license_keys;
 
-        DROP INDEX license_limits_tenant_id_value_creators_idx;
         DROP INDEX license_limits_tenant_id_started_at_idx;
         DROP TABLE license_limits;
     `);
