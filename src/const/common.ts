@@ -204,6 +204,10 @@ export const DEFAULT_PAGE_SIZE = 1000;
 export const DEFAULT_PAGE = 0;
 
 export const CURRENT_TIMESTAMP = 'CURRENT_TIMESTAMP';
+export enum OrderBy {
+    Asc = 'ASC',
+    Desc = 'DESC',
+}
 
 export const APP_NAME = 'united-storage';
 

@@ -1,6 +1,7 @@
 import {CollectionModel, CollectionModelColumn} from '../../../../db/models/new/collection';
 import {Entry, EntryColumn} from '../../../../db/models/new/entry';
 import {Favorite, FavoriteColumn} from '../../../../db/models/new/favorite';
+import {License, LicenseColumn} from '../../../../db/models/new/license';
 import {RevisionModel, RevisionModelColumn} from '../../../../db/models/new/revision';
 import {Tenant, TenantColumn} from '../../../../db/models/new/tenant';
 
@@ -68,6 +69,16 @@ export const collectionColumns = [
 
 export const selectedCollectionColumns = collectionColumns.map(
     (column) => `${CollectionModel.tableName}.${column}`,
+);
+
+export const licenseColumns = [
+    LicenseColumn.LicenseId,
+    LicenseColumn.ExpiresAt,
+    LicenseColumn.LicenseType,
+] as const;
+
+export const selectedLicenseColumns = licenseColumns.map(
+    (column) => `${License.tableName}.${column}`,
 );
 
 export const ENTRY_QUERY_TIMEOUT = 3000;

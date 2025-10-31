@@ -58,3 +58,17 @@ export {
     JoinedEntryRevisionTenant,
     JoinedEntryRevisionTenantColumns,
 } from '../src/db/presentations/joined-entry-revision-tenant';
+
+export {
+    LicenseLimit,
+    LicenseLimitColumn,
+    LicenseLimitColumnRaw,
+} from '../src/db/models/new/license-limit';
+export {LicenseLimitWithStartedInFuture} from '../src/db/models/new/license-limit/presentations';
+
+export {LicenseKey, LicenseKeyColumn, LicenseKeyColumnRaw} from '../src/db/models/new/license-key';
+export {LicenseKeyWithIsActive} from '../src/db/models/new/license-key/presentations';
+
+export {License, LicenseColumnRaw, LicenseColumn} from '../src/db/models/new/license';
+export {LicenseType} from '../src/db/models/new/license/types';
+export {LicenseWithIsActive} from '../src/db/models/new/license/presentations';
