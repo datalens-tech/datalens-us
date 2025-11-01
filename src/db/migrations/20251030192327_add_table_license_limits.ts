@@ -2,12 +2,15 @@ import type {Knex} from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
     return knex.raw(`
+        CREATE TYPE LICENSE_LIMIT_REASON AS ENUM ('manual', 'system');
+
         CREATE TABLE license_limits (
             license_limit_id BIGINT NOT NULL PRIMARY KEY DEFAULT get_id(),
             meta JSONB NOT NULL DEFAULT '{}'::jsonb,
             tenant_id TEXT NOT NULL DEFAULT 'common' REFERENCES tenants (tenant_id) ON UPDATE CASCADE ON DELETE CASCADE,
-            creators_limit_value INT NOT NULL,
             started_at TIMESTAMPTZ NOT NULL,
+            reason LICENSE_LIMIT_REASON NOT NULL,
+            creators_limit_value INT NOT NULL,
             created_by TEXT NOT NULL,
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             updated_by TEXT NOT NULL,
@@ -67,5 +70,6 @@ export async function down(knex: Knex): Promise<void> {
 
         DROP INDEX license_limits_tenant_id_started_at_idx;
         DROP TABLE license_limits;
+        DROP TYPE LICENSE_LIMIT_REASON;
     `);
 }

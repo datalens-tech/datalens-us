@@ -64,6 +64,7 @@ export {
     LicenseLimitColumn,
     LicenseLimitColumnRaw,
 } from '../src/db/models/new/license-limit';
+export {LicenseLimitReason} from '../src/db/models/new/license-limit/types';
 export {LicenseLimitWithStartedInFuture} from '../src/db/models/new/license-limit/presentations';
 
 export {LicenseKey, LicenseKeyColumn, LicenseKeyColumnRaw} from '../src/db/models/new/license-key';
