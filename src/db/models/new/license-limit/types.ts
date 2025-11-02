@@ -1,4 +1,4 @@
-export enum LicenseLimitReason {
-    Manual = 'manual',
-    System = 'system',
+export enum LicenseLimitType {
+    Regular = 'regular',
+    Forced = 'forced',
 }
