@@ -8,8 +8,8 @@ export async function up(knex: Knex): Promise<void> {
             license_limit_id BIGINT NOT NULL PRIMARY KEY DEFAULT get_id(),
             meta JSONB NOT NULL DEFAULT '{}'::jsonb,
             tenant_id TEXT NOT NULL DEFAULT 'common' REFERENCES tenants (tenant_id) ON UPDATE CASCADE ON DELETE CASCADE,
-            started_at TIMESTAMPTZ NOT NULL,
             type LICENSE_LIMIT_TYPE NOT NULL,
+            started_at TIMESTAMPTZ NOT NULL,
             creators_limit_value INT NOT NULL,
             created_by TEXT NOT NULL,
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -86,16 +86,16 @@ export async function up(knex: Knex): Promise<void> {
                 END IF;
             END IF;
 
+            v_check_times := ARRAY[NOW()];
+
             IF TG_TABLE_NAME = 'licenses' THEN
                 IF TG_OP = 'INSERT' THEN
-                    v_check_times := ARRAY[NEW.created_at];
+                    v_check_times := v_check_times || NEW.created_at;
                     IF NEW.expires_at IS NOT NULL THEN
                         v_check_times := v_check_times || NEW.expires_at;
                     END IF;
                     
-                ELSIF TG_OP = 'UPDATE' THEN
-                    v_check_times := ARRAY[]::TIMESTAMPTZ[];
-                    
+                ELSIF TG_OP = 'UPDATE' THEN                    
                     IF OLD.created_at != NEW.created_at THEN
                         v_check_times := v_check_times || OLD.created_at || NEW.created_at;
                     ELSE
@@ -112,7 +112,7 @@ export async function up(knex: Knex): Promise<void> {
                     END IF;
                     
                 ELSIF TG_OP = 'DELETE' THEN
-                    v_check_times := ARRAY[OLD.created_at];
+                    v_check_times := v_check_times || OLD.created_at;
                     IF OLD.expires_at IS NOT NULL THEN
                         v_check_times := v_check_times || OLD.expires_at;
                     END IF;
@@ -120,17 +120,17 @@ export async function up(knex: Knex): Promise<void> {
                 
             ELSIF TG_TABLE_NAME = 'license_limits' THEN
                 IF TG_OP = 'INSERT' THEN
-                    v_check_times := ARRAY[NEW.started_at];
+                    v_check_times := v_check_times || NEW.started_at;
                     
                 ELSIF TG_OP = 'UPDATE' THEN
                     IF OLD.started_at != NEW.started_at THEN
-                        v_check_times := ARRAY[OLD.started_at, NEW.started_at];
+                        v_check_times := v_check_times || OLD.started_at || NEW.started_at;
                     ELSE
-                        v_check_times := ARRAY[NEW.started_at];
+                        v_check_times := v_check_times || NEW.started_at;
                     END IF;
                     
                 ELSIF TG_OP = 'DELETE' THEN
-                    v_check_times := ARRAY[OLD.started_at];
+                    v_check_times := v_check_times || OLD.started_at;
                 END IF;
             END IF;
 
@@ -154,10 +154,12 @@ export async function up(knex: Knex): Promise<void> {
                     GROUP BY ct.check_time
                 )
                 SELECT * FROM violations
-                WHERE active_count > limit_value
+                WHERE 
+                    (limit_value IS NULL AND active_count > 0) OR
+                    (limit_value IS NOT NULL AND active_count > limit_value)
                 LIMIT 1
             LOOP
-                RAISE EXCEPTION 'LICENSE_LIMIT_VIOLATION'
+                RAISE EXCEPTION 'LICENSING_CONSISTENCY_VIOLATION'
                 USING 
                     DETAIL = json_build_object(
                         'tenant_id', v_tenant_id,
@@ -165,10 +167,9 @@ export async function up(knex: Knex): Promise<void> {
                         'limit_value', v_violation.limit_value,
                         'active_count', v_violation.active_count,
                         'exceeded_by', v_violation.active_count - v_violation.limit_value,
-                        'error_code', 'LICENSE_LIMIT_EXCEEDED'
+                        'error_code', 'LICENSING_CONSISTENCY_VIOLATION'
                     )::text,
                     ERRCODE = 'P0001';
-                    -- ERRCODE = 'LC001'; -- custom error code
             END LOOP;
 
             IF TG_OP = 'DELETE' THEN

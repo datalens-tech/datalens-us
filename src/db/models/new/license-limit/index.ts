@@ -7,8 +7,8 @@ export const LicenseLimitColumn = {
     LicenseLimitId: 'licenseLimitId',
     Meta: 'meta',
     TenantId: 'tenantId',
-    StartedAt: 'startedAt',
     Type: 'type',
+    StartedAt: 'startedAt',
     CreatorsLimitValue: 'creatorsLimitValue',
     CreatedBy: 'createdBy',
     CreatedAt: 'createdAt',
@@ -28,10 +28,14 @@ export class LicenseLimit extends Model {
     }
 
     [LicenseLimitColumn.LicenseLimitId]!: string;
-    [LicenseLimitColumn.Meta]!: Record<string, unknown>;
+    [LicenseLimitColumn.Meta]!: {
+        prevState?: {
+            creatorsLimitValue: number;
+        };
+    };
     [LicenseLimitColumn.TenantId]!: string;
-    [LicenseLimitColumn.StartedAt]!: string;
     [LicenseLimitColumn.Type]!: LicenseLimitType;
+    [LicenseLimitColumn.StartedAt]!: string;
     [LicenseLimitColumn.CreatorsLimitValue]!: number;
     [LicenseLimitColumn.CreatedBy]!: string;
     [LicenseLimitColumn.CreatedAt]!: string;
