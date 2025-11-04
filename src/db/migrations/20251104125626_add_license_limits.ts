@@ -105,18 +105,18 @@ export async function up(knex: Knex): Promise<void> {
                         v_check_times := v_check_times || OLD.expires_at;
                     END IF;
                 END IF;
-                
+
             ELSIF TG_TABLE_NAME = 'license_limits' THEN
                 IF TG_OP = 'INSERT' THEN
                     v_check_times := v_check_times || NEW.started_at;
-                    
+
                 ELSIF TG_OP = 'UPDATE' THEN
                     IF OLD.started_at != NEW.started_at THEN
                         v_check_times := v_check_times || OLD.started_at || NEW.started_at;
                     ELSE
                         v_check_times := v_check_times || NEW.started_at;
                     END IF;
-                    
+
                 ELSIF TG_OP = 'DELETE' THEN
                     v_check_times := v_check_times || OLD.started_at;
                 END IF;
@@ -124,7 +124,9 @@ export async function up(knex: Knex): Promise<void> {
 
             FOR v_violation IN
                 WITH check_times AS (
-                    SELECT DISTINCT unnest(v_check_times) as check_time
+                    SELECT check_time
+                    FROM (SELECT DISTINCT unnest(v_check_times) as check_time) dct
+                    WHERE check_time >= NOW()
                 ),
                 violations AS (
                     SELECT 
@@ -167,7 +169,6 @@ export async function up(knex: Knex): Promise<void> {
             END IF;
         END;
         $$ LANGUAGE plpgsql;
-
 
         CREATE CONSTRAINT TRIGGER enforce_license_limits_on_licenses
             AFTER INSERT OR UPDATE OR DELETE ON licenses
