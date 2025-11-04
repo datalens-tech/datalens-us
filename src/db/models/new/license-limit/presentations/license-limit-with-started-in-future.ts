@@ -7,7 +7,7 @@ export class LicenseLimitWithStartedInFuture extends LicenseLimit {
     protected static get selectedColumns() {
         return [
             '*',
-            raw(`?? > ${CURRENT_TIMESTAMP}`, [LicenseLimitColumnRaw.StartedAt]).as(
+            raw(`?? > ?`, [LicenseLimitColumnRaw.StartedAt, raw(CURRENT_TIMESTAMP)]).as(
                 'started_in_future',
             ),
         ];

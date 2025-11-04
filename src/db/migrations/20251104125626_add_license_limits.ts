@@ -17,21 +17,9 @@ export async function up(knex: Knex): Promise<void> {
             updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
 
-        CREATE INDEX license_limits_tenant_id_started_at_idx ON license_limits(tenant_id, started_at);
-
-        CREATE TABLE license_keys (
-            license_key_id BIGINT NOT NULL PRIMARY KEY DEFAULT get_id(),
-            meta JSONB NOT NULL DEFAULT '{}'::jsonb,
-            tenant_id TEXT NOT NULL DEFAULT 'common' REFERENCES tenants (tenant_id) ON UPDATE CASCADE ON DELETE CASCADE,
-            value TEXT NOT NULL,
-            started_at TIMESTAMPTZ NOT NULL,
-            ended_at TIMESTAMPTZ NOT NULL,
-            created_by TEXT NOT NULL,
-            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-        );
-
-        CREATE INDEX license_keys_tenant_id_started_at_idx ON license_keys(tenant_id, started_at);
-        CREATE INDEX license_keys_tenant_id_ended_at_idx ON license_keys(tenant_id, ended_at);
+        CREATE INDEX license_limits_tenant_id_idx ON license_limits(tenant_id);
+        CREATE INDEX license_limits_started_at_idx ON license_limits(started_at);
+        CREATE INDEX license_limits_creators_limit_value_idx ON license_limits(creators_limit_value);
 
         CREATE TYPE LICENSE_TYPE AS ENUM ('creator', 'viewer');
 
@@ -159,7 +147,7 @@ export async function up(knex: Knex): Promise<void> {
                     (limit_value IS NOT NULL AND active_count > limit_value)
                 LIMIT 1
             LOOP
-                RAISE EXCEPTION 'LICENSING_CONSISTENCY_VIOLATION'
+                RAISE EXCEPTION 'LICENSES_CONSISTENCY_VIOLATION'
                 USING 
                     DETAIL = json_build_object(
                         'tenant_id', v_tenant_id,
@@ -167,7 +155,7 @@ export async function up(knex: Knex): Promise<void> {
                         'limit_value', v_violation.limit_value,
                         'active_count', v_violation.active_count,
                         'exceeded_by', v_violation.active_count - v_violation.limit_value,
-                        'error_code', 'LICENSING_CONSISTENCY_VIOLATION'
+                        'error_code', 'LICENSES_CONSISTENCY_VIOLATION'
                     )::text,
                     ERRCODE = 'P0001';
             END LOOP;
@@ -210,12 +198,10 @@ export async function down(knex: Knex): Promise<void> {
         DROP TABLE licenses;
         DROP TYPE LICENSE_TYPE;
 
-        DROP INDEX license_keys_tenant_id_ended_at_idx;
-        DROP INDEX license_keys_tenant_id_started_at_idx;
-        DROP TABLE license_keys;
-
-        DROP INDEX license_limits_tenant_id_started_at_idx;
+        DROP INDEX license_limits_creators_limit_value_idx;
+        DROP INDEX license_limits_started_at_idx;
+        DROP INDEX license_limits_tenant_id_idx;
         DROP TABLE license_limits;
-        DROP TYPE LICENSE_LIMIT_REASON;
+        DROP TYPE LICENSE_LIMIT_TYPE;
     `);
 }

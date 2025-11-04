@@ -7,8 +7,9 @@ export class LicenseWithIsActive extends License {
     protected static get selectedColumns() {
         return [
             '*',
-            raw(`?? > ${CURRENT_TIMESTAMP} OR ?? IS NULL`, [
+            raw(`?? > ? OR ?? IS NULL`, [
                 LicenseColumnRaw.ExpiresAt,
+                raw(CURRENT_TIMESTAMP),
                 LicenseColumnRaw.ExpiresAt,
             ]).as('is_active'),
         ];
