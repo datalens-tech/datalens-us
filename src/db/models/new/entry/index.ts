@@ -2,7 +2,7 @@ import {Model} from '../../..';
 import {EntryPermissions} from '../../../../services/new/entry/types';
 import {CollectionModel, CollectionModelColumn} from '../collection';
 import {Favorite} from '../favorite';
-import {LicenseAssignment, LicenseAssignmentColumn} from '../license-assignment';
+import {License, LicenseColumn} from '../license';
 import {RevisionModel} from '../revision';
 import {Tenant, TenantColumn} from '../tenant';
 import {WorkbookModel} from '../workbook';
@@ -128,12 +128,12 @@ export class Entry extends Model {
                     to: `${Tenant.tableName}.${TenantColumn.TenantId}`,
                 },
             },
-            licenseAssignment: {
+            license: {
                 relation: Model.HasOneRelation,
-                modelClass: LicenseAssignment,
+                modelClass: License,
                 join: {
                     from: `${Entry.tableName}.${EntryColumn.TenantId}`,
-                    to: `${LicenseAssignment.tableName}.${LicenseAssignmentColumn.TenantId}`,
+                    to: `${License.tableName}.${LicenseColumn.TenantId}`,
                 },
             },
         };

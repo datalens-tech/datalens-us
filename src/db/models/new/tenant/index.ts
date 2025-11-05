@@ -1,4 +1,5 @@
 import {Model} from '../../..';
+import {mapValuesToSnakeCase} from '../../../../utils';
 
 export const TenantColumn = {
     TenantId: 'tenantId',
@@ -17,10 +18,13 @@ export const TenantColumn = {
     BillingEndedAt: 'billingEndedAt',
     TrialEndedAt: 'trialEndedAt',
     TrialWithoutBilling: 'trialWithoutBilling',
+    BillingDiscount: 'billingDiscount',
     Branding: 'branding',
     Settings: 'settings',
     Features: 'features',
 } as const;
+
+export const TenantColumnRaw = mapValuesToSnakeCase(TenantColumn);
 
 export class Tenant extends Model {
     static get tableName() {
@@ -47,6 +51,7 @@ export class Tenant extends Model {
     [TenantColumn.BillingEndedAt]!: Nullable<string>;
     [TenantColumn.TrialEndedAt]!: Nullable<string>;
     [TenantColumn.TrialWithoutBilling]!: Nullable<boolean>;
+    [TenantColumn.BillingDiscount]!: Nullable<number>;
     [TenantColumn.Branding]!: Record<string, unknown>;
     [TenantColumn.Settings]!: Record<string, unknown>;
     [TenantColumn.Features]!: Record<string, unknown>;
