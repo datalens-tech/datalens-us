@@ -145,7 +145,7 @@ export async function up(knex: Knex): Promise<void> {
                 )
                 SELECT * FROM violations
                 WHERE
-                    (creators_limit_value IS NULL AND active_licenses_count > 0) OR
+                    (creators_limit_value IS NULL AND active_licenses_count > 0 AND TG_TABLE_NAME = 'license_limits') OR
                     (creators_limit_value IS NOT NULL AND active_licenses_count > creators_limit_value)
                 LIMIT 1
             LOOP
@@ -156,7 +156,6 @@ export async function up(knex: Knex): Promise<void> {
                         'check_time', v_violation.check_time,
                         'creators_limit_value', v_violation.creators_limit_value,
                         'active_licenses_count', v_violation.active_licenses_count,
-                        'exceeded_by', v_violation.active_licenses_count - v_violation.creators_limit_value,
                         'error_code', 'LICENSES_CONSISTENCY_VIOLATION'
                     )::text,
                     ERRCODE = 'P0001';
