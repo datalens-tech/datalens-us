@@ -1,1 +1,1 @@
-export * from './tenant-with-limit';
+export * from './tenant-with-current-limit';

@@ -12,7 +12,7 @@ export {
     RevisionModelColumnRaw,
 } from '../src/db/models/new/revision';
 export {Tenant, TenantColumn} from '../src/db/models/new/tenant';
-export {TenantWithLimit} from '../src/db/models/new/tenant/presentations';
+export {TenantWithCurrentLimit} from '../src/db/models/new/tenant/presentations';
 export {WorkbookModel, WorkbookModelColumn} from '../src/db/models/new/workbook';
 export {CollectionModel, CollectionModelColumn} from '../src/db/models/new/collection';
 export {State} from '../src/db/models/new/state';
