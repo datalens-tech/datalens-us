@@ -54,6 +54,50 @@ export async function up(knex: Knex): Promise<void> {
             LIMIT 1;
         $$ LANGUAGE SQL STABLE;
 
+        CREATE FUNCTION find_license_violations(
+            p_tenant_id TEXT,
+            p_check_times TIMESTAMPTZ[],
+            p_check_null_limit BOOLEAN DEFAULT FALSE
+        ) RETURNS TABLE(
+            tenant_id TEXT,
+            check_time TIMESTAMPTZ,
+            creators_limit_value INT,
+            active_licenses_count BIGINT
+        ) AS $$
+        BEGIN
+            RETURN QUERY
+            WITH check_times AS (
+                SELECT DISTINCT t.check_time
+                FROM unnest(p_check_times) AS t(check_time)
+                WHERE t.check_time >= NOW()
+                AND t.check_time IS NOT NULL
+            ),
+            violations AS (
+                SELECT
+                    p_tenant_id as tenant_id,
+                    ct.check_time,
+                    get_tenant_creators_limit_value(p_tenant_id, ct.check_time) AS creators_limit_value,
+                    COUNT(l.license_id) as active_licenses_count
+                FROM check_times AS ct
+                LEFT JOIN licenses AS l ON
+                    l.tenant_id = p_tenant_id
+                    AND l.license_type = 'creator'
+                    AND l.created_at <= ct.check_time
+                    AND (l.expires_at IS NULL OR l.expires_at > ct.check_time)
+                GROUP BY ct.check_time
+            )
+            SELECT
+                v.tenant_id,
+                v.check_time,
+                v.creators_limit_value,
+                v.active_licenses_count
+            FROM violations v
+            WHERE
+                (p_check_null_limit AND v.creators_limit_value IS NULL AND v.active_licenses_count > 0) OR
+                (v.creators_limit_value IS NOT NULL AND v.active_licenses_count > v.creators_limit_value);
+        END;
+        $$ LANGUAGE plpgsql STABLE;
+
         CREATE FUNCTION enforce_license_limits()
         RETURNS TRIGGER AS $$
         DECLARE
@@ -79,31 +123,13 @@ export async function up(knex: Knex): Promise<void> {
 
             IF TG_TABLE_NAME = 'licenses' THEN
                 IF TG_OP = 'INSERT' THEN
-                    v_check_times := v_check_times || NEW.created_at;
-                    IF NEW.expires_at IS NOT NULL THEN
-                        v_check_times := v_check_times || NEW.expires_at;
-                    END IF;
+                    v_check_times := v_check_times || NEW.created_at || NEW.expires_at;
 
                 ELSIF TG_OP = 'UPDATE' THEN
-                    IF OLD.created_at != NEW.created_at THEN
-                        v_check_times := v_check_times || OLD.created_at || NEW.created_at;
-                    ELSE
-                        v_check_times := v_check_times || NEW.created_at;
-                    END IF;
+                    v_check_times := v_check_times || OLD.created_at || NEW.created_at;
 
                     IF OLD.expires_at IS DISTINCT FROM NEW.expires_at THEN
-                        IF OLD.expires_at IS NOT NULL THEN
-                            v_check_times := v_check_times || OLD.expires_at;
-                        END IF;
-                        IF NEW.expires_at IS NOT NULL THEN
-                            v_check_times := v_check_times || NEW.expires_at;
-                        END IF;
-                    END IF;
-
-                ELSIF TG_OP = 'DELETE' THEN
-                    v_check_times := v_check_times || OLD.created_at;
-                    IF OLD.expires_at IS NOT NULL THEN
-                        v_check_times := v_check_times || OLD.expires_at;
+                        v_check_times := v_check_times || OLD.expires_at || NEW.expires_at;
                     END IF;
                 END IF;
 
@@ -112,11 +138,7 @@ export async function up(knex: Knex): Promise<void> {
                     v_check_times := v_check_times || NEW.started_at;
 
                 ELSIF TG_OP = 'UPDATE' THEN
-                    IF OLD.started_at != NEW.started_at THEN
-                        v_check_times := v_check_times || OLD.started_at || NEW.started_at;
-                    ELSE
-                        v_check_times := v_check_times || NEW.started_at;
-                    END IF;
+                    v_check_times := v_check_times || OLD.started_at || NEW.started_at;
 
                 ELSIF TG_OP = 'DELETE' THEN
                     v_check_times := v_check_times || OLD.started_at;
@@ -124,30 +146,8 @@ export async function up(knex: Knex): Promise<void> {
             END IF;
 
             FOR v_violation IN
-                WITH check_times AS (
-                    SELECT check_time
-                    FROM (SELECT DISTINCT unnest(v_check_times) AS check_time) AS dct
-                    WHERE check_time >= NOW()
-                ),
-                violations AS (
-                    SELECT 
-                        v_tenant_id as tenant_id,
-                        ct.check_time,
-                        get_tenant_creators_limit_value(v_tenant_id, ct.check_time) AS creators_limit_value,
-                        COUNT(l.license_id) as active_licenses_count
-                    FROM check_times AS ct
-                    LEFT JOIN licenses AS l ON 
-                        l.tenant_id = v_tenant_id
-                        AND l.license_type = 'creator'
-                        AND l.created_at <= ct.check_time
-                        AND (l.expires_at IS NULL OR l.expires_at > ct.check_time)
-                    WHERE ct.check_time IS NOT NULL
-                    GROUP BY ct.check_time
-                )
-                SELECT * FROM violations
-                WHERE
-                    (creators_limit_value IS NULL AND active_licenses_count > 0 AND TG_TABLE_NAME = 'license_limits') OR
-                    (creators_limit_value IS NOT NULL AND active_licenses_count > creators_limit_value)
+                SELECT *
+                FROM find_license_violations(v_tenant_id, v_check_times, TG_TABLE_NAME = 'license_limits')
                 LIMIT 1
             LOOP
                 RAISE EXCEPTION 'LICENSES_CONSISTENCY_VIOLATION'
@@ -190,6 +190,7 @@ export async function down(knex: Knex): Promise<void> {
         DROP TRIGGER enforce_license_limits_on_licenses ON licenses;
 
         DROP FUNCTION enforce_license_limits();
+        DROP FUNCTION find_license_violations(TEXT, TIMESTAMPTZ[], BOOLEAN);
         DROP FUNCTION get_tenant_creators_limit_value(TEXT, TIMESTAMPTZ);
 
         DROP INDEX licenses_tenant_id_updated_at_idx;
