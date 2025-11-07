@@ -17,7 +17,7 @@ export async function up(knex: Knex): Promise<void> {
             updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
 
-        CREATE INDEX license_limits_tenant_id_idx ON license_limits(tenant_id);
+        CREATE INDEX license_limits_tenant_id_started_at_desc_idx ON license_limits(tenant_id, started_at DESC);
         CREATE INDEX license_limits_started_at_idx ON license_limits(started_at);
         CREATE INDEX license_limits_creators_limit_value_idx ON license_limits(creators_limit_value);
 
@@ -36,10 +36,11 @@ export async function up(knex: Knex): Promise<void> {
             updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
 
-        CREATE UNIQUE INDEX licenses_tenant_id_license_type_user_id_unique_idx ON licenses(tenant_id, license_type, user_id);
-        CREATE INDEX licenses_expires_at_idx ON licenses(expires_at);
-        CREATE INDEX licenses_created_at_idx ON licenses(created_at);
-        CREATE INDEX licenses_updated_at_idx ON licenses(updated_at);
+        CREATE UNIQUE INDEX licenses_tenant_id_user_id_license_type_unique_idx ON licenses(tenant_id, user_id, license_type);
+        CREATE INDEX licenses_tenant_id_license_type_created_at_expires_at_idx ON licenses(tenant_id, license_type, created_at, expires_at);
+        CREATE INDEX licenses_tenant_id_expires_at_idx ON licenses(tenant_id, expires_at);
+        CREATE INDEX licenses_tenant_id_created_at_idx ON licenses(tenant_id, created_at);
+        CREATE INDEX licenses_tenant_id_updated_at_idx ON licenses(tenant_id, updated_at);
 
         CREATE FUNCTION get_tenant_creators_limit_value(
             p_tenant_id TEXT,
@@ -191,16 +192,17 @@ export async function down(knex: Knex): Promise<void> {
         DROP FUNCTION enforce_license_limits();
         DROP FUNCTION get_tenant_creators_limit_value(TEXT, TIMESTAMPTZ);
 
-        DROP INDEX licenses_updated_at_idx;
-        DROP INDEX licenses_created_at_idx;
-        DROP INDEX licenses_expires_at_idx;
-        DROP INDEX licenses_tenant_id_license_type_user_id_unique_idx;
+        DROP INDEX licenses_tenant_id_updated_at_idx;
+        DROP INDEX licenses_tenant_id_created_at_idx;
+        DROP INDEX licenses_tenant_id_expires_at_idx;
+        DROP INDEX licenses_tenant_id_license_type_created_at_expires_at_idx;
+        DROP INDEX licenses_tenant_id_user_id_license_type_unique_idx;
         DROP TABLE licenses;
         DROP TYPE LICENSE_TYPE;
 
         DROP INDEX license_limits_creators_limit_value_idx;
         DROP INDEX license_limits_started_at_idx;
-        DROP INDEX license_limits_tenant_id_idx;
+        DROP INDEX license_limits_tenant_id_started_at_desc_idx;
         DROP TABLE license_limits;
         DROP TYPE LICENSE_LIMIT_TYPE;
     `);
