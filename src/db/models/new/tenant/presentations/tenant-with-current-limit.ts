@@ -1,4 +1,4 @@
-import Objection, {QueryBuilder, TransactionOrKnex, raw} from 'objection';
+import {QueryBuilder, RawBuilder, TransactionOrKnex, raw} from 'objection';
 
 import {CURRENT_TIMESTAMP, OrderBy} from '../../../../../const';
 import {LicenseLimit, LicenseLimitColumn} from '../../license-limit';
@@ -7,10 +7,7 @@ import {Tenant, TenantColumn} from '../index';
 export class TenantWithCurrentLimit extends Tenant {
     static currentLimitsAlias = 'current_limits';
 
-    static getSelectQuery(
-        trx: TransactionOrKnex,
-        args?: {checkTimestamp?: Objection.RawBuilder | string},
-    ) {
+    static getSelectQuery(trx: TransactionOrKnex, args?: {checkTimestamp?: RawBuilder | string}) {
         const checkTimestamp = args?.checkTimestamp ?? raw(CURRENT_TIMESTAMP);
 
         const query = Tenant.query(trx)
