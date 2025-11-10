@@ -64,6 +64,7 @@ export type {
     GetEntryResolveUserLogin,
     IsLicenseRequired,
     CheckLicense,
+    FetchAndValidateLicense,
 } from '../../src/registry/plugins/common/utils/entry/types';
 export type {
     CollectionConstructor,

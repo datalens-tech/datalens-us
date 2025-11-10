@@ -12,13 +12,14 @@ import type {SharedEntryConstructor} from './entities/shared-entry/types';
 import type {WorkbookConstructor} from './entities/workbook/types';
 import type {CheckColorPalettesAdmin} from './utils/color-palettes/types';
 import type {CheckEmbedding} from './utils/embedding/types';
-import type {
-    CheckLicense,
-    GetEntryAddFormattedFieldsHook,
-    GetEntryBeforeDbRequestHook,
-    GetEntryResolveUserLogin,
-    IsLicenseRequired,
-    IsNeedBypassEntryByKey,
+import {
+    type CheckLicense,
+    type FetchAndValidateLicense,
+    type GetEntryAddFormattedFieldsHook,
+    type GetEntryBeforeDbRequestHook,
+    type GetEntryResolveUserLogin,
+    type IsLicenseRequired,
+    type IsNeedBypassEntryByKey,
 } from './utils/entry/types';
 import type {LogEvent} from './utils/log-event/types';
 import type {CheckTenant, GetServicePlan, ProcessTenantSettings} from './utils/tenant/types';
@@ -46,5 +47,6 @@ export const commonPlugin = {
         checkColorPalettesAdmin: makeFunctionTemplate<CheckColorPalettesAdmin>(),
         isLicenseRequired: makeFunctionTemplate<IsLicenseRequired>(),
         checkLicense: makeFunctionTemplate<CheckLicense>(),
+        fetchAndValidateLicenseOrFail: makeFunctionTemplate<FetchAndValidateLicense>(),
     }),
 };

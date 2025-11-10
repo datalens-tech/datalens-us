@@ -170,7 +170,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
             await checkEntry(ctx, Entry.replica, {verifiableEntry: entry});
         }
 
-        const {checkTenant} = registry.common.functions.get();
+        const {checkTenant, fetchAndValidateLicenseOrFail} = registry.common.functions.get();
 
         await checkTenant({
             ctx,
@@ -178,6 +178,8 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
             servicePlan: checkServicePlan,
             features: checkTenantFeatures,
         });
+
+        await fetchAndValidateLicenseOrFail({ctx});
 
         await Lock.checkLock({entryId, lockToken}, ctx);
     } else {

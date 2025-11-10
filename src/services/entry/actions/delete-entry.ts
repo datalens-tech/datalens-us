@@ -72,10 +72,13 @@ export async function deleteEntry(
 
     const registry = ctx.get('registry');
     const {DLS, SharedEntry} = registry.common.classes.get();
+    const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
 
     if (!skipValidation) {
         validateArgs(args);
     }
+
+    await fetchAndValidateLicenseOrFail({ctx});
 
     const {accessServiceEnabled} = ctx.config;
     const {tenantId, isPrivateRoute, user} = ctx.get('info');

@@ -51,7 +51,7 @@ export default class EntryService {
         const {requestId, tenantId, user, dlContext, isPrivateRoute} = ctx.get('info');
 
         const registry = ctx.get('registry');
-        const {checkTenant} = registry.common.functions.get();
+        const {checkTenant, fetchAndValidateLicenseOrFail} = registry.common.functions.get();
 
         await checkTenant({
             ctx,
@@ -60,6 +60,8 @@ export default class EntryService {
             features: checkTenantFeatures,
             foldersEnabled: !workbookId,
         });
+
+        await fetchAndValidateLicenseOrFail({ctx});
 
         if (workbookId) {
             return await createEntryInWorkbook(ctx, {
