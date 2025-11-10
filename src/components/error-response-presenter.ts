@@ -458,6 +458,16 @@ export default (error: AppError | DBError) => {
             };
         }
 
+        case US_ERRORS.INVALID_PAGE_TOKEN: {
+            return {
+                code: 400,
+                response: {
+                    code,
+                    message: 'Invalid page token',
+                },
+            };
+        }
+
         default:
             return {
                 code: 500,
