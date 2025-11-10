@@ -2,13 +2,13 @@ import type {Knex} from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
     return knex.raw(`
-        CREATE TYPE LICENSE_LIMIT_TYPE AS ENUM ('regular', 'forced');
+        CREATE TYPE license_limit_type AS ENUM ('regular', 'forced');
 
         CREATE TABLE license_limits (
             license_limit_id BIGINT NOT NULL PRIMARY KEY DEFAULT get_id(),
             meta JSONB NOT NULL DEFAULT '{}'::jsonb,
             tenant_id TEXT NOT NULL DEFAULT 'common' REFERENCES tenants (tenant_id) ON UPDATE CASCADE ON DELETE CASCADE,
-            type LICENSE_LIMIT_TYPE NOT NULL,
+            type license_limit_type NOT NULL,
             started_at TIMESTAMPTZ NOT NULL,
             creators_limit_value INT NOT NULL,
             created_by TEXT NOT NULL,
@@ -21,14 +21,14 @@ export async function up(knex: Knex): Promise<void> {
         CREATE INDEX license_limits_started_at_idx ON license_limits(started_at);
         CREATE INDEX license_limits_creators_limit_value_idx ON license_limits(creators_limit_value);
 
-        CREATE TYPE LICENSE_TYPE AS ENUM ('creator', 'viewer');
+        CREATE TYPE license_type AS ENUM ('creator', 'viewer');
 
         CREATE TABLE licenses (
             license_id BIGINT NOT NULL PRIMARY KEY DEFAULT get_id(),
             meta JSONB NOT NULL DEFAULT '{}'::jsonb,
             tenant_id TEXT NOT NULL DEFAULT 'common' REFERENCES tenants (tenant_id) ON UPDATE CASCADE ON DELETE CASCADE,
             user_id TEXT NOT NULL,
-            license_type LICENSE_TYPE NOT NULL,
+            license_type license_type NOT NULL,
             expires_at TIMESTAMPTZ,
             created_by TEXT NOT NULL,
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -236,12 +236,12 @@ export async function down(knex: Knex): Promise<void> {
         DROP INDEX licenses_tenant_id_license_type_expires_at_idx;
         DROP INDEX licenses_tenant_id_user_id_license_type_unique_idx;
         DROP TABLE licenses;
-        DROP TYPE LICENSE_TYPE;
+        DROP TYPE license_type;
 
         DROP INDEX license_limits_creators_limit_value_idx;
         DROP INDEX license_limits_started_at_idx;
         DROP INDEX license_limits_tenant_id_started_at_desc_idx;
         DROP TABLE license_limits;
-        DROP TYPE LICENSE_LIMIT_TYPE;
+        DROP TYPE license_limit_type;
     `);
 }
