@@ -2,7 +2,7 @@ import {AppError} from '@gravity-ui/nodekit';
 import {Model, QueryBuilder, raw, ref} from 'objection';
 import {z} from 'zod';
 
-import {US_ERRORS} from '../../api/constants';
+import {US_ERRORS} from '../const';
 
 export interface PaginatorConfig<TFields extends string = string> {
     sortField: TFields;
