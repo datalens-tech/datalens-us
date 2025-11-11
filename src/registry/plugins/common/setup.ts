@@ -9,6 +9,7 @@ import {checkColorPalettesAdmin} from './utils/color-palettes/utils';
 import {checkEmbedding} from './utils/embedding/utils';
 import {
     checkLicense,
+    fetchAndValidateLicenseOrFail,
     getEntryAddFormattedFieldsHook,
     getEntryBeforeDbRequestHook,
     getEntryResolveUserLogin,
@@ -35,6 +36,7 @@ export const setupCommonPlugin = () => {
         getEntryResolveUserLogin,
         isLicenseRequired,
         checkLicense,
+        fetchAndValidateLicenseOrFail,
         checkEmbedding,
         logEvent,
         checkTenant,

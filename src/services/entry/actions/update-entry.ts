@@ -172,14 +172,15 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
 
         const {checkTenant, fetchAndValidateLicenseOrFail} = registry.common.functions.get();
 
-        await checkTenant({
-            ctx,
-            tenantId: entry.tenantId,
-            servicePlan: checkServicePlan,
-            features: checkTenantFeatures,
-        });
-
-        await fetchAndValidateLicenseOrFail({ctx});
+        await Promise.all([
+            checkTenant({
+                ctx,
+                tenantId: entry.tenantId,
+                servicePlan: checkServicePlan,
+                features: checkTenantFeatures,
+            }),
+            fetchAndValidateLicenseOrFail({ctx}),
+        ]);
 
         await Lock.checkLock({entryId, lockToken}, ctx);
     } else {
