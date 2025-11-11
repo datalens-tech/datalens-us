@@ -1,5 +1,6 @@
 import type {
     CheckLicense,
+    FetchAndValidateLicense,
     GetEntryAddFormattedFieldsHook,
     GetEntryBeforeDbRequestHook,
     GetEntryResolveUserLogin,
@@ -20,5 +21,9 @@ export const isLicenseRequired: IsLicenseRequired = () => {
 };
 
 export const checkLicense: CheckLicense = async () => {
+    return;
+};
+
+export const fetchAndValidateLicenseOrFail: FetchAndValidateLicense = async () => {
     return;
 };

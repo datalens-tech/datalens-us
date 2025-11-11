@@ -24,3 +24,5 @@ export type CheckLicense = (args: {
         isActive: boolean;
     };
 }) => void;
+
+export type FetchAndValidateLicense = (args: {ctx: AppContext}) => Promise<void>;

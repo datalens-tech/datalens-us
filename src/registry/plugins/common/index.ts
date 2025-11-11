@@ -14,6 +14,7 @@ import type {CheckColorPalettesAdmin} from './utils/color-palettes/types';
 import type {CheckEmbedding} from './utils/embedding/types';
 import type {
     CheckLicense,
+    FetchAndValidateLicense,
     GetEntryAddFormattedFieldsHook,
     GetEntryBeforeDbRequestHook,
     GetEntryResolveUserLogin,
@@ -46,5 +47,6 @@ export const commonPlugin = {
         checkColorPalettesAdmin: makeFunctionTemplate<CheckColorPalettesAdmin>(),
         isLicenseRequired: makeFunctionTemplate<IsLicenseRequired>(),
         checkLicense: makeFunctionTemplate<CheckLicense>(),
+        fetchAndValidateLicenseOrFail: makeFunctionTemplate<FetchAndValidateLicense>(),
     }),
 };
