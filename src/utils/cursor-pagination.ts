@@ -18,8 +18,6 @@ export interface PaginationResult<T> {
     nextPageToken?: string;
 }
 
-export const QUERY_SELECT_IS_REQUIRED_ERROR = 'QUERY_SELECT_IS_REQUIRED_ERROR';
-
 const CursorColumn = '$cursor';
 
 type ItemWithCursor<T> = T & {[CursorColumn]: string};
@@ -46,11 +44,8 @@ function decodeCursorPageToken<TFields extends string>(params: {
         const result = z.tuple([sortFieldSchema, tiebreakerSchema]).safeParse(parsed);
 
         if (!result.success) {
-            throw new AppError(US_ERRORS.INVALID_PAGE_TOKEN, {
+            throw new AppError(`Invalid cursor token: ${result.error.message}`, {
                 code: US_ERRORS.INVALID_PAGE_TOKEN,
-                details: {
-                    message: `Invalid cursor token: ${result.error.message}`,
-                },
             });
         }
 
@@ -59,12 +54,12 @@ function decodeCursorPageToken<TFields extends string>(params: {
         if (error instanceof AppError) {
             throw error;
         }
-        throw new AppError(US_ERRORS.INVALID_PAGE_TOKEN, {
-            code: US_ERRORS.INVALID_PAGE_TOKEN,
-            details: {
-                message: `Invalid cursor token: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        throw new AppError(
+            `Invalid cursor token: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            {
+                code: US_ERRORS.INVALID_PAGE_TOKEN,
             },
-        });
+        );
     }
 }
 
@@ -78,11 +73,8 @@ export function createPaginator<TFields extends string>(config: PaginatorConfig<
         const {sortField, tiebreakerField, direction, limit, pageToken} = normalizedConfig;
 
         if (!builder.hasSelects()) {
-            throw new AppError(QUERY_SELECT_IS_REQUIRED_ERROR, {
-                code: QUERY_SELECT_IS_REQUIRED_ERROR,
-                details: {
-                    mesage: 'The query requires select statement',
-                },
+            throw new AppError('The query requires select statement', {
+                code: US_ERRORS.QUERY_SELECT_IS_REQUIRED_ERROR,
             });
         }
 

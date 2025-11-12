@@ -463,7 +463,17 @@ export default (error: AppError | DBError) => {
                 code: 400,
                 response: {
                     code,
-                    message: 'Invalid page token',
+                    message,
+                },
+            };
+        }
+
+        case US_ERRORS.QUERY_SELECT_IS_REQUIRED_ERROR: {
+            return {
+                code: 500,
+                response: {
+                    code,
+                    message,
                 },
             };
         }

@@ -20,7 +20,7 @@ export const isLicenseRequired: IsLicenseRequired = () => {
     return false;
 };
 
-export const checkLicense: CheckLicense = async () => {
+export const checkLicense: CheckLicense = () => {
     return;
 };
 
