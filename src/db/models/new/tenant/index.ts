@@ -1,4 +1,5 @@
 import {Model} from '../../..';
+import {mapValuesToSnakeCase} from '../../../../utils';
 
 export const TenantColumn = {
     TenantId: 'tenantId',
@@ -22,6 +23,8 @@ export const TenantColumn = {
     Settings: 'settings',
     Features: 'features',
 } as const;
+
+export const TenantColumnRaw = mapValuesToSnakeCase(TenantColumn);
 
 export class Tenant extends Model {
     static get tableName() {

@@ -13,9 +13,12 @@ import type {WorkbookConstructor} from './entities/workbook/types';
 import type {CheckColorPalettesAdmin} from './utils/color-palettes/types';
 import type {CheckEmbedding} from './utils/embedding/types';
 import type {
+    CheckLicense,
+    FetchAndValidateLicense,
     GetEntryAddFormattedFieldsHook,
     GetEntryBeforeDbRequestHook,
     GetEntryResolveUserLogin,
+    IsLicenseRequired,
     IsNeedBypassEntryByKey,
 } from './utils/entry/types';
 import type {LogEvent} from './utils/log-event/types';
@@ -42,5 +45,8 @@ export const commonPlugin = {
         processTenantSettings: makeFunctionTemplate<ProcessTenantSettings>(),
         getZitadelUserRole: makeFunctionTemplate<GetZitadelUserRole>(),
         checkColorPalettesAdmin: makeFunctionTemplate<CheckColorPalettesAdmin>(),
+        isLicenseRequired: makeFunctionTemplate<IsLicenseRequired>(),
+        checkLicense: makeFunctionTemplate<CheckLicense>(),
+        fetchAndValidateLicenseOrFail: makeFunctionTemplate<FetchAndValidateLicense>(),
     }),
 };

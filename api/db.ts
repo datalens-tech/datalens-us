@@ -12,6 +12,7 @@ export {
     RevisionModelColumnRaw,
 } from '../src/db/models/new/revision';
 export {Tenant, TenantColumn} from '../src/db/models/new/tenant';
+export {TenantWithCurrentLimit} from '../src/db/models/new/tenant/presentations';
 export {WorkbookModel, WorkbookModelColumn} from '../src/db/models/new/workbook';
 export {CollectionModel, CollectionModelColumn} from '../src/db/models/new/collection';
 export {State} from '../src/db/models/new/state';
@@ -58,3 +59,15 @@ export {
     JoinedEntryRevisionTenant,
     JoinedEntryRevisionTenantColumns,
 } from '../src/db/presentations/joined-entry-revision-tenant';
+
+export {
+    LicenseLimit,
+    LicenseLimitColumn,
+    LicenseLimitColumnRaw,
+} from '../src/db/models/new/license-limit';
+export {LicenseLimitType} from '../src/db/models/new/license-limit/types';
+export {LicenseLimitWithStartedInFuture} from '../src/db/models/new/license-limit/presentations';
+
+export {License, LicenseColumnRaw, LicenseColumn} from '../src/db/models/new/license';
+export {LicenseType} from '../src/db/models/new/license/types';
+export {LicenseWithIsActive} from '../src/db/models/new/license/presentations';

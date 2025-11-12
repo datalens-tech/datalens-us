@@ -458,6 +458,26 @@ export default (error: AppError | DBError) => {
             };
         }
 
+        case US_ERRORS.INVALID_PAGE_TOKEN: {
+            return {
+                code: 400,
+                response: {
+                    code,
+                    message,
+                },
+            };
+        }
+
+        case US_ERRORS.QUERY_SELECT_IS_REQUIRED_ERROR: {
+            return {
+                code: 500,
+                response: {
+                    code,
+                    message,
+                },
+            };
+        }
+
         default:
             return {
                 code: 500,

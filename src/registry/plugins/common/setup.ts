@@ -8,9 +8,12 @@ import {Workbook} from './entities/workbook/workbook';
 import {checkColorPalettesAdmin} from './utils/color-palettes/utils';
 import {checkEmbedding} from './utils/embedding/utils';
 import {
+    checkLicense,
+    fetchAndValidateLicenseOrFail,
     getEntryAddFormattedFieldsHook,
     getEntryBeforeDbRequestHook,
     getEntryResolveUserLogin,
+    isLicenseRequired,
     isNeedBypassEntryByKey,
 } from './utils/entry/utils';
 import {logEvent} from './utils/log-event/utils';
@@ -31,6 +34,9 @@ export const setupCommonPlugin = () => {
         getEntryBeforeDbRequestHook,
         getEntryAddFormattedFieldsHook,
         getEntryResolveUserLogin,
+        isLicenseRequired,
+        checkLicense,
+        fetchAndValidateLicenseOrFail,
         checkEmbedding,
         logEvent,
         checkTenant,

@@ -51,15 +51,18 @@ export default class EntryService {
         const {requestId, tenantId, user, dlContext, isPrivateRoute} = ctx.get('info');
 
         const registry = ctx.get('registry');
-        const {checkTenant} = registry.common.functions.get();
+        const {checkTenant, fetchAndValidateLicenseOrFail} = registry.common.functions.get();
 
-        await checkTenant({
-            ctx,
-            tenantId,
-            servicePlan: checkServicePlan,
-            features: checkTenantFeatures,
-            foldersEnabled: !workbookId,
-        });
+        await Promise.all([
+            checkTenant({
+                ctx,
+                tenantId,
+                servicePlan: checkServicePlan,
+                features: checkTenantFeatures,
+                foldersEnabled: !workbookId,
+            }),
+            fetchAndValidateLicenseOrFail({ctx}),
+        ]);
 
         if (workbookId) {
             return await createEntryInWorkbook(ctx, {
