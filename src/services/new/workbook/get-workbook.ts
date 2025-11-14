@@ -35,6 +35,13 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
     const {tenantId, isPrivateRoute, onlyMirrored} = ctx.get('info');
     const {accessServiceEnabled} = ctx.config;
 
+    const registry = ctx.get('registry');
+
+    if (!isPrivateRoute) {
+        const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+        await fetchAndValidateLicenseOrFail({ctx});
+    }
+
     const targetTrx = getReplica(trx);
 
     const model: Optional<WorkbookModel> = await WorkbookModel.query(targetTrx)
@@ -57,7 +64,6 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
         });
     }
 
-    const registry = ctx.get('registry');
     const {Workbook} = registry.common.classes.get();
 
     const workbook = new Workbook({

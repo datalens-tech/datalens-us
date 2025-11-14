@@ -24,6 +24,11 @@ export const getWorkbooksListByIds = async (
     const {tenantId, isPrivateRoute} = ctx.get('info');
     const registry = ctx.get('registry');
 
+    if (!isPrivateRoute) {
+        const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+        await fetchAndValidateLicenseOrFail({ctx});
+    }
+
     const targetTrx = getReplica(trx);
 
     const workbookList = await WorkbookModel.query(targetTrx)
