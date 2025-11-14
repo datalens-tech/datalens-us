@@ -24,6 +24,11 @@ export const updateCollection = async (
 ) => {
     const {collectionId, title: newTitle, description: newDescription} = args;
 
+    const registry = ctx.get('registry');
+
+    const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+    await fetchAndValidateLicenseOrFail({ctx});
+
     const {
         user: {userId},
     } = ctx.get('info');

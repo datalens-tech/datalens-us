@@ -48,6 +48,13 @@ export const updateWorkbook = async (
         isPrivateRoute,
     } = ctx.get('info');
 
+    const registry = ctx.get('registry');
+
+    if (!isPrivateRoute) {
+        const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+        await fetchAndValidateLicenseOrFail({ctx});
+    }
+
     const targetTrx = getPrimary(trx);
 
     const workbook = await getWorkbook(

@@ -29,6 +29,11 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
 
     const {tenantId, isPrivateRoute} = ctx.get('info');
 
+    const registry = ctx.get('registry');
+
+    const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+    await fetchAndValidateLicenseOrFail({ctx});
+
     const targetTrx = getReplica(trx);
 
     const model: Optional<CollectionModel> = await CollectionModel.query(targetTrx)
@@ -51,7 +56,6 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
         });
     }
 
-    const registry = ctx.get('registry');
     const {Collection} = registry.common.classes.get();
 
     const collectionInstance = new Collection({

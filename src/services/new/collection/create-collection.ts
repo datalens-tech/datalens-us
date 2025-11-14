@@ -37,6 +37,11 @@ export const createCollection = async (
         isPrivateRoute,
     } = ctx.get('info');
 
+    if (!isPrivateRoute) {
+        const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+        await fetchAndValidateLicenseOrFail({ctx});
+    }
+
     const {accessServiceEnabled, accessBindingsServiceEnabled} = ctx.config;
 
     const targetTrx = getPrimary(trx);

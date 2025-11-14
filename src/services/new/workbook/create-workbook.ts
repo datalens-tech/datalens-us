@@ -40,6 +40,11 @@ export const createWorkbook = async (
     } = ctx.get('info');
     const registry = ctx.get('registry');
 
+    if (!isPrivateRoute) {
+        const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+        await fetchAndValidateLicenseOrFail({ctx});
+    }
+
     const targetTrx = getPrimary(trx);
 
     let parentIds: string[] = [];

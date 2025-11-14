@@ -26,6 +26,9 @@ export const getCollectionsListByIds = async (
     const {tenantId} = ctx.get('info');
     const registry = ctx.get('registry');
 
+    const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+    await fetchAndValidateLicenseOrFail({ctx});
+
     const models = await CollectionModel.query(getReplica(trx))
         .where({
             [CollectionModelColumn.DeletedAt]: null,
