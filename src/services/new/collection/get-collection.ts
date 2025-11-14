@@ -32,7 +32,6 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
     const registry = ctx.get('registry');
 
     const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
-
     await fetchAndValidateLicenseOrFail({ctx});
 
     const targetTrx = getReplica(trx);

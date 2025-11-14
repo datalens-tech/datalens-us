@@ -35,6 +35,7 @@ export const deleteCollections = async (
     const targetTrx = getPrimary(trx);
 
     const registry = ctx.get('registry');
+
     const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
     await fetchAndValidateLicenseOrFail({ctx});
 
