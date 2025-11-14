@@ -3,6 +3,7 @@ export {getPrimary, getReplica} from '../src/services/new/utils';
 
 export {checkEntry} from '../src/services/entry/actions/check-entry';
 export {
+    GetRelatedEntriesResult,
     getRelatedEntries,
     RelationDirection,
 } from '../src/services/entry/actions/get-related-entries';
@@ -74,6 +75,7 @@ export {
     getMinimumReadOnlyCollectionEntryPermissions,
 } from '../src/services/new/entry/utils/check-collection-entry-permission/map-collection-entry-permissions';
 export {checkSharedEntryPermission} from '../src/services/new/entry/utils/check-collection-entry-permission/check-permission';
+export {deleteSharedEntries} from '../src/services/new/entry/delete-shared-entries';
 
 export {
     setDefaultColorPalette,

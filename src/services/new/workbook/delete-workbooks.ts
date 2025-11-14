@@ -7,7 +7,7 @@ import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {WorkbookInstance} from '../../../registry/plugins/common/entities/workbook/types';
 import Utils, {makeUserId} from '../../../utils';
-import {markEntryAsDeleted} from '../../entry/crud';
+import {markEntriesAsDeleted} from '../../entry/crud';
 import {getParentIds} from '../collection/utils/get-parents';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
@@ -17,13 +17,14 @@ import {markWorkbooksAsDeleted} from './utils';
 
 export interface DeleteWorkbooksArgs {
     workbookIds: string[];
+    detachDeletePermissions?: boolean;
 }
 
 export const deleteWorkbooks = async (
     {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: DeleteWorkbooksArgs,
 ) => {
-    const {workbookIds} = args;
+    const {workbookIds, detachDeletePermissions = false} = args;
 
     ctx.log('DELETE_WORKBOOKS_START', {
         workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.encodeId(id)),
@@ -36,10 +37,8 @@ export const deleteWorkbooks = async (
         isPrivateRoute,
     } = ctx.get('info');
 
-    const targetTrx = getPrimary(trx);
-
     const workbooks = await getWorkbooksListByIds(
-        {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions: true},
+        {ctx, trx: getPrimary(trx), skipValidation: true, skipCheckPermissions: true},
         {workbookIds},
     );
 
@@ -57,7 +56,7 @@ export const deleteWorkbooks = async (
         if (workbook.model.collectionId !== null) {
             parentIds = await getParentIds({
                 ctx,
-                trx: targetTrx,
+                trx: getPrimary(trx),
                 collectionId: workbook.model.collectionId,
             });
         }
@@ -74,10 +73,10 @@ export const deleteWorkbooks = async (
 
     await Promise.all(checkDeletePermissionPromises);
 
-    const result = await transaction(targetTrx, async (transactionTrx) => {
+    const result = await transaction(getPrimary(trx), async (transactionTrx) => {
         const deletedWorkbooks = await markWorkbooksAsDeleted(
             {ctx, trx: transactionTrx, skipCheckPermissions: true},
-            {workbooksMap},
+            {workbooksMap, detachDeletePermissions: true},
         );
 
         const entries = await Entry.query(transactionTrx)
@@ -86,46 +85,43 @@ export const deleteWorkbooks = async (
             .whereIn([EntryColumn.WorkbookId], workbookIds)
             .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
-        const entryDeletedBy = makeUserId(userId);
-
-        await Promise.all(
-            entries.map(async (entry) => {
-                const {entryId, displayKey, key} = entry;
-
-                await Lock.checkLock({entryId}, ctx);
-
-                const newInnerMeta = {
-                    ...entry.innerMeta,
-                    oldKey: key as string,
-                    oldDisplayKey: displayKey as string,
-                };
-
-                return markEntryAsDeleted(transactionTrx, {
-                    entryId,
-                    newKey: key as string,
-                    newDisplayKey: displayKey as string,
-                    newInnerMeta,
-                    updatedBy: entryDeletedBy,
-                });
-            }),
+        await Lock.bulkCheckLock(
+            entries.map((entry) => ({entryId: entry.entryId})),
+            ctx,
         );
+
+        const data = entries.map((entry) => ({
+            entryId: entry.entryId,
+            newKey: entry.key as string,
+            newDisplayKey: entry.displayKey as string,
+            updatedBy: makeUserId(userId),
+            newInnerMeta: {
+                ...entry.innerMeta,
+                oldKey: entry.key as string,
+                oldDisplayKey: entry.displayKey as string,
+            },
+            scope: entry.scope,
+            type: entry.type,
+            createdBy: entry.createdBy,
+        }));
+
+        await markEntriesAsDeleted({ctx, trx: transactionTrx}, data);
 
         return deletedWorkbooks;
     });
 
-    if (!result) {
-        throw new AppError(US_ERRORS.WORKBOOK_NOT_EXISTS, {
-            code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-        });
+    if (!detachDeletePermissions) {
+        await result.deletePermissions?.();
     }
 
     ctx.log('DELETE_WORKBOOKS_FINISH', {
-        workbookIds: await Utils.macrotasksMap(result, (workbook) =>
+        workbookIds: await Utils.macrotasksMap(result.workbooks, (workbook) =>
             Utils.encodeId(workbook.workbookId),
         ),
     });
 
     return {
-        workbooks: result,
+        workbooks: result.workbooks,
+        deletePermissions: detachDeletePermissions ? result.deletePermissions : undefined,
     };
 };

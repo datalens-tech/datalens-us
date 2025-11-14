@@ -2,6 +2,7 @@ import {Model} from '../../..';
 import {EntryPermissions} from '../../../../services/new/entry/types';
 import {CollectionModel, CollectionModelColumn} from '../collection';
 import {Favorite} from '../favorite';
+import {License, LicenseColumn} from '../license';
 import {RevisionModel} from '../revision';
 import {Tenant, TenantColumn} from '../tenant';
 import {WorkbookModel} from '../workbook';
@@ -125,6 +126,14 @@ export class Entry extends Model {
                 join: {
                     from: `${Entry.tableName}.${EntryColumn.TenantId}`,
                     to: `${Tenant.tableName}.${TenantColumn.TenantId}`,
+                },
+            },
+            license: {
+                relation: Model.HasOneRelation,
+                modelClass: License,
+                join: {
+                    from: `${Entry.tableName}.${EntryColumn.TenantId}`,
+                    to: `${License.tableName}.${LicenseColumn.TenantId}`,
                 },
             },
         };

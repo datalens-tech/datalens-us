@@ -72,10 +72,13 @@ export async function deleteEntry(
 
     const registry = ctx.get('registry');
     const {DLS, SharedEntry} = registry.common.classes.get();
+    const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
 
     if (!skipValidation) {
         validateArgs(args);
     }
+
+    await fetchAndValidateLicenseOrFail({ctx});
 
     const {accessServiceEnabled} = ctx.config;
     const {tenantId, isPrivateRoute, user} = ctx.get('info');
@@ -219,22 +222,6 @@ export async function deleteEntry(
                 newInnerMeta,
                 updatedBy: deletedBy,
             });
-
-            if (entry.collectionId) {
-                const parentIds = await getParentIds({
-                    ctx,
-                    trx,
-                    collectionId: entry.collectionId,
-                });
-                const sharedEntry = new SharedEntry({
-                    ctx,
-                    model: entry as Entry,
-                });
-                await sharedEntry.deletePermissions({
-                    parentIds,
-                    skipCheckPermissions: true,
-                });
-            }
         }
 
         return await OldEntry.query(trx)
@@ -247,6 +234,21 @@ export async function deleteEntry(
             .first()
             .timeout(DEFAULT_QUERY_TIMEOUT);
     });
+
+    if (result && result.collectionId) {
+        const parentIds = await getParentIds({
+            ctx,
+            collectionId: result.collectionId,
+        });
+        const sharedEntry = new SharedEntry({
+            ctx,
+            model: result as Entry,
+        });
+        await sharedEntry.deletePermissions({
+            parentIds,
+            skipCheckPermissions: true,
+        });
+    }
 
     ctx.log(BiTrackingLogs.DeleteEntry, {
         entryId: Utils.encodeId(entryId),

@@ -36,6 +36,7 @@ type CreateMockWorkbookEntryArgs = {
     data?: Record<string, unknown>;
     description?: string;
     mode?: 'save' | 'publish';
+    links?: Record<string, string>;
 };
 
 export const createMockWorkbookEntry = async (
@@ -50,6 +51,7 @@ export const createMockWorkbookEntry = async (
     const meta = args.meta ?? mockWorkbookEntry.meta;
     const mode = args.mode ?? mockWorkbookEntry.mode;
     const description = args?.description;
+    const links = args?.links;
 
     const response = await auth(request(app).post(routes.entries), {
         ...options?.authArgs,
@@ -69,6 +71,7 @@ export const createMockWorkbookEntry = async (
             description,
             workbookId,
             mode,
+            links,
         })
         .expect(200);
 
@@ -83,6 +86,7 @@ export const createPrivateMockWorkbookEntry = async (args: CreateMockWorkbookEnt
     const data = args.data ?? mockWorkbookEntry.data;
     const meta = args.meta ?? mockWorkbookEntry.meta;
     const mode = args.mode ?? mockWorkbookEntry.mode;
+    const links = args?.links;
 
     const response = await authMasterToken(request(app).post(routes.privateCreateEntry))
         .send({
@@ -93,6 +97,7 @@ export const createPrivateMockWorkbookEntry = async (args: CreateMockWorkbookEnt
             meta,
             workbookId,
             mode,
+            links,
         })
         .expect(200);
 
@@ -117,6 +122,7 @@ type CreateMockCollectionEntryArgs = {
     data?: Record<string, unknown>;
     description?: string;
     mode?: 'save' | 'publish';
+    links?: Record<string, string>;
 };
 
 export const createMockCollectionEntry = async (
@@ -131,6 +137,7 @@ export const createMockCollectionEntry = async (
     const meta = args.meta ?? mockCollectionEntry.meta;
     const mode = args.mode ?? mockCollectionEntry.mode;
     const description = args?.description;
+    const links = args?.links;
 
     const response = await auth(request(app).post(routes.entries), {
         ...options?.authArgs,
@@ -149,6 +156,7 @@ export const createMockCollectionEntry = async (
             description,
             collectionId,
             mode,
+            links,
         })
         .expect(200);
 
@@ -163,6 +171,7 @@ export const createPrivateMockCollectionEntry = async (args: CreateMockCollectio
     const data = args.data ?? mockCollectionEntry.data;
     const meta = args.meta ?? mockCollectionEntry.meta;
     const mode = args.mode ?? mockCollectionEntry.mode;
+    const links = args?.links;
 
     const response = await authMasterToken(request(app).post(routes.privateCreateEntry))
         .send({
@@ -173,6 +182,7 @@ export const createPrivateMockCollectionEntry = async (args: CreateMockCollectio
             meta,
             collectionId,
             mode,
+            links,
         })
         .expect(200);
 

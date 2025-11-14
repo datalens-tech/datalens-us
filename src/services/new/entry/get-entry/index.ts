@@ -1,10 +1,12 @@
 import {AppError} from '@gravity-ui/nodekit';
+import {raw} from 'objection';
 
 import {Feature, isEnabledFeature} from '../../../../components/features';
-import {US_ERRORS} from '../../../../const';
+import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../../const';
 import OldEntry from '../../../../db/models/entry';
 import {CollectionModelColumn} from '../../../../db/models/new/collection';
 import {Entry, EntryColumn} from '../../../../db/models/new/entry';
+import {LicenseColumnRaw} from '../../../../db/models/new/license';
 import {TenantColumn} from '../../../../db/models/new/tenant';
 import {WorkbookModelColumn} from '../../../../db/models/new/workbook';
 import {DlsActions} from '../../../../types/models';
@@ -19,6 +21,7 @@ import {
     selectedCollectionColumns,
     selectedEntryColumns,
     selectedFavoriteColumns,
+    selectedLicenseColumns,
     selectedRevisionColumns,
     selectedTenantColumns,
 } from './constants';
@@ -86,8 +89,13 @@ export const getEntry = async (
 
     const {isPrivateRoute, user, onlyPublic, onlyMirrored, tenantId} = ctx.get('info');
 
-    const {getEntryBeforeDbRequestHook, checkEmbedding, getEntryResolveUserLogin} =
-        registry.common.functions.get();
+    const {
+        getEntryBeforeDbRequestHook,
+        checkEmbedding,
+        getEntryResolveUserLogin,
+        isLicenseRequired,
+        checkLicense,
+    } = registry.common.functions.get();
 
     let userLoginPromise: Promise<string | undefined> = Promise.resolve(undefined);
 
@@ -105,6 +113,13 @@ export const getEntry = async (
     const isEmbedding = checkEmbedding({ctx});
 
     const graphRelations = ['workbook', 'tenant(tenantModifier)', 'collection(collectionModifier)'];
+
+    const licenseRequired =
+        !isPrivateRoute && !onlyPublic && !isEmbedding && isLicenseRequired({ctx});
+
+    if (licenseRequired) {
+        graphRelations.push('license(licenseModifier)');
+    }
 
     if (revId) {
         graphRelations.push('revisions(revisionsModifier)');
@@ -162,6 +177,20 @@ export const getEntry = async (
             favoriteModifier(builder) {
                 builder.select(selectedFavoriteColumns).where({login: userLogin});
             },
+
+            licenseModifier(builder) {
+                builder
+                    .select([
+                        ...selectedLicenseColumns,
+                        raw(`coalesce(?? > ${CURRENT_TIMESTAMP}, true)`, [
+                            LicenseColumnRaw.ExpiresAt,
+                        ]).as('is_active'),
+                    ])
+                    .where({
+                        tenantId,
+                        userId: user.userId,
+                    });
+            },
         })
         .first()
         .timeout(ENTRY_QUERY_TIMEOUT);
@@ -178,6 +207,10 @@ export const getEntry = async (
         throw new AppError(US_ERRORS.NOT_EXIST_TENANT, {
             code: US_ERRORS.NOT_EXIST_TENANT,
         });
+    }
+
+    if (licenseRequired) {
+        checkLicense({ctx, license: entry.license});
     }
 
     const checkWorkbookIsolationEnabled =
