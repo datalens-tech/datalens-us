@@ -47,7 +47,7 @@ export const getEntriesRelations = async (
     const {tenantId, isPrivateRoute} = ctx.get('info');
 
     const {
-        entryIds,
+        entryIds: rawEntryIds,
         scope,
         limit = 100,
         pageToken,
@@ -56,7 +56,7 @@ export const getEntriesRelations = async (
     } = args;
 
     ctx.log('GET_ENTRIES_RELATIONS_REQUEST', {
-        entryIds: await Utils.macrotasksMap(entryIds, (id) => Utils.encodeId(id)),
+        entryIds: await Utils.macrotasksMap(rawEntryIds, (id) => Utils.encodeId(id)),
         searchDirection,
         scope,
         limit,
@@ -64,7 +64,9 @@ export const getEntriesRelations = async (
         includePermissionsInfo,
     });
 
-    const entries = (await Entry.query(getReplica(trx))
+    const entryIds = Array.from(new Set(rawEntryIds));
+
+    const entriesData = (await Entry.query(getReplica(trx))
         .select(EntryColumn.EntryId)
         .whereIn(EntryColumn.EntryId, entryIds)
         .where({
@@ -75,8 +77,8 @@ export const getEntriesRelations = async (
         [EntryColumn.EntryId]: string;
     }>;
 
-    if (entries.length !== entryIds.length) {
-        const foundEntryIds = entries.map((entry) => entry.entryId);
+    if (entriesData.length !== entryIds.length) {
+        const foundEntryIds = entriesData.map(({entryId}) => entryId);
         const missingEntryIds = entryIds.filter((id) => !foundEntryIds.includes(id));
 
         throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
