@@ -2,6 +2,7 @@ import {AppError} from '@gravity-ui/nodekit';
 import {z} from 'zod';
 
 import {US_ERRORS} from '../../../../../../const';
+import {zc} from '../../../../components/zod';
 import {OrderBy} from '../../../../const';
 import {Entry, EntryColumn} from '../../../../db/models/new/entry';
 import {EntryScope} from '../../../../db/models/new/entry/types';
@@ -36,7 +37,7 @@ export type GetEntriesRelationsResult = {
 };
 
 const validationRules = {
-    [`${Entry.tableName}.${EntryColumn.CreatedAt}`]: z.string(),
+    [`${Entry.tableName}.${EntryColumn.CreatedAt}`]: zc.stringSqlTimestampz(),
     [`${Entry.tableName}.${EntryColumn.EntryId}`]: z.string(),
 } as const;
 
