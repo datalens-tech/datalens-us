@@ -98,13 +98,12 @@ export const getEntriesRelations = async (
 
     const relatedEntriesQuery = EntryRelation.getSelectQuery(getReplica(trx), {
         entryIds,
+        tenantId,
         searchDirection,
         scope,
     });
 
     const {result: relatedEntries, nextPageToken} = await paginator.execute(relatedEntriesQuery);
-
-    // CHECK TENANT FOR RELATED ENTRIES ???
 
     const workbookEntries = relatedEntries.filter((entry) => entry.workbookId);
     const collectionEntries = relatedEntries.filter((entry) => entry.collectionId);

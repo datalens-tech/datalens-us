@@ -12,6 +12,7 @@ import {SearchDirection} from './types';
 export interface EntryRelationsArgs {
     entryIds: string[];
     searchDirection: SearchDirection;
+    tenantId: string;
     scope?: EntryScope;
 }
 
@@ -26,7 +27,7 @@ export class EntryRelation extends Model {
 
     static getSelectQuery(
         trx: TransactionOrKnex,
-        {entryIds, searchDirection, scope}: EntryRelationsArgs,
+        {entryIds, tenantId, searchDirection, scope}: EntryRelationsArgs,
     ): QueryBuilder<EntryRelation, EntryRelation[]> {
         const isChildrenSearch = searchDirection === SearchDirection.Children;
 
@@ -34,6 +35,7 @@ export class EntryRelation extends Model {
             .select(this.selectedColumns)
             .join(Link.tableName, this.joinLinks(isChildrenSearch))
             .join(RevisionModel.tableName, this.joinRevision)
+            .where(`${Entry.tableName}.${EntryColumn.TenantId}`, tenantId)
             .whereIn(
                 isChildrenSearch
                     ? `${Link.tableName}.${LinkColumn.FromId}`
