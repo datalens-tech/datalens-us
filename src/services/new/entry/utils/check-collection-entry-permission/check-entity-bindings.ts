@@ -407,7 +407,7 @@ async function checkEntryByWorkbook(
     },
 ) {
     const workbook = await getWorkbook(
-        {ctx, trx},
+        {ctx, trx, skipLicenseCheck: true},
         {workbookId, getParentsQueryTimeout, getWorkbookQueryTimeout, includePermissionsInfo: true},
     );
     const permissions = getEntryPermissionsByWorkbook({workbook, scope}) as EntryPermissions;

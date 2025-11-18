@@ -18,7 +18,7 @@ export interface CreateCollectionArgs {
 }
 
 export const createCollection = async (
-    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipLicenseCheck, skipCheckPermissions = false}: ServiceArgs,
     args: CreateCollectionArgs,
 ) => {
     const {title, description, parentId} = args;
@@ -37,7 +37,7 @@ export const createCollection = async (
         isPrivateRoute,
     } = ctx.get('info');
 
-    if (!isPrivateRoute) {
+    if (!isPrivateRoute && !skipLicenseCheck) {
         const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
         await fetchAndValidateLicenseOrFail({ctx});
     }

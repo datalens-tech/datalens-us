@@ -52,7 +52,7 @@ export const checkWorkbookPermissionById = async ({
     getWorkbookQueryTimeout?: number;
 }) => {
     const workbook = await getWorkbook(
-        {ctx, skipValidation: true, skipCheckPermissions: true},
+        {ctx, skipValidation: true, skipCheckPermissions: true, skipLicenseCheck: true},
         {workbookId, getParentsQueryTimeout, getWorkbookQueryTimeout},
     );
 

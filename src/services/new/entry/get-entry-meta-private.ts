@@ -48,7 +48,10 @@ export const getEntryMetaPrivate = async (
 
     if (entryMeta.workbookId) {
         try {
-            await getWorkbook({ctx, trx}, {workbookId: entryMeta.workbookId});
+            await getWorkbook(
+                {ctx, trx, skipLicenseCheck: true},
+                {workbookId: entryMeta.workbookId},
+            );
         } catch (error) {
             const err = error as AppError;
             if (err.code === US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED) {

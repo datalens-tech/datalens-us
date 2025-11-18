@@ -418,7 +418,7 @@ class Lock extends Model {
         if (entry.workbookId) {
             if (accessServiceEnabled) {
                 const workbook = await getWorkbook(
-                    {ctx, skipCheckPermissions: true},
+                    {ctx, skipCheckPermissions: true, skipLicenseCheck: true},
                     {workbookId: entry.workbookId},
                 );
 

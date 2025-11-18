@@ -110,7 +110,7 @@ export const checkWorkbookEntriesByPermission = async <T extends PartialEntry>(
     ];
 
     const workbookList = await getWorkbooksListByIds(
-        {ctx, trx: getReplica(trx)},
+        {ctx, trx: getReplica(trx), skipLicenseCheck: true},
         {
             workbookIds,
             includePermissionsInfo: true,

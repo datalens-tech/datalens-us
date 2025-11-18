@@ -84,7 +84,7 @@ export const renameEntry = async (ctx: CTX, renameEntryData: RenameEntryData) =>
         if (renamingEntry.workbookId) {
             if (!isPrivateRoute) {
                 const workbook = await getWorkbook(
-                    {ctx, trx: Entry.replica},
+                    {ctx, trx: Entry.replica, skipLicenseCheck: true},
                     {workbookId: renamingEntry.workbookId},
                 );
 

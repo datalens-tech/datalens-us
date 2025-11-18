@@ -67,7 +67,13 @@ export const moveWorkbook = async (
 
         if (newCollectionId) {
             const newCollection = await getCollection(
-                {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions: true},
+                {
+                    ctx,
+                    trx: targetTrx,
+                    skipValidation: true,
+                    skipCheckPermissions: true,
+                    skipLicenseCheck: true,
+                },
                 {collectionId: newCollectionId},
             );
 

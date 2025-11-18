@@ -121,7 +121,7 @@ export const getEntryByKey = async (
         if (joinedEntryRevision.workbookId) {
             if (!isPrivateRoute) {
                 const workbook = await getWorkbook(
-                    {ctx, trx},
+                    {ctx, trx, skipLicenseCheck: true},
                     {workbookId: joinedEntryRevision.workbookId, includePermissionsInfo},
                 );
 

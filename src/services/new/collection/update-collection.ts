@@ -19,15 +19,20 @@ export interface UpdateCollectionArgs {
 }
 
 export const updateCollection = async (
-    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipLicenseCheck, skipCheckPermissions = false}: ServiceArgs,
     args: UpdateCollectionArgs,
 ) => {
     const {collectionId, title: newTitle, description: newDescription} = args;
 
+    const {isPrivateRoute} = ctx.get('info');
+
     const registry = ctx.get('registry');
 
     const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
-    await fetchAndValidateLicenseOrFail({ctx});
+
+    if (!skipLicenseCheck && !isPrivateRoute) {
+        await fetchAndValidateLicenseOrFail({ctx});
+    }
 
     const {
         user: {userId},
@@ -44,7 +49,13 @@ export const updateCollection = async (
     const targetTrx = getPrimary(trx);
 
     const collection = await getCollection(
-        {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions: true},
+        {
+            ctx,
+            trx: targetTrx,
+            skipValidation: true,
+            skipCheckPermissions: true,
+            skipLicenseCheck: true,
+        },
         {collectionId},
     );
 

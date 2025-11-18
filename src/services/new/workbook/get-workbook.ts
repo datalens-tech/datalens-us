@@ -17,7 +17,7 @@ export interface GetWorkbookArgs {
 }
 
 export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>(
-    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipLicenseCheck, skipCheckPermissions = false}: ServiceArgs,
     args: GetWorkbookArgs,
 ): Promise<T> => {
     const {
@@ -37,8 +37,9 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
 
     const registry = ctx.get('registry');
 
-    if (!isPrivateRoute) {
-        const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+    const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+
+    if (!isPrivateRoute && !skipLicenseCheck) {
         await fetchAndValidateLicenseOrFail({ctx});
     }
 

@@ -59,7 +59,7 @@ export async function checkEntry(ctx: CTX, trx: TransactionOrKnex, data: CheckEn
 
     if (workbookId) {
         await getWorkbook(
-            {ctx, trx, skipValidation: true, skipCheckPermissions: true},
+            {ctx, trx, skipValidation: true, skipCheckPermissions: true, skipLicenseCheck: true},
             {workbookId},
         );
     } else {

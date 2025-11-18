@@ -11,7 +11,7 @@ type GetWorkbooksListAndAllParentsArgs = {
 };
 
 export const getWorkbooksListByIds = async (
-    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipLicenseCheck, skipCheckPermissions = false}: ServiceArgs,
     args: GetWorkbooksListAndAllParentsArgs,
 ) => {
     const {workbookIds, includePermissionsInfo = false} = args;
@@ -24,8 +24,9 @@ export const getWorkbooksListByIds = async (
     const {tenantId, isPrivateRoute} = ctx.get('info');
     const registry = ctx.get('registry');
 
-    if (!isPrivateRoute) {
-        const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+    const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+
+    if (!isPrivateRoute && !skipLicenseCheck) {
         await fetchAndValidateLicenseOrFail({ctx});
     }
 

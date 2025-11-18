@@ -137,6 +137,7 @@ export async function getEntryRelations(
             {
                 ctx,
                 trx: getReplica(trx),
+                skipLicenseCheck: true,
             },
             {workbookId: entry.workbookId, includePermissionsInfo},
         );

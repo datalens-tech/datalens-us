@@ -142,7 +142,7 @@ export async function createEntryInWorkbook(
     const {accessServiceEnabled} = ctx.config;
 
     const workbook = await getWorkbook(
-        {ctx, skipCheckPermissions: isPrivateRoute},
+        {ctx, skipCheckPermissions: isPrivateRoute, skipLicenseCheck: true},
         {workbookId, includePermissionsInfo},
     );
 

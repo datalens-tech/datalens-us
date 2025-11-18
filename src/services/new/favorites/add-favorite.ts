@@ -45,7 +45,7 @@ export const addFavorite = async ({ctx, trx}: ServiceArgs, {entryId}: AddFavorit
     }
 
     if (entry.workbookId) {
-        await getWorkbook({ctx}, {workbookId: entry.workbookId});
+        await getWorkbook({ctx, skipLicenseCheck: true}, {workbookId: entry.workbookId});
     } else if (entry.collectionId) {
         await checkSharedEntryPermission(
             {ctx, trx},

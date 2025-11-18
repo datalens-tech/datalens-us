@@ -21,12 +21,12 @@ export interface DeleteCollectionArgs {
 }
 
 export const deleteCollections = async (
-    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipLicenseCheck, skipCheckPermissions = false}: ServiceArgs,
     args: DeleteCollectionArgs,
 ) => {
     const {collectionIds} = args;
 
-    const {tenantId} = ctx.get('info');
+    const {tenantId, isPrivateRoute} = ctx.get('info');
 
     ctx.log('DELETE_COLLECTIONS_START', {
         collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),
@@ -37,10 +37,13 @@ export const deleteCollections = async (
     const registry = ctx.get('registry');
 
     const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
-    await fetchAndValidateLicenseOrFail({ctx});
+
+    if (!skipLicenseCheck && !isPrivateRoute) {
+        await fetchAndValidateLicenseOrFail({ctx});
+    }
 
     const collectionsInstances = await getCollectionsListByIds(
-        {ctx, trx: getReplica(trx), skipCheckPermissions: true},
+        {ctx, trx: getReplica(trx), skipCheckPermissions: true, skipLicenseCheck: true},
         {collectionIds},
     );
 
@@ -134,7 +137,7 @@ export const deleteCollections = async (
         if (workbookIds.length) {
             deletedCollectionsEntitiesPromises.push(
                 deleteWorkbooks(
-                    {ctx, trx: transactionTrx, skipCheckPermissions: true},
+                    {ctx, trx: transactionTrx, skipCheckPermissions: true, skipLicenseCheck: true},
                     {
                         workbookIds,
                         detachDeletePermissions: true,

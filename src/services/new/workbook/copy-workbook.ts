@@ -75,7 +75,7 @@ export const copyWorkbook = async (
 
     if (newCollectionId) {
         await getCollection(
-            {ctx, trx, skipValidation: true, skipCheckPermissions: true},
+            {ctx, trx, skipValidation: true, skipCheckPermissions: true, skipLicenseCheck: true},
             {collectionId: newCollectionId},
         );
     }
