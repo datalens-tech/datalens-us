@@ -2,15 +2,15 @@ import {AppError} from '@gravity-ui/nodekit';
 import {Model, QueryBuilder, raw, ref} from 'objection';
 import {z} from 'zod';
 
-import {US_ERRORS} from '../const';
+import {OrderBy, US_ERRORS} from '../const';
 
 export interface PaginatorConfig<TFields extends string = string> {
     sortField: TFields;
     tiebreakerField: TFields;
-    direction: 'asc' | 'desc';
-    limit?: number;
+    validationRules: Record<TFields, z.ZodSchema>;
+    direction: OrderBy;
+    limit: number;
     pageToken?: string;
-    validationRules: Record<TFields, z.ZodSchema<any>>;
 }
 
 export interface PaginationResult<T> {
@@ -18,33 +18,34 @@ export interface PaginationResult<T> {
     nextPageToken?: string;
 }
 
-const CursorColumn = '$cursor';
+const CURSOR_SORT_COLUMN = '$cursorSort';
+const CURSOR_TIEBREAKER_COLUMN = '$cursorTiebreaker';
 
-type ItemWithCursor<T> = T & {[CursorColumn]: string};
+type ItemWithCursor<T> = T & {[CURSOR_SORT_COLUMN]: string; [CURSOR_TIEBREAKER_COLUMN]: string};
 
-function encodeCursorPageToken(cursorValue: string, tiebreakerValue: string): string {
+const encodeCursorPageToken = (cursorValue: string, tiebreakerValue: string) => {
     const payload = JSON.stringify([cursorValue, tiebreakerValue]);
     return Buffer.from(payload, 'utf8').toString('base64url');
-}
+};
 
-function decodeCursorPageToken<TFields extends string>(params: {
-    token: string;
+const decodeCursorPageToken = <TFields extends string>(params: {
     sortField: TFields;
     tiebreakerField: TFields;
-    validationRules: Record<TFields, z.ZodSchema<any>>;
-}): [string, string] {
+    validationRules: Record<TFields, z.ZodSchema>;
+    pageToken: string;
+}) => {
     try {
-        const {token, sortField, tiebreakerField, validationRules} = params;
-        const payload = Buffer.from(token, 'base64url').toString('utf8');
-        const parsed = JSON.parse(payload);
+        const {sortField, tiebreakerField, validationRules, pageToken} = params;
 
-        const sortFieldSchema = validationRules[sortField];
-        const tiebreakerSchema = validationRules[tiebreakerField];
+        const payload = Buffer.from(pageToken, 'base64url').toString('utf8');
+        const parsedPayload = JSON.parse(payload);
 
-        const result = z.tuple([sortFieldSchema, tiebreakerSchema]).safeParse(parsed);
+        const result = z
+            .tuple([validationRules[sortField], validationRules[tiebreakerField]])
+            .safeParse(parsedPayload);
 
         if (!result.success) {
-            throw new AppError(`Invalid cursor token: ${result.error.message}`, {
+            throw new AppError(`Invalid page token: ${result.error.message}`, {
                 code: US_ERRORS.INVALID_PAGE_TOKEN,
             });
         }
@@ -55,22 +56,17 @@ function decodeCursorPageToken<TFields extends string>(params: {
             throw error;
         }
         throw new AppError(
-            `Invalid cursor token: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            `Invalid page token: ${error instanceof Error ? error.message : 'Unknown error'}`,
             {
                 code: US_ERRORS.INVALID_PAGE_TOKEN,
             },
         );
     }
-}
+};
 
 export function createPaginator<TFields extends string>(config: PaginatorConfig<TFields>) {
-    const normalizedConfig = {
-        limit: 100,
-        ...config,
-    };
-
-    function onBuild<T>(builder: QueryBuilder<any, ItemWithCursor<T>[]>) {
-        const {sortField, tiebreakerField, direction, limit, pageToken} = normalizedConfig;
+    const onBuild = <M extends Model>(builder: QueryBuilder<M, M[]>) => {
+        const {sortField, tiebreakerField, validationRules, direction, limit, pageToken} = config;
 
         if (!builder.hasSelects()) {
             throw new AppError('The query requires select statement', {
@@ -78,17 +74,20 @@ export function createPaginator<TFields extends string>(config: PaginatorConfig<
             });
         }
 
-        builder.select(ref(sortField).castText().as(CursorColumn));
+        builder.select(
+            ref(sortField).castText().as(CURSOR_SORT_COLUMN),
+            ref(tiebreakerField).castText().as(CURSOR_TIEBREAKER_COLUMN),
+        );
 
         if (pageToken) {
             const [cursorValue, tiebreakerValue] = decodeCursorPageToken({
-                token: pageToken,
-                sortField: normalizedConfig.sortField,
-                tiebreakerField: normalizedConfig.tiebreakerField,
-                validationRules: normalizedConfig.validationRules,
+                sortField,
+                tiebreakerField,
+                validationRules,
+                pageToken,
             });
 
-            const operator = direction === 'asc' ? '>' : '<';
+            const operator = direction === OrderBy.Asc ? '>' : '<';
 
             builder.where(
                 raw(`(??, ??) ${operator} (?, ?)`, [
@@ -104,36 +103,36 @@ export function createPaginator<TFields extends string>(config: PaginatorConfig<
             .orderBy(sortField, direction)
             .orderBy(tiebreakerField, direction)
             .limit(limit + 1);
-    }
+    };
 
-    function processResults<T>(results: ItemWithCursor<T>[]): PaginationResult<T> {
-        const {limit, tiebreakerField} = normalizedConfig;
+    const processResults = <M extends Model>(results: ItemWithCursor<M>[]): PaginationResult<M> => {
+        const {limit} = config;
+
         const hasMore = results.length > limit;
         let nextPageToken: string | undefined;
 
         if (hasMore) {
             const lastItem = results[limit - 1];
-            const sortValue = lastItem[CursorColumn];
-            const tiebreakerValue = String((lastItem as any)[tiebreakerField]);
+
+            const sortValue = lastItem[CURSOR_SORT_COLUMN];
+            const tiebreakerValue = lastItem[CURSOR_TIEBREAKER_COLUMN];
 
             nextPageToken = encodeCursorPageToken(sortValue, tiebreakerValue);
         }
 
         return {
-            result: results.slice(0, limit) as T[],
+            result: results.slice(0, limit) as M[],
             nextPageToken,
         };
-    }
+    };
 
     return {
-        async execute<M extends Model, T>(
-            query: QueryBuilder<M, T[]>,
-        ): Promise<PaginationResult<T>> {
-            const paginatedQuery = query.onBuild((builder) =>
-                onBuild<T>(builder as QueryBuilder<M, ItemWithCursor<T>[]>),
-            );
-            const results = (await paginatedQuery) as ItemWithCursor<T>[];
-            return processResults<T>(results);
+        async execute<M extends Model>(query: QueryBuilder<M, M[]>): Promise<PaginationResult<M>> {
+            const paginatedQuery = query.onBuild((builder) => onBuild(builder));
+
+            const results = (await paginatedQuery) as ItemWithCursor<M>[];
+
+            return processResults<M>(results);
         },
     };
 }
