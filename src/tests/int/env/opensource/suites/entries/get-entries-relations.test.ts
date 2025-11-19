@@ -115,7 +115,7 @@ describe('Get entries relations', () => {
         const response = await auth(request(app).post(routes.getEntriesRelations))
             .send({
                 entryIds: [connectionId, widgetId],
-                searchDirection: 'parents',
+                linkDirection: 'to',
             })
             .expect(200);
 

@@ -1,4 +1,4 @@
-export enum SearchDirection {
-    Parents = 'parents',
-    Children = 'children',
+export enum LinkDirection {
+    From = 'from',
+    To = 'to',
 }

@@ -5,14 +5,14 @@ import {makeReqParser, z, zc} from '../../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../../const';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import {getEntriesRelations} from '../../../services/new/entry';
-import {SearchDirection} from '../../../services/new/entry/get-entries-relations/types';
+import {LinkDirection} from '../../../services/new/entry/get-entries-relations/types';
 
 import {getEntriesRelationsResult} from './response-model';
 
 const requestSchema = {
     body: z.object({
         entryIds: zc.encodedIdArray({min: 1, max: 1000}),
-        searchDirection: z.nativeEnum(SearchDirection).optional(),
+        linkDirection: z.nativeEnum(LinkDirection).optional(),
         includePermissionsInfo: z.boolean().optional(),
         limit: z.number().min(1).max(1000).optional(),
         pageToken: z.string().optional(),
@@ -29,7 +29,7 @@ export const getEntriesRelationsController = async (req: Request, res: Response)
         {ctx: req.ctx},
         {
             entryIds: body.entryIds,
-            searchDirection: body.searchDirection,
+            linkDirection: body.linkDirection,
             includePermissionsInfo: body.includePermissionsInfo,
             limit: body.limit,
             pageToken: body.pageToken,

@@ -17,11 +17,11 @@ import {
 } from '../utils/check-entries-by-permission';
 
 import {EntryRelation} from './entry-relation-presentation';
-import {SearchDirection} from './types';
+import {LinkDirection} from './types';
 
 export type GetEntriesRelationsArgs = {
     entryIds: string[];
-    searchDirection?: SearchDirection;
+    linkDirection?: LinkDirection;
     includePermissionsInfo?: boolean;
     scope?: EntryScope;
     limit?: number;
@@ -51,13 +51,13 @@ export const getEntriesRelations = async (
         scope,
         limit = 100,
         pageToken,
-        searchDirection = SearchDirection.Children,
+        linkDirection = LinkDirection.From,
         includePermissionsInfo = false,
     } = args;
 
     ctx.log('GET_ENTRIES_RELATIONS_REQUEST', {
         entryIds: await Utils.macrotasksMap(rawEntryIds, (id) => Utils.encodeId(id)),
-        searchDirection,
+        linkDirection,
         scope,
         limit,
         pageToken,
@@ -99,7 +99,7 @@ export const getEntriesRelations = async (
     const relatedEntriesQuery = EntryRelation.getSelectQuery(getReplica(trx), {
         entryIds,
         tenantId,
-        searchDirection,
+        linkDirection,
         scope,
     });
 

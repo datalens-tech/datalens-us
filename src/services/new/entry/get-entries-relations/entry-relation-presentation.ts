@@ -7,11 +7,11 @@ import {EntryScope} from '../../../../db/models/new/entry/types';
 import {Link, LinkColumn} from '../../../../db/models/new/link';
 import {RevisionModel, RevisionModelColumn} from '../../../../db/models/new/revision';
 
-import {SearchDirection} from './types';
+import {LinkDirection} from './types';
 
 type EntryRelationArgs = {
     entryIds: string[];
-    searchDirection: SearchDirection;
+    linkDirection: LinkDirection;
     tenantId: string;
     scope?: EntryScope;
 };
@@ -27,19 +27,19 @@ export class EntryRelation extends Model {
 
     static getSelectQuery(
         trx: TransactionOrKnex,
-        {entryIds, tenantId, searchDirection, scope}: EntryRelationArgs,
+        {entryIds, tenantId, linkDirection, scope}: EntryRelationArgs,
     ): QueryBuilder<EntryRelation, EntryRelation[]> {
-        const isChildrenSearch = searchDirection === SearchDirection.Children;
+        const isToDirection = linkDirection === LinkDirection.To;
 
         const query = Entry.query(trx)
             .select(this.selectedColumns)
-            .join(Link.tableName, this.joinLinks(isChildrenSearch))
+            .join(Link.tableName, this.joinLinks(isToDirection))
             .join(RevisionModel.tableName, this.joinRevision)
             .where(`${Entry.tableName}.${EntryColumn.TenantId}`, tenantId)
             .whereIn(
-                isChildrenSearch
-                    ? `${Link.tableName}.${LinkColumn.FromId}`
-                    : `${Link.tableName}.${LinkColumn.ToId}`,
+                isToDirection
+                    ? `${Link.tableName}.${LinkColumn.ToId}`
+                    : `${Link.tableName}.${LinkColumn.FromId}`,
                 entryIds,
             )
             .where(`${Entry.tableName}.${EntryColumn.IsDeleted}`, false);
@@ -51,12 +51,12 @@ export class EntryRelation extends Model {
         return query as unknown as QueryBuilder<EntryRelation, EntryRelation[]>;
     }
 
-    protected static joinLinks(isChildrenSearch: boolean) {
+    protected static joinLinks(isToDirection: boolean) {
         return (builder: Knex.JoinClause) => {
             builder.on(
-                isChildrenSearch
-                    ? `${Link.tableName}.${LinkColumn.ToId}`
-                    : `${Link.tableName}.${LinkColumn.FromId}`,
+                isToDirection
+                    ? `${Link.tableName}.${LinkColumn.FromId}`
+                    : `${Link.tableName}.${LinkColumn.ToId}`,
                 `${Entry.tableName}.${EntryColumn.EntryId}`,
             );
         };
