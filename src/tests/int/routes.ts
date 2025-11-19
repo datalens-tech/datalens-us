@@ -27,4 +27,5 @@ export const routes = {
     privateSetIsTemplateWorkbook: (workbookId: string) =>
         `/private/v2/workbooks/${workbookId}/setIsTemplate`,
     getEntriesRelations: '/v1/get-entries-relations',
+    privateGetEntriesRelations: '/private/v1/get-entries-relations',
 } as const;

@@ -1,7 +1,7 @@
 import request from 'supertest';
 
 import {routes} from '../../../../routes';
-import {app, auth} from '../../auth';
+import {app, auth, authMasterToken, testTenantId} from '../../auth';
 import {createMockWorkbook, createMockWorkbookEntry} from '../../helpers';
 
 let workbookId: string;
@@ -16,7 +16,7 @@ const commonExpect = {
     createdAt: expect.any(String),
     meta: null,
     public: false,
-    tenantId: 'org_test-tenant-id',
+    tenantId: testTenantId,
     collectionId: null,
     links: null,
     isLocked: false,
@@ -70,6 +70,15 @@ describe('Get entries relations', () => {
         });
 
         dashId = dashEntry.entryId;
+    });
+
+    test('Get entries relations auth error', async () => {
+        await request(app)
+            .post(routes.getEntriesRelations)
+            .send({
+                entryIds: [dashId],
+            })
+            .expect(401);
     });
 
     test('Get children entries relations by entryIds', async () => {
@@ -201,5 +210,65 @@ describe('Get entries relations', () => {
                 },
             ],
         });
+    });
+
+    test('Get entries relations with permissions info', async () => {
+        const response = await auth(request(app).post(routes.getEntriesRelations))
+            .send({
+                entryIds: [dashId],
+                includePermissionsInfo: true,
+            })
+            .expect(200);
+
+        expect(response.body).toStrictEqual({
+            relations: [
+                {
+                    ...commonExpect,
+                    entryId: datasetId,
+                    scope: 'dataset',
+                    type: 'dataset-type',
+                    workbookId: workbookId,
+                    links: {
+                        [connectionId]: connectionId,
+                    },
+                    permissions: {
+                        admin: false,
+                        edit: false,
+                        execute: true,
+                        read: true,
+                    },
+                },
+                {
+                    ...commonExpect,
+                    entryId: widgetId,
+                    scope: 'widget',
+                    type: 'widget-type',
+                    workbookId: workbookId,
+                    permissions: {
+                        admin: false,
+                        edit: false,
+                        execute: true,
+                        read: true,
+                    },
+                },
+            ],
+        });
+    });
+
+    test('Private endpoint. Get entries relations auth error', async () => {
+        await request(app)
+            .post(routes.privateGetEntriesRelations)
+            .send({
+                entryIds: [dashId],
+            })
+            .expect(403);
+    });
+
+    test('Private endpoint. Get entries relations successful', async () => {
+        await authMasterToken(request(app).post(routes.privateGetEntriesRelations))
+            .send({
+                entryIds: [dashId],
+            })
+            .expect(200);
     });
 });

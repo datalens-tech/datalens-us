@@ -12,7 +12,6 @@ export const mockWorkbookEntry = {
     data: null,
     meta: null,
     mode: undefined,
-    links: null,
 };
 
 type OptionsArgs = {
@@ -41,7 +40,7 @@ export const createMockWorkbookEntry = async (
     const data = args.data ?? mockWorkbookEntry.data;
     const meta = args.meta ?? mockWorkbookEntry.meta;
     const mode = args.mode ?? mockWorkbookEntry.mode;
-    const links = args.links ?? mockWorkbookEntry.links;
+    const links = args?.links;
 
     const response = await auth(request(app).post(routes.entries), {
         ...options?.authArgs,

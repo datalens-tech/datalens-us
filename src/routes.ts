@@ -196,7 +196,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             handler: entries.getEntriesRelationsController,
         }),
         privateGetEntriesRelations: makeRoute({
-            route: 'POST /private/get-entries-relations',
+            route: 'POST /private/v1/get-entries-relations',
             handler: entries.getEntriesRelationsController,
             authPolicy: AuthPolicy.disabled,
             private: true,
