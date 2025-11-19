@@ -19,5 +19,5 @@ export type ProcessTenantSettings = (args: {
     ctx: AppContext;
     trx?: TransactionOrKnex;
     key: string;
-    value: string | boolean | number;
+    value: string | boolean | number | null;
 }) => Promise<void>;

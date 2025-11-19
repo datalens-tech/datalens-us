@@ -1,3 +1,3 @@
 import {z} from 'zod';
 
-export const primitive = () => z.union([z.string(), z.number(), z.boolean()]);
+export const primitive = () => z.union([z.boolean(), z.string(), z.number(), z.null()]);

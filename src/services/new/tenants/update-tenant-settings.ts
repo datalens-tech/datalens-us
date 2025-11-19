@@ -10,7 +10,7 @@ import {getPrimary} from '../utils';
 
 type UpdateTenantSettingsArgs = {
     key: string;
-    value: string | boolean | number;
+    value: string | boolean | number | null;
 };
 
 export const updateTenantSettings = async (

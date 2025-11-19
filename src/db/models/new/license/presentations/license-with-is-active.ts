@@ -4,7 +4,7 @@ import {CURRENT_TIMESTAMP} from '../../../../../const';
 import {License, LicenseColumnRaw} from '../index';
 
 export class LicenseWithIsActive extends License {
-    protected static get selectedColumns() {
+    static get selectedColumns() {
         return [
             '*',
             raw(`?? > ? OR ?? IS NULL`, [
