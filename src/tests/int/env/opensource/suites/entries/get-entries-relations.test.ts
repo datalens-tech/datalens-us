@@ -1,7 +1,8 @@
 import request from 'supertest';
 
-import {app, auth} from '../../../platform/auth';
-import {createMockWorkbook, createMockWorkbookEntry} from '../../../platform/helpers';
+import {routes} from '../../../../routes';
+import {app, auth} from '../../auth';
+import {createMockWorkbook, createMockWorkbookEntry} from '../../helpers';
 
 let workbookId: string;
 
@@ -72,7 +73,7 @@ describe('Get entries relations', () => {
     });
 
     test('Get children entries relations by entryIds', async () => {
-        const response = await auth(request(app).post('/v1/get-entries-relations'))
+        const response = await auth(request(app).post(routes.getEntriesRelations))
             .send({
                 entryIds: [dashId],
             })
@@ -102,7 +103,7 @@ describe('Get entries relations', () => {
     });
 
     test('Get parent entries relations by entryIds', async () => {
-        const response = await auth(request(app).post('/v1/get-entries-relations'))
+        const response = await auth(request(app).post(routes.getEntriesRelations))
             .send({
                 entryIds: [connectionId, widgetId],
                 searchDirection: 'parents',
@@ -137,7 +138,7 @@ describe('Get entries relations', () => {
     });
 
     test('Get entries relations filtered by scope', async () => {
-        const response = await auth(request(app).post('/v1/get-entries-relations'))
+        const response = await auth(request(app).post(routes.getEntriesRelations))
             .send({
                 entryIds: [dashId],
                 scope: 'widget',
@@ -158,7 +159,7 @@ describe('Get entries relations', () => {
     });
 
     test('Get entries relations with pagination', async () => {
-        const response1 = await auth(request(app).post('/v1/get-entries-relations'))
+        const response1 = await auth(request(app).post(routes.getEntriesRelations))
             .send({
                 entryIds: [dashId],
                 limit: 1,
@@ -181,7 +182,7 @@ describe('Get entries relations', () => {
             nextPageToken: expect.any(String),
         });
 
-        const response2 = await auth(request(app).post('/v1/get-entries-relations'))
+        const response2 = await auth(request(app).post(routes.getEntriesRelations))
             .send({
                 entryIds: [dashId],
                 limit: 1,

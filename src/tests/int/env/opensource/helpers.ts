@@ -12,6 +12,7 @@ export const mockWorkbookEntry = {
     data: null,
     meta: null,
     mode: undefined,
+    links: null,
 };
 
 type OptionsArgs = {
@@ -26,6 +27,7 @@ type CreateMockWorkbookEntryArgs = {
     meta?: Record<string, string>;
     data?: Record<string, string | boolean>;
     mode?: 'save' | 'publish';
+    links?: Record<string, string>;
 };
 
 export const createMockWorkbookEntry = async (
@@ -39,6 +41,7 @@ export const createMockWorkbookEntry = async (
     const data = args.data ?? mockWorkbookEntry.data;
     const meta = args.meta ?? mockWorkbookEntry.meta;
     const mode = args.mode ?? mockWorkbookEntry.mode;
+    const links = args.links ?? mockWorkbookEntry.links;
 
     const response = await auth(request(app).post(routes.entries), {
         ...options?.authArgs,
@@ -52,6 +55,7 @@ export const createMockWorkbookEntry = async (
             meta,
             workbookId,
             mode,
+            links,
         })
         .expect(200);
 
