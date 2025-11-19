@@ -9,12 +9,12 @@ import {RevisionModel, RevisionModelColumn} from '../../../../db/models/new/revi
 
 import {SearchDirection} from './types';
 
-export interface EntryRelationsArgs {
+type EntryRelationArgs = {
     entryIds: string[];
     searchDirection: SearchDirection;
     tenantId: string;
     scope?: EntryScope;
-}
+};
 
 export class EntryRelation extends Model {
     static get tableName() {
@@ -27,7 +27,7 @@ export class EntryRelation extends Model {
 
     static getSelectQuery(
         trx: TransactionOrKnex,
-        {entryIds, tenantId, searchDirection, scope}: EntryRelationsArgs,
+        {entryIds, tenantId, searchDirection, scope}: EntryRelationArgs,
     ): QueryBuilder<EntryRelation, EntryRelation[]> {
         const isChildrenSearch = searchDirection === SearchDirection.Children;
 
