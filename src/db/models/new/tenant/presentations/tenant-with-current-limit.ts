@@ -18,7 +18,7 @@ export class TenantWithCurrentLimit extends Tenant {
                 raw(`?? IS NOT NULL AND ?? > ?`, [
                     `${Tenant.tableName}.${TenantColumn.TrialEndedAt}`,
                     `${Tenant.tableName}.${TenantColumn.TrialEndedAt}`,
-                    raw(CURRENT_TIMESTAMP),
+                    checkTimestamp,
                 ]).as('trial_is_active'),
                 this.getCurrentLicenseLimitSubQuery({
                     trx,
