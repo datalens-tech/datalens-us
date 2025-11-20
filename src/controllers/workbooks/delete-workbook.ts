@@ -31,6 +31,7 @@ export const deleteWorkbookController: AppRouteHandler = async (
         const result = await deleteWorkbooks(
             {
                 ctx: req.ctx,
+                checkLicense: true,
             },
             {
                 workbookIds: [params.workbookId],

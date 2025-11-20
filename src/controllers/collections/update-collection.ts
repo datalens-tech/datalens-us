@@ -32,7 +32,7 @@ export const updateCollectionController: AppRouteHandler = async (req, res) => {
 
     try {
         const result = await updateCollection(
-            {ctx: req.ctx},
+            {ctx: req.ctx, checkLicense: true},
             {
                 collectionId: params.collectionId,
                 title: body.title?.trim(),
