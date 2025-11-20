@@ -31,6 +31,8 @@ export const updateEntryController: AppRouteHandler = async (req, res) => {
             updateRevision: body.updateRevision,
             checkServicePlan: body.checkServicePlan,
             checkTenantFeatures: body.checkTenantFeatures,
+            version: body.version,
+            sourceVersion: body.sourceVersion,
         });
 
         logEvent({

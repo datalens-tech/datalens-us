@@ -101,14 +101,6 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             write: true,
             requireCtxTenantId: true,
         }),
-        privateCreateEntryAlt: makeRoute({
-            route: 'POST /private/createEntry',
-            handler: entries.createEntryAltController,
-            authPolicy: AuthPolicy.disabled,
-            private: true,
-            write: true,
-            requireCtxTenantId: true,
-        }),
 
         updateEntry: makeRoute({
             route: 'POST /v1/entries/:entryId',
