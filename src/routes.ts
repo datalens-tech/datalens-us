@@ -13,6 +13,8 @@ import locks from './controllers/locks';
 import states from './controllers/states';
 import structureItems from './controllers/structure-items';
 import tenants from './controllers/tenants';
+import testGraphController from './controllers/test-graph';
+import testPresentationsController from './controllers/test-presentations';
 import workbooks from './controllers/workbooks';
 
 export type GetRoutesOptions = {
@@ -35,6 +37,17 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
     });
 
     const routes = {
+        testGraph: makeRoute({
+            route: 'GET /test-graph',
+            handler: testGraphController,
+            authPolicy: AuthPolicy.disabled,
+        }),
+        testPresentations: makeRoute({
+            route: 'GET /test-presentations',
+            handler: testPresentationsController,
+            authPolicy: AuthPolicy.disabled,
+        }),
+
         home: makeRoute({
             route: 'GET /',
             handler: homeController,
