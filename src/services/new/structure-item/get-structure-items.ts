@@ -66,12 +66,7 @@ export const getStructureItems = async (
     let parentIds: string[] = [];
     if (collectionId) {
         const collection = await getCollection(
-            {
-                ctx,
-                trx: targetTrx,
-                skipValidation: true,
-                skipCheckPermissions,
-            },
+            {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions},
             {collectionId},
         );
 

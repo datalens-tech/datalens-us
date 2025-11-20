@@ -49,12 +49,7 @@ export const updateCollection = async (
     const targetTrx = getPrimary(trx);
 
     const collection = await getCollection(
-        {
-            ctx,
-            trx: targetTrx,
-            skipValidation: true,
-            skipCheckPermissions: true,
-        },
+        {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions: true},
         {collectionId},
     );
 

@@ -59,12 +59,7 @@ export const updateWorkbook = async (
     const targetTrx = getPrimary(trx);
 
     const workbook = await getWorkbook(
-        {
-            ctx,
-            trx: targetTrx,
-            skipValidation: true,
-            skipCheckPermissions: true,
-        },
+        {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions: true},
         {workbookId},
     );
 

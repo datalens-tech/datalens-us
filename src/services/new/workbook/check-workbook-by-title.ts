@@ -44,12 +44,7 @@ export const checkWorkbookByTitle = async (
 
     if (collectionId) {
         await getCollection(
-            {
-                ctx,
-                trx: targetTrx,
-                skipValidation: true,
-                skipCheckPermissions,
-            },
+            {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions},
             {collectionId},
         );
     }
