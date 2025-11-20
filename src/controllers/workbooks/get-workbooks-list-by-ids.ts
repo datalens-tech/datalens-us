@@ -22,7 +22,10 @@ export const getWorkbooksListByIdsController: AppRouteHandler = async (
     const {body} = await parseReq(req);
 
     const result = await getWorkbooksListByIds(
-        {ctx: req.ctx, checkLicense: true},
+        {
+            ctx: req.ctx,
+            checkLicense: true,
+        },
         {
             workbookIds: body.workbookIds,
         },

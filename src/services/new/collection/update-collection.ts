@@ -24,7 +24,10 @@ export const updateCollection = async (
 ) => {
     const {collectionId, title: newTitle, description: newDescription} = args;
 
-    const {isPrivateRoute} = ctx.get('info');
+    const {
+        user: {userId},
+        isPrivateRoute,
+    } = ctx.get('info');
 
     const registry = ctx.get('registry');
 
@@ -33,10 +36,6 @@ export const updateCollection = async (
     if (checkLicense && !isPrivateRoute) {
         await fetchAndValidateLicenseOrFail({ctx});
     }
-
-    const {
-        user: {userId},
-    } = ctx.get('info');
 
     const {accessServiceEnabled} = ctx.config;
 

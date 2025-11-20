@@ -22,7 +22,10 @@ export const getCollectionController: AppRouteHandler = async (req, res) => {
     const {params, query} = await parseReq(req);
 
     const result = await getCollection(
-        {ctx: req.ctx, checkLicense: true},
+        {
+            ctx: req.ctx,
+            checkLicense: true,
+        },
         {
             collectionId: params.collectionId,
             includePermissionsInfo: query.includePermissionsInfo,

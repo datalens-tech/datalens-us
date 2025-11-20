@@ -29,7 +29,10 @@ export const getWorkbooksListController: AppRouteHandler = async (
     const {query} = await parseReq(req);
 
     const result = await getWorkbooksList(
-        {ctx: req.ctx, checkLicense: true},
+        {
+            ctx: req.ctx,
+            checkLicense: true,
+        },
         {
             collectionId: query.collectionId ?? null,
             includePermissionsInfo: query.includePermissionsInfo,

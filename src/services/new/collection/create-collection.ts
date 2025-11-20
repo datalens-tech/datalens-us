@@ -37,8 +37,9 @@ export const createCollection = async (
         isPrivateRoute,
     } = ctx.get('info');
 
+    const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+
     if (!isPrivateRoute && checkLicense) {
-        const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
         await fetchAndValidateLicenseOrFail({ctx});
     }
 
