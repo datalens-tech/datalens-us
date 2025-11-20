@@ -45,12 +45,7 @@ export const checkCollectionByTitle = async (
 
     if (parentId) {
         await getCollection(
-            {
-                ctx,
-                trx: targetTrx,
-                skipValidation: true,
-                skipCheckPermissions,
-            },
+            {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions},
             {collectionId: parentId},
         );
     }
