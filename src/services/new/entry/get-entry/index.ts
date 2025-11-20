@@ -305,7 +305,11 @@ export const getEntry = async (
 
     let servicePlan: string | undefined;
     if (includeServicePlan) {
-        servicePlan = getServicePlan(entry.tenant);
+        servicePlan = getServicePlan({
+            ctx,
+            billingStartedAt: entry.tenant.billingStartedAt,
+            billingEndedAt: entry.tenant.billingEndedAt,
+        });
     }
 
     let tenantFeatures: Record<string, unknown> | undefined;

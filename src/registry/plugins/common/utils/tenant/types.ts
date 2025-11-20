@@ -1,8 +1,6 @@
 import type {AppContext} from '@gravity-ui/nodekit';
 import {TransactionOrKnex} from 'objection';
 
-import {Tenant, TenantColumn} from '../../../../../db/models/new/tenant';
-
 export type CheckTenant = (args: {
     ctx: AppContext;
     tenantId: string;
@@ -11,9 +9,11 @@ export type CheckTenant = (args: {
     foldersEnabled?: boolean;
 }) => Promise<void>;
 
-export type GetServicePlan = (
-    args: Pick<Tenant, typeof TenantColumn.BillingEndedAt | typeof TenantColumn.BillingStartedAt>,
-) => string | undefined;
+export type GetServicePlan = (args: {
+    ctx: AppContext;
+    billingStartedAt: Nullable<string>;
+    billingEndedAt: Nullable<string>;
+}) => string | undefined;
 
 export type ProcessTenantSettings = (args: {
     ctx: AppContext;
