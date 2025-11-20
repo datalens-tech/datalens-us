@@ -20,7 +20,7 @@ export interface CreateWorkbookArgs {
 }
 
 export const createWorkbook = async (
-    {ctx, trx, skipLicenseCheck, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, checkLicense, skipCheckPermissions = false}: ServiceArgs,
     args: CreateWorkbookArgs,
 ) => {
     const {title, description, collectionId, meta, status} = args;
@@ -42,7 +42,7 @@ export const createWorkbook = async (
 
     const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
 
-    if (!isPrivateRoute && !skipLicenseCheck) {
+    if (!isPrivateRoute && checkLicense) {
         await fetchAndValidateLicenseOrFail({ctx});
     }
 

@@ -21,7 +21,7 @@ export interface DeleteCollectionArgs {
 }
 
 export const deleteCollections = async (
-    {ctx, trx, skipLicenseCheck, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, checkLicense, skipCheckPermissions = false}: ServiceArgs,
     args: DeleteCollectionArgs,
 ) => {
     const {collectionIds} = args;
@@ -38,12 +38,12 @@ export const deleteCollections = async (
 
     const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
 
-    if (!skipLicenseCheck && !isPrivateRoute) {
+    if (checkLicense && !isPrivateRoute) {
         await fetchAndValidateLicenseOrFail({ctx});
     }
 
     const collectionsInstances = await getCollectionsListByIds(
-        {ctx, trx: getReplica(trx), skipCheckPermissions: true, skipLicenseCheck: true},
+        {ctx, trx: getReplica(trx), skipCheckPermissions: true},
         {collectionIds},
     );
 
@@ -137,7 +137,7 @@ export const deleteCollections = async (
         if (workbookIds.length) {
             deletedCollectionsEntitiesPromises.push(
                 deleteWorkbooks(
-                    {ctx, trx: transactionTrx, skipCheckPermissions: true, skipLicenseCheck: true},
+                    {ctx, trx: transactionTrx, skipCheckPermissions: true},
                     {
                         workbookIds,
                         detachDeletePermissions: true,

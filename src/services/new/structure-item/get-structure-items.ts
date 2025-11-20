@@ -71,7 +71,6 @@ export const getStructureItems = async (
                 trx: targetTrx,
                 skipValidation: true,
                 skipCheckPermissions,
-                skipLicenseCheck: true,
             },
             {collectionId},
         );

@@ -21,7 +21,7 @@ export interface DeleteWorkbooksArgs {
 }
 
 export const deleteWorkbooks = async (
-    {ctx, trx, skipLicenseCheck, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, checkLicense, skipCheckPermissions = false}: ServiceArgs,
     args: DeleteWorkbooksArgs,
 ) => {
     const {workbookIds, detachDeletePermissions = false} = args;
@@ -41,7 +41,7 @@ export const deleteWorkbooks = async (
 
     const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
 
-    if (!isPrivateRoute && !skipLicenseCheck) {
+    if (!isPrivateRoute && checkLicense) {
         await fetchAndValidateLicenseOrFail({ctx});
     }
 
@@ -51,7 +51,6 @@ export const deleteWorkbooks = async (
             trx: getPrimary(trx),
             skipValidation: true,
             skipCheckPermissions: true,
-            skipLicenseCheck: true,
         },
         {workbookIds},
     );

@@ -70,10 +70,7 @@ export const getEntryMeta = async (
 
         if (joinedEntryRevision.workbookId) {
             if (!isPrivateRoute) {
-                await getWorkbook(
-                    {ctx, trx, skipLicenseCheck: true},
-                    {workbookId: joinedEntryRevision.workbookId},
-                );
+                await getWorkbook({ctx, trx}, {workbookId: joinedEntryRevision.workbookId});
             }
         } else if (joinedEntryRevision.collectionId) {
             if (!isPrivateRoute) {

@@ -56,7 +56,7 @@ export const getWorkbookContent = async (
     const {user, tenantId, isPrivateRoute} = ctx.get('info');
 
     const workbook = await getWorkbook(
-        {ctx, trx, skipValidation: true, skipCheckPermissions, skipLicenseCheck: true},
+        {ctx, trx, skipValidation: true, skipCheckPermissions},
         {
             workbookId,
             includePermissionsInfo: true,

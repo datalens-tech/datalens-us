@@ -22,7 +22,7 @@ export interface UpdateWorkbookArgs {
 }
 
 export const updateWorkbook = async (
-    {ctx, trx, skipLicenseCheck, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, checkLicense, skipCheckPermissions = false}: ServiceArgs,
     args: UpdateWorkbookArgs,
 ) => {
     const {
@@ -52,7 +52,7 @@ export const updateWorkbook = async (
 
     const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
 
-    if (!isPrivateRoute && !skipLicenseCheck) {
+    if (!isPrivateRoute && checkLicense) {
         await fetchAndValidateLicenseOrFail({ctx});
     }
 
@@ -64,7 +64,6 @@ export const updateWorkbook = async (
             trx: targetTrx,
             skipValidation: true,
             skipCheckPermissions: true,
-            skipLicenseCheck: true,
         },
         {workbookId},
     );

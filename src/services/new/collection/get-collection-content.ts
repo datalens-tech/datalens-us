@@ -81,7 +81,6 @@ export const getCollectionContent = async (
                 trx: targetTrx,
                 skipValidation: true,
                 skipCheckPermissions,
-                skipLicenseCheck: true,
             },
             {collectionId},
         );

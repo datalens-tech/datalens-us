@@ -97,7 +97,7 @@ export async function getEntryRevisions(
         }
 
         if (entry.workbookId) {
-            await getWorkbook({ctx, skipLicenseCheck: true}, {workbookId: entry.workbookId});
+            await getWorkbook({ctx}, {workbookId: entry.workbookId});
         } else if (entry.collectionId) {
             await checkSharedEntryPermission(
                 {ctx},

@@ -50,7 +50,6 @@ export const checkCollectionByTitle = async (
                 trx: targetTrx,
                 skipValidation: true,
                 skipCheckPermissions,
-                skipLicenseCheck: true,
             },
             {collectionId: parentId},
         );

@@ -124,7 +124,7 @@ export async function deleteEntry(
         if (!isPrivateRoute) {
             if (entryObj.workbookId) {
                 const workbook = await getWorkbook(
-                    {ctx, trx: OldEntry.replica, skipLicenseCheck: true},
+                    {ctx, trx: OldEntry.replica},
                     {workbookId: entryObj.workbookId},
                 );
                 if (accessServiceEnabled) {

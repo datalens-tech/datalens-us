@@ -194,7 +194,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
     if (entry.workbookId) {
         if (!isPrivateRoute) {
             const workbook = await getWorkbook(
-                {ctx, trx: Entry.replica, skipLicenseCheck: true},
+                {ctx, trx: Entry.replica},
                 {workbookId: entry.workbookId},
             );
 
@@ -470,10 +470,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                         const newKey = entryObjInnerMeta.oldKey;
 
                         if (entryObj.workbookId) {
-                            await getWorkbook(
-                                {ctx, skipLicenseCheck: true},
-                                {workbookId: entryObj.workbookId},
-                            );
+                            await getWorkbook({ctx}, {workbookId: entryObj.workbookId});
                         } else {
                             const keyLowerCase = newKey.toLowerCase();
                             const isFolder = Utils.isFolder({scope: entryObj.scope});

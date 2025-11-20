@@ -44,7 +44,7 @@ export const checkFetchedEntry = async (
 
     if (workbookId) {
         await getWorkbook(
-            {ctx, trx, skipValidation: true, skipCheckPermissions: true, skipLicenseCheck: true},
+            {ctx, trx, skipValidation: true, skipCheckPermissions: true},
             {workbookId},
         );
     } else {

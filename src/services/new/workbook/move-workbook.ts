@@ -72,7 +72,6 @@ export const moveWorkbook = async (
                     trx: targetTrx,
                     skipValidation: true,
                     skipCheckPermissions: true,
-                    skipLicenseCheck: true,
                 },
                 {collectionId: newCollectionId},
             );

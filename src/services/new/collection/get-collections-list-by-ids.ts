@@ -13,7 +13,7 @@ export interface GetCollectionsListByIdsArgs {
 }
 
 export const getCollectionsListByIds = async (
-    {ctx, trx, skipLicenseCheck, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, checkLicense, skipCheckPermissions = false}: ServiceArgs,
     args: GetCollectionsListByIdsArgs,
 ) => {
     const {collectionIds, includePermissionsInfo = false} = args;
@@ -28,7 +28,7 @@ export const getCollectionsListByIds = async (
 
     const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
 
-    if (!skipLicenseCheck && !isPrivateRoute) {
+    if (checkLicense && !isPrivateRoute) {
         await fetchAndValidateLicenseOrFail({ctx});
     }
 

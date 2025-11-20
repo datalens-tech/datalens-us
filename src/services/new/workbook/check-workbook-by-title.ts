@@ -49,7 +49,6 @@ export const checkWorkbookByTitle = async (
                 trx: targetTrx,
                 skipValidation: true,
                 skipCheckPermissions,
-                skipLicenseCheck: true,
             },
             {collectionId},
         );

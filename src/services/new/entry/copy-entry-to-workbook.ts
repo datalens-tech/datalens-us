@@ -108,7 +108,6 @@ export const copyEntryToWorkbook = async (
                     trx: transactionTrx,
                     skipValidation: true,
                     skipCheckPermissions: true,
-                    skipLicenseCheck: true,
                 },
                 {workbookId: copingEntry.workbookId},
             );
@@ -141,7 +140,6 @@ export const copyEntryToWorkbook = async (
                     trx: transactionTrx,
                     skipValidation: true,
                     skipCheckPermissions: true,
-                    skipLicenseCheck: true,
                 },
                 {workbookId: targetWorkbookId},
             );
