@@ -66,6 +66,7 @@ export {
     LicenseLimitColumnRaw,
 } from '../src/db/models/new/license-limit';
 export {LicenseLimitType} from '../src/db/models/new/license-limit/types';
+export {LicenseLimitWithIsStartedOnCurrentDay} from '../src/db/models/new/license-limit/presentations';
 
 export {License, LicenseColumnRaw, LicenseColumn} from '../src/db/models/new/license';
 export {LicenseType} from '../src/db/models/new/license/types';
