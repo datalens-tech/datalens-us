@@ -26,7 +26,7 @@ export interface GetWorkbookListArgs {
 }
 
 export const getWorkbooksList = async (
-    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, checkLicense, skipCheckPermissions = false}: ServiceArgs,
     args: GetWorkbookListArgs,
 ) => {
     const {
@@ -50,8 +50,15 @@ export const getWorkbooksList = async (
     });
 
     const {accessServiceEnabled} = ctx.config;
+    const {isPrivateRoute} = ctx.get('info');
     const registry = ctx.get('registry');
     const {Workbook, Collection} = registry.common.classes.get();
+
+    const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+
+    if (!isPrivateRoute && checkLicense) {
+        await fetchAndValidateLicenseOrFail({ctx});
+    }
 
     const {
         tenantId,

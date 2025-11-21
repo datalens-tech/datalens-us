@@ -13,7 +13,7 @@ export interface GetCollectionsListByIdsArgs {
 }
 
 export const getCollectionsListByIds = async (
-    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, checkLicense, skipCheckPermissions = false}: ServiceArgs,
     args: GetCollectionsListByIdsArgs,
 ) => {
     const {collectionIds, includePermissionsInfo = false} = args;
@@ -23,8 +23,14 @@ export const getCollectionsListByIds = async (
         includePermissionsInfo,
     });
 
-    const {tenantId} = ctx.get('info');
+    const {tenantId, isPrivateRoute} = ctx.get('info');
     const registry = ctx.get('registry');
+
+    const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+
+    if (checkLicense && !isPrivateRoute) {
+        await fetchAndValidateLicenseOrFail({ctx});
+    }
 
     const models = await CollectionModel.query(getReplica(trx))
         .where({

@@ -19,7 +19,10 @@ export const getCollectionsListByIdsController: AppRouteHandler = async (req, re
     const {body} = await parseReq(req);
 
     const result = await getCollectionsListByIds(
-        {ctx: req.ctx},
+        {
+            ctx: req.ctx,
+            checkLicense: true,
+        },
         {
             collectionIds: body.collectionIds,
         },
