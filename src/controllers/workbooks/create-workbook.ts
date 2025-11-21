@@ -39,6 +39,7 @@ export const createWorkbookController: AppRouteHandler = async (
         const result = await createWorkbook(
             {
                 ctx: req.ctx,
+                checkLicense: true,
             },
             {
                 collectionId: body.collectionId ?? null,
