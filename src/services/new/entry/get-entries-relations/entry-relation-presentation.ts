@@ -85,7 +85,6 @@ export class EntryRelation extends Model {
             `${Entry.tableName}.${EntryColumn.WorkbookId}`,
             `${Entry.tableName}.${EntryColumn.CollectionId}`,
 
-            `${RevisionModel.tableName}.${RevisionModelColumn.Meta}`,
             `${RevisionModel.tableName}.${RevisionModelColumn.Links}`,
         ];
     }
@@ -100,6 +99,5 @@ export class EntryRelation extends Model {
     [EntryColumn.WorkbookId]!: Entry[typeof EntryColumn.WorkbookId];
     [EntryColumn.CollectionId]!: Entry[typeof EntryColumn.CollectionId];
 
-    [RevisionModelColumn.Meta]!: RevisionModel[typeof RevisionModelColumn.Meta];
     [RevisionModelColumn.Links]!: RevisionModel[typeof RevisionModelColumn.Links];
 }

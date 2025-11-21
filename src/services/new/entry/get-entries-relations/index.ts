@@ -101,7 +101,7 @@ export const getEntriesRelations = async (
         tenantId,
         linkDirection,
         scope,
-    });
+    }).timeout(EntryRelation.DEFAULT_QUERY_TIMEOUT);
 
     const {result: relatedEntries, nextPageToken} = await paginator.execute(relatedEntriesQuery);
 

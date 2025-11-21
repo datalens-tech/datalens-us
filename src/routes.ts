@@ -200,6 +200,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             handler: entries.getEntriesRelationsController,
             authPolicy: AuthPolicy.disabled,
             private: true,
+            requireCtxTenantId: true,
         }),
 
         getEntriesData: makeRoute({

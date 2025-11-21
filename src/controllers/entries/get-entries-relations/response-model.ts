@@ -11,7 +11,6 @@ const relationItemSchema = z
         scope: z.nativeEnum(EntryScope),
         type: z.string(),
         createdAt: z.string(),
-        meta: z.record(z.string(), z.unknown()).nullable(),
         public: z.boolean(),
         tenantId: z.string().nullable(),
         workbookId: z.string().nullable(),
@@ -35,11 +34,10 @@ const formatRelation = (
 ): z.infer<typeof relationItemSchema> => {
     return {
         entryId: Utils.encodeId(relation.entryId),
-        key: relation.key,
+        key: relation.workbookId || relation.collectionId ? null : relation.key,
         scope: relation.scope,
         type: relation.type,
         createdAt: relation.createdAt,
-        meta: relation.meta,
         public: relation.public,
         tenantId: relation.tenantId,
         workbookId: relation.workbookId ? Utils.encodeId(relation.workbookId) : null,
