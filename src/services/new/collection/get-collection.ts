@@ -17,7 +17,7 @@ export interface GetCollectionArgs {
 }
 
 export const getCollection = async <T extends CollectionInstance = CollectionInstance>(
-    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, checkLicense, skipCheckPermissions = false}: ServiceArgs,
     args: GetCollectionArgs,
 ): Promise<T> => {
     const {collectionId, includePermissionsInfo = false, permission} = args;
@@ -28,6 +28,13 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
     });
 
     const {tenantId, isPrivateRoute} = ctx.get('info');
+
+    const registry = ctx.get('registry');
+
+    if (!isPrivateRoute && checkLicense) {
+        const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
+        await fetchAndValidateLicenseOrFail({ctx});
+    }
 
     const targetTrx = getReplica(trx);
 
@@ -51,7 +58,6 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
         });
     }
 
-    const registry = ctx.get('registry');
     const {Collection} = registry.common.classes.get();
 
     const collectionInstance = new Collection({

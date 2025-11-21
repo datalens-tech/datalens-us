@@ -6,6 +6,7 @@ export interface ServiceArgs {
     trx?: TransactionOrKnex;
     skipValidation?: boolean;
     skipCheckPermissions?: boolean;
+    checkLicense?: boolean;
 }
 
 export type CountAggregation = undefined | {count?: string};
