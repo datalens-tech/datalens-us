@@ -27,6 +27,8 @@ export const ALL_COLUMNS = [
     'links',
     'workbookId',
     'collectionId',
+    'revisions.version',
+    'revisions.sourceVersion',
 ];
 
 export const RETURN_COLUMNS = [
@@ -51,6 +53,8 @@ export const RETURN_COLUMNS = [
     'public',
     'workbookId',
     'collectionId',
+    'revisions.version',
+    'revisions.sourceVersion',
 ];
 
 export const RETURN_META_COLUMNS = [

@@ -38,8 +38,6 @@ export type {
     LogEventCopyEntriesToWorkbookSuccessParams,
     LogEventCopyEntryToWorkbookFailParams,
     LogEventCopyEntryToWorkbookSuccessParams,
-    LogEventCreateEntryAltFailParams,
-    LogEventCreateEntryAltSuccessParams,
     LogEventCreateEntryFailParams,
     LogEventCreateEntrySuccessParams,
     LogEventDeleteEntryFailParams,

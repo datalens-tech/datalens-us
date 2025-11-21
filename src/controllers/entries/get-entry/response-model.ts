@@ -45,6 +45,8 @@ const schema = z
         servicePlan: z.string().optional(),
         tenantFeatures: z.record(z.string(), z.unknown()).optional(),
         tenantSettings: z.record(z.string(), z.unknown()).optional(),
+        version: z.number().nullable(),
+        sourceVersion: z.number().nullable(),
     })
     .describe('Get entry result');
 
@@ -99,6 +101,8 @@ const format = (
         data: revision.data,
         meta: revision.meta,
         annotation: revision.annotation,
+        version: revision.version,
+        sourceVersion: revision.sourceVersion,
         hidden: entry.hidden,
         public: entry.public,
         workbookId: entry.workbookId ? Utils.encodeId(entry.workbookId) : null,

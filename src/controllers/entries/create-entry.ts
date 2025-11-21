@@ -45,6 +45,8 @@ export const createEntryController: AppRouteHandler = async (req, res) => {
             initialParentId: body.initialParentId,
             checkServicePlan: body.checkServicePlan,
             checkTenantFeatures: body.checkTenantFeatures,
+            version: body.version,
+            sourceVersion: body.sourceVersion,
             ctx: req.ctx,
         });
 
