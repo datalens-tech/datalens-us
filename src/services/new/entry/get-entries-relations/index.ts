@@ -44,7 +44,7 @@ export const getEntriesRelations = async (
     {ctx, trx}: ServiceArgs,
     args: GetEntriesRelationsArgs,
 ): Promise<GetEntriesRelationsResult> => {
-    const {tenantId, isPrivateRoute} = ctx.get('info');
+    const {tenantId} = ctx.get('info');
 
     const {
         entryIds: rawEntryIds,
@@ -71,7 +71,6 @@ export const getEntriesRelations = async (
         .whereIn(EntryColumn.EntryId, entryIds)
         .where({
             [EntryColumn.IsDeleted]: false,
-            ...(isPrivateRoute ? {} : {[EntryColumn.TenantId]: tenantId}),
         })
         .timeout(Entry.DEFAULT_QUERY_TIMEOUT)) as Array<{
         [EntryColumn.EntryId]: string;
