@@ -1,11 +1,10 @@
 import type {Knex} from 'knex';
-import {QueryBuilder, TransactionOrKnex, raw} from 'objection';
+import {QueryBuilder, TransactionOrKnex} from 'objection';
 
 import {Model} from '../../../../db';
 import {Entry, EntryColumn} from '../../../../db/models/new/entry';
 import {EntryScope} from '../../../../db/models/new/entry/types';
 import {Link, LinkColumn} from '../../../../db/models/new/link';
-import {RevisionModel, RevisionModelColumn} from '../../../../db/models/new/revision';
 
 import {LinkDirection} from './types';
 
@@ -34,7 +33,6 @@ export class EntryRelation extends Model {
         const query = Entry.query(trx)
             .select(this.selectedColumns)
             .join(Link.tableName, this.joinLinks(isToDirection))
-            .join(RevisionModel.tableName, this.joinRevision)
             .where(`${Entry.tableName}.${EntryColumn.TenantId}`, tenantId)
             .whereIn(
                 isToDirection
@@ -62,17 +60,6 @@ export class EntryRelation extends Model {
         };
     }
 
-    protected static joinRevision(builder: Knex.JoinClause) {
-        builder.on(
-            raw('COALESCE(??, ??)', [
-                `${Entry.tableName}.${EntryColumn.PublishedId}`,
-                `${Entry.tableName}.${EntryColumn.SavedId}`,
-            ]) as unknown as string,
-            '=',
-            `${RevisionModel.tableName}.${RevisionModelColumn.RevId}`,
-        );
-    }
-
     protected static get selectedColumns() {
         return [
             `${Entry.tableName}.${EntryColumn.EntryId}`,
@@ -84,8 +71,6 @@ export class EntryRelation extends Model {
             `${Entry.tableName}.${EntryColumn.TenantId}`,
             `${Entry.tableName}.${EntryColumn.WorkbookId}`,
             `${Entry.tableName}.${EntryColumn.CollectionId}`,
-
-            `${RevisionModel.tableName}.${RevisionModelColumn.Links}`,
         ];
     }
 
@@ -98,6 +83,4 @@ export class EntryRelation extends Model {
     [EntryColumn.TenantId]!: Entry[typeof EntryColumn.TenantId];
     [EntryColumn.WorkbookId]!: Entry[typeof EntryColumn.WorkbookId];
     [EntryColumn.CollectionId]!: Entry[typeof EntryColumn.CollectionId];
-
-    [RevisionModelColumn.Links]!: RevisionModel[typeof RevisionModelColumn.Links];
 }
