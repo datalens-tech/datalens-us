@@ -12,13 +12,11 @@ let widgetId: string;
 let dashId: string;
 
 const commonExpect = {
-    key: expect.any(String),
+    key: null,
     createdAt: expect.any(String),
-    meta: null,
     public: false,
     tenantId: testTenantId,
     collectionId: null,
-    links: null,
     isLocked: false,
 };
 
@@ -96,9 +94,6 @@ describe('Get entries relations', () => {
                     scope: 'dataset',
                     type: 'dataset-type',
                     workbookId: workbookId,
-                    links: {
-                        [connectionId]: connectionId,
-                    },
                 },
                 {
                     ...commonExpect,
@@ -127,9 +122,6 @@ describe('Get entries relations', () => {
                     scope: 'dataset',
                     type: 'dataset-type',
                     workbookId: workbookId,
-                    links: {
-                        [connectionId]: connectionId,
-                    },
                 },
                 {
                     ...commonExpect,
@@ -137,10 +129,6 @@ describe('Get entries relations', () => {
                     scope: 'dash',
                     type: 'dash-type',
                     workbookId: workbookId,
-                    links: {
-                        [widgetId]: widgetId,
-                        [datasetId]: datasetId,
-                    },
                 },
             ],
         });
@@ -183,9 +171,6 @@ describe('Get entries relations', () => {
                     scope: 'dataset',
                     type: 'dataset-type',
                     workbookId: workbookId,
-                    links: {
-                        [connectionId]: connectionId,
-                    },
                 },
             ],
             nextPageToken: expect.any(String),
@@ -228,9 +213,7 @@ describe('Get entries relations', () => {
                     scope: 'dataset',
                     type: 'dataset-type',
                     workbookId: workbookId,
-                    links: {
-                        [connectionId]: connectionId,
-                    },
+
                     permissions: {
                         admin: false,
                         edit: false,
