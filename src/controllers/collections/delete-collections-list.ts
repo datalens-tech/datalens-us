@@ -26,7 +26,10 @@ export const deleteCollectionsListController: AppRouteHandler = async (req, res)
 
     try {
         const result = await deleteCollections(
-            {ctx: req.ctx},
+            {
+                ctx: req.ctx,
+                checkLicense: true,
+            },
             {
                 collectionIds: body.collectionIds,
             },

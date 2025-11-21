@@ -28,7 +28,10 @@ export const createCollectionController: AppRouteHandler = async (req, res) => {
 
     try {
         const result = await createCollection(
-            {ctx: req.ctx},
+            {
+                ctx: req.ctx,
+                checkLicense: true,
+            },
             {
                 title: body.title.trim(),
                 description: body.description?.trim(),
