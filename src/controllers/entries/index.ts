@@ -25,6 +25,7 @@ import {getEntriesController} from './get-entries';
 import {getEntriesAnnotationController} from './get-entries-annotation';
 import {getEntriesDataController} from './get-entries-data';
 import {getEntriesMetaController} from './get-entries-meta';
+import {getEntriesRelationsController} from './get-entries-relations';
 import {getEntryController} from './get-entry';
 import {renameEntryController} from './rename-entry';
 import {updateEntryController} from './update-entry';
@@ -41,6 +42,7 @@ export default {
     createEntryController,
     getEntriesController,
     getEntryController,
+    getEntriesRelationsController,
 
     getEntryMeta: async (req: Request, res: Response) => {
         const {params, query} = req;
