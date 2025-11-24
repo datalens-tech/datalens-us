@@ -43,5 +43,7 @@ export const formatGetEntryByKeyResponse = (
         collectionId: joinedEntryRevision.collectionId,
         links: includeLinks ? joinedEntryRevision.links : undefined,
         permissions: includePermissionsInfo ? permissions : undefined,
+        version: joinedEntryRevision.version,
+        sourceVersion: joinedEntryRevision.sourceVersion,
     };
 };

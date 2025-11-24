@@ -15,6 +15,8 @@ const selectedRevisionColumns = [
     'updatedAt',
     'revId',
     'links',
+    'version',
+    'sourceVersion',
 ] as const;
 
 export const selectedColumns = [
