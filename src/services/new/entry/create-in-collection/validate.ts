@@ -22,6 +22,8 @@ const requestSchema = z.object({
     annotation: z
         .object({description: z.string().max(ANNOTATION_DESCRIPTION_MAX_LENGTH)})
         .optional(),
+    version: z.number().nullable().optional(),
+    sourceVersion: z.number().nullable().optional(),
 });
 
 export type CreateEntryInCollectionArgs = z.infer<typeof requestSchema>;

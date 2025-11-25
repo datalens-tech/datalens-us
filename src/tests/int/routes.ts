@@ -1,7 +1,6 @@
 export const routes = {
     entries: '/v1/entries',
     privateEntries: '/private/entries',
-    privateCreateEntry: '/private/createEntry',
     favorites: '/v1/favorites',
     states: '/v1/states',
     locks: '/v1/locks',
