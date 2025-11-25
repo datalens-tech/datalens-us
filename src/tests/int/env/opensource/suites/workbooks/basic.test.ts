@@ -307,6 +307,8 @@ describe('Entries in workboooks managment', () => {
             updatedBy: expect.any(String),
             workbookId: testWorkbookId,
             collectionId: null,
+            version: null,
+            sourceVersion: null,
         });
 
         const responseEntry2 = await auth(request(app).post(routes.entries), {
@@ -347,6 +349,8 @@ describe('Entries in workboooks managment', () => {
             updatedBy: expect.any(String),
             workbookId: testWorkbookId,
             collectionId: null,
+            version: null,
+            sourceVersion: null,
         });
     });
 

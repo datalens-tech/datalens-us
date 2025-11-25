@@ -44,7 +44,6 @@ import {ColorPaletteModel} from '../../../../../db/models/new/color-palette';
 import {Entry} from '../../../../../db/models/new/entry';
 import {Tenant} from '../../../../../db/models/new/tenant';
 import type {WorkbookModel} from '../../../../../db/models/new/workbook';
-import type {EntryType} from '../../../../../types/models';
 
 export enum LogEventType {
     CreateCollectionSuccess = 'createCollectionSuccess',
@@ -103,9 +102,6 @@ export enum LogEventType {
 
     CreateEntrySuccess = 'createEntrySuccess',
     CreateEntryFail = 'createEntryFail',
-
-    CreateEntryAltSuccess = 'createEntryAltSuccess',
-    CreateEntryAltFail = 'createEntryAltFail',
 
     DeleteEntrySuccess = 'deleteEntrySuccess',
     DeleteEntryFail = 'deleteEntryFail',
@@ -437,30 +433,6 @@ export interface LogEventCreateEntryFailParams extends EventParams {
     error: unknown;
 }
 
-type CreateEntryAltReqParams = {
-    workbookId?: string;
-    collectionId?: string;
-    name?: string;
-    scope?: string;
-    type?: string;
-    key?: string;
-    recursion?: boolean;
-};
-
-export interface LogEventCreateEntryAltSuccessParams extends EventParams {
-    type: LogEventType.CreateEntryAltSuccess;
-
-    reqParams: CreateEntryAltReqParams;
-    data: Entry | EntryType | EntryType[] | undefined;
-}
-
-export interface LogEventCreateEntryAltFailParams extends EventParams {
-    type: LogEventType.CreateEntryAltFail;
-
-    reqParams: CreateEntryAltReqParams;
-    error: unknown;
-}
-
 type RenameEntryReqParams = {
     entryId?: string;
     name?: string;
@@ -566,8 +538,6 @@ export type LogEventParams =
     | LogEventCopyEntryToWorkbookFailParams
     | LogEventCreateEntrySuccessParams
     | LogEventCreateEntryFailParams
-    | LogEventCreateEntryAltSuccessParams
-    | LogEventCreateEntryAltFailParams
     | LogEventRenameEntrySuccessParams
     | LogEventRenameEntryFailParams
     | LogEventUpdateEntrySuccessParams
