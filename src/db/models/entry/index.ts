@@ -39,6 +39,7 @@ class Entry extends Model {
 
     static originatePermissions({
         isPrivateRoute,
+        isAuditRoute,
         shared,
         permissions,
         iamPermissions,
@@ -59,6 +60,13 @@ class Entry extends Model {
                 read: iamPermissions.read ?? false,
                 edit: iamPermissions.edit ?? false,
                 admin: iamPermissions.admin ?? false,
+            };
+        } else if (isAuditRoute) {
+            originatedPermissions = {
+                execute: false,
+                read: false,
+                edit: false,
+                admin: false,
             };
         } else if (isPrivateRoute || !ctx.config.dlsEnabled) {
             originatedPermissions = {

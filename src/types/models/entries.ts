@@ -11,6 +11,7 @@ import {UsPermissions} from './permission';
 
 export interface OriginatePermissionsConf {
     isPrivateRoute?: boolean;
+    isAuditRoute?: boolean;
     shared?: boolean;
     permissions?: {
         extra: DlsPermission;
