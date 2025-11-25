@@ -66,6 +66,8 @@ export interface RevisionColumns {
     createdAt: string;
     updatedBy: string;
     updatedAt: string;
+    version: Nullable<number>;
+    sourceVersion: Nullable<number>;
 }
 
 export interface LockColumns {

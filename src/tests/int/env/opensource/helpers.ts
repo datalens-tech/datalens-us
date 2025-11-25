@@ -70,7 +70,7 @@ export const createPrivateMockWorkbookEntry = async (args: CreateMockWorkbookEnt
     const meta = args.meta ?? mockWorkbookEntry.meta;
     const mode = args.mode ?? mockWorkbookEntry.mode;
 
-    const response = await authMasterToken(request(app).post(routes.privateCreateEntry))
+    const response = await authMasterToken(request(app).post(routes.privateEntries))
         .send({
             name,
             scope,
