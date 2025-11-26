@@ -5,6 +5,8 @@ import {EntryScope} from '../../../db/models/new/entry/types';
 import {RevisionAnnotationFields} from '../../../db/models/new/revision';
 import {GetEntryResult} from '../../../services/new/entry';
 import Utils from '../../../utils';
+import {entryPermissionsModel} from '../response-models/entry-permissions-model';
+import {sharedEntryPermissionsModel} from '../response-models/shared-entry-permissions-model';
 
 const schema = z
     .object({
@@ -34,14 +36,8 @@ const schema = z
         collectionId: z.string().nullable(),
         links: z.record(z.string(), z.unknown()).optional().nullable(),
         isFavorite: z.boolean().optional(),
-        permissions: z
-            .object({
-                execute: z.boolean().optional(),
-                read: z.boolean().optional(),
-                edit: z.boolean().optional(),
-                admin: z.boolean().optional(),
-            })
-            .optional(),
+        permissions: entryPermissionsModel.schema.optional(),
+        fullPermissions: sharedEntryPermissionsModel.schema.optional(),
         servicePlan: z.string().optional(),
         tenantFeatures: z.record(z.string(), z.unknown()).optional(),
         tenantSettings: z.record(z.string(), z.unknown()).optional(),
@@ -57,6 +53,7 @@ const format = (
         revision,
         includePermissionsInfo,
         permissions,
+        fullPermissions,
         includeLinks,
         includeServicePlan,
         servicePlan,
@@ -110,6 +107,7 @@ const format = (
         links: includeLinks ? revision.links : undefined,
         isFavorite,
         permissions: includePermissionsInfo ? permissions : undefined,
+        fullPermissions: includePermissionsInfo ? fullPermissions : undefined,
         servicePlan: includeServicePlan ? servicePlan : undefined,
         tenantFeatures: includeTenantFeatures ? tenantFeatures : undefined,
         tenantSettings: includeTenantSettings ? tenantSettings : undefined,
