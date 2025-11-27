@@ -1,7 +1,7 @@
 import {QueryBuilder, TransactionOrKnex, raw} from 'objection';
 
 import {CURRENT_TIMESTAMP} from '../../../../../const';
-import {LicenseLimit, LicenseLimitColumnRaw} from '../index';
+import {LicenseLimit, LicenseLimitColumn} from '../index';
 
 export class LicenseLimitWithIsStartedOnCurrentDay extends LicenseLimit {
     static get selectedColumns() {
@@ -9,7 +9,7 @@ export class LicenseLimitWithIsStartedOnCurrentDay extends LicenseLimit {
             '*',
             raw(
                 `DATE_TRUNC('day', ?? AT TIME ZONE 'Europe/Moscow') = DATE_TRUNC('day', ? AT TIME ZONE 'Europe/Moscow')`,
-                [LicenseLimitColumnRaw.StartedAt, raw(CURRENT_TIMESTAMP)],
+                [LicenseLimitColumn.StartedAt, raw(CURRENT_TIMESTAMP)],
             ).as('is_started_on_current_day'),
         ];
     }
