@@ -29,7 +29,7 @@ export const deleteEntryController: AppRouteHandler = async (req, res) => {
 
     try {
         const result = await deleteEntry(
-            {ctx: req.ctx, skipValidation: true},
+            {ctx: req.ctx, skipValidation: true, checkLicense: true},
             {
                 entryId: params.entryId,
                 lockToken: query.lockToken,
