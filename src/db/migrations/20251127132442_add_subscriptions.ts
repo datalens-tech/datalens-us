@@ -49,7 +49,7 @@ export async function up(knex: Knex): Promise<void> {
             transport subscription_recipient_transport_type_enum NOT NULL,
 
             created_by TEXT NOT NULL,
-            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
 
         CREATE UNIQUE INDEX subscription_recipients_subscription_id_user_id_transport_unique_idx ON subscription_recipients(subscription_id, user_id, transport);
