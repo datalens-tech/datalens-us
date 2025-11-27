@@ -60,7 +60,7 @@ export type DeleteEntryData = {
 };
 
 export async function deleteEntry(
-    {ctx, skipValidation = false}: ServiceArgs,
+    {ctx, checkLicense, skipValidation = false}: ServiceArgs,
     args: DeleteEntryData,
 ) {
     const {entryId, lockToken, useLegacyLogin = false, scope, types} = args;
@@ -78,10 +78,13 @@ export async function deleteEntry(
         validateArgs(args);
     }
 
-    await fetchAndValidateLicenseOrFail({ctx});
+    const {tenantId, user, isPrivateRoute} = ctx.get('info');
+
+    if (checkLicense && !isPrivateRoute) {
+        await fetchAndValidateLicenseOrFail({ctx});
+    }
 
     const {accessServiceEnabled} = ctx.config;
-    const {tenantId, isPrivateRoute, user} = ctx.get('info');
     const deletedBy = useLegacyLogin ? user.login : makeUserId(user.userId);
 
     const result = await transaction(OldEntry.primary, async (trx) => {
