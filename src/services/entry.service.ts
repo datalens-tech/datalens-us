@@ -63,7 +63,7 @@ export default class EntryService {
                 features: checkTenantFeatures,
                 foldersEnabled: !workbookId,
             }),
-            fetchAndValidateLicenseOrFail({ctx}),
+            ...(!isPrivateRoute ? [fetchAndValidateLicenseOrFail({ctx})] : []),
         ]);
 
         if (workbookId) {

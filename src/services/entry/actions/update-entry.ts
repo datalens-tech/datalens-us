@@ -191,7 +191,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                 servicePlan: checkServicePlan,
                 features: checkTenantFeatures,
             }),
-            fetchAndValidateLicenseOrFail({ctx}),
+            ...(!isPrivateRoute ? [fetchAndValidateLicenseOrFail({ctx})] : []),
         ]);
 
         await Lock.checkLock({entryId, lockToken}, ctx);
