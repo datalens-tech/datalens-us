@@ -20,10 +20,10 @@ export class SubscriptionRecipient extends Model {
         return SubscriptionRecipientColumn.SubscriptionRecipientId;
     }
 
-    [SubscriptionRecipientColumn.SubscriptionRecipientId]?: string;
+    [SubscriptionRecipientColumn.SubscriptionRecipientId]!: string;
     [SubscriptionRecipientColumn.SubscriptionId]!: string;
-    [SubscriptionRecipientColumn.UserId]?: string;
-    [SubscriptionRecipientColumn.transport]?: SubscriptionRecipientTransportType;
-    [SubscriptionRecipientColumn.CreatedBy]?: string;
-    [SubscriptionRecipientColumn.CreatedAt]?: string;
+    [SubscriptionRecipientColumn.UserId]!: string;
+    [SubscriptionRecipientColumn.transport]!: SubscriptionRecipientTransportType;
+    [SubscriptionRecipientColumn.CreatedBy]!: string;
+    [SubscriptionRecipientColumn.CreatedAt]!: string;
 }
