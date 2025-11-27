@@ -15,7 +15,7 @@ export async function up(knex: Knex): Promise<void> {
             
             status subscription_status_enum NOT NULL DEFAULT 'active',
             tenant_id TEXT NOT NULL DEFAULT 'common' REFERENCES tenants (tenant_id) ON UPDATE CASCADE ON DELETE CASCADE,
-            workbook_id BIGINT NOT NULL REFERENCES workbooks (workbook_id) ON UPDATE CASCADE ON DELETE CASCADE;
+            workbook_id BIGINT NOT NULL REFERENCES workbooks (workbook_id) ON UPDATE CASCADE ON DELETE CASCADE,
             
             created_by TEXT NOT NULL,
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -43,7 +43,7 @@ export async function up(knex: Knex): Promise<void> {
 
         CREATE TABLE subscription_recipients (
             subscription_recipient_id BIGINT NOT NULL PRIMARY KEY DEFAULT get_id(),
-            subscription_id BIGINT NOT NULL REFERENCES subscriptions (subscription_id) ON UPDATE CASCADE ON DELETE CASCADE;
+            subscription_id BIGINT NOT NULL REFERENCES subscriptions (subscription_id) ON UPDATE CASCADE ON DELETE CASCADE,
 
             user_id TEXT NOT NULL,
             transport subscription_recipient_transport_type_enum NOT NULL,
