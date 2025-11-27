@@ -7,4 +7,5 @@ export type LicenseLimitMeta = {
     prevState?: {
         creatorsLimitValue: number;
     };
+    manual?: boolean;
 };
