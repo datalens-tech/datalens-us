@@ -39,7 +39,7 @@ export async function up(knex: Knex): Promise<void> {
         CREATE INDEX subscriptions_tenant_id_workbook_id_created_at_desc_idx ON subscriptions(tenant_id, workbook_id, created_at DESC);
         CREATE INDEX subscriptions_tenant_id_content_entry_id_idx ON subscriptions(tenant_id, content_entry_id);
         CREATE INDEX subscriptions_tenant_id_created_by_idx ON subscriptions(tenant_id, created_by);
-        CREATE INDEX subscriptions_title_description_trgm_idx ON users USING GIN ((title || ' ' || description) gin_trgm_ops);
+        CREATE INDEX subscriptions_title_description_trgm_idx ON subscriptions USING GIN ((title || ' ' || description) gin_trgm_ops);
 
         CREATE TYPE subscription_recipient_transport_type_enum AS ENUM ('email', 'tg');
 
