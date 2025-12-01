@@ -190,7 +190,7 @@ export const getEntry = async (
                     ])
                     .where({
                         tenantId,
-                        userId: user.userId,
+                        userId: user.licenseUserId,
                     });
             },
         })
