@@ -1,7 +1,10 @@
 import {AppError} from '@gravity-ui/nodekit';
 
 import {US_ERRORS} from '../../../../../const/errors';
-import {SharedEntryPermission} from '../../../../../entities/shared-entry';
+import {
+    SharedEntryPermission,
+    Permissions as SharedEntryPermissions,
+} from '../../../../../entities/shared-entry';
 import {SharedEntryInstance} from '../../../../../registry/plugins/common/entities/shared-entry/types';
 import {getParentIds} from '../../../collection/utils';
 import {ServiceArgs} from '../../../types';
@@ -14,7 +17,6 @@ export interface CheckCollectionEntryPermissionArgs {
     sharedEntryInstance: SharedEntryInstance;
     skipCheckPermissions?: boolean;
     includePermissions?: boolean;
-
     getEntityBindingsQueryTimeout?: number;
     getParentsQueryTimeout?: number;
     getEntryQueryTimeout?: number;
@@ -29,7 +31,6 @@ export async function checkCollectionEntryPermission(
         skipCheckPermissions = false,
         sharedEntryInstance,
         includePermissions,
-
         getEntityBindingsQueryTimeout,
         getParentsQueryTimeout,
         getEntryQueryTimeout,
@@ -46,6 +47,7 @@ export async function checkCollectionEntryPermission(
     const {accessServiceEnabled} = ctx.config;
 
     let permissions: EntryPermissions | undefined;
+    let fullPermissions: SharedEntryPermissions | undefined;
 
     if (accessServiceEnabled && !skipCheckPermissions && !isPrivateRoute) {
         if (requestWorkbookId || requestDatasetId) {
@@ -55,6 +57,7 @@ export async function checkCollectionEntryPermission(
                 {ctx, trx},
                 {
                     sharedEntryInstance,
+                    includePermissions,
                     getEntityBindingsQueryTimeout,
                     getParentsQueryTimeout,
                     getEntryQueryTimeout,
@@ -63,7 +66,8 @@ export async function checkCollectionEntryPermission(
             );
 
             if (includePermissions) {
-                permissions = entryPermissions;
+                permissions = entryPermissions.permissions;
+                fullPermissions = entryPermissions.fullPermissions;
             }
         } else {
             const parentIds = await getParentIds({
@@ -82,6 +86,7 @@ export async function checkCollectionEntryPermission(
                     });
                 }
                 permissions = mapCollectionEntryPermissions({sharedEntry: sharedEntryInstance});
+                fullPermissions = sharedEntryInstance.permissions;
             } else {
                 await sharedEntryInstance.checkPermission({
                     parentIds,
@@ -94,10 +99,11 @@ export async function checkCollectionEntryPermission(
 
         if (includePermissions) {
             permissions = mapCollectionEntryPermissions({sharedEntry: sharedEntryInstance});
+            fullPermissions = sharedEntryInstance.permissions;
         }
     }
 
     ctx.log('CHECK_COLLECTION_ENTRY_PERMISSION_FINISH');
 
-    return permissions;
+    return {permissions, fullPermissions};
 }

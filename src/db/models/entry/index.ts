@@ -173,6 +173,8 @@ class Entry extends Model {
             trxOverride,
             dlContext,
             useLegacyLogin = false,
+            version,
+            sourceVersion,
         }: MT.CreationEntryConfig,
         ctx: MT.CTX,
     ) {
@@ -197,6 +199,8 @@ class Entry extends Model {
             initialParentId,
             isPrivateRoute,
             dlContext,
+            version,
+            sourceVersion,
         });
 
         const registry = ctx.get('registry');
@@ -230,6 +234,8 @@ class Entry extends Model {
             initialPermissions,
             mirrored,
             mode,
+            version,
+            sourceVersion,
         });
 
         if (!isValid) {
@@ -490,6 +496,8 @@ class Entry extends Model {
                 links: syncedLinks,
                 createdBy: createdBy,
                 updatedBy: createdBy,
+                version,
+                sourceVersion,
             });
 
             if (!dlsBypassByKeyEnabled && !isPrivateRoute && ctx.config.dlsEnabled) {
@@ -577,6 +585,8 @@ class Entry extends Model {
             initialPermissions,
             initialParentId,
             isPrivateRoute = false,
+            version,
+            sourceVersion,
             dlContext,
         }: MT.PrivateCreationEntryConfig,
         ctx: MT.CTX,
@@ -598,6 +608,8 @@ class Entry extends Model {
             initialParentId,
             requestedBy,
             isPrivateRoute,
+            version,
+            sourceVersion,
         });
 
         const registry = ctx.get('registry');
@@ -630,6 +642,8 @@ class Entry extends Model {
                     disableCheckPermission: true,
                     trxOverride: trx,
                     verbose: true,
+                    version,
+                    sourceVersion,
                     dlContext,
                 },
                 ctx,

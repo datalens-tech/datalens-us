@@ -9,6 +9,7 @@ import {Entry, EntryColumn} from '../../../../db/models/new/entry';
 import {LicenseColumnRaw} from '../../../../db/models/new/license';
 import {TenantColumn} from '../../../../db/models/new/tenant';
 import {WorkbookModelColumn} from '../../../../db/models/new/workbook';
+import type {Permissions as SharedEntryPermissions} from '../../../../entities/shared-entry/types';
 import {DlsActions} from '../../../../types/models';
 import Utils, {withTimeout} from '../../../../utils';
 import {ServiceArgs} from '../../types';
@@ -45,6 +46,7 @@ export type GetEntryResult = {
     revision: SelectedRevision;
     includePermissionsInfo?: boolean;
     permissions: EntryPermissions;
+    fullPermissions?: SharedEntryPermissions;
     includeLinks?: boolean;
     includeServicePlan?: boolean;
     servicePlan?: string;
@@ -192,7 +194,7 @@ export const getEntry = async (
                     ])
                     .where({
                         tenantId,
-                        userId: user.userId,
+                        userId: user.licenseUserId,
                     });
             },
         })
@@ -234,6 +236,7 @@ export const getEntry = async (
 
     let dlsPermissions: any; // TODO: Update the type after refactoring DLS.checkPermission(...)
     let iamPermissions: Optional<EntryPermissions>;
+    let fullPermissions: Optional<SharedEntryPermissions>;
 
     if (entry.workbookId) {
         if (!entry.workbook || entry.workbook[WorkbookModelColumn.DeletedAt] !== null) {
@@ -273,17 +276,17 @@ export const getEntry = async (
             });
         }
 
-        const checkPermissionEnabled =
-            !isPrivateOrAuditRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
+        const checkedResult = await checkCollectionEntry({
+            ctx,
+            trx,
+            entry,
+            includePermissionsInfo,
+            skipCheckPermissions:
+                isPrivateOrAuditRoute || onlyPublic || onlyMirrored || isEmbedding,
+        });
 
-        if (checkPermissionEnabled) {
-            iamPermissions = await checkCollectionEntry({
-                ctx,
-                trx,
-                entry,
-                includePermissionsInfo,
-            });
-        }
+        iamPermissions = checkedResult.permissions;
+        fullPermissions = checkedResult.fullPermissions;
     } else {
         const checkPermissionEnabled =
             !dlsBypassByKeyEnabled &&
@@ -345,6 +348,7 @@ export const getEntry = async (
         revision,
         includePermissionsInfo,
         permissions,
+        fullPermissions,
         includeLinks,
         includeServicePlan,
         servicePlan,

@@ -87,11 +87,13 @@ export const checkCollectionEntry = async ({
     trx,
     entry,
     includePermissionsInfo,
+    skipCheckPermissions,
 }: {
     ctx: AppContext;
     trx?: TransactionOrKnex;
     entry: SelectedEntry;
     includePermissionsInfo?: boolean;
+    skipCheckPermissions?: boolean;
 }) => {
     const registry = ctx.get('registry');
     const {SharedEntry} = registry.common.classes.get();
@@ -106,6 +108,7 @@ export const checkCollectionEntry = async ({
         {
             sharedEntryInstance,
             includePermissions: includePermissionsInfo,
+            skipCheckPermissions,
             getEntityBindingsQueryTimeout: ENTITY_BINDING_QUERY_TIMEOUT,
             getParentsQueryTimeout: GET_PARENTS_QUERY_TIMEOUT,
             getEntryQueryTimeout: ENTRY_QUERY_TIMEOUT,

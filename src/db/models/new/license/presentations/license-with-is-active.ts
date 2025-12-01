@@ -1,16 +1,16 @@
 import {QueryBuilder, TransactionOrKnex, raw} from 'objection';
 
 import {CURRENT_TIMESTAMP} from '../../../../../const';
-import {License, LicenseColumnRaw} from '../index';
+import {License, LicenseColumn} from '../index';
 
 export class LicenseWithIsActive extends License {
     static get selectedColumns() {
         return [
             '*',
             raw(`?? > ? OR ?? IS NULL`, [
-                LicenseColumnRaw.ExpiresAt,
+                LicenseColumn.ExpiresAt,
                 raw(CURRENT_TIMESTAMP),
-                LicenseColumnRaw.ExpiresAt,
+                LicenseColumn.ExpiresAt,
             ]).as('is_active'),
         ];
     }

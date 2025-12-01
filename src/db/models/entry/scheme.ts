@@ -63,6 +63,12 @@ export const validateCreateEntry = compileSchema({
         },
         description: ANNOTATION_DESCRIPTION_SCHEMA,
         annotation: ANNOTATION_SCHEMA,
+        version: {
+            type: ['number', 'null'],
+        },
+        sourceVersion: {
+            type: ['number', 'null'],
+        },
     },
 });
 

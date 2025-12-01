@@ -76,6 +76,12 @@ export const validateCreateEntryInWorkbook = makeSchemaValidator({
         },
         description: ANNOTATION_DESCRIPTION_SCHEMA,
         annotation: ANNOTATION_SCHEMA,
+        version: {
+            type: ['number', 'null'],
+        },
+        sourceVersion: {
+            type: ['number', 'null'],
+        },
     },
 });
 
@@ -94,6 +100,8 @@ export type CreateEntryInWorkbookData = {
     description?: string;
     annotation?: {description: string};
     includePermissionsInfo?: boolean;
+    version?: RevisionColumns['version'];
+    sourceVersion?: RevisionColumns['sourceVersion'];
 };
 
 export async function createEntryInWorkbook(
@@ -113,6 +121,8 @@ export async function createEntryInWorkbook(
         description,
         annotation,
         includePermissionsInfo,
+        version,
+        sourceVersion,
     }: CreateEntryInWorkbookData,
 ) {
     ctx.log('CREATE_ENTRY_IN_WORKBOOK_CALL');
@@ -132,6 +142,8 @@ export async function createEntryInWorkbook(
         description,
         annotation,
         includePermissionsInfo,
+        version,
+        sourceVersion,
     });
 
     const registry = ctx.get('registry');
@@ -196,6 +208,8 @@ export async function createEntryInWorkbook(
             updatedBy: createdBy,
             ...(description ? {annotation: {description}} : {}),
             ...(annotation ? {annotation} : {}),
+            version,
+            sourceVersion,
         });
 
         return await Entry.query(trx)

@@ -4,6 +4,7 @@ import {ZitadelServiceUser, ZitadelUserRole} from './zitadel';
 export interface UserCtxInfo {
     userId: string;
     login: string;
+    licenseUserId: string;
 }
 
 export interface CtxInfo {

@@ -20,7 +20,6 @@ import {isTrueArg} from '../../utils/env-utils';
 import {copyEntriesToWorkbookController} from './copy-entries-to-workbook';
 import {copyEntryToWorkbookController} from './copy-entry-to-workbook';
 import {createEntryController} from './create-entry';
-import {createEntryAltController} from './create-entry-alt';
 import {deleteEntryController} from './delete-entry';
 import {getEntriesController} from './get-entries';
 import {getEntriesAnnotationController} from './get-entries-annotation';
@@ -41,7 +40,6 @@ export default {
     renameEntryController,
     updateEntryController,
     createEntryController,
-    createEntryAltController,
     getEntriesController,
     getEntryController,
     getEntriesRelationsController,
