@@ -4,7 +4,7 @@ export async function up(knex: Knex): Promise<void> {
     return knex.raw(`
         CREATE TYPE subscription_status_enum AS ENUM ('active', 'stopped', 'suspended');
         CREATE TYPE subscription_content_type_enum AS ENUM ('dash', 'chart', 'report');
-        CREATE TYPE subscription_trigger_type_enum AS ENUM ('cron', 'dataset_refresh', 'threshold', 'relative', 'non_empty', 'is_true');
+        CREATE TYPE subscription_trigger_type_enum AS ENUM ('cron', 'dataset-refresh', 'threshold', 'relative', 'non-empty', 'is-true');
         CREATE TYPE subscription_artifact_type_enum AS ENUM ('png');
 
         CREATE TABLE subscriptions (
@@ -64,12 +64,14 @@ export async function down(knex: Knex): Promise<void> {
         DROP TABLE subscription_recipients;
         DROP TYPE subscription_recipient_transport_type_enum;
 
-        DROP INDEX subscriptions_tenant_id_content_entry_id_created_at_desc_idx;
+        DROP INDEX subscriptions_title_description_trgm_idx;
         DROP INDEX subscriptions_tenant_id_created_by_idx;
+        DROP INDEX subscriptions_tenant_id_content_entry_id_idx;
+        DROP INDEX subscriptions_tenant_id_workbook_id_created_at_desc_idx;
         DROP TABLE subscriptions;
-        DROP TYPE subscription_status_enum;
-        DROP TYPE subscription_content_type_enum;
-        DROP TYPE subscription_trigger_type_enum;
         DROP TYPE subscription_artifact_type_enum;
+        DROP TYPE subscription_trigger_type_enum;
+        DROP TYPE subscription_content_type_enum;
+        DROP TYPE subscription_status_enum;
     `);
 }

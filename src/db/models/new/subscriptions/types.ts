@@ -12,11 +12,11 @@ export enum SubscriptionContentType {
 
 export enum SubscriptionTriggerType {
     Cron = 'cron',
-    DatasetRefresh = 'dataset_refresh',
+    DatasetRefresh = 'dataset-refresh',
     Threshold = 'threshold',
     Relative = 'relative',
-    NonEmpty = 'non_empty',
-    IsTrue = 'is_true',
+    NonEmpty = 'non-empty',
+    IsTrue = 'is-true',
 }
 
 export enum SubscriptionArtifactType {
