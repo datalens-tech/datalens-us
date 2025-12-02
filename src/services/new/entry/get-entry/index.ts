@@ -138,8 +138,7 @@ export const getEntry = async (
         graphRelations.push('favorite(favoriteModifier)');
     }
 
-    const checkEntryTenantEnabled =
-        !isPrivateOrAuditRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
+    const checkEntryTenantEnabled = !isPrivateRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
 
     const entry: SelectedEntry | undefined = await Entry.query(getReplica(trx))
         .select(selectedEntryColumns)
