@@ -54,19 +54,19 @@ class Entry extends Model {
                 edit: false,
                 admin: false,
             };
-        } else if (iamPermissions !== undefined) {
-            originatedPermissions = {
-                execute: iamPermissions.execute ?? false,
-                read: iamPermissions.read ?? false,
-                edit: iamPermissions.edit ?? false,
-                admin: iamPermissions.admin ?? false,
-            };
         } else if (isAuditRoute) {
             originatedPermissions = {
                 execute: false,
                 read: false,
                 edit: false,
                 admin: false,
+            };
+        } else if (iamPermissions !== undefined) {
+            originatedPermissions = {
+                execute: iamPermissions.execute ?? false,
+                read: iamPermissions.read ?? false,
+                edit: iamPermissions.edit ?? false,
+                admin: iamPermissions.admin ?? false,
             };
         } else if (isPrivateRoute || !ctx.config.dlsEnabled) {
             originatedPermissions = {
