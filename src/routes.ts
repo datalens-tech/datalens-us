@@ -3,6 +3,7 @@ import type {HttpMethod} from '@gravity-ui/expresskit/dist/types';
 import type {NodeKit} from '@gravity-ui/nodekit';
 
 import {Feature} from './components/features';
+import {runExampleWorkflow} from './components/temporal/client/workflows';
 import collections from './controllers/collections';
 import colorPalettes from './controllers/color-palettes';
 import entries from './controllers/entries';
@@ -40,6 +41,15 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             handler: homeController,
         }),
 
+        // TODO: delete it
+        temporalExample: makeRoute({
+            route: 'GET /temporal/example',
+            authPolicy: AuthPolicy.disabled,
+            handler: async (req, res) => {
+                const result = await runExampleWorkflow(req.ctx, {name: 'Bob Smith'});
+                res.status(200).send(result);
+            },
+        }),
         ping: {
             route: 'GET /ping',
             handler: helpers.ping,

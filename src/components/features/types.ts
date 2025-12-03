@@ -6,6 +6,7 @@ export enum Feature {
     WorkbookIsolationEnabled = 'WorkbookIsolationEnabled',
     DefaultColorPaletteEnabled = 'DefaultColorPaletteEnabled',
     TenantsEnabled = 'TenantsEnabled',
+    TemporalEnabled = 'TemporalEnabled',
 }
 
 export type FeaturesConfig = {
