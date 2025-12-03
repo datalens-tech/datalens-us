@@ -50,4 +50,9 @@ export default {
     debug: isTrueArg(getEnvVariable('DEBUG')),
 
     swaggerEnabled: !isTrueArg(getEnvVariable('DISABLE_SWAGGER')),
+
+    temporal: {
+        address: getEnvVariable('TEMPORAL_ADDRESS') || 'localhost:7233',
+        namespace: getEnvVariable('TEMPORAL_NAMESPACE') || 'default',
+    },
 } as Partial<AppConfig>;

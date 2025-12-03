@@ -1,5 +1,6 @@
 import type {CtxUser} from '../components/auth/types/user';
 import {FeaturesConfig} from '../components/features/types';
+import type {TemporalConfig} from '../components/temporal/types';
 import type {Registry} from '../registry';
 
 import {CtxInfo} from './ctx';
@@ -28,6 +29,8 @@ export interface PlatformAppConfig {
     authTokenPublicKey?: string;
 
     swaggerEnabled?: boolean;
+
+    temporal?: TemporalConfig;
 }
 
 export interface PlatformAppContextParams {
