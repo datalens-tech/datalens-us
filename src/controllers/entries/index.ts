@@ -17,6 +17,7 @@ import {
 } from '../../services/new/entry/formatters';
 import {isTrueArg} from '../../utils/env-utils';
 
+import {checkEntriesExistenceController} from './check-entries-existence';
 import {copyEntriesToWorkbookController} from './copy-entries-to-workbook';
 import {copyEntryToWorkbookController} from './copy-entry-to-workbook';
 import {createEntryController} from './create-entry';
@@ -31,6 +32,7 @@ import {renameEntryController} from './rename-entry';
 import {updateEntryController} from './update-entry';
 
 export default {
+    checkEntriesExistenceController,
     getEntriesDataController,
     getEntriesMetaController,
     getEntriesAnnotationController,

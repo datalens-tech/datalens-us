@@ -1,3 +1,4 @@
+export * from './check-entries-existence-model';
 export * from './entries-data-model';
 export * from './entries-meta-model';
 export * from './entries-error-model';
