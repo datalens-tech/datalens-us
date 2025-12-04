@@ -39,6 +39,7 @@ class Entry extends Model {
 
     static originatePermissions({
         isPrivateRoute,
+        isAuditRoute,
         shared,
         permissions,
         iamPermissions,
@@ -50,6 +51,13 @@ class Entry extends Model {
             originatedPermissions = {
                 execute: true,
                 read: true,
+                edit: false,
+                admin: false,
+            };
+        } else if (isAuditRoute) {
+            originatedPermissions = {
+                execute: false,
+                read: false,
                 edit: false,
                 admin: false,
             };

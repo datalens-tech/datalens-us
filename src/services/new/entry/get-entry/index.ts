@@ -89,7 +89,10 @@ export const getEntry = async (
     const registry = ctx.get('registry');
     const {DLS} = registry.common.classes.get();
 
-    const {isPrivateRoute, user, onlyPublic, onlyMirrored, tenantId} = ctx.get('info');
+    const {isPrivateRoute, user, onlyPublic, onlyMirrored, isAuditRoute, tenantId} =
+        ctx.get('info');
+
+    const isPrivateOrAuditRoute = isPrivateRoute || isAuditRoute;
 
     const {
         getEntryBeforeDbRequestHook,
@@ -117,7 +120,7 @@ export const getEntry = async (
     const graphRelations = ['workbook', 'tenant(tenantModifier)', 'collection(collectionModifier)'];
 
     const licenseRequired =
-        !isPrivateRoute && !onlyPublic && !isEmbedding && isLicenseRequired({ctx});
+        !isPrivateOrAuditRoute && !onlyPublic && !isEmbedding && isLicenseRequired({ctx});
 
     if (licenseRequired) {
         graphRelations.push('license(licenseModifier)');
@@ -216,7 +219,7 @@ export const getEntry = async (
     }
 
     const checkWorkbookIsolationEnabled =
-        !isPrivateRoute &&
+        !isPrivateOrAuditRoute &&
         !onlyPublic &&
         !onlyMirrored &&
         !isEmbedding &&
@@ -248,7 +251,7 @@ export const getEntry = async (
         }
 
         const checkWorkbookEnabled =
-            !isPrivateRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
+            !isPrivateOrAuditRoute && !onlyPublic && !onlyMirrored && !isEmbedding;
 
         if (checkWorkbookEnabled) {
             iamPermissions = await checkWorkbookEntry({
@@ -277,7 +280,8 @@ export const getEntry = async (
             trx,
             entry,
             includePermissionsInfo,
-            skipCheckPermissions: isPrivateRoute || onlyPublic || onlyMirrored || isEmbedding,
+            skipCheckPermissions:
+                isPrivateOrAuditRoute || onlyPublic || onlyMirrored || isEmbedding,
         });
 
         iamPermissions = checkedResult.permissions;
@@ -285,7 +289,7 @@ export const getEntry = async (
     } else {
         const checkPermissionEnabled =
             !dlsBypassByKeyEnabled &&
-            !isPrivateRoute &&
+            !isPrivateOrAuditRoute &&
             ctx.config.dlsEnabled &&
             !onlyPublic &&
             !onlyMirrored;
@@ -328,6 +332,7 @@ export const getEntry = async (
     if (includePermissionsInfo) {
         permissions = OldEntry.originatePermissions({
             isPrivateRoute,
+            isAuditRoute,
             shared: onlyPublic || isEmbedding,
             permissions: dlsPermissions,
             iamPermissions,
