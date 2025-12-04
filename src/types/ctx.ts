@@ -15,6 +15,7 @@ export interface CtxInfo {
     userToken?: string;
     user: UserCtxInfo;
     isPrivateRoute: boolean;
+    isAuditRoute?: boolean;
     dlContext: string;
     onlyPublic: boolean;
     onlyMirrored?: boolean;
