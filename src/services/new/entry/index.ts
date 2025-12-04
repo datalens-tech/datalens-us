@@ -1,3 +1,4 @@
+export * from './check-entries-existence';
 export * from './copy-entries-to-workbook';
 export * from './copy-entry-to-workbook';
 export * from './get-entry-by-key';
