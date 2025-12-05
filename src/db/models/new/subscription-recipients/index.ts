@@ -6,7 +6,7 @@ export const SubscriptionRecipientColumn = {
     SubscriptionRecipientId: 'subscriptionRecipientId',
     SubscriptionId: 'subscriptionId',
     UserId: 'userId',
-    transport: 'transport',
+    Transport: 'transport',
     CreatedBy: 'createdBy',
     CreatedAt: 'createdAt',
 } as const;
@@ -23,7 +23,7 @@ export class SubscriptionRecipient extends Model {
     [SubscriptionRecipientColumn.SubscriptionRecipientId]!: string;
     [SubscriptionRecipientColumn.SubscriptionId]!: string;
     [SubscriptionRecipientColumn.UserId]!: string;
-    [SubscriptionRecipientColumn.transport]!: SubscriptionRecipientTransportType;
+    [SubscriptionRecipientColumn.Transport]!: SubscriptionRecipientTransportType;
     [SubscriptionRecipientColumn.CreatedBy]!: string;
     [SubscriptionRecipientColumn.CreatedAt]!: string;
 }
