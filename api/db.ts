@@ -71,3 +71,17 @@ export {LicenseLimitWithIsStartedOnCurrentDay} from '../src/db/models/new/licens
 export {License, LicenseColumnRaw, LicenseColumn} from '../src/db/models/new/license';
 export {LicenseType} from '../src/db/models/new/license/types';
 export {LicenseWithIsActive} from '../src/db/models/new/license/presentations';
+
+export {
+    SubscriptionStatus,
+    SubscriptionContentType,
+    SubscriptionArtifactType,
+    SubscriptionTriggerType,
+} from '../src/db/models/new/subscriptions/types';
+export {Subscription, SubscriptionColumn} from '../src/db/models/new/subscriptions';
+
+export {SubscriptionRecipientTransportType} from '../src/db/models/new/subscription-recipients/types';
+export {
+    SubscriptionRecipient,
+    SubscriptionRecipientColumn,
+} from '../src/db/models/new/subscription-recipients';
