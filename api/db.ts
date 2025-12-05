@@ -78,7 +78,10 @@ export {
     SubscriptionArtifactType,
     SubscriptionTriggerType,
 } from '../src/db/models/new/subscriptions/types';
-export {Subscription} from '../src/db/models/new/subscriptions';
+export {Subscription, SubscriptionColumn} from '../src/db/models/new/subscriptions';
 
 export {SubscriptionRecipientTransportType} from '../src/db/models/new/subscription-recipients/types';
-export {SubscriptionRecipient} from '../src/db/models/new/subscription-recipients';
+export {
+    SubscriptionRecipient,
+    SubscriptionRecipientColumn,
+} from '../src/db/models/new/subscription-recipients';

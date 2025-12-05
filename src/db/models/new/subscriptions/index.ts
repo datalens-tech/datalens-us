@@ -24,7 +24,7 @@ export const SubscriptionColumn = {
     ContentEntryId: 'contentEntryId',
     ContentOptions: 'contentOptions',
     TriggerType: 'triggerType',
-    triggerEntryId: 'triggerEntryId',
+    TriggerEntryId: 'triggerEntryId',
     TriggerOptions: 'triggerOptions',
     ArtifactType: 'artifactType',
     ArtifactOptions: 'artifactOptions',
@@ -55,7 +55,7 @@ export class Subscription extends Model {
     [SubscriptionColumn.ContentEntryId]!: string;
     [SubscriptionColumn.ContentOptions]!: Record<string, unknown>;
     [SubscriptionColumn.TriggerType]!: SubscriptionTriggerType;
-    [SubscriptionColumn.triggerEntryId]!: Nullable<string>;
+    [SubscriptionColumn.TriggerEntryId]!: Nullable<string>;
     [SubscriptionColumn.TriggerOptions]!: Record<string, unknown>;
     [SubscriptionColumn.ArtifactType]!: SubscriptionArtifactType;
     [SubscriptionColumn.ArtifactOptions]!: Record<string, unknown>;
