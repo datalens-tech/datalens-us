@@ -7,11 +7,9 @@ import {checkEntriesExistence} from '../../services/new/entry';
 
 import {checkEntriesExistenceModel} from './response-models';
 
-const idsSchema = z.array(z.string()).pipe(zc.encodedIdArraySafe({min: 1, max: 1000}));
-
 const requestSchema = {
     body: z.object({
-        entryIds: idsSchema,
+        entryIds: zc.encodedIdArraySafe({min: 1, max: 1000}),
     }),
 };
 

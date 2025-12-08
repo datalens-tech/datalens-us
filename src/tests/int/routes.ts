@@ -20,7 +20,7 @@ export const routes = {
     getEntriesData: '/v1/get-entries-data',
     getEntriesAnnotation: '/v1/get-entries-annotation',
     getEntriesMeta: '/v1/get-entries-meta',
-    checkEntriesExistence: '/v1/entries/check-entries-existence',
+    checkEntriesExistence: '/v1/check-entries-existence',
     setDefaultColorPalette: '/v1/tenants/set-default-color-palette',
     updateTenantSettings: '/v1/tenants/settings',
     colorPalettes: '/v1/color-palettes',

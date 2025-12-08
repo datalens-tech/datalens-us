@@ -102,7 +102,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             requireCtxTenantId: true,
         }),
         checkEntriesExistence: makeRoute({
-            route: 'POST /v1/entries/check-entries-existence',
+            route: 'POST /v1/check-entries-existence',
             handler: entries.checkEntriesExistenceController,
         }),
         updateEntry: makeRoute({

@@ -32,7 +32,7 @@ export const checkEntriesExistence = async (
                       [EntryColumn.IsDeleted]: false,
                   })
                   .timeout(Entry.DEFAULT_QUERY_TIMEOUT)
-            : [];
+            : ([] as Pick<Entry, typeof EntryColumn.EntryId>[]);
 
     ctx.log('CHECK_ENTRIES_EXISTENCE_SUCCESS', {
         existingCount: existingEntries.length,
