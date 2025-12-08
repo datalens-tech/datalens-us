@@ -25,15 +25,6 @@ export type InitTemporalOptions = {
     metadataProvider?: ConnectionMetadataProvider;
 };
 
-export type TemporalTlsConfig = {
-    serverNameOverride?: string;
-    serverRootCACertificatePath?: string;
-    clientCertPair?: {
-        crtPath: string;
-        keyPath: string;
-    };
-};
-
 export type TemporalConfig = {
     address: string;
     namespace: string;
