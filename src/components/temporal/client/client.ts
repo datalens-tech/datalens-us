@@ -1,15 +1,13 @@
 import {AppContext} from '@gravity-ui/nodekit';
-import {Connection, WorkflowClient} from '@temporalio/client';
+import {Client, Connection} from '@temporalio/client';
 
 import type {ConnectionMetadataProvider} from '../types';
 import {getConnectionOptions} from '../utils/connections';
 
-type GetClientArgs = {
-    ctx: AppContext;
-};
+type WithClientCallback<T> = (client: Client) => Promise<T>;
 
 let _connection: Connection | undefined;
-let _client: WorkflowClient | undefined;
+let _client: Client | undefined;
 let _metadataProvider: ConnectionMetadataProvider | undefined;
 
 export const setClientMetadataProvider = (provider: ConnectionMetadataProvider | undefined) => {
@@ -42,32 +40,19 @@ const ensureClient = async (ctx: AppContext) => {
     const {namespace} = ctx.config.temporal || {};
     const connection = await ensureConnection(ctx);
 
-    _client = new WorkflowClient({connection, namespace});
+    _client = new Client({connection, namespace});
 
     return _client;
 };
 
-const createClientWrapper = (ctx: AppContext, client: WorkflowClient): WorkflowClient => {
-    return new Proxy(client, {
-        get(target, prop, receiver) {
-            const value = Reflect.get(target, prop, receiver);
+export const getClient = (ctx: AppContext) => {
+    return {
+        withClient: async <T>(callback: WithClientCallback<T>): Promise<T> => {
+            const client = await ensureClient(ctx);
+            const connection = await ensureConnection(ctx);
+            const metadata = await getMetadata(ctx);
 
-            if (typeof value === 'function' && ['start', 'execute'].includes(prop as string)) {
-                return async (...args: unknown[]) => {
-                    const metadata = await getMetadata(ctx);
-                    const connection = await ensureConnection(ctx);
-
-                    return connection.withMetadata(metadata, () => value.apply(target, args));
-                };
-            }
-
-            return value;
+            return connection.withMetadata(metadata, () => callback(client));
         },
-    });
-};
-
-export const getClient = async ({ctx}: GetClientArgs): Promise<WorkflowClient> => {
-    const client = await ensureClient(ctx);
-
-    return createClientWrapper(ctx, client);
+    };
 };

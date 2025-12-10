@@ -8,13 +8,15 @@ import type {ExampleArgs} from '../../workflows/example/types';
 import {getClient} from '../client';
 
 export const runExampleWorkflow = async (ctx: AppContext, {name}: ExampleArgs) => {
-    const client = await getClient({ctx});
+    const {withClient} = getClient(ctx);
 
-    const handle = await client.start(example, {
-        args: [{name}],
-        taskQueue: TASK_QUEUE,
-        workflowId: randomUUID(),
+    return withClient(async (client) => {
+        const handle = await client.workflow.start(example, {
+            args: [{name}],
+            taskQueue: TASK_QUEUE,
+            workflowId: randomUUID(),
+        });
+
+        return await handle.result();
     });
-
-    return await handle.result();
 };
