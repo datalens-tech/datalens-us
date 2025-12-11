@@ -7,11 +7,13 @@ export async function up(knex: Knex): Promise<void> {
         ALTER TABLE subscription_recipients DROP COLUMN subscription_recipient_id;
 
         ALTER TABLE subscription_recipients ADD PRIMARY KEY (subscription_id, user_id, transport);
+        CREATE INDEX subscription_recipients_user_id_transport_idx ON subscription_recipients(user_id, transport);
     `);
 }
 
 export async function down(knex: Knex): Promise<void> {
     await knex.raw(`
+        DROP INDEX subscription_recipients_user_id_transport_idx;
         ALTER TABLE subscription_recipients DROP CONSTRAINT subscription_recipients_pkey;
 
         ALTER TABLE subscription_recipients ADD COLUMN subscription_recipient_id BIGINT NOT NULL DEFAULT get_id();
