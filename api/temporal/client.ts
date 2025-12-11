@@ -1,1 +1,1 @@
-export {getClient} from '../../src/components/temporal/client/client';
+export {withClient} from '../../src/components/temporal/client/client';

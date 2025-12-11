@@ -45,14 +45,13 @@ const ensureClient = async (ctx: AppContext) => {
     return _client;
 };
 
-export const getClient = (ctx: AppContext) => {
-    return {
-        withClient: async <T>(callback: WithClientCallback<T>): Promise<T> => {
-            const client = await ensureClient(ctx);
-            const connection = await ensureConnection(ctx);
-            const metadata = await getMetadata(ctx);
+export const withClient = async <T>(
+    ctx: AppContext,
+    callback: WithClientCallback<T>,
+): Promise<T> => {
+    const client = await ensureClient(ctx);
+    const connection = await ensureConnection(ctx);
+    const metadata = await getMetadata(ctx);
 
-            return connection.withMetadata(metadata, () => callback(client));
-        },
-    };
+    return connection.withMetadata(metadata, () => callback(client));
 };
