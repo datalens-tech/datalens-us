@@ -44,7 +44,7 @@ const rootWorkbook2 = {
 
 describe('Setup', () => {
     test('Create all test entities', async () => {
-        const [rootCol, rootWorkb, rootCol2, rootWorkb2] = await Promise.all([
+        const [rootCol, rootWorkb] = await Promise.all([
             createMockCollection({
                 title: rootCollection.title,
                 parentId: null,
@@ -53,6 +53,11 @@ describe('Setup', () => {
                 title: rootWorkbook.title,
                 collectionId: null,
             }),
+        ]);
+        rootCollection.collectionId = rootCol.collectionId;
+        rootWorkbook.workbookId = rootWorkb.workbookId;
+
+        const [rootCol2, rootWorkb2] = await Promise.all([
             createMockCollection({
                 title: rootCollection2.title,
                 parentId: null,
@@ -62,8 +67,6 @@ describe('Setup', () => {
                 collectionId: null,
             }),
         ]);
-        rootCollection.collectionId = rootCol.collectionId;
-        rootWorkbook.workbookId = rootWorkb.workbookId;
         rootCollection2.collectionId = rootCol2.collectionId;
         rootWorkbook2.workbookId = rootWorkb2.workbookId;
 
@@ -560,7 +563,7 @@ describe('Getting root content with sorting', () => {
             ],
         })
             .query({
-                orderField: 'title',
+                orderField: 'createdAt',
                 orderDirection: 'desc',
             })
             .expect(200);
