@@ -13,6 +13,8 @@ export const features: FeaturesConfig = {
     [Feature.DefaultColorPaletteEnabled]: true,
     [Feature.TenantsEnabled]: true,
     [Feature.TemporalEnabled]: false,
+    [Feature.DynamicMasterTokenEnabled]: true,
+    [Feature.DynamicMasterTokenIsRequired]: false,
 };
 
 export default {

@@ -31,6 +31,8 @@ export interface PlatformAppConfig {
     swaggerEnabled?: boolean;
 
     temporal?: TemporalConfig;
+
+    dynamicMasterTokenPublicKeys?: Record<string, (string | undefined)[]>;
 }
 
 export interface PlatformAppContextParams {

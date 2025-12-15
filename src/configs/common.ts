@@ -55,4 +55,11 @@ export default {
         address: getEnvVariable('TEMPORAL_ADDRESS') || 'localhost:7233',
         namespace: getEnvVariable('TEMPORAL_NAMESPACE') || 'default',
     },
+
+    dynamicMasterTokenPublicKeys: {
+        ui: [
+            getEnvCert(process.env.UI_MASTER_TOKEN_PUBLIC_KEY_PRIMARY),
+            getEnvCert(process.env.UI_MASTER_TOKEN_PUBLIC_KEY_SECONDARY),
+        ],
+    },
 } as Partial<AppConfig>;
