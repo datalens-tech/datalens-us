@@ -1,7 +1,12 @@
 import {AuthPolicy} from '@gravity-ui/expresskit';
 import {NodeKit} from '@gravity-ui/nodekit';
 
-import {DL_SERVICE_USER_ACCESS_TOKEN, US_MASTER_TOKEN_HEADER} from '../../const';
+import {Feature, isEnabledFeature} from '../../components/features';
+import {
+    DL_SERVICE_USER_ACCESS_TOKEN,
+    US_DYNAMIC_MASTER_TOKEN_HEADER,
+    US_MASTER_TOKEN_HEADER,
+} from '../../const';
 import type {ExtendedAppRouteDescription} from '../../routes';
 
 import {SecurityType} from './constants';
@@ -17,6 +22,14 @@ export const getAdditionalSecuritySchemes = (
         in: 'header',
         name: US_MASTER_TOKEN_HEADER,
     };
+
+    if (isEnabledFeature(nodekit.ctx, Feature.DynamicMasterTokenEnabled)) {
+        result[SecurityType.DynamicMasterToken] = {
+            type: 'apiKey',
+            in: 'header',
+            name: US_DYNAMIC_MASTER_TOKEN_HEADER,
+        };
+    }
 
     const {config} = nodekit;
 
