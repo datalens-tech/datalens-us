@@ -3,7 +3,6 @@ import {Model} from '../../..';
 import {SubscriptionRecipientTransportType} from './types';
 
 export const SubscriptionRecipientColumn = {
-    SubscriptionRecipientId: 'subscriptionRecipientId',
     SubscriptionId: 'subscriptionId',
     UserId: 'userId',
     Transport: 'transport',
@@ -17,10 +16,13 @@ export class SubscriptionRecipient extends Model {
     }
 
     static get idColumn() {
-        return SubscriptionRecipientColumn.SubscriptionRecipientId;
+        return [
+            SubscriptionRecipientColumn.SubscriptionId,
+            SubscriptionRecipientColumn.UserId,
+            SubscriptionRecipientColumn.Transport,
+        ];
     }
 
-    [SubscriptionRecipientColumn.SubscriptionRecipientId]!: string;
     [SubscriptionRecipientColumn.SubscriptionId]!: string;
     [SubscriptionRecipientColumn.UserId]!: string;
     [SubscriptionRecipientColumn.Transport]!: SubscriptionRecipientTransportType;
