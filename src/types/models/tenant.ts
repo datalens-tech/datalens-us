@@ -7,9 +7,5 @@ export type TenantMeta = {
     };
 };
 
-export type TenantSettingsValue =
-    | string
-    | boolean
-    | number
-    | null
-    | Record<string, string | boolean | number | null>;
+type Primitive = string | boolean | number | null;
+export type TenantSettingsValue = Primitive | Record<string, Primitive>;
