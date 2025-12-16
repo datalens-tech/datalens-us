@@ -5,12 +5,13 @@ import {OrganizationPermission} from '../../../components/iam';
 import {US_ERRORS} from '../../../const';
 import {Tenant} from '../../../db/models/new/tenant';
 import {registry} from '../../../registry';
+import {TenantSettingsValue} from '../../../types/models';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
 
 type UpdateTenantSettingsArgs = {
     key: string;
-    value: string | boolean | number | null;
+    value: TenantSettingsValue;
 };
 
 export const updateTenantSettings = async (
