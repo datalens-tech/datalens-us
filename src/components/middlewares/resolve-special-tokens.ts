@@ -81,10 +81,16 @@ export async function resolvePrivateRoute(req: Request, res: Response, next: Nex
                 const servicePublicKeys = publicKeys[serviceId];
 
                 try {
+                    const keysToVerify = servicePublicKeys.filter((key) => key !== undefined);
+
+                    if (keysToVerify.length === 0) {
+                        req.ctx.log('DYNAMIC_MASTER_TOKEN_PUBLIC_KEY_NOT_FOUND', {serviceId});
+                        res.status(403).send({error: 'Public key not found'});
+                        return;
+                    }
+
                     await Promise.any(
-                        servicePublicKeys
-                            .filter((publicKey) => publicKey !== undefined)
-                            .map((publicKey) => jwtVerify(dynamicMasterToken, publicKey)),
+                        keysToVerify.map((key) => jwtVerify(dynamicMasterToken, key)),
                     );
                 } catch (err) {
                     req.ctx.logError('DYNAMIC_MASTER_TOKEN_VERIFICATION_ERROR', err);
