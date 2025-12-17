@@ -7,6 +7,8 @@ export enum Feature {
     DefaultColorPaletteEnabled = 'DefaultColorPaletteEnabled',
     TenantsEnabled = 'TenantsEnabled',
     TemporalEnabled = 'TemporalEnabled',
+    DynamicMasterTokenEnabled = 'DynamicMasterTokenEnabled',
+    DynamicMasterTokenIsRequired = 'DynamicMasterTokenIsRequired',
 }
 
 export type FeaturesConfig = {

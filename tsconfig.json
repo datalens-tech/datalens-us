@@ -2,6 +2,7 @@
   "extends": "@gravity-ui/tsconfig/tsconfig",
   "compilerOptions": {
     "outDir": "dist/server",
+    "lib": ["ES2021"],
     "noUnusedParameters": false,
     "noUnusedLocals": false,
     "sourceMap": true

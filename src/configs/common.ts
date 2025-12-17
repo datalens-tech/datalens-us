@@ -1,7 +1,12 @@
 import {AuthPolicy} from '@gravity-ui/expresskit';
 import {AppConfig} from '@gravity-ui/nodekit';
 
-import {APP_NAME, US_MASTER_TOKEN_HEADER} from '../const';
+import {
+    APP_NAME,
+    DL_SERVICE_USER_ACCESS_TOKEN,
+    US_DYNAMIC_MASTER_TOKEN_HEADER,
+    US_MASTER_TOKEN_HEADER,
+} from '../const';
 import {getEnvCert, getEnvTokenVariable, getEnvVariable, isTrueArg} from '../utils/env-utils';
 
 const isZitadelEnabled = isTrueArg(getEnvVariable('ZITADEL'));
@@ -24,7 +29,16 @@ export default {
 
     appAuthPolicy: isAuthServiceEnabled ? AuthPolicy.required : AuthPolicy.disabled,
 
-    appSensitiveKeys: [US_MASTER_TOKEN_HEADER],
+    appSensitiveKeys: [
+        US_MASTER_TOKEN_HEADER,
+        US_DYNAMIC_MASTER_TOKEN_HEADER,
+        DL_SERVICE_USER_ACCESS_TOKEN,
+    ],
+    appSensitiveHeaders: [
+        US_MASTER_TOKEN_HEADER,
+        US_DYNAMIC_MASTER_TOKEN_HEADER,
+        DL_SERVICE_USER_ACCESS_TOKEN,
+    ],
 
     // zitadel
     zitadelEnabled: isZitadelEnabled,
@@ -54,5 +68,16 @@ export default {
     temporal: {
         address: getEnvVariable('TEMPORAL_ADDRESS') || 'localhost:7233',
         namespace: getEnvVariable('TEMPORAL_NAMESPACE') || 'default',
+    },
+
+    dynamicMasterTokenPublicKeys: {
+        ui: [
+            getEnvCert(process.env.UI_MASTER_TOKEN_PUBLIC_KEY_PRIMARY),
+            getEnvCert(process.env.UI_MASTER_TOKEN_PUBLIC_KEY_SECONDARY),
+        ],
+        bi: [
+            getEnvCert(process.env.BI_MASTER_TOKEN_PUBLIC_KEY_PRIMARY),
+            getEnvCert(process.env.BI_MASTER_TOKEN_PUBLIC_KEY_SECONDARY),
+        ],
     },
 } as Partial<AppConfig>;

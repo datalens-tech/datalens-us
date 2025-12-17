@@ -40,3 +40,5 @@ export {
     z,
     zc,
 } from '../src/components/zod';
+
+export {resolvePrivateRoute} from '../src/components/middlewares';

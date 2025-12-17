@@ -1,7 +1,6 @@
 import {AppConfig} from '@gravity-ui/nodekit';
 
 import {Feature, FeaturesConfig} from '../../components/features/types';
-import {DL_SERVICE_USER_ACCESS_TOKEN} from '../../const';
 import {isTrueArg} from '../../utils/env-utils';
 
 export const features: FeaturesConfig = {
@@ -13,10 +12,10 @@ export const features: FeaturesConfig = {
     [Feature.DefaultColorPaletteEnabled]: true,
     [Feature.TenantsEnabled]: true,
     [Feature.TemporalEnabled]: false,
+    [Feature.DynamicMasterTokenEnabled]: true,
+    [Feature.DynamicMasterTokenIsRequired]: false,
 };
 
 export default {
-    appSensitiveKeys: [DL_SERVICE_USER_ACCESS_TOKEN],
-    appSensitiveHeaders: [DL_SERVICE_USER_ACCESS_TOKEN],
     features,
 } as Partial<AppConfig>;

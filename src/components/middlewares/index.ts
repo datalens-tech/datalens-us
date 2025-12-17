@@ -1,6 +1,6 @@
 export {decodeId} from './decode-id';
 export {resolveTenantId} from './resolve-tenant-id';
-export {resolveSpecialTokens} from './resolve-special-tokens';
+export {resolveSpecialTokens, resolvePrivateRoute} from './resolve-special-tokens';
 export {waitDatabase} from './wait-database';
 export {setCiEnv} from './set-ci-env';
 export {dlContext} from './x-dl-context';
