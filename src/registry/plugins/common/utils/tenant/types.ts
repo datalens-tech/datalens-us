@@ -1,6 +1,8 @@
 import type {AppContext} from '@gravity-ui/nodekit';
 import {TransactionOrKnex} from 'objection';
 
+import {TenantSettingsValue} from '../../../../../types/models';
+
 export type CheckTenant = (args: {
     ctx: AppContext;
     tenantId: string;
@@ -19,5 +21,5 @@ export type ProcessTenantSettings = (args: {
     ctx: AppContext;
     trx?: TransactionOrKnex;
     key: string;
-    value: string | boolean | number | null;
+    value: TenantSettingsValue;
 }) => Promise<void>;
