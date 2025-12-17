@@ -25,7 +25,6 @@ const jwtVerify = (token: string, publicKey: string) => {
             publicKey,
             {
                 algorithms: ['RS256'],
-                complete: true,
             },
             (err, decoded) => {
                 if (err) {
@@ -54,18 +53,15 @@ async function resolvePrivateRoute(req: Request, res: Response, next: NextFuncti
                 req.ctx.log('CHECK_DYNAMIC_MASTER_TOKEN');
 
                 // Decode token to get serviceId (without verification)
-                const decoded = jwt.decode(dynamicMasterToken, {complete: true}) as {
-                    header: jwt.JwtHeader;
-                    payload: DynamicMasterTokenPayload;
-                } | null;
+                const decoded = jwt.decode(dynamicMasterToken) as DynamicMasterTokenPayload | null;
 
-                if (!decoded || !decoded.payload) {
+                if (!decoded || !decoded.serviceId) {
                     req.ctx.log('DYNAMIC_MASTER_TOKEN_DECODE_FAILED');
                     res.status(403).send({error: 'Invalid dynamic master token format'});
                     return;
                 }
 
-                const serviceId = decoded.payload.serviceId;
+                const serviceId = decoded.serviceId;
 
                 if (!serviceId) {
                     req.ctx.log('DYNAMIC_MASTER_TOKEN_MISSING_SERVICE_ID');
@@ -96,7 +92,6 @@ async function resolvePrivateRoute(req: Request, res: Response, next: NextFuncti
                     return;
                 }
 
-                req.ctx.log('DYNAMIC_MASTER_TOKEN_VERIFIED', {serviceId});
                 req.ctx.log('PRIVATE_API_CALL_AUTHORIZED', {method: 'dynamic', serviceId});
 
                 res.locals.isPrivateRoute = true;

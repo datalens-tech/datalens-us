@@ -63,6 +63,10 @@ export const getAdditionalHeaders = (
 
     if (routeDescription.private) {
         security.push({[SecurityType.MasterToken]: []});
+
+        if (isEnabledFeature(nodekit.ctx, Feature.DynamicMasterTokenEnabled)) {
+            security.push({[SecurityType.DynamicMasterToken]: []});
+        }
     }
 
     const {config} = nodekit;

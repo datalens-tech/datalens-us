@@ -61,5 +61,9 @@ export default {
             getEnvCert(process.env.UI_MASTER_TOKEN_PUBLIC_KEY_PRIMARY),
             getEnvCert(process.env.UI_MASTER_TOKEN_PUBLIC_KEY_SECONDARY),
         ],
+        bi: [
+            getEnvCert(process.env.BI_MASTER_TOKEN_PUBLIC_KEY_PRIMARY),
+            getEnvCert(process.env.BI_MASTER_TOKEN_PUBLIC_KEY_SECONDARY),
+        ],
     },
 } as Partial<AppConfig>;
