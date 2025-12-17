@@ -11,7 +11,7 @@ import {briefTenantWithSettingsModel} from './response-models';
 const requestSchema = {
     body: z.object({
         key: z.string(),
-        value: zc.primitive(),
+        value: zc.primitive().or(z.record(z.string(), zc.primitive())),
     }),
 };
 export type UpdateTenantSettingsRequestBodySchema = z.infer<typeof requestSchema.body>;

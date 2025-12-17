@@ -22,7 +22,7 @@ export const ctx = async (req: Request, res: Response, next: NextFunction) => {
         req.headers[DL_COMPONENT_HEADER] as string,
     );
 
-    const user = {userId, login, licenseUserId: userId};
+    const user = {userId, login};
 
     req.originalContext.set('info', {
         requestId: req.id,

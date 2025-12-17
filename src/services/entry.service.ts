@@ -61,7 +61,7 @@ export default class EntryService {
                 tenantId,
                 servicePlan: checkServicePlan,
                 features: checkTenantFeatures,
-                foldersEnabled: !workbookId,
+                foldersEnabled: !workbookId && !collectionId,
             }),
             ...(!isPrivateRoute ? [fetchAndValidateLicenseOrFail({ctx})] : []),
         ]);

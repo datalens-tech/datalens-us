@@ -6,3 +6,6 @@ export type TenantMeta = {
         traceId: string;
     };
 };
+
+type Primitive = string | boolean | number | null;
+export type TenantSettingsValue = Primitive | Record<string, Primitive>;
