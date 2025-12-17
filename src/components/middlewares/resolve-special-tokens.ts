@@ -70,7 +70,7 @@ export async function resolvePrivateRoute(req: Request, res: Response, next: Nex
                 }
 
                 const publicKeys = req.ctx.config.dynamicMasterTokenPublicKeys?.[serviceId]?.filter(
-                    (key) => key !== undefined,
+                    (key): key is string => typeof key === 'string' && key.length > 0,
                 );
 
                 if (!publicKeys || publicKeys.length === 0) {
