@@ -37,7 +37,7 @@ const jwtVerify = (token: string, publicKey: string) => {
     });
 };
 
-async function resolvePrivateRoute(req: Request, res: Response, next: NextFunction) {
+export async function resolvePrivateRoute(req: Request, res: Response, next: NextFunction) {
     req.ctx.log('PRIVATE_API_CALL');
 
     const isDynamicMasterTokenEnabled = isEnabledFeature(
