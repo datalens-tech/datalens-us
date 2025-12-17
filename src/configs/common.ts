@@ -1,7 +1,12 @@
 import {AuthPolicy} from '@gravity-ui/expresskit';
 import {AppConfig} from '@gravity-ui/nodekit';
 
-import {APP_NAME, US_DYNAMIC_MASTER_TOKEN_HEADER, US_MASTER_TOKEN_HEADER} from '../const';
+import {
+    APP_NAME,
+    DL_SERVICE_USER_ACCESS_TOKEN,
+    US_DYNAMIC_MASTER_TOKEN_HEADER,
+    US_MASTER_TOKEN_HEADER,
+} from '../const';
 import {getEnvCert, getEnvTokenVariable, getEnvVariable, isTrueArg} from '../utils/env-utils';
 
 const isZitadelEnabled = isTrueArg(getEnvVariable('ZITADEL'));
@@ -24,7 +29,16 @@ export default {
 
     appAuthPolicy: isAuthServiceEnabled ? AuthPolicy.required : AuthPolicy.disabled,
 
-    appSensitiveKeys: [US_MASTER_TOKEN_HEADER, US_DYNAMIC_MASTER_TOKEN_HEADER],
+    appSensitiveKeys: [
+        US_MASTER_TOKEN_HEADER,
+        US_DYNAMIC_MASTER_TOKEN_HEADER,
+        DL_SERVICE_USER_ACCESS_TOKEN,
+    ],
+    appSensitiveHeaders: [
+        US_MASTER_TOKEN_HEADER,
+        US_DYNAMIC_MASTER_TOKEN_HEADER,
+        DL_SERVICE_USER_ACCESS_TOKEN,
+    ],
 
     // zitadel
     zitadelEnabled: isZitadelEnabled,
