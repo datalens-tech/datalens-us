@@ -69,8 +69,11 @@ export async function resolvePrivateRoute(req: Request, res: Response, next: Nex
                     return;
                 }
 
-                const publicKeys = req.ctx.config.dynamicMasterTokenPublicKeys;
-                if (!publicKeys || !publicKeys[serviceId] || publicKeys[serviceId].length === 0) {
+                const publicKeys = req.ctx.config.dynamicMasterTokenPublicKeys?.[serviceId]?.filter(
+                    (key) => key !== undefined,
+                );
+
+                if (!publicKeys || publicKeys.length === 0) {
                     req.ctx.log('DYNAMIC_MASTER_TOKEN_PUBLIC_KEY_NOT_FOUND', {serviceId});
                     res.status(403).send({
                         error: `Public key not found for serviceId: ${serviceId}`,
@@ -78,20 +81,8 @@ export async function resolvePrivateRoute(req: Request, res: Response, next: Nex
                     return;
                 }
 
-                const servicePublicKeys = publicKeys[serviceId];
-
                 try {
-                    const keysToVerify = servicePublicKeys.filter((key) => key !== undefined);
-
-                    if (keysToVerify.length === 0) {
-                        req.ctx.log('DYNAMIC_MASTER_TOKEN_PUBLIC_KEY_NOT_FOUND', {serviceId});
-                        res.status(403).send({error: 'Public key not found'});
-                        return;
-                    }
-
-                    await Promise.any(
-                        keysToVerify.map((key) => jwtVerify(dynamicMasterToken, key)),
-                    );
+                    await Promise.any(publicKeys.map((key) => jwtVerify(dynamicMasterToken, key)));
                 } catch (err) {
                     req.ctx.logError('DYNAMIC_MASTER_TOKEN_VERIFICATION_ERROR', err);
                     res.status(403).send({error: 'Invalid dynamic master token'});
