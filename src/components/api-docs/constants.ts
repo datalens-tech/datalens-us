@@ -2,7 +2,6 @@ export enum SecurityType {
     MasterToken = 'Master token',
     DynamicMasterToken = 'Dynamic master token',
     BearerAuth = 'Access token',
-    ServiceUserToken = 'Service user access token',
 }
 
 export enum ApiTag {

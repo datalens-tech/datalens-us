@@ -58,7 +58,10 @@ export const createWorkbookController: AppRouteHandler = async (
         });
 
         res.status(200).send(
-            workbookInstanceWithOperation.format(result.workbook, result.operation),
+            workbookInstanceWithOperation.format({
+                workbook: result.workbook,
+                operation: result.operation,
+            }),
         );
     } catch (error) {
         logEvent({

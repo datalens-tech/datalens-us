@@ -6,4 +6,7 @@ export default {
     features: {
         ...features,
     },
+    dynamicMasterTokenPublicKeys: {
+        'test-service': ['test-public-key'],
+    },
 } as Partial<AppConfig>;

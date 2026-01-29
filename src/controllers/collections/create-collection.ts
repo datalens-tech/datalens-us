@@ -47,7 +47,10 @@ export const createCollectionController: AppRouteHandler = async (req, res) => {
         });
 
         res.status(200).send(
-            collectionInstanceWithOperation.format(result.collection, result.operation),
+            collectionInstanceWithOperation.format({
+                collection: result.collection,
+                operation: result.operation,
+            }),
         );
     } catch (error) {
         logEvent({

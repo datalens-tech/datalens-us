@@ -1,5 +1,4 @@
 import {PrivatePermissions} from './models';
-import {ZitadelServiceUser, ZitadelUserRole} from './zitadel';
 
 export interface UserCtxInfo {
     userId: string;
@@ -11,7 +10,6 @@ export interface CtxInfo {
     tenantId: string;
     workbookId?: string;
     datasetId?: string;
-    userToken?: string;
     user: UserCtxInfo;
     isPrivateRoute: boolean;
     isAuditRoute?: boolean;
@@ -19,6 +17,4 @@ export interface CtxInfo {
     onlyPublic: boolean;
     onlyMirrored?: boolean;
     privatePermissions: PrivatePermissions;
-    serviceUser?: ZitadelServiceUser;
-    zitadelUserRole?: ZitadelUserRole;
 }

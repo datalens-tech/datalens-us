@@ -1,7 +1,7 @@
 import request from 'supertest';
 
 import usApp from '../..';
-import {US_ERRORS, US_MASTER_TOKEN_HEADER} from '../../const';
+import {US_DYNAMIC_MASTER_TOKEN_HEADER, US_ERRORS} from '../../const';
 
 export type CommonAuthArgs = {
     userId?: string;
@@ -16,8 +16,13 @@ export const appNodekit = usApp.nodekit;
 
 export const testTenantId = 'common';
 
-export const authMasterToken = (req: request.Test) => {
-    const token = process.env.MASTER_TOKEN ?? '';
-    req.set(US_MASTER_TOKEN_HEADER, token);
+export type AuthPrivateRouteOptions = {
+    serviceId?: string;
+};
+
+export const authPrivateRoute = (req: request.Test, options: AuthPrivateRouteOptions = {}) => {
+    const {serviceId = 'test-service'} = options;
+    const token = JSON.stringify({serviceId});
+    req.set(US_DYNAMIC_MASTER_TOKEN_HEADER, token);
     return req;
 };

@@ -3,7 +3,6 @@ import {AppContext, AppError} from '@gravity-ui/nodekit';
 import {UserRole} from '../../../../../components/auth/constants/role';
 import {OrganizationPermission} from '../../../../../components/iam';
 import {US_ERRORS} from '../../../../../const';
-import {ZitadelUserRole} from '../../../../../types/zitadel';
 
 import type {CheckOrganizationPermission} from './types';
 
@@ -44,47 +43,11 @@ const checkAuthOrganizationPermission: CheckOrganizationPermission = async (args
     }
 };
 
-const checkZitadelOrganizationPermission: CheckOrganizationPermission = async (args: {
-    ctx: AppContext;
-    permission: OrganizationPermission;
-}) => {
-    const {ctx, permission} = args;
-    const {zitadelUserRole} = ctx.get('info');
-
-    switch (permission) {
-        case OrganizationPermission.UseInstance:
-            break;
-
-        case OrganizationPermission.ManageInstance: {
-            if (zitadelUserRole !== ZitadelUserRole.Admin) {
-                throwAccessServicePermissionDenied();
-            }
-            break;
-        }
-
-        case OrganizationPermission.CreateCollectionInRoot:
-        case OrganizationPermission.CreateWorkbookInRoot: {
-            if (
-                zitadelUserRole !== ZitadelUserRole.Editor &&
-                zitadelUserRole !== ZitadelUserRole.Admin
-            ) {
-                throwAccessServicePermissionDenied();
-            }
-            break;
-        }
-
-        default:
-            throwAccessServicePermissionDenied();
-    }
-};
-
 export const checkOrganizationPermission: CheckOrganizationPermission = async (args: {
     ctx: AppContext;
     permission: OrganizationPermission;
 }) => {
     if (args.ctx.config.isAuthEnabled) {
         await checkAuthOrganizationPermission(args);
-    } else {
-        await checkZitadelOrganizationPermission(args);
     }
 };

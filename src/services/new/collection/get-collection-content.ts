@@ -63,6 +63,7 @@ export const getCollectionContent = async (
 
     const registry = ctx.get('registry');
     const {accessServiceEnabled} = ctx.config;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {Workbook, Collection} = registry.common.classes.get();
 
     const {

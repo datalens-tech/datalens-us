@@ -32,7 +32,12 @@ export const getCollectionController: AppRouteHandler = async (req, res) => {
         },
     );
 
-    res.status(200).send(collectionInstance.format(result));
+    res.status(200).send(
+        collectionInstance.format({
+            collection: result,
+            includePermissionsInfo: query.includePermissionsInfo,
+        }),
+    );
 };
 
 getCollectionController.api = {

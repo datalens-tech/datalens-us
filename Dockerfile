@@ -14,21 +14,22 @@ RUN mkdir -p /etc/apt/keyrings && \
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
 
-RUN apt-get update && apt-get -y install nodejs g++ make
+RUN apt-get update && apt-get -y install nodejs g++ make && npm i -g pnpm@10.17.1
 
 RUN useradd -m -u 1001 app && mkdir /opt/app && chown app:app /opt/app
 
 WORKDIR /opt/app
 
-COPY package.json package-lock.json .npmrc /opt/app/
-RUN npm ci
+COPY package.json pnpm-lock.yaml .npmrc /opt/app/
+
+RUN pnpm install --frozen-lockfile --prefer-offline
 
 COPY ./dist /opt/app/dist
 COPY ./src /opt/app/src
 COPY ./typings /opt/app/typings
 COPY tsconfig.json /opt/app/
 
-RUN npm run build && chown app /opt/app/dist/run
+RUN pnpm run build && chown app /opt/app/dist/run
 
 # runtime base image for both platform
 FROM ubuntu:${UBUNTU_VERSION} AS base-stage
@@ -44,7 +45,7 @@ RUN mkdir -p /etc/apt/keyrings && \
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
 
-RUN apt-get update && apt-get -y install nodejs
+RUN apt-get update && apt-get -y install nodejs && npm i -g pnpm@10.17.1
 
 # install postgresql-client
 RUN apt-get -y install postgresql-client
@@ -73,21 +74,23 @@ RUN apt-get update && apt-get -y install g++ make
 
 WORKDIR /opt/app
 
-COPY package.json package-lock.json .npmrc /opt/app/
+COPY package.json pnpm-lock.yaml .npmrc /opt/app/
 
-RUN npm ci && npm prune --production
+RUN pnpm install --frozen-lockfile --prefer-offline --prod --ignore-scripts
 
 # production running stage
 FROM base-stage AS runtime-stage
 
 ARG USER=app
 ARG app_version
-ENV APP_VERSION=$app_version
-ENV TMPDIR=/tmp
+ENV APP_VERSION=$app_version \
+    TMPDIR=/tmp \
+    NODE_ENV=production \
+    APP_PORT=8080
 
 WORKDIR /opt/app
 
-COPY package.json package-lock.json /opt/app/
+COPY package.json pnpm-lock.yaml /opt/app/
 COPY ./scripts/preflight.sh /opt/app/scripts/preflight.sh
 
 COPY --from=install-stage /opt/app/node_modules /opt/app/node_modules
@@ -96,9 +99,6 @@ COPY --from=native-build-stage /opt/app/dist /opt/app/dist
 RUN chown -R ${USER} /opt/app/dist/run
 
 USER app
-
-ENV NODE_ENV=production
-ENV APP_PORT=8080
 
 EXPOSE 8080
 

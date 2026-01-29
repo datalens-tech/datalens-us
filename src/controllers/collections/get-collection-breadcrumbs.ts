@@ -29,7 +29,12 @@ export const getCollectionBreadcrumbsController: AppRouteHandler = async (req, r
         },
     );
 
-    res.status(200).send(await collectionInstanceArray.format(result));
+    res.status(200).send(
+        await collectionInstanceArray.format({
+            collections: result,
+            includePermissionsInfo: query.includePermissionsInfo,
+        }),
+    );
 };
 
 getCollectionBreadcrumbsController.api = {

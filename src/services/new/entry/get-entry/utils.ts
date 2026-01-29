@@ -5,6 +5,7 @@ import {US_ERRORS} from '../../../../const';
 import {Entry as EntryModel} from '../../../../db/models/new/entry';
 import {WorkbookModel} from '../../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../../entities/workbook';
+import {UsPermissions} from '../../../../types/models';
 import {getParentIds} from '../../collection/utils';
 import {getReplica} from '../../utils';
 import {getEntryPermissionsByWorkbook} from '../../workbook/utils';
@@ -86,12 +87,14 @@ export const checkCollectionEntry = async ({
     ctx,
     trx,
     entry,
+    permission,
     includePermissionsInfo,
     skipCheckPermissions,
 }: {
     ctx: AppContext;
     trx?: TransactionOrKnex;
     entry: SelectedEntry;
+    permission: UsPermissions;
     includePermissionsInfo?: boolean;
     skipCheckPermissions?: boolean;
 }) => {
@@ -107,6 +110,7 @@ export const checkCollectionEntry = async ({
         {ctx, trx},
         {
             sharedEntryInstance,
+            permission,
             includePermissions: includePermissionsInfo,
             skipCheckPermissions,
             getEntityBindingsQueryTimeout: ENTITY_BINDING_QUERY_TIMEOUT,

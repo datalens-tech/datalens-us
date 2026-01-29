@@ -2,7 +2,18 @@ const {execSync} = require('child_process');
 
 const chalk = require('chalk');
 const glob = require('glob');
-const _ = require('lodash');
+
+const {calculateWorkerCount} = require('./helpers');
+
+// Get command line arguments
+// e.g. pnpm test:int states.test
+//      pnpm test:int collections/move
+const getTestPatterns = () => {
+    if (process.argv.length > 2) {
+        return process.argv.slice(2);
+    }
+    return null;
+};
 
 const run = async () => {
     try {
@@ -12,13 +23,15 @@ const run = async () => {
             throw new Error(`Unknown appInstallation – ${appInstallation}`);
         }
 
-        const chunkSize = parseInt(process.env.TEST_CHUNK_SIZE, 10) || 50;
+        const customPatterns = getTestPatterns();
 
-        console.log(`${chalk.bold.hex('#ff6928')('Integration tests')}\n`);
+        const title = customPatterns ? 'Running specific integration tests' : 'Integration tests';
+
+        console.log(`${chalk.bold.hex('#ff6928')(title)}\n`);
 
         const patterns = ['dist/server/tests/int/env/opensource/suites/**/*.test.js'];
 
-        const suites = [];
+        let suites = [];
 
         patterns.forEach((pattern) => {
             const files = glob.sync(pattern, {
@@ -32,29 +45,47 @@ const run = async () => {
             suites.push(...files);
         });
 
-        const chunkedSuites = _.chunk(suites, chunkSize);
+        if (customPatterns) {
+            console.log(`${chalk.bold(`Running tests matching: ${customPatterns.join(', ')}`)}\n`);
+
+            suites = suites.filter((suite) =>
+                customPatterns.some((pattern) => suite.includes(pattern)),
+            );
+
+            if (suites.length === 0) {
+                console.log(
+                    chalk.red(
+                        `Error: No test files found matching patterns: ${customPatterns.join(', ')}`,
+                    ),
+                );
+                process.exit(1);
+            }
+        }
 
         console.log(`${chalk.bold(`Suites count: ${suites.length}`)}\n`);
 
-        const manyChunks = chunkedSuites.length > 1;
+        const testMatchPattern = `**/(${suites.join('|')})`;
 
-        if (manyChunks) {
-            console.log(`${chalk.bold(`Chunks count: ${chunkedSuites.length}`)}\n`);
-        }
+        const maxWorkersValue = process.env.JEST_MAX_WORKERS || '50%';
+        const calculatedWorkers = calculateWorkerCount(maxWorkersValue);
+        const maxWorkers = Math.min(calculatedWorkers, suites.length);
 
-        for (let i = 0; i < chunkedSuites.length; i++) {
-            if (manyChunks) {
-                const message = `Chunk №${i + 1} started`;
-                console.log(`${chalk.bold(message)}\n${'-'.repeat(message.length)}\n`);
-            }
+        console.log(
+            `${chalk.bold(`Running tests in parallel with ${maxWorkers} workers (from ${maxWorkersValue}, capped to ${suites.length} suites)...`)}\n`,
+        );
 
-            execSync(
-                `JEST_TESTCONTAINERS_CONFIG_PATH='./jest/int/testcontainers-config.js' NODE_TLS_REJECT_UNAUTHORIZED=0 jest -c './jest/int/jest.config.js' --testMatch '**/(${chunkedSuites[i].join('|')})' --logHeapUsage --detectOpenHandles`,
-                {stdio: 'inherit'},
-            );
+        const jestCommand = [
+            `JEST_MAX_WORKERS=${maxWorkers}`,
+            'JEST_TESTCONTAINERS_CONFIG_PATH=./jest/int/testcontainers-config.js',
+            'NODE_TLS_REJECT_UNAUTHORIZED=0',
+            'jest',
+            '-c ./jest/int/jest.config.js',
+            `--testMatch '${testMatchPattern}'`,
+            `--maxWorkers=${maxWorkers}`,
+            '--logHeapUsage',
+        ].join(' ');
 
-            console.log('\n');
-        }
+        execSync(jestCommand, {stdio: 'inherit'});
     } catch (e) {
         // eslint-disable-next-line no-console
         console.error(e);

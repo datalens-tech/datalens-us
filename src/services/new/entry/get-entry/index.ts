@@ -10,7 +10,7 @@ import {LicenseColumnRaw} from '../../../../db/models/new/license';
 import {TenantColumn} from '../../../../db/models/new/tenant';
 import {WorkbookModelColumn} from '../../../../db/models/new/workbook';
 import type {Permissions as SharedEntryPermissions} from '../../../../entities/shared-entry/types';
-import {DlsActions} from '../../../../types/models';
+import {DlsActions, UsPermissions} from '../../../../types/models';
 import Utils, {withTimeout} from '../../../../utils';
 import {ServiceArgs} from '../../types';
 import {getReplica} from '../../utils';
@@ -279,6 +279,7 @@ export const getEntry = async (
             ctx,
             trx,
             entry,
+            permission: UsPermissions.Execute,
             includePermissionsInfo,
             skipCheckPermissions:
                 isPrivateOrAuditRoute || onlyPublic || onlyMirrored || isEmbedding,

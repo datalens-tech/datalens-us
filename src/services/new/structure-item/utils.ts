@@ -1,7 +1,6 @@
-import {AppContext, AppError} from '@gravity-ui/nodekit';
+import {AppContext} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
-import {US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {EntryColumn, Entry as EntryModel} from '../../../db/models/new/entry';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
@@ -195,66 +194,27 @@ export const processPermissions = async ({
     skipCheckPermissions,
     includePermissionsInfo,
 }: ProcessPermissionsArgs) => {
-    let result;
-
     const {accessServiceEnabled} = ctx.config;
     const registry = ctx.get('registry');
     const {Workbook, Collection, SharedEntry} = registry.common.classes.get();
 
     if (accessServiceEnabled && !skipCheckPermissions) {
-        const checkedItems = await Promise.all(
-            models.map(async (model: WorkbookModel | CollectionModel | EntryModel) => {
-                let item: WorkbookInstance | CollectionInstance | SharedEntryInstance;
-
-                try {
-                    if (isSharedEntryModel(model)) {
-                        item = new SharedEntry({ctx, model});
-                        await item.checkPermission({
-                            parentIds,
-                            permission: SharedEntryPermission.LimitedView,
-                        });
-                    } else if (isWorkbookModel(model)) {
-                        item = new Workbook({ctx, model});
-                        await item.checkPermission({
-                            parentIds,
-                            permission: WorkbookPermission.LimitedView,
-                        });
-                    } else {
-                        item = new Collection({ctx, model});
-                        await item.checkPermission({
-                            parentIds,
-                            permission: CollectionPermission.LimitedView,
-                        });
-                    }
-
-                    return item;
-                } catch (error) {
-                    const err = error as AppError;
-
-                    if (err.code === US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED) {
-                        return null;
-                    }
-
-                    throw error;
-                }
-            }),
+        const itemsWithPermissions = await bulkFetchStructureItemsAllPermissions(
+            ctx,
+            models.map((model) => ({model, parentIds})),
         );
 
-        result = checkedItems.filter((item) => item !== null) as InstanceType<
-            typeof Collection | typeof Workbook | typeof SharedEntry
-        >[];
-
-        if (includePermissionsInfo) {
-            result = await bulkFetchStructureItemsAllPermissions(
-                ctx,
-                result.map((item) => ({
-                    model: item.model,
-                    parentIds,
-                })),
-            );
-        }
+        return itemsWithPermissions.filter((item) => {
+            if (isSharedEntryModel(item.model)) {
+                return item.permissions?.[SharedEntryPermission.View] === true;
+            } else if (isWorkbookModel(item.model)) {
+                return item.permissions?.[WorkbookPermission.LimitedView] === true;
+            } else {
+                return item.permissions?.[CollectionPermission.LimitedView] === true;
+            }
+        });
     } else {
-        result = models.map((model: WorkbookModel | CollectionModel | EntryModel) => {
+        return models.map((model: WorkbookModel | CollectionModel | EntryModel) => {
             let item: WorkbookInstance | CollectionInstance | SharedEntryInstance;
             if (isSharedEntryModel(model)) {
                 item = new SharedEntry({ctx, model});
@@ -271,7 +231,6 @@ export const processPermissions = async ({
             return item;
         });
     }
-    return result;
 };
 
 function isSharedEntryModel(

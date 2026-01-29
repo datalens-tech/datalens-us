@@ -45,6 +45,7 @@ export const moveCollection = async (
         {collectionId},
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {Collection} = registry.common.classes.get();
     const {checkOrganizationPermission} = registry.common.functions.get();
 

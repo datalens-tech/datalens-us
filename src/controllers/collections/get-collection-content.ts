@@ -57,7 +57,12 @@ export const getCollectionContentController: AppRouteHandler = async (req, res) 
         },
     );
 
-    res.status(200).send(await collectionContent.format(result));
+    res.status(200).send(
+        await collectionContent.format({
+            ...result,
+            includePermissionsInfo: query.includePermissionsInfo,
+        }),
+    );
 };
 
 getCollectionContentController.api = {

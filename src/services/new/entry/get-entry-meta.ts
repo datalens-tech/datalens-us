@@ -4,15 +4,14 @@ import {makeSchemaValidator} from '../../../components/validation-schema-compile
 import {US_ERRORS} from '../../../const';
 import {Entry} from '../../../db/models/new/entry';
 import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
-import {SharedEntryPermission} from '../../../entities/shared-entry';
-import {DlsActions} from '../../../types/models';
+import {DlsActions, UsPermissions} from '../../../types/models';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 import {getWorkbook} from '../workbook';
 
 import {checkFetchedEntry} from './utils';
-import {checkSharedEntryPermission} from './utils/check-collection-entry-permission/check-permission';
+import {checkCollectionEntryPermission} from './utils/check-collection-entry-permission';
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
@@ -73,12 +72,22 @@ export const getEntryMeta = async (
                 await getWorkbook({ctx, trx}, {workbookId: joinedEntryRevision.workbookId});
             }
         } else if (joinedEntryRevision.collectionId) {
-            if (!isPrivateRoute) {
-                await checkSharedEntryPermission(
-                    {ctx, trx},
-                    {entry: joinedEntryRevision, permission: SharedEntryPermission.View},
-                );
-            }
+            const {SharedEntry} = registry.common.classes.get();
+
+            const sharedEntryInstance = new SharedEntry({
+                ctx,
+                model: joinedEntryRevision as unknown as Entry,
+            });
+
+            await checkCollectionEntryPermission(
+                {ctx, trx: getReplica(trx)},
+                {
+                    sharedEntryInstance,
+                    permission: UsPermissions.Read,
+                    includePermissions: false,
+                    skipCheckPermissions: isPrivateRoute,
+                },
+            );
         } else {
             const {isNeedBypassEntryByKey} = registry.common.functions.get();
 

@@ -6,14 +6,11 @@ import {US_ERRORS} from '../../../../../const';
 import type {WorkbookModel} from '../../../../../db/models/new/workbook';
 import {getMockedOperation} from '../../../../../entities/utils';
 import {Permissions, WorkbookPermission} from '../../../../../entities/workbook/types';
-import {ZitadelUserRole} from '../../../../../types/zitadel';
 import Utils from '../../../../../utils';
 
 import {WorkbookConstructor, WorkbookInstance} from './types';
 
-export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
-    implements WorkbookInstance
-{
+export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook implements WorkbookInstance {
     static bulkFetchAllPermissions = async (ctx, items) => {
         return items.map(({model}) => {
             const workbook = new Workbook({ctx, model});
@@ -93,13 +90,11 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook
     private isEditorOrAdmin() {
         const {isAuthEnabled} = this.ctx.config;
         const user = this.ctx.get('user');
-        const {zitadelUserRole} = this.ctx.get('info');
         return isAuthEnabled
             ? (user?.roles || []).some(
                   (role) => role === UserRole.Editor || role === UserRole.Admin,
               )
-            : zitadelUserRole === ZitadelUserRole.Editor ||
-                  zitadelUserRole === ZitadelUserRole.Admin;
+            : false;
     }
 
     private getAllPermissions() {

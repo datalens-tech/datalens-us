@@ -6,6 +6,7 @@ export function jsonString<T extends z.ZodTypeAny>(schema: T) {
         .transform((str, ctx) => {
             try {
                 return JSON.parse(str);
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (error) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,

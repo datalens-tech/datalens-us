@@ -73,6 +73,7 @@ class Links extends Model {
                     toId: decodedId,
                     name,
                 });
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (error) {
                 invalidLinkIds[name] = toId as string;
             }

@@ -24,12 +24,18 @@ const schema = collectionModel.schema
     )
     .describe('Collection instance');
 
-const format = (data: CollectionInstance): z.infer<typeof schema> => {
-    const {model} = data;
+const format = ({
+    collection,
+    includePermissionsInfo,
+}: {
+    collection: CollectionInstance;
+    includePermissionsInfo?: boolean;
+}): z.infer<typeof schema> => {
+    const {model} = collection;
 
     return {
         ...collectionModel.format(model),
-        permissions: data.permissions,
+        permissions: includePermissionsInfo ? collection.permissions : undefined,
     };
 };
 

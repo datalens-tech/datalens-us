@@ -6,7 +6,7 @@ import {WorkbookModel, WorkbookModelColumn} from '../../../../../../db/models/ne
 import Utils from '../../../../../../utils';
 import {testUserId} from '../../../../constants';
 import {routes} from '../../../../routes';
-import {app, appNodekit, authMasterToken, testTenantId} from '../../auth';
+import {app, appNodekit, authPrivateRoute, testTenantId} from '../../auth';
 
 const workbookTitle = 'Favourite Workbook';
 const folderName = 'F1 2024 results';
@@ -86,7 +86,7 @@ describe('Rename entries', () => {
     });
 
     test('Rename folder', async () => {
-        const {body} = await authMasterToken(
+        const {body} = await authPrivateRoute(
             request(app).post(`${routes.privateEntries}/${folderEntryId}/rename`),
         )
             .send({
@@ -113,7 +113,7 @@ describe('Rename entries', () => {
     test('Rename entry in workbook', async () => {
         const newName = 'Capitalized Name';
 
-        const {body} = await authMasterToken(
+        const {body} = await authPrivateRoute(
             request(app).post(`${routes.privateEntries}/${workbookEntryId}/rename`),
         )
             .send({
@@ -133,7 +133,7 @@ describe('Rename entries', () => {
     test('Rename entry in Folder', async () => {
         const newName = 'Teams';
 
-        const {body} = await authMasterToken(
+        const {body} = await authPrivateRoute(
             request(app).post(`${routes.privateEntries}/${entryInFolderId}/rename`),
         )
             .send({

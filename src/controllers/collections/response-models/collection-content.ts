@@ -20,15 +20,21 @@ const format = async ({
     workbooks,
     collectionsNextPageToken,
     workbooksNextPageToken,
+    includePermissionsInfo,
 }: {
     collections: CollectionInstance[];
     workbooks: WorkbookInstance[];
     collectionsNextPageToken: Nullable<string>;
     workbooksNextPageToken: Nullable<string>;
+    includePermissionsInfo?: boolean;
 }): Promise<z.infer<typeof schema>> => {
     return {
-        collections: await Utils.macrotasksMap(collections, collectionInstance.format),
-        workbooks: await Utils.macrotasksMap(workbooks, workbookInstance.format),
+        collections: await Utils.macrotasksMap(collections, (collection) =>
+            collectionInstance.format({collection, includePermissionsInfo}),
+        ),
+        workbooks: await Utils.macrotasksMap(workbooks, (workbook) =>
+            workbookInstance.format({workbook, includePermissionsInfo}),
+        ),
         collectionsNextPageToken,
         workbooksNextPageToken,
     };

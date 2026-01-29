@@ -18,12 +18,6 @@ export interface PlatformAppConfig {
 
     masterToken: string[];
 
-    // zitadel
-    zitadelEnabled?: boolean;
-    zitadelUri?: string;
-    clientId?: string;
-    clientSecret?: string;
-
     // auth
     isAuthEnabled?: boolean;
     authTokenPublicKey?: string;

@@ -1,20 +1,22 @@
 import {AppError} from '@gravity-ui/nodekit';
 
 import {US_ERRORS} from '../../../../../const/errors';
-import {
-    SharedEntryPermission,
-    Permissions as SharedEntryPermissions,
-} from '../../../../../entities/shared-entry';
+import {Permissions as SharedEntryPermissions} from '../../../../../entities/shared-entry';
 import {SharedEntryInstance} from '../../../../../registry/plugins/common/entities/shared-entry/types';
+import {UsPermissions} from '../../../../../types/models';
 import {getParentIds} from '../../../collection/utils';
 import {ServiceArgs} from '../../../types';
 import type {EntryPermissions} from '../../types';
 
 import {checkEntityBindings} from './check-entity-bindings';
-import {mapCollectionEntryPermissions} from './map-collection-entry-permissions';
+import {
+    mapCollectionEntryPermissions,
+    mapPermissionToSharedEntryPermission,
+} from './map-collection-entry-permissions';
 
 export interface CheckCollectionEntryPermissionArgs {
     sharedEntryInstance: SharedEntryInstance;
+    permission: UsPermissions;
     skipCheckPermissions?: boolean;
     includePermissions?: boolean;
     getEntityBindingsQueryTimeout?: number;
@@ -30,12 +32,15 @@ export async function checkCollectionEntryPermission(
     const {
         skipCheckPermissions = false,
         sharedEntryInstance,
+        permission,
         includePermissions,
         getEntityBindingsQueryTimeout,
         getParentsQueryTimeout,
         getEntryQueryTimeout,
         getWorkbookQueryTimeout,
     } = args;
+
+    const sharedEntryPermission = mapPermissionToSharedEntryPermission[permission];
 
     ctx.log('CHECK_COLLECTION_ENTRY_PERMISSION_START');
 
@@ -65,6 +70,12 @@ export async function checkCollectionEntryPermission(
                 },
             );
 
+            if (!entryPermissions.permissions?.[permission]) {
+                throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
+                    code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
+                });
+            }
+
             if (includePermissions) {
                 permissions = entryPermissions.permissions;
                 fullPermissions = entryPermissions.fullPermissions;
@@ -80,7 +91,7 @@ export async function checkCollectionEntryPermission(
             if (includePermissions) {
                 await sharedEntryInstance.fetchAllPermissions({parentIds});
 
-                if (!sharedEntryInstance.permissions?.[SharedEntryPermission.LimitedView]) {
+                if (!sharedEntryInstance.permissions?.[sharedEntryPermission]) {
                     throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
                         code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
                     });
@@ -90,7 +101,7 @@ export async function checkCollectionEntryPermission(
             } else {
                 await sharedEntryInstance.checkPermission({
                     parentIds,
-                    permission: SharedEntryPermission.LimitedView,
+                    permission: sharedEntryPermission,
                 });
             }
         }

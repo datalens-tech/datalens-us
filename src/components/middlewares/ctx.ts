@@ -8,14 +8,11 @@ export const ctx = async (req: Request, res: Response, next: NextFunction) => {
         tenantId,
         workbookId,
         datasetId,
-        userToken,
         userId,
         login,
         isPrivateRoute = false,
         dlContext,
         onlyPublic,
-        serviceUser,
-        zitadelUserRole,
     } = res.locals;
 
     const privatePermissions = resolvePrivatePermissions(
@@ -29,14 +26,11 @@ export const ctx = async (req: Request, res: Response, next: NextFunction) => {
         tenantId,
         workbookId,
         datasetId,
-        userToken,
         user,
         isPrivateRoute,
         dlContext,
         onlyPublic,
         privatePermissions,
-        serviceUser,
-        zitadelUserRole,
     });
 
     req.ctx.log('REQUEST_INFO', {
