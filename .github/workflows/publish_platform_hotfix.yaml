@@ -21,10 +21,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: .
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.1
       - uses: actions/setup-node@v3
         with:
           node-version: 22
-          cache: 'npm'
+          cache: 'pnpm'
       - name: 'Get current release'
         run: |
           COMMIT_NAME=$(git log -n 1 --pretty=format:%s) 
@@ -36,7 +39,7 @@ jobs:
           echo "COMMIT_NAME=$COMMIT_NAME" >> "$GITHUB_ENV"
       - name: 'Make new release version number'
         run: |
-          TAG_NEW_VERSION=$(npm version patch --no-git-tag-version --allow-same-version)
+          TAG_NEW_VERSION=$(pnpm version patch --no-git-tag-version --allow-same-version)
           NEW_VERSION=$(echo $TAG_NEW_VERSION | sed 's|v||')
 
           echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
@@ -44,7 +47,7 @@ jobs:
       - name: 'Commit package version'
         run: |
           git config user.email "" && git config user.name "GitHub Release"
-          git add package.json && git add package-lock.json && git commit -am "Bump version to $NEW_VERSION [hotfix]"
+          git add package.json && git add pnpm-lock.yaml && git commit -am "Bump version to $NEW_VERSION [hotfix]"
           git push
       - uses: actions/create-release@v1
         env:
