@@ -21,13 +21,6 @@ jobs:
         with:
           sparse-checkout: .
           fetch-depth: 0
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.17.1
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          cache: 'pnpm'
       - name: Run on release branch only
         run: |
           if [[ "${{ github.ref }}" != "refs/heads/release-"* ]]; then
