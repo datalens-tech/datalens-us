@@ -16,17 +16,14 @@ jobs:
   build:
     name: datalens-us
     runs-on: ubuntu-24.04
+    if: |
+      startsWith(github.ref, 'refs/heads/release-') &&
+      github.event.head_commit.author.username == 'robot-charts'
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: .
           fetch-depth: 0
-      - name: Run on release branch only
-        run: |
-          if [[ "${{ github.ref }}" != "refs/heads/release-"* ]]; then
-            echo "Branch is not release branch, exiting."
-            exit 1
-          fi
       - name: Get version
         run: |
           set -e
