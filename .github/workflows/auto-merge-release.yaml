@@ -2,7 +2,7 @@ name: Auto Merge Release PR
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened]
     branches:
       - main
 
@@ -25,4 +25,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
+          RELEASE_TAG=$(git describe --tags --abbrev=0)
+          
+          # skip hotfix release (tag does not end with .0)
+          if [[ "$RELEASE_TAG" != *".0" ]]; then
+            echo "Skipping hostfix tag"
+            exit 0
+          fi
+
           gh pr merge ${{ github.event.pull_request.number }} --admin --squash

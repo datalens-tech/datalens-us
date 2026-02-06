@@ -62,7 +62,7 @@ jobs:
           tags: |
             type=raw,value=${{ env.BUILD_VERSION }}
             type=raw,value=${{ env.RELEASE_TAG }}
-            type=raw,value=latest
+            ${{ endsWith(env.RELEASE_TAG, '.0') && 'type=raw,value=latest' || '' }}
       - name: Build and push Docker image
         uses: docker/build-push-action@v5.0.0
         with:
