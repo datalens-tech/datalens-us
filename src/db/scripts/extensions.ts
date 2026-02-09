@@ -4,6 +4,11 @@ dotenv.config();
 import '../../index';
 import {registry} from '../../registry';
 
+if (process.env.PROHIBIT_MIGRATIONS) {
+    console.error('Migrations are prohibited in this env!');
+    process.exit(1);
+}
+
 if (require.main === module) {
     const {db} = registry.getDbInstance();
 

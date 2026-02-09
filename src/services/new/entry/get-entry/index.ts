@@ -215,7 +215,7 @@ export const getEntry = async (
     }
 
     if (licenseRequired) {
-        checkLicense({ctx, license: entry.license});
+        checkLicense({ctx, license: entry.license, tenant: entry.tenant});
     }
 
     const checkWorkbookIsolationEnabled =
