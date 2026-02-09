@@ -22,8 +22,14 @@ const schema = z
     })
     .describe('Shared entry instance');
 
-const format = (data: SharedEntryInstance): z.infer<typeof schema> => {
-    const {model} = data;
+const format = ({
+    sharedEntry,
+    includePermissionsInfo,
+}: {
+    sharedEntry: SharedEntryInstance;
+    includePermissionsInfo?: boolean;
+}): z.infer<typeof schema> => {
+    const {model} = sharedEntry;
 
     return {
         entryId: Utils.encodeId(model.entryId),
@@ -38,7 +44,7 @@ const format = (data: SharedEntryInstance): z.infer<typeof schema> => {
         tenantId: model.tenantId,
         workbookId: model.workbookId ? Utils.encodeId(model.workbookId) : null,
         collectionId: model.collectionId ? Utils.encodeId(model.collectionId) : null,
-        permissions: data.permissions,
+        permissions: includePermissionsInfo ? sharedEntry.permissions : undefined,
     };
 };
 

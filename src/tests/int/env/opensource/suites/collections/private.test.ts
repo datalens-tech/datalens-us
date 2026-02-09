@@ -2,7 +2,7 @@ import request from 'supertest';
 
 import {COLLECTIONS_DEFAULT_FIELDS} from '../../../../models';
 import {routes} from '../../../../routes';
-import {app, authMasterToken} from '../../auth';
+import {app, authPrivateRoute} from '../../auth';
 
 const testCollection = {
     collectionId: '',
@@ -16,7 +16,7 @@ describe('Creating private collection', () => {
     });
 
     test('Create', async () => {
-        const response = await authMasterToken(request(app).post(routes.privateCollections))
+        const response = await authPrivateRoute(request(app).post(routes.privateCollections))
             .send({
                 title: testCollection.title,
                 description: testCollection.description,
@@ -43,7 +43,7 @@ describe('Getting private collection', () => {
     });
 
     test('Get', async () => {
-        const response = await authMasterToken(
+        const response = await authPrivateRoute(
             request(app).get(`${routes.privateCollections}/${testCollection.collectionId}`),
         ).expect(200);
 

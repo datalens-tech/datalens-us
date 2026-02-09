@@ -1,8 +1,16 @@
 import {AppContext, AppError} from '@gravity-ui/nodekit';
 
+import {SharedEntryPermission} from '../../../../../entities/shared-entry';
 import type {SharedEntryInstance} from '../../../../../registry/plugins/common/entities/shared-entry/types';
 import {UsPermissions} from '../../../../../types/models';
 import type {EntryPermissions} from '../../types';
+
+export const mapPermissionToSharedEntryPermission: Record<UsPermissions, SharedEntryPermission> = {
+    [UsPermissions.Execute]: SharedEntryPermission.LimitedView,
+    [UsPermissions.Read]: SharedEntryPermission.View,
+    [UsPermissions.Edit]: SharedEntryPermission.Update,
+    [UsPermissions.Admin]: SharedEntryPermission.UpdateAccessBindings,
+};
 
 type MapCollectionEntryPermissionsParams = {
     sharedEntry: SharedEntryInstance;

@@ -15,10 +15,15 @@ export type WorkbookInstancePage = z.infer<typeof schema>;
 const format = async (data: {
     workbooks: WorkbookInstance[];
     nextPageToken?: string;
+    includePermissionsInfo?: boolean;
 }): Promise<WorkbookInstancePage> => {
+    const {workbooks, nextPageToken, includePermissionsInfo} = data;
     return {
-        workbooks: await workbookInstanceArray.format(data.workbooks),
-        nextPageToken: data.nextPageToken,
+        workbooks: await workbookInstanceArray.format({
+            workbooks,
+            includePermissionsInfo,
+        }),
+        nextPageToken,
     };
 };
 

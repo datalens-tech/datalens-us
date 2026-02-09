@@ -1,1 +1,2 @@
-import './auth-zitadel';
+import './app-auth';
+import './dynamic-master-token';

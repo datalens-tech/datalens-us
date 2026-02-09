@@ -2,7 +2,7 @@ import request from 'supertest';
 
 import {routes} from '../../routes';
 
-import {AuthArgs, app, auth, authMasterToken, testTenantId} from './auth';
+import {AuthArgs, app, auth, authPrivateRoute, testTenantId} from './auth';
 import {OpensourceRole} from './roles';
 
 export const mockWorkbookEntry = {
@@ -70,7 +70,7 @@ export const createPrivateMockWorkbookEntry = async (args: CreateMockWorkbookEnt
     const meta = args.meta ?? mockWorkbookEntry.meta;
     const mode = args.mode ?? mockWorkbookEntry.mode;
 
-    const response = await authMasterToken(request(app).post(routes.privateEntries))
+    const response = await authPrivateRoute(request(app).post(routes.privateEntries))
         .send({
             name,
             scope,

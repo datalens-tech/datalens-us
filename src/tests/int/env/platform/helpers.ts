@@ -7,7 +7,7 @@ import {
     AuthArgs,
     app,
     auth,
-    authMasterToken,
+    authPrivateRoute,
     getCollectionBinding,
     getWorkbookBinding,
     testTenantId,
@@ -88,7 +88,7 @@ export const createPrivateMockWorkbookEntry = async (args: CreateMockWorkbookEnt
     const mode = args.mode ?? mockWorkbookEntry.mode;
     const links = args?.links;
 
-    const response = await authMasterToken(request(app).post(routes.privateEntries))
+    const response = await authPrivateRoute(request(app).post(routes.privateEntries))
         .send({
             name,
             scope,
@@ -173,7 +173,7 @@ export const createPrivateMockCollectionEntry = async (args: CreateMockCollectio
     const mode = args.mode ?? mockCollectionEntry.mode;
     const links = args?.links;
 
-    const response = await authMasterToken(request(app).post(routes.privateEntries))
+    const response = await authPrivateRoute(request(app).post(routes.privateEntries))
         .send({
             name,
             scope,

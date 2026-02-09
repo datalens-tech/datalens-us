@@ -15,12 +15,17 @@ const schema = originalWorkbookInstance.schema
 
 export type WorkbookInstanceWithOperationResponseModel = z.infer<typeof schema>;
 
-const format = (
-    workbookInstance: WorkbookInstance,
-    operation?: Operation,
-): WorkbookInstanceWithOperationResponseModel => {
+const format = ({
+    workbook,
+    operation,
+    includePermissionsInfo,
+}: {
+    workbook: WorkbookInstance;
+    operation?: Operation;
+    includePermissionsInfo?: boolean;
+}): WorkbookInstanceWithOperationResponseModel => {
     return {
-        ...originalWorkbookInstance.format(workbookInstance),
+        ...originalWorkbookInstance.format({workbook, includePermissionsInfo}),
         operation: operation ? operationResponseModel.format(operation) : undefined,
     };
 };

@@ -1,4 +1,6 @@
-export {getGatewayConfig} from '../src/components/gateway';
+export {getGatewayConfig, isGatewayError} from '../src/components/gateway';
+export {createAction, defaultParamsSerializer} from '../src/components/gateway/utils';
+export type {SchemaEndpoints} from '../src/components/gateway/types';
 
 export {
     default as compileSchema,
@@ -16,8 +18,6 @@ export {default as prepareErrorResponse} from '../src/components/error-response-
 
 export {isEnabledFeature, Feature} from '../src/components/features';
 export type {FeaturesConfig} from '../src/components/features/types';
-
-export {isGatewayError} from '../src/components/gateway';
 
 export {resolvePrivatePermissions} from '../src/components/private-permissions';
 

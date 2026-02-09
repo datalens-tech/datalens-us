@@ -3,7 +3,7 @@ import request from 'supertest';
 import {systemUserId} from '../../../../constants';
 import {WORKBOOK_DEFAULT_FIELDS} from '../../../../models';
 import {routes} from '../../../../routes';
-import {app, authMasterToken, testTenantId} from '../../auth';
+import {app, authPrivateRoute, testTenantId} from '../../auth';
 
 const workbooksData = {
     id: null,
@@ -17,7 +17,7 @@ describe('Private Workbooks managment', () => {
     test('Create workbooks', async () => {
         await request(app).post(routes.privateWorkbooks).expect(403);
 
-        const response1 = await authMasterToken(request(app).post(routes.privateWorkbooks))
+        const response1 = await authPrivateRoute(request(app).post(routes.privateWorkbooks))
             .send({
                 title: workbooksData.title,
                 description: workbooksData.description,
@@ -39,7 +39,7 @@ describe('Private Workbooks managment', () => {
 
         await request(app).get(`${routes.privateWorkbooks}/${body1.workbookId}`).expect(403);
 
-        const response2 = await authMasterToken(
+        const response2 = await authPrivateRoute(
             request(app).get(`${routes.privateWorkbooks}/${body1.workbookId}`),
         ).expect(200);
 
@@ -64,7 +64,7 @@ describe('Private Entries in workboooks managment', () => {
 
         const entry1Name = 'Entry in test workbook 1';
 
-        const responseWorkbook = await authMasterToken(request(app).post(routes.privateWorkbooks))
+        const responseWorkbook = await authPrivateRoute(request(app).post(routes.privateWorkbooks))
             .send({
                 title: testTitle,
                 description: testDescription,
@@ -75,7 +75,7 @@ describe('Private Entries in workboooks managment', () => {
 
         testWorkbookId = bodyWorkbook.workbookId;
 
-        await authMasterToken(request(app).post(routes.privateEntries))
+        await authPrivateRoute(request(app).post(routes.privateEntries))
             .send({
                 scope: 'dataset',
                 type: 'graph',
@@ -90,7 +90,7 @@ describe('Private Entries in workboooks managment', () => {
     test('Get workbook entries', async () => {
         await request(app).get(`${routes.privateWorkbooks}/${testWorkbookId}/entries`).expect(403);
 
-        const response = await authMasterToken(
+        const response = await authPrivateRoute(
             request(app).get(`${routes.privateWorkbooks}/${testWorkbookId}/entries`),
         ).expect(200);
 

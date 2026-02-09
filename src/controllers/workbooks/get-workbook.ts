@@ -35,7 +35,12 @@ export const getWorkbookController: AppRouteHandler = async (
         },
     );
 
-    res.status(200).send(workbookInstance.format(result));
+    res.status(200).send(
+        workbookInstance.format({
+            workbook: result,
+            includePermissionsInfo: query.includePermissionsInfo,
+        }),
+    );
 };
 
 getWorkbookController.api = {

@@ -1,12 +1,9 @@
 import {NextFunction, Request, Response} from '@gravity-ui/expresskit';
-import jwt from 'jsonwebtoken';
 
 import {SYSTEM_USER, US_DYNAMIC_MASTER_TOKEN_HEADER, US_MASTER_TOKEN_HEADER} from '../../const';
 import {Feature, isEnabledFeature} from '../features';
 
-interface DynamicMasterTokenPayload {
-    serviceId: string;
-}
+import {decodeDynamicMasterToken, jwtVerify} from './utils/jwt';
 
 function replaceDotsInLogin(login: string) {
     let correctedLogin = login;
@@ -17,25 +14,6 @@ function replaceDotsInLogin(login: string) {
 
     return correctedLogin;
 }
-
-const jwtVerify = (token: string, publicKey: string) => {
-    return new Promise((resolve, reject) => {
-        jwt.verify(
-            token,
-            publicKey,
-            {
-                algorithms: ['RS256'],
-            },
-            (err, decoded) => {
-                if (err) {
-                    reject(err);
-                }
-
-                resolve(decoded);
-            },
-        );
-    });
-};
 
 export async function resolvePrivateRoute(req: Request, res: Response, next: NextFunction) {
     req.ctx.log('PRIVATE_API_CALL');
@@ -53,8 +31,7 @@ export async function resolvePrivateRoute(req: Request, res: Response, next: Nex
                 req.ctx.log('CHECK_DYNAMIC_MASTER_TOKEN');
 
                 // Decode token to get serviceId (without verification)
-                const decoded = jwt.decode(dynamicMasterToken) as DynamicMasterTokenPayload | null;
-
+                const decoded = decodeDynamicMasterToken(dynamicMasterToken);
                 if (!decoded || !decoded.serviceId) {
                     req.ctx.log('DYNAMIC_MASTER_TOKEN_DECODE_FAILED');
                     res.status(403).send({error: 'Invalid dynamic master token format'});

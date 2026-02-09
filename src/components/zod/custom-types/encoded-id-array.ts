@@ -21,6 +21,7 @@ export const encodedIdArraySafe = ({min, max}: {min: number; max: number}) => {
         await Utils.macrotasksForEach(ids, (val) => {
             try {
                 decoded.push(Utils.decodeId(val));
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (error) {
                 failed.push(val);
             }

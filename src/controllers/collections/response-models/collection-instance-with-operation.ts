@@ -13,12 +13,17 @@ const schema = originalCollectionInstance.schema
     )
     .describe('Collection instance with operation');
 
-const format = (
-    collectionInstance: CollectionInstance,
-    operation?: Operation,
-): z.infer<typeof schema> => {
+const format = ({
+    collection,
+    operation,
+    includePermissionsInfo,
+}: {
+    collection: CollectionInstance;
+    operation?: Operation;
+    includePermissionsInfo?: boolean;
+}): z.infer<typeof schema> => {
     return {
-        ...originalCollectionInstance.format(collectionInstance),
+        ...originalCollectionInstance.format({collection, includePermissionsInfo}),
         operation: operation ? operationResponseModel.format(operation) : undefined,
     };
 };

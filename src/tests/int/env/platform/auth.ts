@@ -1,17 +1,17 @@
 import request from 'supertest';
 
+import {UserRole} from '../../../../components/auth/constants/role';
 import {AUTHORIZATION_HEADER, DL_AUTH_HEADER_KEY} from '../../../../const';
 import {CollectionPermission} from '../../../../entities/collection/types';
 import {SharedEntryPermission} from '../../../../entities/shared-entry/types';
 import {ResourceType} from '../../../../entities/types';
 import {WorkbookPermission} from '../../../../entities/workbook/types';
-import {ZitadelUserRole} from '../../../../types/zitadel';
 import type {CommonAuthArgs} from '../../auth';
 import {testUserId, testUserLogin} from '../../constants';
 
 import {PlatformRole} from './roles';
 
-export {US_ERRORS, app, appConfig, testTenantId, authMasterToken, appNodekit} from '../../auth';
+export {US_ERRORS, app, appConfig, testTenantId, authPrivateRoute, appNodekit} from '../../auth';
 
 export const getCollectionBinding = (
     collectionId: string,
@@ -49,6 +49,13 @@ export type AuthArgs = CommonAuthArgs & {
     accessBindings?: AccessBinding[];
 };
 
+export type AuthToken = {
+    userId: string;
+    login: string;
+    roles: `${UserRole}`[];
+    accessBindings: AccessBinding[];
+};
+
 export const auth = (req: request.Test, args: AuthArgs = {}) => {
     const {
         userId = testUserId,
@@ -57,29 +64,28 @@ export const auth = (req: request.Test, args: AuthArgs = {}) => {
         accessBindings = [],
     } = args;
 
-    let zitadelRole: ZitadelUserRole;
+    let roles: `${UserRole}`[] = [];
 
     switch (role) {
         case PlatformRole.Admin:
-            zitadelRole = ZitadelUserRole.Admin;
+            roles = [UserRole.Admin];
             break;
         case PlatformRole.Creator:
-            zitadelRole = ZitadelUserRole.Creator;
+            roles = [UserRole.Creator];
             break;
         default:
-            zitadelRole = ZitadelUserRole.Visitor;
+            roles = [UserRole.Visitor];
             break;
     }
 
-    req.set(
-        AUTHORIZATION_HEADER,
-        `${DL_AUTH_HEADER_KEY} ${JSON.stringify({
-            userId,
-            login,
-            role: zitadelRole,
-            accessBindings,
-        })}`,
-    );
+    const authToken: AuthToken = {
+        userId,
+        login,
+        roles,
+        accessBindings,
+    };
+
+    req.set(AUTHORIZATION_HEADER, `${DL_AUTH_HEADER_KEY} ${JSON.stringify(authToken)}`);
 
     return req;
 };

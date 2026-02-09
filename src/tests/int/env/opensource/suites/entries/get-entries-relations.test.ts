@@ -1,7 +1,7 @@
 import request from 'supertest';
 
 import {routes} from '../../../../routes';
-import {app, auth, authMasterToken, testTenantId} from '../../auth';
+import {app, auth, authPrivateRoute, testTenantId} from '../../auth';
 import {createMockWorkbook, createMockWorkbookEntry} from '../../helpers';
 
 let workbookId: string;
@@ -248,7 +248,7 @@ describe('Get entries relations', () => {
     });
 
     test('Private endpoint. Get entries relations successful', async () => {
-        await authMasterToken(request(app).post(routes.privateGetEntriesRelations))
+        await authPrivateRoute(request(app).post(routes.privateGetEntriesRelations))
             .send({
                 entryIds: [dashId],
             })

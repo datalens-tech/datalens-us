@@ -2,11 +2,7 @@ import {AuthPolicy} from '@gravity-ui/expresskit';
 import {NodeKit} from '@gravity-ui/nodekit';
 
 import {Feature, isEnabledFeature} from '../../components/features';
-import {
-    DL_SERVICE_USER_ACCESS_TOKEN,
-    US_DYNAMIC_MASTER_TOKEN_HEADER,
-    US_MASTER_TOKEN_HEADER,
-} from '../../const';
+import {US_DYNAMIC_MASTER_TOKEN_HEADER, US_MASTER_TOKEN_HEADER} from '../../const';
 import type {ExtendedAppRouteDescription} from '../../routes';
 
 import {SecurityType} from './constants';
@@ -35,20 +31,12 @@ export const getAdditionalSecuritySchemes = (
 
     const authDisabled = config.appAuthPolicy === AuthPolicy.disabled;
 
-    if (!authDisabled && (config.zitadelEnabled || config.isAuthEnabled)) {
+    if (!authDisabled && config.isAuthEnabled) {
         result[SecurityType.BearerAuth] = {
             type: 'http',
             scheme: 'bearer',
             bearerFormat: 'JWT',
         };
-
-        if (config.zitadelEnabled) {
-            result[SecurityType.ServiceUserToken] = {
-                type: 'apiKey',
-                in: 'header',
-                name: DL_SERVICE_USER_ACCESS_TOKEN,
-            };
-        }
     }
 
     return result;
@@ -75,12 +63,8 @@ export const getAdditionalHeaders = (
         config.appAuthPolicy === AuthPolicy.disabled ||
         routeDescription.authPolicy === AuthPolicy.disabled;
 
-    if (!authDisabled && (config.zitadelEnabled || config.isAuthEnabled)) {
+    if (!authDisabled && config.isAuthEnabled) {
         security.push({[SecurityType.BearerAuth]: []});
-
-        if (config.zitadelEnabled) {
-            security.push({[SecurityType.ServiceUserToken]: []});
-        }
     }
 
     return {headers, security};

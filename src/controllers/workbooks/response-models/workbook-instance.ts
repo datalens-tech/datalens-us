@@ -26,12 +26,18 @@ const schema = workbookModel.schema
 
 export type WorkbookInstanceResponseModel = z.infer<typeof schema>;
 
-const format = (data: WorkbookInstance): WorkbookInstanceResponseModel => {
-    const {model} = data;
+const format = ({
+    workbook,
+    includePermissionsInfo,
+}: {
+    workbook: WorkbookInstance;
+    includePermissionsInfo?: boolean;
+}): WorkbookInstanceResponseModel => {
+    const {model} = workbook;
 
     return {
         ...workbookModel.format(model),
-        permissions: data.permissions,
+        permissions: includePermissionsInfo ? workbook.permissions : undefined,
     };
 };
 

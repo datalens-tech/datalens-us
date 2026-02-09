@@ -6,6 +6,7 @@ export const stringBigInt = () => {
             try {
                 BigInt(val);
                 return true;
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (e) {
                 return false;
             }

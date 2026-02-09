@@ -28,30 +28,41 @@ export type StructureItemsModel = z.infer<typeof schema>;
 const format = async (data: {
     items: (CollectionInstance | WorkbookInstance | SharedEntryInstance)[];
     nextPageToken: Nullable<string>;
+    includePermissionsInfo?: boolean;
 }): Promise<StructureItemsModel> => {
+    const {items, nextPageToken, includePermissionsInfo} = data;
     return {
         items: await Utils.macrotasksMap(
-            data.items,
+            items,
             (structureItem: CollectionInstance | WorkbookInstance | SharedEntryInstance) => {
                 if (isSharedEntryInstance(structureItem)) {
                     return {
-                        ...sharedEntryInstance.format(structureItem),
+                        ...sharedEntryInstance.format({
+                            sharedEntry: structureItem,
+                            includePermissionsInfo,
+                        }),
                         entity: 'entry' as const,
                     };
                 } else if (isWorkbookInstance(structureItem)) {
                     return {
-                        ...workbookInstance.format(structureItem),
+                        ...workbookInstance.format({
+                            workbook: structureItem,
+                            includePermissionsInfo,
+                        }),
                         entity: 'workbook' as const,
                     };
                 } else {
                     return {
-                        ...collectionInstance.format(structureItem),
+                        ...collectionInstance.format({
+                            collection: structureItem,
+                            includePermissionsInfo,
+                        }),
                         entity: 'collection' as const,
                     };
                 }
             },
         ),
-        nextPageToken: data.nextPageToken,
+        nextPageToken,
     };
 };
 

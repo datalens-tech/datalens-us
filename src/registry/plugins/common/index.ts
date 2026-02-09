@@ -23,7 +23,6 @@ import type {
 } from './utils/entry/types';
 import type {LogEvent} from './utils/log-event/types';
 import type {CheckTenant, GetServicePlan, ProcessTenantSettings} from './utils/tenant/types';
-import type {GetZitadelUserRole} from './zitadel/types';
 
 export const commonPlugin = {
     classes: createClassesRegistry({
@@ -43,7 +42,6 @@ export const commonPlugin = {
         checkTenant: makeFunctionTemplate<CheckTenant>(),
         getServicePlan: makeFunctionTemplate<GetServicePlan>(),
         processTenantSettings: makeFunctionTemplate<ProcessTenantSettings>(),
-        getZitadelUserRole: makeFunctionTemplate<GetZitadelUserRole>(),
         checkColorPalettesAdmin: makeFunctionTemplate<CheckColorPalettesAdmin>(),
         isLicenseRequired: makeFunctionTemplate<IsLicenseRequired>(),
         checkLicense: makeFunctionTemplate<CheckLicense>(),

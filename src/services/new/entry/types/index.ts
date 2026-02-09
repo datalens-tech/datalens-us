@@ -12,6 +12,7 @@ export type EntryWithPermissions<T> = T & {
     isLocked?: boolean;
     permissions?: EntryPermissions;
     fullPermissions?: SharedEntryPermissions;
+    isRestricted?: boolean;
 };
 
 export type PartialEntry = {

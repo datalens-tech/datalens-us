@@ -6,8 +6,14 @@ import {collectionInstance} from './collection-instance';
 
 const schema = collectionInstance.schema.array().describe('Collection instance array');
 
-const format = (data: CollectionInstance[]): Promise<z.infer<typeof schema>> => {
-    return Utils.macrotasksMap(data, collectionInstance.format);
+const format = async (data: {
+    collections: CollectionInstance[];
+    includePermissionsInfo?: boolean;
+}): Promise<z.infer<typeof schema>> => {
+    const {collections, includePermissionsInfo} = data;
+    return Utils.macrotasksMap(collections, (collection) =>
+        collectionInstance.format({collection, includePermissionsInfo}),
+    );
 };
 
 export const collectionInstanceArray = {

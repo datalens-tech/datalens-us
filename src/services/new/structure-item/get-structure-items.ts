@@ -59,6 +59,7 @@ export const getStructureItems = async (
 
     const {accessServiceEnabled} = ctx.config;
     const registry = ctx.get('registry');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {Workbook, Collection, SharedEntry} = registry.common.classes.get();
 
     const targetTrx = getReplica(trx);

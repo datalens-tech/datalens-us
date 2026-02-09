@@ -1,8 +1,20 @@
 {
-  "name": "@datalens-tech/datalens-us",
+  "name": "@united-storage/opensource",
   "description": "United Storage",
   "version": "0.0.0",
   "private": true,
+  "engines": {
+    "pnpm": "10.17.1",
+    "node": ">= 18.17.0",
+    "yarn": "Please use pnpm instead of yarn to install dependencies",
+    "npm": "Please use pnpm instead of npm to install dependencies"
+  },
+  "packageManager": "pnpm@10.17.1",
+  "pnpm": {
+    "overrides": {
+      "undici": "5.28.4"
+    }
+  },
   "author": "DataLens Team <https://github.com/datalens-tech>",
   "license": "Apache-2.0",
   "repository": {
@@ -13,7 +25,7 @@
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.0",
     "@gravity-ui/expresskit": "^2.4.0",
-    "@gravity-ui/gateway": "^4.7.2",
+    "@gravity-ui/gateway": "^4.10.4",
     "@gravity-ui/nodekit": "^2.4.1",
     "@gravity-ui/postgreskit": "^3.1.0",
     "@temporalio/activity": "^1.13.2",
@@ -55,11 +67,14 @@
     "@types/supertest": "^6.0.3",
     "@types/swagger-ui-express": "^4.1.7",
     "@types/uuid": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "8.47.0",
     "chalk": "^4.1.2",
     "dsn-parser": "^1.0.3",
     "eslint": "^8.57.1",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-prettier": "5.5.4",
+    "eslint-plugin-security": "3.0.1",
     "glob": "^11.0.3",
-    "husky": "^8.0.3",
     "jest": "^29.7.0",
     "jest-extended": "^4.0.2",
     "lint-staged": "^13.2.3",
@@ -71,34 +86,34 @@
     "typescript": "^5.6.3"
   },
   "scripts": {
-    "build": "npm run clear:dist && tsc && npm run build:workflow",
+    "preinstall": "npx only-allow pnpm",
+    "deps:global": "pnpm --version | grep -q 10.17.1 && echo 'pnpm@10.17.1 already installed' || npm i -g pnpm@10.17.1",
+    "build": "pnpm run clear:dist && tsc && pnpm run build:workflow",
     "build:workflow": "ts-node src/components/temporal/scripts/build-workflow-bundle.ts",
-    "dev": "node ./scripts/setup-dev-env.js opensource && npm run clear:dist && APP_DEV_MODE=1 tsc-watch --onSuccess 'node dist/server'",
+    "dev": "node ./scripts/setup-dev-env.js opensource && pnpm run clear:dist && APP_DEV_MODE=1 tsc-watch --onSuccess 'node dist/server'",
     "test:unit": "jest -c './jest/unit/jest.config.js'",
-    "build:test:unit": "npm run build && npm run test:unit",
+    "build:test:unit": "pnpm run build && pnpm run test:unit",
     "test:int:run": "APP_INSTALLATION=opensource APP_ENV=int-testing node ./jest/int/run.js",
-    "test:int": "npm run build && npm run test:int:run",
-    "test": "npm run build && npm run test:unit && npm run test:int:run",
+    "test:int": "pnpm run build && pnpm run test:int:run",
+    "test": "pnpm run build && pnpm run test:unit && pnpm run test:int:run",
     "db:migrate": "node dist/server/db/scripts/migrate.js",
     "db:migrate-one": "node dist/server/db/scripts/migrate-one.js",
     "db:rollback": "node dist/server/db/scripts/rollback.js",
     "db:rollback-one": "node dist/server/db/scripts/rollback-one.js",
-    "prepare-and-test": "rm -rf dist/server && npm run build && npm test",
-    "prepare:db": "npm run build && CI_MODE=true SQL_DEBUG=false DEBUG=false node dist/server/db/scripts/clear-and-prepare",
+    "prepare-and-test": "rm -rf dist/server && pnpm run build && pnpm run test",
     "migration:create": "npx knex migrate:make --migrations-directory ./src/db/migrations -x ts",
     "docker:build": "docker build --build-arg app_version=${BUILD_VERSION} . -t ${TARGET_IMAGE}:${BUILD_VERSION} -t ${TARGET_IMAGE}:latest",
     "docker:push": "docker image push ${TARGET_IMAGE}:${BUILD_VERSION} && docker image push ${TARGET_IMAGE}:latest",
     "lint:prettier": "prettier --check '**/*.{js,ts}'",
     "lint:js": "eslint \"**/*.{js,ts}\" --quiet",
-    "lint": "npm run lint:prettier && npm run lint:js && npm run lint:migrations",
+    "lint": "pnpm run lint:prettier && pnpm run lint:js && pnpm run lint:migrations",
     "lint:version": "node scripts/linters/package-version-test.js",
     "lint:migrations": "node ./scripts/linters/migration-timestamp-consistency.js",
-    "lint-release": "npm run lint:version && npm run lint",
+    "lint-release": "pnpm run lint:version && pnpm run lint",
     "typecheck": "tsc --noEmit",
     "decode": "node ./scripts/helpers.js -h=decode",
     "encode": "node ./scripts/helpers.js -h=encode",
-    "clear:dist": "rm -rf ./dist/server",
-    "prepare": "husky install"
+    "clear:dist": "rm -rf ./dist/server"
   },
   "lint-staged": {
     "*.{js,ts}": [

@@ -39,7 +39,6 @@ const prepareTestUsDb = async ({dsnList}) => {
 
 const prepareTestDb = async () => {
     const dsnList = getTestDsnList();
-
     const testDbName = 'int-testing_us_ci_purgeable';
     const parsedDsn = new DSNParser(dsnList);
     if (parsedDsn.getParts().database !== testDbName) {

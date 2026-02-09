@@ -3,7 +3,7 @@ import request from 'supertest';
 import {testUserId} from '../../../../constants';
 import {OPERATION_DEFAULT_FIELDS, WORKBOOK_DEFAULT_FIELDS} from '../../../../models';
 import {routes} from '../../../../routes';
-import {app, auth, authMasterToken, getWorkbookBinding, testTenantId} from '../../auth';
+import {app, auth, authPrivateRoute, getWorkbookBinding, testTenantId} from '../../auth';
 import {PlatformRole} from '../../roles';
 
 const workbooksData = [
@@ -633,7 +633,7 @@ describe('Workbook template', () => {
             })
             .expect(403);
 
-        const response = await authMasterToken(
+        const response = await authPrivateRoute(
             request(app).post(routes.privateSetIsTemplateWorkbook(testTemplateWorkbookData.id)),
         ).send({
             workbookId: testTemplateWorkbookData.id,

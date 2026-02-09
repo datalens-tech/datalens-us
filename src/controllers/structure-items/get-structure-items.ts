@@ -51,7 +51,12 @@ export const getStructureItemsController: AppRouteHandler = async (req, res) => 
         },
     );
 
-    res.status(200).send(await structureItemsModel.format(result));
+    res.status(200).send(
+        await structureItemsModel.format({
+            ...result,
+            includePermissionsInfo: query.includePermissionsInfo,
+        }),
+    );
 };
 
 getStructureItemsController.api = {
