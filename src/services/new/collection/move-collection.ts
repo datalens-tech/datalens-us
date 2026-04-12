@@ -5,6 +5,7 @@ import {OrganizationPermission} from '../../../components/iam';
 import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
+import {EXTRA_PERMISSIONS_ACTION} from '../../../registry/plugins/common/utils/extra-permissions/constants';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
@@ -47,7 +48,7 @@ export const moveCollection = async (
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {Collection} = registry.common.classes.get();
-    const {checkOrganizationPermission} = registry.common.functions.get();
+    const {checkOrganizationPermission, checkExtraPermissions} = registry.common.functions.get();
 
     let newParentCollection: Optional<InstanceType<typeof Collection>>;
     let newParentParentIds: string[] = [];
@@ -110,6 +111,14 @@ export const moveCollection = async (
                 permission: OrganizationPermission.CreateCollectionInRoot,
             });
         }
+
+        await checkExtraPermissions({
+            ctx,
+            action: EXTRA_PERMISSIONS_ACTION.MOVE_COLLECTION,
+            collectionId,
+            parentIds,
+            newParentParentIds,
+        });
     }
 
     const titleForPatch = newTitle ?? collection.model.title;

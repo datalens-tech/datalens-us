@@ -7,18 +7,38 @@ export enum ResourceType {
     SharedEntry = 'datalens.sharedEntry',
 }
 
+interface OperationError {
+    code: number;
+    details: any;
+    message?: string;
+}
+
+type ResultError = {
+    error?: {
+        code: number;
+        message: string;
+    };
+};
+
+type ResultResponse = {
+    response?: any;
+};
+
 export type Operation = {
+    id: string;
+    done: boolean;
     createdAt: {
         nanos?: number;
-        seconds: string;
+        seconds: string | number;
     };
-    createdBy: string;
-    description: string;
-    done: boolean;
-    id: string;
-    metadata: Object;
     modifiedAt: {
+        seconds: string | number;
         nanos?: number;
-        seconds: string;
     };
+    createdBy?: string;
+    description?: string;
+    metadata?: Object;
+    result?: ResultError | ResultResponse;
+    response?: any;
+    error?: OperationError;
 };

@@ -10,7 +10,7 @@ const schema = z
     .object({
         entryId: z.string(),
         result: z.object({
-            scope: z.nativeEnum(EntryScope),
+            scope: z.enum(EntryScope),
             type: z.string(),
             annotation: z.object({
                 [RevisionAnnotationFields.Description]: z.string().optional(),

@@ -97,6 +97,7 @@ export const getEntry = async (
     const {
         getEntryBeforeDbRequestHook,
         checkEmbedding,
+        getEmbeddingWorkbookId,
         getEntryResolveUserLogin,
         isLicenseRequired,
         checkLicense,
@@ -116,6 +117,7 @@ export const getEntry = async (
     ]);
 
     const isEmbedding = checkEmbedding({ctx});
+    const embeddingWorkbookId = getEmbeddingWorkbookId({ctx});
 
     const graphRelations = ['workbook', 'tenant(tenantModifier)', 'collection(collectionModifier)'];
 
@@ -146,19 +148,26 @@ export const getEntry = async (
             builder.where({
                 [`${Entry.tableName}.${EntryColumn.EntryId}`]: entryId,
                 [`${Entry.tableName}.${EntryColumn.IsDeleted}`]: false,
-                ...(checkEntryTenantEnabled
-                    ? {
-                          [`${Entry.tableName}.${EntryColumn.TenantId}`]: tenantId,
-                      }
-                    : {}),
             });
 
+            if (checkEntryTenantEnabled) {
+                builder.andWhere({
+                    [`${Entry.tableName}.${EntryColumn.TenantId}`]: tenantId,
+                });
+            }
+
+            if (isEmbedding && embeddingWorkbookId) {
+                builder.andWhere({
+                    [`${Entry.tableName}.${EntryColumn.WorkbookId}`]: embeddingWorkbookId,
+                });
+            }
+
             if (onlyPublic) {
-                builder.andWhere({public: true});
+                builder.andWhere({[`${Entry.tableName}.${EntryColumn.Public}`]: true});
             }
 
             if (onlyMirrored) {
-                builder.andWhere({mirrored: true});
+                builder.andWhere({[`${Entry.tableName}.${EntryColumn.Mirrored}`]: true});
             }
         })
         .withGraphJoined(`[${graphRelations.join(', ')}]`)
@@ -215,7 +224,7 @@ export const getEntry = async (
     }
 
     if (licenseRequired) {
-        checkLicense({ctx, license: entry.license, tenant: entry.tenant});
+        checkLicense({ctx, license: entry.license});
     }
 
     const checkWorkbookIsolationEnabled =

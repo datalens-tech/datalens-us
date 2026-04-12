@@ -10,6 +10,7 @@ import {
     US_ERRORS,
 } from '../../../const';
 import Entry from '../../../db/models/entry';
+import {EntryScope} from '../../../db/models/new/entry/types';
 import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {CTX, DlsActions} from '../../../types/models';
 import Utils from '../../../utils';
@@ -19,49 +20,42 @@ import {getWorkbook} from '../../new/workbook';
 
 import {checkEntry} from './check-entry';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['entryId'],
-    properties: {
-        entryId: {
-            type: 'string',
-        },
-        page: {
-            type: 'number',
-            minimum: 0,
-        },
-        pageSize: {
-            type: 'number',
-            minimum: 1,
-            maximum: 200,
-        },
-        revIds: {
-            oneOf: [
-                {type: 'string'},
-                {
-                    type: 'array',
-                    items: {type: 'string'},
-                },
-            ],
-        },
-        updatedAfter: {
-            type: 'string',
-        },
-    },
-});
+export type EntryRevisionNavItem = {
+    entryId: string;
+    scope: EntryScope;
+    type: string;
+    key: string;
+    meta: Record<string, unknown> | null;
+    createdBy: string;
+    createdAt: string;
+    updatedBy: string;
+    updatedAt: string;
+    annotation: Record<string, unknown> | null;
+    savedId: string | null;
+    publishedId: string | null;
+    revId: string;
+    hidden: boolean;
+    workbookId: string | null;
+    collectionId: string | null;
+};
+
+export type GetEntryRevisionsResult = {
+    nextPageToken?: string;
+    entries: EntryRevisionNavItem[];
+};
 
 export type GetEntryRevisionsData = {
     entryId: string;
     page?: number;
     pageSize?: number;
-    revIds?: string | string[];
+    revIds?: string[];
     updatedAfter?: string;
 };
 
 export async function getEntryRevisions(
-    {ctx, skipValidation = false}: ServiceArgs,
+    {ctx}: ServiceArgs,
     args: GetEntryRevisionsData,
-) {
+): Promise<GetEntryRevisionsResult> {
     const {entryId, page = DEFAULT_PAGE, pageSize = DEFAULT_PAGE_SIZE, revIds, updatedAfter} = args;
 
     ctx.log('GET_REVISIONS_REQUEST', {
@@ -72,10 +66,6 @@ export async function getEntryRevisions(
 
     const registry = ctx.get('registry');
     const {DLS} = registry.common.classes.get();
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const {isPrivateRoute} = ctx.get('info');
 
@@ -108,7 +98,7 @@ export async function getEntryRevisions(
         }
     }
 
-    const entryRevisions = await Entry.query(Entry.replica)
+    const entryRevisions = (await Entry.query(Entry.replica)
         .select([...RETURN_NAVIGATION_COLUMNS, 'revId'])
         .join('revisions', 'entries.entryId', 'revisions.entryId')
         .where({
@@ -117,7 +107,7 @@ export async function getEntryRevisions(
         })
         .where((builder) => {
             if (revIds) {
-                builder.whereIn('revId', Array.isArray(revIds) ? revIds : [revIds]);
+                builder.whereIn('revId', revIds);
             }
             if (updatedAfter) {
                 builder.where('revisions.updatedAt', '>=', updatedAfter);
@@ -126,7 +116,7 @@ export async function getEntryRevisions(
         .orderBy('revisions.updatedAt', 'desc')
         .limit(pageSize)
         .offset(pageSize * page)
-        .timeout(DEFAULT_QUERY_TIMEOUT);
+        .timeout(DEFAULT_QUERY_TIMEOUT)) as unknown as EntryRevisionNavItem[];
 
     ctx.log('GET_REVISIONS_SUCCESS');
 

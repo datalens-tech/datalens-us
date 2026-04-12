@@ -19,7 +19,6 @@ export interface PlatformAppConfig {
     masterToken: string[];
 
     // auth
-    isAuthEnabled?: boolean;
     authTokenPublicKey?: string;
 
     swaggerEnabled?: boolean;

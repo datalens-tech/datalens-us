@@ -1,7 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {ALLOWED_ENTRIES_SCOPE, US_ERRORS} from '../../../const';
+import {US_ERRORS} from '../../../const';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import {SharedEntryPermission} from '../../../entities/shared-entry';
@@ -30,42 +29,17 @@ export type GetEntryRelationsArgs = {
     pageSize?: number;
 };
 
-type RelationItem = EntryWithPermissions<GetRelatedEntriesResult>;
+export type RelationItem = EntryWithPermissions<GetRelatedEntriesResult>;
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['entryId'],
-    properties: {
-        entryId: {
-            type: 'string',
-        },
-        direction: {
-            type: 'string',
-            enum: [RelationDirection.Parent, RelationDirection.Child],
-        },
-        includePermissionsInfo: {
-            type: 'boolean',
-        },
-        scope: {
-            type: 'string',
-            enum: ALLOWED_ENTRIES_SCOPE,
-        },
-        page: {
-            type: 'number',
-            minimum: 0,
-        },
-        pageSize: {
-            type: 'number',
-            minimum: 1,
-            maximum: 200,
-        },
-    },
-});
+export type GetEntryRelationsResult = {
+    relations: RelationItem[];
+    nextPageToken?: string;
+};
 
 export async function getEntryRelations(
-    {ctx, trx, skipValidation = false}: ServiceArgs,
+    {ctx, trx}: ServiceArgs,
     args: GetEntryRelationsArgs,
-) {
+): Promise<GetEntryRelationsResult> {
     const {tenantId, isPrivateRoute} = ctx.get('info');
 
     const {
@@ -85,10 +59,6 @@ export async function getEntryRelations(
         pageSize,
         includePermissionsInfo,
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const entry = await Entry.query(getReplica(trx))
         .where({

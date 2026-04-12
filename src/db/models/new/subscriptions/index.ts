@@ -28,6 +28,8 @@ export const SubscriptionColumn = {
     TriggerOptions: 'triggerOptions',
     ArtifactType: 'artifactType',
     ArtifactOptions: 'artifactOptions',
+    EmbedId: 'embedId',
+    EmbedPrivateKey: 'embedPrivateKey',
 } as const;
 
 export class Subscription extends Model {
@@ -59,4 +61,6 @@ export class Subscription extends Model {
     [SubscriptionColumn.TriggerOptions]!: Record<string, unknown>;
     [SubscriptionColumn.ArtifactType]!: SubscriptionArtifactType;
     [SubscriptionColumn.ArtifactOptions]!: Record<string, unknown>;
+    [SubscriptionColumn.EmbedId]!: Nullable<string>;
+    [SubscriptionColumn.EmbedPrivateKey]!: Record<string, unknown>;
 }

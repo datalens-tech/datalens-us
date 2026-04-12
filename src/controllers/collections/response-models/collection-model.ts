@@ -13,7 +13,7 @@ const schema = z
         createdAt: z.string(),
         updatedBy: z.string(),
         updatedAt: z.string(),
-        meta: z.object({}),
+        meta: z.record(z.string(), z.unknown()),
     })
     .describe('Collection model');
 

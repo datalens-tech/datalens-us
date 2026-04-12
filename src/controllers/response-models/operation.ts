@@ -8,14 +8,17 @@ const schema = z
         createdBy: z.string(),
         createdAt: z.object({
             nanos: z.number().optional(),
-            seconds: z.string(),
+            seconds: z.union([z.string(), z.number()]),
         }),
         modifiedAt: z.object({
             nanos: z.number().optional(),
-            seconds: z.string(),
+            seconds: z.union([z.string(), z.number()]),
         }),
         metadata: z.object({}),
         done: z.boolean(),
+        result: z.unknown().optional(),
+        response: z.unknown().optional(),
+        error: z.unknown().optional(),
     })
     .describe('Operation');
 
@@ -29,7 +32,10 @@ const format = (operation: Operation): OperationResponseModel => {
         createdAt: operation.createdAt,
         modifiedAt: operation.modifiedAt,
         metadata: {},
-        done: operation.done,
+        done: operation.done ?? true,
+        ...(operation.result ? {result: operation.result} : {}),
+        ...(operation.response ? {response: operation.response} : {}),
+        ...(operation.error ? {error: operation.error} : {}),
     };
 };
 

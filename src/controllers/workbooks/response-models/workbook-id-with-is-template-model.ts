@@ -3,11 +3,9 @@ import {z} from '../../../components/zod';
 import {workbookIdModel} from './workbook-id-model';
 
 const schema = workbookIdModel.schema
-    .merge(
-        z.object({
-            isTemplate: z.boolean(),
-        }),
-    )
+    .extend({
+        isTemplate: z.boolean(),
+    })
     .describe('Workbook id with isTemplate flag model');
 
 export type WorkbookIdWithTemplateModel = z.infer<typeof schema>;

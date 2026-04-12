@@ -7,3 +7,7 @@ export * from './entry-with-revision-and-favorite-model';
 export * from './entry-permissions-model';
 export * from './entries-annotation-model';
 export * from './shared-entry-permissions-model';
+export * from './entry-model';
+export * from './switch-revision-entry-model';
+export * from './entry-relations-page-model';
+export * from './entry-revisions-page-model';

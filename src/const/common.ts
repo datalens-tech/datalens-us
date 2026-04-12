@@ -213,6 +213,11 @@ export enum OrderBy {
     Desc = 'DESC',
 }
 
+export enum UpdateMode {
+    FULL = 'full',
+    PATCH = 'patch',
+}
+
 export const APP_NAME = 'united-storage';
 
 export enum AppInstallation {

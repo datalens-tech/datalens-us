@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-export function jsonString<T extends z.ZodTypeAny>(schema: T) {
+export function jsonString<T extends z.ZodType>(schema: T) {
     return z
         .string()
         .transform((str, ctx) => {
@@ -9,10 +9,10 @@ export function jsonString<T extends z.ZodTypeAny>(schema: T) {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (error) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: 'custom',
                     message: 'Invalid JSON',
                 });
-                return z.INVALID;
+                return z.NEVER;
             }
         })
         .pipe(schema);

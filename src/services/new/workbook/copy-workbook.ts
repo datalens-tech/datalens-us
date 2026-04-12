@@ -8,6 +8,7 @@ import {RevisionModel} from '../../../db/models/new/revision';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {JoinedEntryRevisionColumns} from '../../../db/presentations/joined-entry-revision';
 import {WorkbookPermission} from '../../../entities/workbook';
+import {EXTRA_PERMISSIONS_ACTION} from '../../../registry/plugins/common/utils/extra-permissions/constants';
 import Utils from '../../../utils';
 import {copyToWorkbook} from '../../entry/actions';
 import {getCollection} from '../collection';
@@ -44,6 +45,8 @@ export const copyWorkbook = async (
 
     const registry = ctx.get('registry');
     const {Workbook} = registry.common.classes.get();
+    const {checkExtraPermissions} = registry.common.functions.get();
+    let targetCollection;
 
     const originWorkbookModel: Optional<WorkbookModel> = await WorkbookModel.query(getReplica(trx))
         .select()
@@ -74,7 +77,7 @@ export const copyWorkbook = async (
     });
 
     if (newCollectionId) {
-        await getCollection(
+        targetCollection = await getCollection(
             {ctx, trx, skipValidation: true, skipCheckPermissions: true},
             {collectionId: newCollectionId},
         );
@@ -93,6 +96,14 @@ export const copyWorkbook = async (
         await originWorkbook.checkPermission({
             parentIds: originWorkbookParentIds,
             permission: WorkbookPermission.Copy,
+        });
+
+        await checkExtraPermissions({
+            ctx,
+            action: EXTRA_PERMISSIONS_ACTION.COPY_WORKBOOK,
+            workbookId,
+            parentIds: originWorkbookParentIds,
+            targetCollection,
         });
     }
 

@@ -112,6 +112,9 @@ export enum LogEventType {
     UpdateEntrySuccess = 'updateEntrySuccess',
     UpdateEntryFail = 'updateEntryFail',
 
+    UpdateEntryUnversionedDataSuccess = 'updateEntryUnversionedDataSuccess',
+    UpdateEntryUnversionedDataFail = 'updateEntryUnversionedDataFail',
+
     SetDefaultColorPaletteSuccess = 'setDefaultColorPaletteSuccess',
     SetDefaultColorPaletteFail = 'setDefaultColorPaletteFail',
 
@@ -471,6 +474,24 @@ export interface LogEventUpdateEntryFailParams extends EventParams {
     error: unknown;
 }
 
+type UpdateEntryUnversionedDataReqParams = {
+    entryId: string;
+};
+
+export interface LogEventUpdateEntryUnversionedDataSuccessParams extends EventParams {
+    type: LogEventType.UpdateEntryUnversionedDataSuccess;
+
+    reqParams: UpdateEntryUnversionedDataReqParams;
+    data: Entry;
+}
+
+export interface LogEventUpdateEntryUnversionedDataFailParams extends EventParams {
+    type: LogEventType.UpdateEntryUnversionedDataFail;
+
+    reqParams: UpdateEntryUnversionedDataReqParams;
+    error: unknown;
+}
+
 export interface LogEventSetDefaultColorPaletteSuccessParams extends EventParams {
     type: LogEventType.SetDefaultColorPaletteSuccess;
 
@@ -542,6 +563,8 @@ export type LogEventParams =
     | LogEventRenameEntryFailParams
     | LogEventUpdateEntrySuccessParams
     | LogEventUpdateEntryFailParams
+    | LogEventUpdateEntryUnversionedDataSuccessParams
+    | LogEventUpdateEntryUnversionedDataFailParams
     | LogEventSetDefaultColorPaletteSuccessParams
     | LogEventSetDefaultColorPaletteFailParams
     | LogEventUpdateColorPaletteSuccessParams

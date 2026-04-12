@@ -26,6 +26,8 @@ export const COLLECTIONS_DEFAULT_PERMISSIONS: Permissions = {
     copy: false,
     move: false,
     delete: false,
+    securityManage: false,
+    securityApprove: false,
 };
 
 export const GET_COLLECTION_CONTENT_DEFAULT_FIELDS = {

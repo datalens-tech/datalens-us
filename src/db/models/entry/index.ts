@@ -57,7 +57,7 @@ class Entry extends Model {
         } else if (isAuditRoute) {
             originatedPermissions = {
                 execute: false,
-                read: false,
+                read: true,
                 edit: false,
                 admin: false,
             };

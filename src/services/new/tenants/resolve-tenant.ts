@@ -5,12 +5,14 @@ import {ServiceArgs} from '../types';
 
 import {getTenantByCollectionId} from './get-tenant-by-collection-id';
 import {getTenantByEntryId} from './get-tenant-by-entry-id';
+import {getTenantBySubscriptionId} from './get-tenant-by-subscription-id';
 import {getTenantByWorkbookId} from './get-tenant-by-workbook-id';
 
 type ResolveTenantArgs = {
     entryId?: string;
     collectionId?: string;
     workbookId?: string;
+    subscriptionId?: string;
 };
 
 export const resolveTenant = async ({ctx, trx}: ServiceArgs, args: ResolveTenantArgs) => {
@@ -23,6 +25,8 @@ export const resolveTenant = async ({ctx, trx}: ServiceArgs, args: ResolveTenant
         tenant = await getTenantByCollectionId({ctx, trx}, {collectionId: args.collectionId});
     } else if (args.workbookId) {
         tenant = await getTenantByWorkbookId({ctx, trx}, {workbookId: args.workbookId});
+    } else if (args.subscriptionId) {
+        tenant = await getTenantBySubscriptionId({ctx, trx}, {subscriptionId: args.subscriptionId});
     }
 
     if (tenant === undefined) {

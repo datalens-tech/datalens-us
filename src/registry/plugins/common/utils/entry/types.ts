@@ -23,9 +23,6 @@ export type CheckLicense = (args: {
         licenseType: `${LicenseType}`;
         isActive: boolean;
     };
-    tenant: {
-        settings: Record<string, unknown>;
-    };
 }) => void;
 
 export type FetchAndValidateLicense = (args: {ctx: AppContext}) => Promise<void>;

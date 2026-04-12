@@ -6,6 +6,7 @@ import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {CollectionPermission} from '../../../entities/collection';
 import {WorkbookPermission} from '../../../entities/workbook';
+import {EXTRA_PERMISSIONS_ACTION} from '../../../registry/plugins/common/utils/extra-permissions/constants';
 import Utils from '../../../utils';
 import {getCollection} from '../collection';
 import {getParentIds} from '../collection/utils';
@@ -42,7 +43,7 @@ export const moveWorkbook = async (
 
     const targetTrx = getPrimary(trx);
 
-    const {checkOrganizationPermission} = registry.common.functions.get();
+    const {checkOrganizationPermission, checkExtraPermissions} = registry.common.functions.get();
 
     const workbook = await getWorkbook(
         {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions: true},
@@ -50,6 +51,7 @@ export const moveWorkbook = async (
     );
 
     if (accessServiceEnabled && !skipCheckPermissions) {
+        let newCollectionParentIds: string[] = [];
         let parentIds: string[] = [];
 
         if (workbook.model.collectionId !== null) {
@@ -71,8 +73,6 @@ export const moveWorkbook = async (
                 {collectionId: newCollectionId},
             );
 
-            let newCollectionParentIds: string[] = [];
-
             if (newCollection.model.parentId !== null) {
                 newCollectionParentIds = await getParentIds({
                     ctx,
@@ -91,6 +91,14 @@ export const moveWorkbook = async (
                 permission: OrganizationPermission.CreateWorkbookInRoot,
             });
         }
+
+        await checkExtraPermissions({
+            ctx,
+            action: EXTRA_PERMISSIONS_ACTION.MOVE_WORKBOOK,
+            workbookId,
+            parentIds,
+            newCollectionParentIds,
+        });
     }
 
     const titleForPatch = newTitle ?? workbook.model.title;

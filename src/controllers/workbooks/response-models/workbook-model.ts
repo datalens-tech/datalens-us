@@ -10,12 +10,12 @@ const schema = z
         title: z.string(),
         description: z.string().nullable(),
         tenantId: z.string(),
-        meta: z.object({}),
+        meta: z.record(z.string(), z.unknown()),
         createdBy: z.string(),
         createdAt: z.string(),
         updatedBy: z.string().nullable(),
         updatedAt: z.string(),
-        status: z.nativeEnum(WorkbookStatus),
+        status: z.enum(WorkbookStatus),
     })
     .describe('Workbook model');
 

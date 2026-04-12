@@ -17,7 +17,7 @@ const requestSchema = {
         .object({
             title: zc.entityName().optional(),
             description: z.string().optional(),
-            status: z.nativeEnum(WorkbookStatus).optional(),
+            status: z.enum(WorkbookStatus).optional(),
             meta: zc.limitedObject({limit: 3000}).optional(),
         })
         .refine(
@@ -30,7 +30,7 @@ const requestSchema = {
                 );
             },
             {
-                message: `The request body must contain at least one of the following fields: "title", "description", "status", or "meta".`,
+                error: `The request body must contain at least one of the following fields: "title", "description", "status", or "meta".`,
             },
         ),
 };

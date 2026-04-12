@@ -23,6 +23,7 @@ export const TenantColumn = {
     Branding: 'branding',
     Settings: 'settings',
     Features: 'features',
+    Onboarding: 'onboarding',
 } as const;
 
 export const TenantColumnRaw = mapValuesToSnakeCase(TenantColumn);
@@ -57,4 +58,5 @@ export class Tenant extends Model {
     [TenantColumn.Branding]!: Record<string, unknown>;
     [TenantColumn.Settings]!: Record<string, unknown>;
     [TenantColumn.Features]!: Record<string, unknown>;
+    [TenantColumn.Onboarding]!: Nullable<Record<string, unknown>>;
 }

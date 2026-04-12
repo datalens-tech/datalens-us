@@ -16,8 +16,8 @@ const requestSchema = {
         includePermissionsInfo: zc.stringBoolean().optional(),
         createdBy: z.string().optional(),
         scope: z
-            .nativeEnum(EntryScope)
-            .or(z.array(z.nativeEnum(EntryScope)))
+            .enum(EntryScope)
+            .or(z.array(z.enum(EntryScope)))
             .optional(),
         filters: z
             .object({

@@ -6,11 +6,9 @@ import {operation as operationResponseModel} from '../../response-models';
 import {collectionInstance as originalCollectionInstance} from './collection-instance';
 
 const schema = originalCollectionInstance.schema
-    .merge(
-        z.object({
-            operation: operationResponseModel.schema.optional(),
-        }),
-    )
+    .extend({
+        operation: operationResponseModel.schema.optional(),
+    })
     .describe('Collection instance with operation');
 
 const format = ({

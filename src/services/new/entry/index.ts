@@ -7,3 +7,4 @@ export * from './get-entry-meta';
 export * from './get-joined-entries-revisions-by-ids';
 export * from './get-entry';
 export * from './get-entries-relations';
+export * from './update-entry-unversioned-data-private';

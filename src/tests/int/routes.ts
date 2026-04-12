@@ -28,4 +28,9 @@ export const routes = {
         `/private/v2/workbooks/${workbookId}/setIsTemplate`,
     getEntriesRelations: '/v1/get-entries-relations',
     privateGetEntriesRelations: '/private/v1/get-entries-relations',
+    privateUpdateEntryUnversionedData: (entryId: string) =>
+        `/private/entries/${entryId}/unversioned-data`,
+    entryRevisions: (entryId: string) => `/v1/entries/${entryId}/revisions`,
+    entryRelations: (entryId: string) => `/v1/entries/${entryId}/relations`,
+    switchRevision: (entryId: string) => `/private/entries/${entryId}/switch-revision`,
 } as const;

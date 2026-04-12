@@ -11,6 +11,8 @@ export const stringBigInt = () => {
                 return false;
             }
         },
-        {message: 'String must be a valid integer'},
+        {
+            error: 'String must be a valid integer',
+        },
     );
 };

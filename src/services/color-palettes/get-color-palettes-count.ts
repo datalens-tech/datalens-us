@@ -1,24 +1,13 @@
-import {makeSchemaValidator} from '../../components/validation-schema-compiler';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
 import {CountAggregation, ServiceArgs} from '../../services/new/types';
 import {getReplica} from '../../services/new/utils';
-
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['isGradient'],
-    properties: {
-        isGradient: {
-            type: 'boolean',
-        },
-    },
-});
 
 export interface CheckColorPalettesCountArgs {
     isGradient: boolean;
 }
 
 export const getColorPalettesCount = async (
-    {ctx, trx, skipValidation = false}: ServiceArgs,
+    {ctx, trx}: ServiceArgs,
     args: CheckColorPalettesCountArgs,
 ) => {
     const {isGradient} = args;
@@ -28,10 +17,6 @@ export const getColorPalettesCount = async (
     });
 
     const {tenantId} = ctx.get('info');
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const targetTrx = getReplica(trx);
 

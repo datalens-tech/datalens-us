@@ -31,11 +31,11 @@ const requestSchema = {
     query: z
         .object({
             ids: idsSchema.optional(),
-            scope: z.nativeEnum(EntryScope).optional(),
+            scope: z.enum(EntryScope).optional(),
             type: z.string().optional(),
             createdBy: z.union([z.string(), z.array(z.string())]).optional(),
             orderBy: orderBySchema.optional(),
-            meta: z.record(z.union([z.string(), z.array(z.string())])).optional(),
+            meta: z.record(z.string(), z.union([z.string(), z.array(z.string())])).optional(),
             filters: filtersSchema.optional(),
             page: zc.stringNumber({min: 0}).optional(),
             pageSize: zc.stringNumber({min: 1, max: 200}).optional(),
@@ -47,7 +47,7 @@ const requestSchema = {
             excludeLocked: zc.stringBoolean().optional(),
         })
         .refine((data) => data.ids || data.scope, {
-            message: 'Either "ids" or "scope" must be provided.',
+            error: 'Either "ids" or "scope" must be provided.',
         }),
 };
 

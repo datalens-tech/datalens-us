@@ -7,7 +7,7 @@ import {OrderBy, US_ERRORS} from '../const';
 export interface PaginatorConfig<TFields extends string = string> {
     sortField: TFields;
     tiebreakerField: TFields;
-    validationRules: Record<TFields, z.ZodSchema>;
+    validationRules: Record<TFields, z.ZodType>;
     direction: OrderBy;
     limit: number;
     pageToken?: string;
@@ -31,7 +31,7 @@ const encodeCursorPageToken = (cursorValue: string, tiebreakerValue: string) => 
 const decodeCursorPageToken = <TFields extends string>(params: {
     sortField: TFields;
     tiebreakerField: TFields;
-    validationRules: Record<TFields, z.ZodSchema>;
+    validationRules: Record<TFields, z.ZodType>;
     pageToken: string;
 }) => {
     try {

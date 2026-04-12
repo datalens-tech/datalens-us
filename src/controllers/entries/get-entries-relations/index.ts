@@ -12,11 +12,11 @@ import {getEntriesRelationsResult} from './response-model';
 const requestSchema = {
     body: z.object({
         entryIds: zc.encodedIdArray({min: 1, max: 1000}),
-        linkDirection: z.nativeEnum(LinkDirection).optional(),
+        linkDirection: z.enum(LinkDirection).optional(),
         includePermissionsInfo: z.boolean().optional(),
         limit: z.number().min(1).max(1000).optional(),
         pageToken: z.string().optional(),
-        scope: z.nativeEnum(EntryScope).optional(),
+        scope: z.enum(EntryScope).optional(),
     }),
 };
 
