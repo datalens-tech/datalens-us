@@ -1,3 +1,4 @@
+import {AuthPolicy} from '@gravity-ui/expresskit';
 import {AppContext, AppError} from '@gravity-ui/nodekit';
 
 import {UserRole} from '../../../../../components/auth/constants/role';
@@ -47,7 +48,7 @@ export const checkOrganizationPermission: CheckOrganizationPermission = async (a
     ctx: AppContext;
     permission: OrganizationPermission;
 }) => {
-    if (args.ctx.config.isAuthEnabled) {
+    if (args.ctx.config.appAuthPolicy !== AuthPolicy.disabled) {
         await checkAuthOrganizationPermission(args);
     }
 };

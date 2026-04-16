@@ -50,6 +50,8 @@ export type {
     LogEventSetDefaultColorPaletteSuccessParams,
     LogEventUpdateTenantSettingsFailParams,
     LogEventUpdateTenantSettingsSuccessParams,
+    LogEventUpdateEntryUnversionedDataFailParams,
+    LogEventUpdateEntryUnversionedDataSuccessParams,
 } from '../../src/registry/plugins/common/utils/log-event/types';
 export {LogEventType} from '../../src/registry/plugins/common/utils/log-event/types';
 export type {GatewayApi} from '../../src/registry';
@@ -64,6 +66,13 @@ export type {
     CheckLicense,
     FetchAndValidateLicense,
 } from '../../src/registry/plugins/common/utils/entry/types';
+export type {
+    CheckExtraPermissions,
+    CheckCopyWorkbookExtraPermissionsArgs,
+    CheckMoveCollectionExtraPermissionsArgs,
+    CheckMoveWorkbookExtraPermissionsArgs,
+    ExtraPermissionsAction,
+} from '../../src/registry/plugins/common/utils/extra-permissions/types';
 export type {
     CollectionConstructor,
     CollectionInstance,

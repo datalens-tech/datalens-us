@@ -82,7 +82,7 @@ export const registerApiRoute = (
             }, [])
             .join('/')}`;
 
-        const headers: ZodType<unknown>[] = [];
+        const headers: ZodType<unknown, unknown>[] = [];
 
         if (additionalHeaders) {
             headers.push(...additionalHeaders);

@@ -1,14 +1,18 @@
 import {Model} from '../../..';
+import type {EmbeddingType} from '../shared';
 
 export const EmbedModelColumn = {
     EmbedId: 'embedId',
     Title: 'title',
     EmbeddingSecretId: 'embeddingSecretId',
     EntryId: 'entryId',
+    TenantId: 'tenantId',
     DepsIds: 'depsIds',
     UnsignedParams: 'unsignedParams',
     PrivateParams: 'privateParams',
     PublicParamsMode: 'publicParamsMode',
+    Type: 'type',
+    AllowAllDeps: 'allowAllDeps',
     CreatedBy: 'createdBy',
     CreatedAt: 'createdAt',
     UpdatedBy: 'updatedBy',
@@ -29,10 +33,13 @@ export class EmbedModel extends Model {
     [EmbedModelColumn.Title]!: string;
     [EmbedModelColumn.EmbeddingSecretId]!: string;
     [EmbedModelColumn.EntryId]!: string;
+    [EmbedModelColumn.TenantId]!: Nullable<string>;
     [EmbedModelColumn.DepsIds]!: string[];
     [EmbedModelColumn.UnsignedParams]!: string[];
     [EmbedModelColumn.PrivateParams]!: string[];
     [EmbedModelColumn.PublicParamsMode]!: boolean;
+    [EmbedModelColumn.Type]!: Nullable<EmbeddingType>;
+    [EmbedModelColumn.AllowAllDeps]!: boolean;
     [EmbedModelColumn.CreatedBy]!: string;
     [EmbedModelColumn.CreatedAt]!: string;
     [EmbedModelColumn.UpdatedBy]!: string;

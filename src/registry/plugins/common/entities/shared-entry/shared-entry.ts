@@ -1,3 +1,4 @@
+import {AuthPolicy} from '@gravity-ui/expresskit';
 import type {AppContext} from '@gravity-ui/nodekit';
 import {AppError} from '@gravity-ui/nodekit';
 
@@ -41,7 +42,7 @@ export const SharedEntry: SharedEntryConstructor<SharedEntryInstance> = class Sh
             });
         }
 
-        return Promise.resolve(getMockedOperation(Utils.encodeId(this.model.entryId)));
+        return Promise.resolve(getMockedOperation({id: Utils.encodeId(this.model.entryId)}));
     }
 
     async checkPermission(args: {
@@ -84,17 +85,21 @@ export const SharedEntry: SharedEntryConstructor<SharedEntryInstance> = class Sh
             delete: true,
             createEntryBinding: true,
             createLimitedEntryBinding: true,
+            securityApprove: true,
         };
     }
 
     private isEditorOrAdmin() {
-        const {isAuthEnabled} = this.ctx.config;
+        const {appAuthPolicy} = this.ctx.config;
         const user = this.ctx.get('user');
-        return isAuthEnabled
-            ? (user?.roles || []).some(
-                  (role) => role === UserRole.Editor || role === UserRole.Admin,
-              )
-            : true;
+
+        if (appAuthPolicy === AuthPolicy.disabled) {
+            return true;
+        }
+
+        return (user?.roles || []).some(
+            (role) => role === UserRole.Editor || role === UserRole.Admin,
+        );
     }
 
     private getAllPermissions() {
@@ -111,6 +116,7 @@ export const SharedEntry: SharedEntryConstructor<SharedEntryInstance> = class Sh
             delete: isEditorOrAdmin,
             createEntryBinding: isEditorOrAdmin,
             createLimitedEntryBinding: isEditorOrAdmin,
+            securityApprove: isEditorOrAdmin,
         };
 
         return permissions;

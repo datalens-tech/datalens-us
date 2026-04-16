@@ -123,9 +123,18 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             write: true,
         }),
 
+        privateUpdateUnversionedData: makeRoute({
+            route: 'POST /private/entries/:entryId/unversioned-data',
+            handler: entries.updateEntryUnversionedDataPrivateController,
+            authPolicy: AuthPolicy.disabled,
+            private: true,
+            write: true,
+            requireCtxTenantId: true,
+        }),
+
         privateSwitchRevisionEntry: makeRoute({
             route: 'POST /private/entries/:entryId/switch-revision',
-            handler: entries.switchRevisionEntry,
+            handler: entries.switchRevisionEntryController,
             authPolicy: AuthPolicy.disabled,
             private: true,
             write: true,
@@ -172,22 +181,22 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         getRevisions: makeRoute({
             route: 'GET /v1/entries/:entryId/revisions',
-            handler: entries.getRevisions,
+            handler: entries.getRevisionsController,
         }),
         privateGetRevisions: makeRoute({
             route: 'GET /private/entries/:entryId/revisions',
-            handler: entries.getRevisions,
+            handler: entries.getRevisionsController,
             authPolicy: AuthPolicy.disabled,
             private: true,
         }),
 
         getRelations: makeRoute({
             route: 'GET /v1/entries/:entryId/relations',
-            handler: entries.getRelations,
+            handler: entries.getRelationsController,
         }),
         privateGetRelations: makeRoute({
             route: 'GET /private/entries/:entryId/relations',
-            handler: entries.getRelations,
+            handler: entries.getRelationsController,
             authPolicy: AuthPolicy.disabled,
             private: true,
         }),
@@ -524,12 +533,12 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
 
         getColorPalettes: makeRoute({
             route: 'GET /v1/color-palettes',
-            handler: colorPalettes.getList,
+            handler: colorPalettes.getColorPalettesListController,
             features: [Feature.ColorPalettesEnabled],
         }),
         getColorPalette: makeRoute({
             route: 'GET /v1/color-palettes/:colorPaletteId',
-            handler: colorPalettes.get,
+            handler: colorPalettes.getColorPaletteController,
             authPolicy: AuthPolicy.disabled,
             features: [Feature.ColorPalettesEnabled],
         }),

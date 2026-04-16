@@ -8,7 +8,7 @@ import {entryPermissionsModel} from '../../entries/response-models';
 const schema = z
     .object({
         entryId: z.string(),
-        scope: z.nativeEnum(EntryScope),
+        scope: z.enum(EntryScope),
         type: z.string(),
         key: z.string().nullable(),
         alias: z.string().nullable(),

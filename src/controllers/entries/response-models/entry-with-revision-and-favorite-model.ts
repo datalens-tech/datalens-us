@@ -4,11 +4,9 @@ import {JoinedEntryRevisionFavoriteColumns} from '../../../db/presentations/join
 import {entryWithRevisionModel} from './entry-with-revision-model';
 
 const schema = entryWithRevisionModel.schema
-    .merge(
-        z.object({
-            isFavorite: z.boolean(),
-        }),
-    )
+    .extend({
+        isFavorite: z.boolean(),
+    })
     .describe('Entry with revision and favorite model');
 
 export type EntryWithRevisionAndFavoriteModel = z.infer<typeof schema>;

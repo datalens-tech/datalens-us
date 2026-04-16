@@ -13,13 +13,19 @@ export const getAdditionalSecuritySchemes = (
 ): GetAdditionalSecuritySchemesResult => {
     const result: GetAdditionalSecuritySchemesResult = {};
 
-    result[SecurityType.MasterToken] = {
-        type: 'apiKey',
-        in: 'header',
-        name: US_MASTER_TOKEN_HEADER,
-    };
+    const {config} = nodekit;
 
-    if (isEnabledFeature(nodekit.ctx, Feature.DynamicMasterTokenEnabled)) {
+    const authDisabled = config.appAuthPolicy === AuthPolicy.disabled;
+
+    if (!authDisabled) {
+        result[SecurityType.MasterToken] = {
+            type: 'apiKey',
+            in: 'header',
+            name: US_MASTER_TOKEN_HEADER,
+        };
+    }
+
+    if (!authDisabled && isEnabledFeature(nodekit.ctx, Feature.DynamicMasterTokenEnabled)) {
         result[SecurityType.DynamicMasterToken] = {
             type: 'apiKey',
             in: 'header',
@@ -27,11 +33,7 @@ export const getAdditionalSecuritySchemes = (
         };
     }
 
-    const {config} = nodekit;
-
-    const authDisabled = config.appAuthPolicy === AuthPolicy.disabled;
-
-    if (!authDisabled && config.isAuthEnabled) {
+    if (!authDisabled) {
         result[SecurityType.BearerAuth] = {
             type: 'http',
             scheme: 'bearer',
@@ -49,7 +51,15 @@ export const getAdditionalHeaders = (
     const headers: GetAdditionalHeadersResult['headers'] = [];
     const security: GetAdditionalHeadersResult['security'] = [];
 
-    if (routeDescription.private) {
+    const {config} = nodekit;
+
+    const authDisabled =
+        config.appAuthPolicy === AuthPolicy.disabled ||
+        routeDescription.authPolicy === AuthPolicy.disabled;
+
+    const appAuthDisabled = config.appAuthPolicy === AuthPolicy.disabled;
+
+    if (!appAuthDisabled && routeDescription.private) {
         security.push({[SecurityType.MasterToken]: []});
 
         if (isEnabledFeature(nodekit.ctx, Feature.DynamicMasterTokenEnabled)) {
@@ -57,13 +67,7 @@ export const getAdditionalHeaders = (
         }
     }
 
-    const {config} = nodekit;
-
-    const authDisabled =
-        config.appAuthPolicy === AuthPolicy.disabled ||
-        routeDescription.authPolicy === AuthPolicy.disabled;
-
-    if (!authDisabled && config.isAuthEnabled) {
+    if (!authDisabled) {
         security.push({[SecurityType.BearerAuth]: []});
     }
 

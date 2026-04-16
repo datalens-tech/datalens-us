@@ -8,7 +8,7 @@ const relationItemSchema = z
     .object({
         entryId: z.string(),
         key: z.string().nullable(),
-        scope: z.nativeEnum(EntryScope),
+        scope: z.enum(EntryScope),
         type: z.string(),
         createdAt: z.string(),
         public: z.boolean(),

@@ -24,8 +24,8 @@ const requestSchema = {
         page: zc.stringNumber({min: 0}).optional(),
         pageSize: zc.stringNumber({min: 1, max: 200}).optional(),
         scope: z
-            .nativeEnum(EntryScope)
-            .or(z.array(z.nativeEnum(EntryScope)))
+            .enum(EntryScope)
+            .or(z.array(z.enum(EntryScope)))
             .optional(),
         includePermissionsInfo: zc.stringBoolean().optional(),
         ignoreWorkbookEntries: zc.stringBoolean().optional(),

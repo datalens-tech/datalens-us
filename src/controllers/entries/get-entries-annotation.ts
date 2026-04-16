@@ -11,7 +11,7 @@ import {entriesAnnotationModel} from './response-models';
 const requestSchema = {
     body: z.object({
         entryIds: zc.encodedIdArray({min: 1, max: 1000}),
-        scope: z.nativeEnum(EntryScope).optional(),
+        scope: z.enum(EntryScope).optional(),
         type: z.string().optional(),
     }),
 };

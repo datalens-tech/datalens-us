@@ -12,6 +12,7 @@ export {
     US_ERRORS,
     CURRENT_TIMESTAMP,
     OrderBy,
+    UpdateMode,
     DEFAULT_QUERY_TIMEOUT,
     EXTENDED_QUERY_TIMEOUT,
     ALL_COLUMNS,

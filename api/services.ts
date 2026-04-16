@@ -13,6 +13,7 @@ export {
     getParentIds,
     makeWorkbooksWithParentsMap,
     makeCollectionsWithParentsMap,
+    makeSharedEntriesWithParentsMap,
 } from '../src/services/new/collection/utils/get-parents';
 
 export {

@@ -12,7 +12,7 @@ const requestSchema = {
     }),
     query: z.object({
         lockToken: z.string().optional(),
-        scope: z.nativeEnum(EntryScope).optional(),
+        scope: z.enum(EntryScope).optional(),
         types: zc.stringArray({min: 1, max: 100}).optional(),
     }),
 };

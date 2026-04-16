@@ -18,7 +18,7 @@ const requestSchema = {
         title: zc.entityName(),
         description: z.string().optional(),
         meta: zc.limitedObject({limit: 3000}).optional(),
-        status: z.nativeEnum(WorkbookStatus).optional(),
+        status: z.enum(WorkbookStatus).optional(),
     }),
 };
 

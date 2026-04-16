@@ -13,6 +13,8 @@ const selectedEmbedColumns = [
     EmbedModelColumn.UnsignedParams,
     EmbedModelColumn.PrivateParams,
     EmbedModelColumn.PublicParamsMode,
+    EmbedModelColumn.Type,
+    EmbedModelColumn.AllowAllDeps,
     EmbedModelColumn.CreatedBy,
     EmbedModelColumn.CreatedAt,
     EmbedModelColumn.UpdatedBy,

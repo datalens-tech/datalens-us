@@ -60,7 +60,7 @@ afterAuth.push(
     checkCtxTenantId,
 );
 
-if (nodekit.config.isAuthEnabled) {
+if (nodekit.config.appAuthPolicy !== AuthPolicy.disabled) {
     nodekit.config.appAuthHandler = appAuth;
 }
 

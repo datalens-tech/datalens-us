@@ -27,4 +27,5 @@ export const WORKBOOKS_DEFAULT_PERMISSIONS: Permissions = {
     publish: false,
     embed: false,
     delete: false,
+    securityApprove: false,
 };

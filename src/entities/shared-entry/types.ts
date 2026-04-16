@@ -18,6 +18,7 @@ export enum SharedEntryPermission {
     Delete = 'delete',
     CreateEntryBinding = 'createEntryBinding',
     CreateLimitedEntryBinding = 'createLimitedEntryBinding',
+    SecurityApprove = 'securityApprove',
 }
 
 export type Permissions = Record<SharedEntryPermission, boolean>;

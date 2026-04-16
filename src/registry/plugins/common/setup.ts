@@ -6,7 +6,7 @@ import {Collection} from './entities/collection/collection';
 import {SharedEntry} from './entities/shared-entry/shared-entry';
 import {Workbook} from './entities/workbook/workbook';
 import {checkColorPalettesAdmin} from './utils/color-palettes/utils';
-import {checkEmbedding} from './utils/embedding/utils';
+import {checkEmbedding, getEmbeddingWorkbookId} from './utils/embedding/utils';
 import {
     checkLicense,
     fetchAndValidateLicenseOrFail,
@@ -16,6 +16,7 @@ import {
     isLicenseRequired,
     isNeedBypassEntryByKey,
 } from './utils/entry/utils';
+import {checkExtraPermissions} from './utils/extra-permissions/utils';
 import {logEvent} from './utils/log-event/utils';
 import {checkTenant, getServicePlan, processTenantSettings} from './utils/tenant/utils';
 
@@ -37,6 +38,8 @@ export const setupCommonPlugin = () => {
         checkLicense,
         fetchAndValidateLicenseOrFail,
         checkEmbedding,
+        getEmbeddingWorkbookId,
+        checkExtraPermissions,
         logEvent,
         checkTenant,
         getServicePlan,

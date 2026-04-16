@@ -23,7 +23,7 @@ const requestSchema = {
         .superRefine(({collectionId, mode}, ctx) => {
             if (mode === 'onlyEntries' && !collectionId) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: 'custom',
                     path: ['mode', 'collectionId'],
                     message: "'collectionId' is required if mode is 'onlyEntries'",
                 });

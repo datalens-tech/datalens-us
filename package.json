@@ -23,10 +23,10 @@
   },
   "main": "dist/index.js",
   "dependencies": {
-    "@asteasolutions/zod-to-openapi": "^7.3.0",
-    "@gravity-ui/expresskit": "^2.4.0",
+    "@asteasolutions/zod-to-openapi": "^8.4.0",
+    "@gravity-ui/expresskit": "^3.1.0",
     "@gravity-ui/gateway": "^4.10.4",
-    "@gravity-ui/nodekit": "^2.4.1",
+    "@gravity-ui/nodekit": "^2.11.0",
     "@gravity-ui/postgreskit": "^3.1.0",
     "@temporalio/activity": "^1.13.2",
     "@temporalio/client": "^1.13.2",
@@ -50,7 +50,7 @@
     "swagger-ui-express": "^5.0.1",
     "utility-types": "^3.10.0",
     "uuid": "^3.4.0",
-    "zod": "^3.24.1"
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@blueground/jest-testcontainers": "^3.0.4",

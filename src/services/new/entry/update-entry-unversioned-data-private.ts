@@ -1,0 +1,60 @@
+import {AppError} from '@gravity-ui/nodekit';
+import {raw} from 'objection';
+
+import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, US_ERRORS} from '../../../const';
+import {Entry, EntryColumn} from '../../../db/models/new/entry';
+import {EntryColumns} from '../../../types/models';
+import {makeUserId} from '../../../utils';
+import {ServiceArgs} from '../types';
+import {getPrimary} from '../utils';
+
+type UpdateUnversionedDataArgs = {
+    entryId: string;
+    unversionedData: EntryColumns['unversionedData'];
+};
+
+export const updateEntryUnversionedDataPrivate = async (
+    {ctx, trx}: ServiceArgs,
+    args: UpdateUnversionedDataArgs,
+) => {
+    const {entryId, unversionedData} = args;
+
+    ctx.log('UPDATE_UNVERSIONED_DATA_START', {
+        entryId,
+    });
+
+    const {isPrivateRoute, user, tenantId} = ctx.get('info');
+
+    if (!isPrivateRoute) {
+        throw new AppError(US_ERRORS.PRIVATE_ROUTE_ONLY, {
+            code: US_ERRORS.PRIVATE_ROUTE_ONLY,
+        });
+    }
+
+    const updatedBy = makeUserId(user.userId);
+
+    const updatedEntry = await Entry.query(getPrimary(trx))
+        .patch({
+            [EntryColumn.UnversionedData]: unversionedData,
+            [EntryColumn.UpdatedBy]: updatedBy,
+            [EntryColumn.UpdatedAt]: raw(CURRENT_TIMESTAMP),
+        })
+        .where({
+            [EntryColumn.EntryId]: entryId,
+            [EntryColumn.TenantId]: tenantId,
+            [EntryColumn.IsDeleted]: false,
+        })
+        .returning('*')
+        .first()
+        .timeout(DEFAULT_QUERY_TIMEOUT);
+
+    if (!updatedEntry) {
+        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
+            code: US_ERRORS.NOT_EXIST_ENTRY,
+        });
+    }
+
+    ctx.log('UPDATE_UNVERSIONED_DATA_SUCCESS');
+
+    return updatedEntry;
+};

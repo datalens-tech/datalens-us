@@ -11,7 +11,7 @@ import {sharedEntryPermissionsModel} from '../response-models/shared-entry-permi
 const schema = z
     .object({
         entryId: z.string(),
-        scope: z.nativeEnum(EntryScope),
+        scope: z.enum(EntryScope),
         type: z.string(),
         key: z.string().nullable(),
         unversionedData: z.record(z.string(), z.unknown()).optional(),

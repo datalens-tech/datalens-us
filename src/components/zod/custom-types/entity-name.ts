@@ -6,8 +6,8 @@ export const entityName = () =>
     z
         .string()
         .refine((value) => !value.includes('/'), {
-            message: 'String should not contain the symbol /',
+            error: 'String should not contain the symbol /',
         })
         .refine((value) => KEY_REG.test(value), {
-            message: `String ${symbolsValidateMessage}`,
+            error: `String ${symbolsValidateMessage}`,
         });

@@ -15,9 +15,9 @@ import {sharedEntryInstance} from './structure-shared-entry-instance';
 const schema = z
     .object({
         items: collectionInstance.schema
-            .merge(z.object({entity: z.literal('collection')}))
-            .or(workbookInstance.schema.merge(z.object({entity: z.literal('workbook')})))
-            .or(sharedEntryInstance.schema.merge(z.object({entity: z.literal('entry')})))
+            .extend({entity: z.literal('collection')})
+            .or(workbookInstance.schema.extend({entity: z.literal('workbook')}))
+            .or(sharedEntryInstance.schema.extend({entity: z.literal('entry')}))
             .array(),
         nextPageToken: z.string().nullable(),
     })

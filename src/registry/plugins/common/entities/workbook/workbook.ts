@@ -1,3 +1,4 @@
+import {AuthPolicy} from '@gravity-ui/expresskit';
 import type {AppContext} from '@gravity-ui/nodekit';
 import {AppError} from '@gravity-ui/nodekit';
 
@@ -41,7 +42,7 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook im
             });
         }
 
-        return Promise.resolve(getMockedOperation(Utils.encodeId(this.model.workbookId)));
+        return Promise.resolve(getMockedOperation({id: Utils.encodeId(this.model.workbookId)}));
     }
 
     async checkPermission(args: {
@@ -84,17 +85,21 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook im
             publish: true,
             embed: true,
             delete: true,
+            securityApprove: true,
         };
     }
 
     private isEditorOrAdmin() {
-        const {isAuthEnabled} = this.ctx.config;
+        const {appAuthPolicy} = this.ctx.config;
         const user = this.ctx.get('user');
-        return isAuthEnabled
-            ? (user?.roles || []).some(
-                  (role) => role === UserRole.Editor || role === UserRole.Admin,
-              )
-            : false;
+
+        if (appAuthPolicy === AuthPolicy.disabled) {
+            return true;
+        }
+
+        return (user?.roles || []).some(
+            (role) => role === UserRole.Editor || role === UserRole.Admin,
+        );
     }
 
     private getAllPermissions() {
@@ -111,6 +116,7 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook im
             publish: isEditorOrAdmin,
             embed: isEditorOrAdmin,
             delete: isEditorOrAdmin,
+            securityApprove: isEditorOrAdmin,
         };
 
         return permissions;

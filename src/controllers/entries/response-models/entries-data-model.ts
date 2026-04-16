@@ -11,7 +11,7 @@ const schema = z
     .object({
         entryId: z.string(),
         result: z.object({
-            scope: z.nativeEnum(EntryScope),
+            scope: z.enum(EntryScope),
             type: z.string(),
             data: z.record(z.string(), z.unknown()),
         }),

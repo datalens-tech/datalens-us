@@ -1,4 +1,4 @@
-import {NextFunction, Request, Response} from '@gravity-ui/expresskit';
+import {AuthPolicy, NextFunction, Request, Response} from '@gravity-ui/expresskit';
 
 import {SYSTEM_USER, US_DYNAMIC_MASTER_TOKEN_HEADER, US_MASTER_TOKEN_HEADER} from '../../const';
 import {Feature, isEnabledFeature} from '../features';
@@ -17,6 +17,12 @@ function replaceDotsInLogin(login: string) {
 
 export async function resolvePrivateRoute(req: Request, res: Response, next: NextFunction) {
     req.ctx.log('PRIVATE_API_CALL');
+
+    if (req.ctx.config.appAuthPolicy === AuthPolicy.disabled) {
+        res.locals.isPrivateRoute = true;
+        req.ctx.log('PRIVATE_API_CALL_AUTHORIZED');
+        return next();
+    }
 
     const isDynamicMasterTokenEnabled = isEnabledFeature(
         req.ctx,

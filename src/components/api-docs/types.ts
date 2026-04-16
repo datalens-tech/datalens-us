@@ -16,7 +16,7 @@ export type SecuritySchemeObject = {
 };
 
 export type GetAdditionalHeadersResult = {
-    headers: ZodType<unknown>[];
+    headers: ZodType<unknown, unknown>[];
     security: {[key: string]: []}[];
 };
 

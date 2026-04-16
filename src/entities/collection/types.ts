@@ -20,6 +20,8 @@ export enum CollectionPermission {
     Copy = 'copy',
     Move = 'move',
     Delete = 'delete',
+    SecurityManage = 'securityManage',
+    SecurityApprove = 'securityApprove',
 }
 
 export type Permissions = Record<CollectionPermission, boolean>;

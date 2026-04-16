@@ -11,7 +11,7 @@ import type {CollectionConstructor} from './entities/collection/types';
 import type {SharedEntryConstructor} from './entities/shared-entry/types';
 import type {WorkbookConstructor} from './entities/workbook/types';
 import type {CheckColorPalettesAdmin} from './utils/color-palettes/types';
-import type {CheckEmbedding} from './utils/embedding/types';
+import type {CheckEmbedding, GetEmbeddingWorkbookId} from './utils/embedding/types';
 import type {
     CheckLicense,
     FetchAndValidateLicense,
@@ -21,6 +21,7 @@ import type {
     IsLicenseRequired,
     IsNeedBypassEntryByKey,
 } from './utils/entry/types';
+import type {CheckExtraPermissions} from './utils/extra-permissions/types';
 import type {LogEvent} from './utils/log-event/types';
 import type {CheckTenant, GetServicePlan, ProcessTenantSettings} from './utils/tenant/types';
 
@@ -38,6 +39,8 @@ export const commonPlugin = {
         getEntryAddFormattedFieldsHook: makeFunctionTemplate<GetEntryAddFormattedFieldsHook>(),
         getEntryResolveUserLogin: makeFunctionTemplate<GetEntryResolveUserLogin>(),
         checkEmbedding: makeFunctionTemplate<CheckEmbedding>(),
+        getEmbeddingWorkbookId: makeFunctionTemplate<GetEmbeddingWorkbookId>(),
+        checkExtraPermissions: makeFunctionTemplate<CheckExtraPermissions>(),
         logEvent: makeFunctionTemplate<LogEvent>(),
         checkTenant: makeFunctionTemplate<CheckTenant>(),
         getServicePlan: makeFunctionTemplate<GetServicePlan>(),

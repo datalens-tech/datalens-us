@@ -13,13 +13,15 @@ export const requestSchema = {
             entryId: zc.encodedId().optional(),
             collectionId: zc.encodedId().optional(),
             workbookId: zc.encodedId().optional(),
+            subscriptionId: zc.encodedId().optional(),
         })
         .superRefine((val, ctx) => {
-            if (!(val.entryId || val.collectionId || val.workbookId)) {
+            if (!(val.entryId || val.collectionId || val.workbookId || val.subscriptionId)) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: 'custom',
                     path: [],
-                    message: "Either 'entryId', 'collectionId' or 'workbookId' must be set",
+                    message:
+                        "Either 'entryId', 'collectionId', 'workbookId' or 'subscriptionId' must be set",
                 });
             }
 
@@ -27,14 +29,15 @@ export const requestSchema = {
                 Boolean(val.entryId),
                 Boolean(val.collectionId),
                 Boolean(val.workbookId),
+                Boolean(val.subscriptionId),
             ].filter((item) => item);
 
             if (settedValues.length > 1) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: 'custom',
                     path: [],
                     message:
-                        "Either 'entryId', 'collectionId' or 'workbookId' must be set, but no more than one",
+                        "Either 'entryId', 'collectionId', 'workbookId' or 'subscriptionId' must be set, but no more than one",
                 });
             }
         }),
@@ -47,7 +50,12 @@ export const resolveTenantController: AppRouteHandler = async (req, res) => {
 
     const result = await resolveTenant(
         {ctx: req.ctx},
-        {entryId: query.entryId, collectionId: query.collectionId, workbookId: query.workbookId},
+        {
+            entryId: query.entryId,
+            collectionId: query.collectionId,
+            workbookId: query.workbookId,
+            subscriptionId: query.subscriptionId,
+        },
     );
 
     res.status(200).send(tenantModel.format(result));

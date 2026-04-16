@@ -478,6 +478,16 @@ export default (error: AppError | DBError) => {
             };
         }
 
+        case US_ERRORS.PRIVATE_ROUTE_ONLY: {
+            return {
+                code: 500,
+                response: {
+                    code,
+                    message,
+                },
+            };
+        }
+
         default:
             return {
                 code: 500,

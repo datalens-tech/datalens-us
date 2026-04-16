@@ -1,7 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, SYSTEM_USER, US_ERRORS} from '../../../const';
 import Entry from '../../../db/models/entry';
 import {EntryColumn} from '../../../db/models/new/entry';
@@ -11,38 +10,18 @@ import Utils, {makeUserId} from '../../../utils';
 import {ServiceArgs} from '../../new/types';
 import {getPrimary, getReplica} from '../../new/utils';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['entryId', 'revId'],
-    properties: {
-        entryId: {
-            type: 'string',
-        },
-        revId: {
-            type: 'string',
-        },
-    },
-});
-
 export type SwitchRevisionEntryData = {
     entryId: string;
     revId: string;
 };
 
-export async function switchRevisionEntry(
-    {ctx, trx, skipValidation = false}: ServiceArgs,
-    args: SwitchRevisionEntryData,
-) {
+export async function switchRevisionEntry({ctx, trx}: ServiceArgs, args: SwitchRevisionEntryData) {
     const {entryId, revId} = args;
 
     ctx.log('SWITCH_REVISION_ENTRY_REQUEST', {
         entryId: Utils.encodeId(entryId),
         revId: Utils.encodeId(revId),
     });
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const replica = getReplica(trx);
 

@@ -8,7 +8,7 @@ export const makeIdDecoder = (ctx: z.RefinementCtx) => (val: string) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
         ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: 'custom',
             message: `id '${val}' has incorrect format`,
         });
         return z.NEVER;

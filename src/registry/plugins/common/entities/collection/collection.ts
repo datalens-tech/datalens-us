@@ -1,3 +1,4 @@
+import {AuthPolicy} from '@gravity-ui/expresskit';
 import type {AppContext} from '@gravity-ui/nodekit';
 import {AppError} from '@gravity-ui/nodekit';
 
@@ -41,7 +42,7 @@ export const Collection: CollectionConstructor<CollectionInstance> = class Colle
             });
         }
 
-        return Promise.resolve(getMockedOperation(Utils.encodeId(this.model.collectionId)));
+        return Promise.resolve(getMockedOperation({id: Utils.encodeId(this.model.collectionId)}));
     }
 
     async checkPermission(args: {
@@ -72,6 +73,8 @@ export const Collection: CollectionConstructor<CollectionInstance> = class Colle
             copy: true,
             move: true,
             delete: true,
+            securityManage: true,
+            securityApprove: true,
         };
     }
 
@@ -89,13 +92,16 @@ export const Collection: CollectionConstructor<CollectionInstance> = class Colle
     }
 
     private isEditorOrAdmin() {
-        const {isAuthEnabled} = this.ctx.config;
+        const {appAuthPolicy} = this.ctx.config;
         const user = this.ctx.get('user');
-        return isAuthEnabled
-            ? (user?.roles || []).some(
-                  (role) => role === UserRole.Editor || role === UserRole.Admin,
-              )
-            : false;
+
+        if (appAuthPolicy === AuthPolicy.disabled) {
+            return true;
+        }
+
+        return (user?.roles || []).some(
+            (role) => role === UserRole.Editor || role === UserRole.Admin,
+        );
     }
 
     private getAllPermissions() {
@@ -113,6 +119,8 @@ export const Collection: CollectionConstructor<CollectionInstance> = class Colle
             copy: isEditorOrAdmin,
             move: isEditorOrAdmin,
             delete: isEditorOrAdmin,
+            securityManage: isEditorOrAdmin,
+            securityApprove: isEditorOrAdmin,
         };
 
         return permissions;

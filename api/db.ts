@@ -30,6 +30,7 @@ export {
     EmbeddingSecretModel,
     EmbeddingSecretModelColumn,
 } from '../src/db/models/new/embedding-secret';
+export {EMBEDDING_TYPE, EmbeddingType} from '../src/db/models/new/shared';
 export {ColorPaletteModel, ColorPaletteModelColumn} from '../src/db/models/new/color-palette';
 export {
     OperationModel,

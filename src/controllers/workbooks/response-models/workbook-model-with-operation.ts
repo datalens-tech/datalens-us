@@ -6,11 +6,9 @@ import {operation as operationResponseModel} from '../../response-models';
 import {workbookModel as originalWorkbookModel} from './workbook-model';
 
 const schema = originalWorkbookModel.schema
-    .merge(
-        z.object({
-            operation: operationResponseModel.schema.optional(),
-        }),
-    )
+    .extend({
+        operation: operationResponseModel.schema.optional(),
+    })
     .describe('Workbook model with operation');
 
 export type WorkbookModelWithOperationResponseModel = z.infer<typeof schema>;

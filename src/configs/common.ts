@@ -4,8 +4,7 @@ import {AppConfig} from '@gravity-ui/nodekit';
 import {APP_NAME, US_DYNAMIC_MASTER_TOKEN_HEADER, US_MASTER_TOKEN_HEADER} from '../const';
 import {getEnvCert, getEnvTokenVariable, getEnvVariable, isTrueArg} from '../utils/env-utils';
 
-const isAuthEnabled = isTrueArg(getEnvVariable('AUTH_ENABLED'));
-const isAuthServiceEnabled = isAuthEnabled;
+const isAuthServiceEnabled = isTrueArg(getEnvVariable('AUTH_ENABLED'));
 
 export default {
     appName: APP_NAME,
@@ -22,12 +21,12 @@ export default {
     },
 
     appAuthPolicy: isAuthServiceEnabled ? AuthPolicy.required : AuthPolicy.disabled,
+    appAuthDisableRedirect: true,
 
     appSensitiveKeys: [US_MASTER_TOKEN_HEADER, US_DYNAMIC_MASTER_TOKEN_HEADER],
     appSensitiveHeaders: [US_MASTER_TOKEN_HEADER, US_DYNAMIC_MASTER_TOKEN_HEADER],
 
     // auth
-    isAuthEnabled: isAuthEnabled,
     authTokenPublicKey: getEnvCert(process.env.AUTH_TOKEN_PUBLIC_KEY),
 
     multitenant: false,

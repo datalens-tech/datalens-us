@@ -66,22 +66,34 @@ export class TenantWithCurrentLimit extends Tenant {
                     `${Tenant.tableName}.${TenantColumn.TrialEndedAt}`,
                     checkTimestamp,
                 ]).as('trial_is_active'),
+                raw(`?? IS NOT NULL AND ?? <= ?`, [
+                    `${Tenant.tableName}.${TenantColumn.BillingInstanceServiceUpdatedAt}`,
+                    `${Tenant.tableName}.${TenantColumn.BillingInstanceServiceUpdatedAt}`,
+                    checkTimestamp,
+                ]).as('billing_instance_service_is_updated'),
                 `${this.currentLimitsAlias}.${LicenseLimitColumn.CreatorsLimitValue}`,
             ])
-            .innerJoin(
+            .leftJoin(
                 this.currentLimitsAlias,
                 `${Tenant.tableName}.${TenantColumn.TenantId}`,
                 `${this.currentLimitsAlias}.${LicenseLimitColumn.TenantId}`,
             )
-            .where(
-                `${this.currentLimitsAlias}.${LicenseLimitColumn.CreatorsLimitValue}`,
-                '>=',
-                minCreatorsLimitValue,
-            );
+            .modify((builder) => {
+                if (minCreatorsLimitValue > 0) {
+                    builder.where(
+                        `${this.currentLimitsAlias}.${LicenseLimitColumn.CreatorsLimitValue}`,
+                        '>=',
+                        minCreatorsLimitValue,
+                    );
+                }
+            });
 
         return query as QueryBuilder<TenantWithCurrentLimit, TenantWithCurrentLimit[]>;
     }
 
-    [LicenseLimitColumn.CreatorsLimitValue]!: LicenseLimit[typeof LicenseLimitColumn.CreatorsLimitValue];
+    [LicenseLimitColumn.CreatorsLimitValue]!:
+        | LicenseLimit[typeof LicenseLimitColumn.CreatorsLimitValue]
+        | null;
     trialIsActive!: boolean;
+    billingInstanceServiceIsUpdated!: boolean;
 }

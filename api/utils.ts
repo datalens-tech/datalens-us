@@ -11,10 +11,12 @@ export {normalizedEnv} from '../src/utils/normalized-env';
 
 export {default as axiosInstance} from '../src/utils/axios';
 
-export {absurd, objectKeys} from '../src/utils/utility-types';
+export {absurd, objectKeys, asTupleValues} from '../src/utils/utility-types';
 
 export {whereBuilderInterTenantGetEntries} from '../src/db/models/navigation/utils';
 
 export {getEnvCert, getEnvVariable, getEnvTokenVariable, isTrueArg} from '../src/utils/env-utils';
 
 export {createPaginator, PaginationResult, PaginatorConfig} from '../src/utils/cursor-pagination';
+
+export {swapKeysAndValues} from '../src/utils/swap-object';
