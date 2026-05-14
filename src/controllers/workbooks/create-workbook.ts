@@ -50,7 +50,7 @@ export const createWorkbookController: AppRouteHandler = async (
             },
         );
 
-        logEvent({
+        await logEvent({
             type: LogEventType.CreateWorkbookSuccess,
             ctx: req.ctx,
             reqBody: body,
@@ -64,7 +64,7 @@ export const createWorkbookController: AppRouteHandler = async (
             }),
         );
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.CreateWorkbookFail,
             ctx: req.ctx,
             reqBody: body,

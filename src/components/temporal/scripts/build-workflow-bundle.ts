@@ -36,7 +36,7 @@ const buildWorkflowBundle = async (): Promise<void> => {
     const bundlePath = path.join(__dirname, scriptArgs.bundlePath);
 
     await writeFile(bundlePath, code);
-    console.log(`Bundle written to ${bundlePath}`);
+    console.info(`Bundle written to ${bundlePath}`);
 };
 
 buildWorkflowBundle().catch((error: unknown) => {

@@ -65,7 +65,7 @@ export const updateWorkbookController: AppRouteHandler = async (
             },
         );
 
-        logEvent({
+        await logEvent({
             type: LogEventType.UpdateWorkbookSuccess,
             ctx: req.ctx,
             reqBody: body,
@@ -75,7 +75,7 @@ export const updateWorkbookController: AppRouteHandler = async (
 
         res.status(200).send(workbookModel.format(result));
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.UpdateWorkbookFail,
             ctx: req.ctx,
             reqBody: body,

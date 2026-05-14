@@ -1,19 +1,22 @@
 import {AppError} from '@gravity-ui/nodekit';
 
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {zc} from '../../../components/zod';
 import {
-    DEFAULT_PAGE,
     DEFAULT_PAGE_SIZE,
     DEFAULT_QUERY_TIMEOUT,
+    OrderBy,
     RETURN_COLUMNS,
     RETURN_NAVIGATION_COLUMNS,
     US_ERRORS,
 } from '../../../const';
 import Entry from '../../../db/models/entry';
 import {EntryScope} from '../../../db/models/new/entry/types';
+import {RevisionModel, RevisionModelColumn} from '../../../db/models/new/revision';
 import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {CTX, DlsActions} from '../../../types/models';
 import Utils from '../../../utils';
+import {createPaginator} from '../../../utils/cursor-pagination';
 import {checkSharedEntryPermission} from '../../new/entry/utils/check-collection-entry-permission/check-permission';
 import {ServiceArgs} from '../../new/types';
 import {getWorkbook} from '../../new/workbook';
@@ -44,9 +47,12 @@ export type GetEntryRevisionsResult = {
     entries: EntryRevisionNavItem[];
 };
 
+const SORT_FIELD = `${RevisionModel.tableName}.${RevisionModelColumn.UpdatedAt}`;
+const TIEBREAKER_FIELD = `${RevisionModel.tableName}.${RevisionModelColumn.RevId}`;
+
 export type GetEntryRevisionsData = {
     entryId: string;
-    page?: number;
+    page?: string;
     pageSize?: number;
     revIds?: string[];
     updatedAfter?: string;
@@ -56,7 +62,7 @@ export async function getEntryRevisions(
     {ctx}: ServiceArgs,
     args: GetEntryRevisionsData,
 ): Promise<GetEntryRevisionsResult> {
-    const {entryId, page = DEFAULT_PAGE, pageSize = DEFAULT_PAGE_SIZE, revIds, updatedAfter} = args;
+    const {entryId, page, pageSize = DEFAULT_PAGE_SIZE, revIds, updatedAfter} = args;
 
     ctx.log('GET_REVISIONS_REQUEST', {
         entryId: Utils.encodeId(entryId),
@@ -98,8 +104,21 @@ export async function getEntryRevisions(
         }
     }
 
-    const entryRevisions = (await Entry.query(Entry.replica)
-        .select([...RETURN_NAVIGATION_COLUMNS, 'revId'])
+    const paginator = createPaginator({
+        sortFields: [
+            {field: SORT_FIELD, direction: OrderBy.Desc, validate: zc.stringSqlTimestampz()},
+        ],
+        tiebreakerField: {
+            field: TIEBREAKER_FIELD,
+            direction: OrderBy.Desc,
+            validate: zc.stringBigInt(),
+        },
+        limit: pageSize,
+        pageToken: page,
+    });
+
+    const query = Entry.query(Entry.replica)
+        .select([...RETURN_NAVIGATION_COLUMNS, 'revisions.revId'])
         .join('revisions', 'entries.entryId', 'revisions.entryId')
         .where({
             'entries.entryId': entryId,
@@ -107,25 +126,21 @@ export async function getEntryRevisions(
         })
         .where((builder) => {
             if (revIds) {
-                builder.whereIn('revId', revIds);
+                builder.whereIn('revisions.revId', revIds);
             }
             if (updatedAfter) {
                 builder.where('revisions.updatedAt', '>=', updatedAfter);
             }
         })
-        .orderBy('revisions.updatedAt', 'desc')
-        .limit(pageSize)
-        .offset(pageSize * page)
-        .timeout(DEFAULT_QUERY_TIMEOUT)) as unknown as EntryRevisionNavItem[];
+        .timeout(DEFAULT_QUERY_TIMEOUT);
+
+    const {result, nextPageToken} = await paginator.execute(query);
+    const entryRevisions = result as unknown as EntryRevisionNavItem[];
 
     ctx.log('GET_REVISIONS_SUCCESS');
 
     return {
-        nextPageToken: Utils.getOptimisticNextPageToken({
-            page,
-            pageSize,
-            curPage: entryRevisions,
-        }),
+        nextPageToken,
         entries: entryRevisions,
     };
 }

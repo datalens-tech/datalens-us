@@ -1,3 +1,3 @@
 import type {LogEvent} from './types';
 
-export const logEvent: LogEvent = () => {};
+export const logEvent: LogEvent = async () => {};

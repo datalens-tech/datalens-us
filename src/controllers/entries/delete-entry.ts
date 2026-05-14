@@ -13,7 +13,7 @@ const requestSchema = {
     query: z.object({
         lockToken: z.string().optional(),
         scope: z.enum(EntryScope).optional(),
-        types: zc.stringArray({min: 1, max: 100}).optional(),
+        types: zc.queryArray({min: 1, max: 100}).optional(),
     }),
 };
 
@@ -38,7 +38,7 @@ export const deleteEntryController: AppRouteHandler = async (req, res) => {
             },
         );
 
-        logEvent({
+        await logEvent({
             type: LogEventType.DeleteEntrySuccess,
             ctx: req.ctx,
             reqParams: params,
@@ -48,7 +48,7 @@ export const deleteEntryController: AppRouteHandler = async (req, res) => {
         const {code, response} = await prepareResponseAsync({data: result});
         res.status(code).send(response);
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.DeleteEntryFail,
             ctx: req.ctx,
             reqParams: params,

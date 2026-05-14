@@ -31,7 +31,7 @@ export const copyEntriesToWorkbookController: AppRouteHandler = async (req, res)
             },
         );
 
-        logEvent({
+        await logEvent({
             type: LogEventType.CopyEntriesToWorkbookSuccess,
             ctx: req.ctx,
             reqBody: body,
@@ -42,7 +42,7 @@ export const copyEntriesToWorkbookController: AppRouteHandler = async (req, res)
 
         res.status(code).send(response);
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.CopyEntriesToWorkbookFail,
             ctx: req.ctx,
             reqBody: body,

@@ -1,22 +1,14 @@
-import type {ZodType} from 'zod';
+import type {SecuritySchemeObject} from '@gravity-ui/expresskit-api';
 
-// Copied from @asteasolutions/zod-to-openapi
-export type Method = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head' | 'options' | 'trace';
-
-export type SecuritySchemeType = 'apiKey' | 'http' | 'oauth2' | 'openIdConnect';
-
-export type SecuritySchemeObject = {
-    type: SecuritySchemeType;
+export type AdditionalHeader = {
+    name: string;
+    required?: boolean;
+    schema?: Record<string, unknown>;
     description?: string;
-    name?: string;
-    in?: string;
-    scheme?: string;
-    bearerFormat?: string;
-    openIdConnectUrl?: string;
 };
 
 export type GetAdditionalHeadersResult = {
-    headers: ZodType<unknown, unknown>[];
+    headers: AdditionalHeader[];
     security: {[key: string]: []}[];
 };
 

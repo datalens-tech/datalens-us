@@ -9,7 +9,7 @@ import {WorkbookModelPage, workbookModelPage} from './response-models';
 
 const requestSchema = {
     query: z.object({
-        page: zc.stringNumber({min: 0}).optional(),
+        page: z.string().optional(),
         pageSize: zc.stringNumber({min: 1, max: 1000}).optional(),
     }),
 };

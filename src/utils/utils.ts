@@ -377,7 +377,7 @@ export class Utils {
             formatStr = `\x1b[33m ${index + 1} ${formatStr}`;
         }
 
-        console.log(formatStr, time[0], time[1] / 1000000);
+        console.info(formatStr, time[0], time[1] / 1000000);
     }
 
     static hrTime(name: string, display = false) {

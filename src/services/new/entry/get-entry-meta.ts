@@ -1,6 +1,5 @@
 import {AppError} from '@gravity-ui/nodekit';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {US_ERRORS} from '../../../const';
 import {Entry} from '../../../db/models/new/entry';
 import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
@@ -13,29 +12,12 @@ import {getWorkbook} from '../workbook';
 import {checkFetchedEntry} from './utils';
 import {checkCollectionEntryPermission} from './utils/check-collection-entry-permission';
 
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['entryId'],
-    properties: {
-        entryId: {
-            type: 'string',
-        },
-        branch: {
-            type: 'string',
-            enum: ['saved', 'published'],
-        },
-    },
-});
-
 export type GetEntryMetaArgs = {
     entryId: string;
     branch?: 'saved' | 'published';
 };
 
-export const getEntryMeta = async (
-    {ctx, trx, skipValidation = false}: ServiceArgs,
-    args: GetEntryMetaArgs,
-) => {
+export const getEntryMeta = async ({ctx, trx}: ServiceArgs, args: GetEntryMetaArgs) => {
     const {entryId, branch = 'saved'} = args;
 
     ctx.log('GET_ENTRY_META_REQUEST', {
@@ -44,10 +26,6 @@ export const getEntryMeta = async (
 
     const registry = ctx.get('registry');
     const {DLS} = registry.common.classes.get();
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const {isPrivateRoute} = ctx.get('info');
 

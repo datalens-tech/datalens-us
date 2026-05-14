@@ -3,7 +3,8 @@ import request from 'supertest';
 import {testUserId} from '../../../../constants';
 import {OPERATION_DEFAULT_FIELDS, WORKBOOK_DEFAULT_FIELDS} from '../../../../models';
 import {routes} from '../../../../routes';
-import {app, auth, authPrivateRoute, testTenantId} from '../../auth';
+import {US_ERRORS, app, auth, authPrivateRoute, testTenantId} from '../../auth';
+import {createMockWorkbook, createMockWorkbookEntry} from '../../helpers';
 import {OpensourceRole} from '../../roles';
 
 const workbooksData = [
@@ -508,6 +509,48 @@ describe('Entries in workboooks managment', () => {
 
         await auth(request(app).get(`${routes.workbooks}/${testWorkbookId}`)).expect(404);
         await auth(request(app).get(`${routes.workbooks}/${testCopiedWorkbookId}`)).expect(404);
+    });
+});
+
+describe('Workbook delete with locked entries', () => {
+    const lockDuration = 80000;
+
+    test('Delete workbook fails when an entry inside is locked', async () => {
+        const wb = await createMockWorkbook({title: `Lock test workbook ${Date.now()}`});
+        const entry = await createMockWorkbookEntry({workbookId: wb.workbookId});
+
+        await auth(request(app).post(`${routes.locks}/${entry.entryId}`), {
+            role: OpensourceRole.Editor,
+        })
+            .send({duration: lockDuration})
+            .expect(200);
+
+        const {body} = await auth(request(app).delete(`${routes.workbooks}/${wb.workbookId}`), {
+            role: OpensourceRole.Editor,
+        }).expect(423);
+
+        expect(body.code).toBe(US_ERRORS.ENTRY_IS_LOCKED);
+    });
+
+    test('Delete workbook succeeds after the locked entry is unlocked', async () => {
+        const wb = await createMockWorkbook({title: `Lock test workbook ${Date.now()}`});
+        const entry = await createMockWorkbookEntry({workbookId: wb.workbookId});
+
+        const lockResponse = await auth(request(app).post(`${routes.locks}/${entry.entryId}`), {
+            role: OpensourceRole.Editor,
+        })
+            .send({duration: lockDuration})
+            .expect(200);
+
+        const {lockToken} = lockResponse.body;
+
+        await auth(request(app).delete(`${routes.locks}/${entry.entryId}`).query({lockToken}), {
+            role: OpensourceRole.Editor,
+        }).expect(200);
+
+        await auth(request(app).delete(`${routes.workbooks}/${wb.workbookId}`), {
+            role: OpensourceRole.Editor,
+        }).expect(200);
     });
 });
 

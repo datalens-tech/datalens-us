@@ -65,7 +65,7 @@ export const getCollectionsListByIds = async (
         const promise = collection
             .checkPermission({
                 parentIds,
-                permission: CollectionPermission.LimitedView,
+                permission: CollectionPermission.Browse,
             })
             .then(() => {
                 acceptedCollectionsMap.set(collection.model, parentIds);

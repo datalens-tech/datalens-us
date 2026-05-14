@@ -35,7 +35,7 @@ export const deleteCollectionsListController: AppRouteHandler = async (req, res)
             },
         );
 
-        logEvent({
+        await logEvent({
             type: LogEventType.DeleteCollectionsListSuccess,
             ctx: req.ctx,
             reqBody: body,
@@ -44,7 +44,7 @@ export const deleteCollectionsListController: AppRouteHandler = async (req, res)
 
         res.status(200).send(await collectionModelArrayInObject.format(result));
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.DeleteCollectionsListFail,
             ctx: req.ctx,
             reqBody: body,

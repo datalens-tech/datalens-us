@@ -90,7 +90,7 @@ export const getWorkbooksList = async (
 
             await collection.checkPermission({
                 parentIds: parents.slice(1).map((model) => model.collectionId),
-                permission: CollectionPermission.LimitedView,
+                permission: CollectionPermission.Browse,
             });
         }
     }

@@ -50,7 +50,7 @@ export const updateColorPaletteController: AppRouteHandler = async (
             },
         );
 
-        logEvent({
+        await logEvent({
             type: LogEventType.UpdateColorPaletteSuccess,
             ctx: req.ctx,
             reqParams: params,
@@ -60,7 +60,7 @@ export const updateColorPaletteController: AppRouteHandler = async (
 
         res.status(200).send(colorPaletteModel.format(result));
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.UpdateColorPaletteFail,
             ctx: req.ctx,
             reqParams: params,

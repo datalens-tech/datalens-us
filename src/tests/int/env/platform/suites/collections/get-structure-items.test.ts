@@ -238,6 +238,7 @@ describe('Getting root content with "includePermissionsInfo" param', () => {
                     permissions: {
                         ...COLLECTIONS_DEFAULT_PERMISSIONS,
                         limitedView: true,
+                        browse: true,
                     },
                 },
                 {

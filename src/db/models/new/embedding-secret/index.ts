@@ -24,7 +24,7 @@ export class EmbeddingSecretModel extends Model {
     [EmbeddingSecretModelColumn.EmbeddingSecretId]!: string;
     [EmbeddingSecretModelColumn.Title]!: string;
     [EmbeddingSecretModelColumn.WorkbookId]!: string;
-    [EmbeddingSecretModelColumn.TenantId]!: Nullable<string>;
+    [EmbeddingSecretModelColumn.TenantId]!: string;
     [EmbeddingSecretModelColumn.PublicKey]!: string;
     [EmbeddingSecretModelColumn.Type]!: Nullable<EmbeddingType>;
     [EmbeddingSecretModelColumn.CreatedBy]!: string;

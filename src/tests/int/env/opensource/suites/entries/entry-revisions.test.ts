@@ -64,7 +64,7 @@ describe('Entry revisions', () => {
 
     test('Get revisions with pagination', async () => {
         const {body: page1} = await auth(request(app).get(routes.entryRevisions(entryId)))
-            .query({page: 0, pageSize: 1})
+            .query({pageSize: 1})
             .expect(200);
 
         expect(page1.entries).toHaveLength(1);

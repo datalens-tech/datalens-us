@@ -3,6 +3,8 @@ export enum CollectionRole {
     Viewer = 'viewer',
     Editor = 'editor',
     Admin = 'admin',
+    Visitor = 'visitor',
+    Creator = 'creator',
     // TODO: add roles
     // EntryBindingCreator = 'entryBindingCreator',
     // LimitedEntryBindingCreator = 'limitedEntryBindingCreator',
@@ -22,6 +24,7 @@ export enum CollectionPermission {
     Delete = 'delete',
     SecurityManage = 'securityManage',
     SecurityApprove = 'securityApprove',
+    Browse = 'browse',
 }
 
 export type Permissions = Record<CollectionPermission, boolean>;

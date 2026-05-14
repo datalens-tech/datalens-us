@@ -284,3 +284,80 @@ describe('Locks', () => {
         ).expect(200);
     });
 });
+
+describe('Locks - edge cases', () => {
+    let edgeEntryId: string;
+    let edgeLockToken: string;
+
+    beforeEach(async () => {
+        const wb = await createMockWorkbook({title: `Edge case workbook ${Date.now()}`});
+        const entry = await createMockWorkbookEntry({workbookId: wb.workbookId});
+        edgeEntryId = entry.entryId;
+
+        const response = await auth(request(app).post(`${routes.locks}/${edgeEntryId}`), {
+            role: OpensourceRole.Editor,
+        })
+            .send({duration})
+            .expect(200);
+
+        edgeLockToken = response.body.lockToken;
+    });
+
+    afterEach(async () => {
+        await auth(request(app).delete(`${routes.locks}/${edgeEntryId}`).query({force: 'true'}), {
+            role: OpensourceRole.Editor,
+        });
+    });
+
+    test('Unlock with wrong lockToken returns 400', async () => {
+        const {body} = await auth(
+            request(app).delete(`${routes.locks}/${edgeEntryId}`).query({lockToken: 'wrong-token'}),
+            {role: OpensourceRole.Editor},
+        ).expect(400);
+
+        expect(body.code).toBe(US_ERRORS.LOCK_TOKEN_REQUIRED);
+
+        await auth(request(app).get(`${routes.locks}/${edgeEntryId}`)).expect(200);
+    });
+
+    test('Extend with wrong lockToken returns 400', async () => {
+        const {body} = await auth(request(app).post(`${routes.locks}/${edgeEntryId}/extend`), {
+            role: OpensourceRole.Editor,
+        })
+            .send({duration, lockToken: 'wrong-token'})
+            .expect(400);
+
+        expect(body.code).toBe(US_ERRORS.LOCK_TOKEN_REQUIRED);
+    });
+
+    test('Force lock overwrites existing lock and returns new token', async () => {
+        const {body} = await auth(request(app).post(`${routes.locks}/${edgeEntryId}`), {
+            role: OpensourceRole.Editor,
+        })
+            .send({duration, force: true})
+            .expect(200);
+
+        expect(body).toStrictEqual({lockToken: expect.any(String)});
+        expect(body.lockToken).not.toBe(edgeLockToken);
+    });
+
+    test('Lock with duration exceeding max returns 400', async () => {
+        const {body} = await auth(request(app).post(`${routes.locks}/${edgeEntryId}`), {
+            role: OpensourceRole.Editor,
+        })
+            .send({duration: 600001})
+            .expect(400);
+
+        expect(body.code).toBe(US_ERRORS.DURATION_IS_LIMITED);
+    });
+
+    test('Extend with duration exceeding max returns 400', async () => {
+        const {body} = await auth(request(app).post(`${routes.locks}/${edgeEntryId}/extend`), {
+            role: OpensourceRole.Editor,
+        })
+            .send({duration: 600001, lockToken: edgeLockToken})
+            .expect(400);
+
+        expect(body.code).toBe(US_ERRORS.DURATION_IS_LIMITED);
+    });
+});

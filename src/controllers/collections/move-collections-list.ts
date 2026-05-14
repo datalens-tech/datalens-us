@@ -34,7 +34,7 @@ export const moveCollectionsListController: AppRouteHandler = async (req, res) =
             },
         );
 
-        logEvent({
+        await logEvent({
             type: LogEventType.MoveCollectionsListSuccess,
             ctx: req.ctx,
             reqBody: body,
@@ -43,7 +43,7 @@ export const moveCollectionsListController: AppRouteHandler = async (req, res) =
 
         res.status(200).send(await collectionModelArrayInObject.format(result));
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.MoveCollectionsListFail,
             ctx: req.ctx,
             reqBody: body,

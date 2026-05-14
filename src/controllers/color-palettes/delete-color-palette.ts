@@ -36,7 +36,7 @@ export const deleteColorPaletteController: AppRouteHandler = async (
             },
         );
 
-        logEvent({
+        await logEvent({
             type: LogEventType.DeleteColorPaletteSuccess,
             ctx: req.ctx,
             reqParams: params,
@@ -45,7 +45,7 @@ export const deleteColorPaletteController: AppRouteHandler = async (
 
         res.status(200).send();
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.DeleteColorPaletteFail,
             ctx: req.ctx,
             reqParams: params,

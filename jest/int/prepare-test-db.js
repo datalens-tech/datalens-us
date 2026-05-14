@@ -1,14 +1,13 @@
 const path = require('path');
 
-const DSNParser = require('dsn-parser');
 const knexBuilder = require('knex');
 const _ = require('lodash');
 
 const {getKnexOptions} = require('../../dist/server/db/init-db');
-const {getTestDsnList} = require('../../dist/server/tests/int/db');
+const {assertDbName, getTestDsnList, testDbConfig} = require('../../dist/server/tests/int/db');
 const {truncateTables, tableExists} = require('../../dist/server/tests/int/utils');
 
-const prepareTestUsDb = async ({dsnList}) => {
+const prepareTestMainDb = async ({dsnList}) => {
     const knexOptions = _.merge({}, getKnexOptions(), {
         connection: dsnList,
         seeds: {
@@ -39,13 +38,9 @@ const prepareTestUsDb = async ({dsnList}) => {
 
 const prepareTestDb = async () => {
     const dsnList = getTestDsnList();
-    const testDbName = 'int-testing_us_ci_purgeable';
-    const parsedDsn = new DSNParser(dsnList);
-    if (parsedDsn.getParts().database !== testDbName) {
-        throw new Error(`Database for tests should be named \`${testDbName}\`!`);
-    }
+    assertDbName(dsnList, testDbConfig.dbName);
 
-    await prepareTestUsDb({dsnList});
+    await prepareTestMainDb({dsnList});
 };
 
 module.exports = {prepareTestDb};

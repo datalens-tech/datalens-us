@@ -2,12 +2,15 @@
   "extends": "@gravity-ui/tsconfig/tsconfig",
   "compilerOptions": {
     "outDir": "dist/server",
+    "rootDir": "src",
+    "module": "node16",
+    "moduleResolution": "node16",
     "noUnusedParameters": false,
     "noUnusedLocals": false,
     "sourceMap": true,
-    "lib": ["ES2021"]
+    "lib": ["ES2021"],
+    "types": ["node", "jest"]
   },
   "include": ["typings", "src"],
-  "exclude": ["node_modules"],
-  "types": ["node"]
+  "exclude": ["node_modules"]
 }

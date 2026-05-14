@@ -3,7 +3,7 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-import LockService from '../../services/lock.service';
+import {verifyLockExistence} from '../../services/new/lock';
 
 import {lockModel} from './response-models';
 
@@ -20,10 +20,7 @@ export const verifyExistenceController: AppRouteHandler = async (req, res) => {
 
     const {entryId} = params;
 
-    const result = await LockService.verifyExistence({
-        entryId,
-        ctx: req.ctx,
-    });
+    const result = await verifyLockExistence({ctx: req.ctx}, {entryId});
 
     res.status(200).send(lockModel.format(result));
 };

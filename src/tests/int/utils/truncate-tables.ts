@@ -18,6 +18,7 @@ export async function truncateTables(
         .whereNotIn('table_name', exclude);
 
     for (const table of tables) {
-        await knex.raw(`TRUNCATE TABLE "${table.tableName}" RESTART IDENTITY CASCADE`);
+        const tableName = table.tableName ?? table['table_name'];
+        await knex.raw(`TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE`);
     }
 }

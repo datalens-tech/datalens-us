@@ -77,7 +77,7 @@ describe('Entry revisions', () => {
         const {body: page1} = await auth(request(app).get(routes.entryRevisions(entryId)), {
             accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
         })
-            .query({page: 0, pageSize: 1})
+            .query({pageSize: 1})
             .expect(200);
 
         expect(page1.entries).toHaveLength(1);

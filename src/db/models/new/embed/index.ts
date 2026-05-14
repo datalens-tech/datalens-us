@@ -33,7 +33,7 @@ export class EmbedModel extends Model {
     [EmbedModelColumn.Title]!: string;
     [EmbedModelColumn.EmbeddingSecretId]!: string;
     [EmbedModelColumn.EntryId]!: string;
-    [EmbedModelColumn.TenantId]!: Nullable<string>;
+    [EmbedModelColumn.TenantId]!: string;
     [EmbedModelColumn.DepsIds]!: string[];
     [EmbedModelColumn.UnsignedParams]!: string[];
     [EmbedModelColumn.PrivateParams]!: string[];

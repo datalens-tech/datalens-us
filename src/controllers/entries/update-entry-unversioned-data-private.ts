@@ -38,7 +38,7 @@ export const updateEntryUnversionedDataPrivateController: AppRouteHandler = asyn
             },
         );
 
-        logEvent({
+        await logEvent({
             type: LogEventType.UpdateEntryUnversionedDataSuccess,
             ctx: req.ctx,
             data: result,
@@ -47,7 +47,7 @@ export const updateEntryUnversionedDataPrivateController: AppRouteHandler = asyn
 
         res.status(200).send(entryModel.format(result));
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.UpdateEntryUnversionedDataFail,
             ctx: req.ctx,
             reqParams: logEventReqParams,

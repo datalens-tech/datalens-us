@@ -58,7 +58,7 @@ export const getCollectionBreadcrumbs = async (
 
                 await collectionInstance.checkPermission({
                     parentIds,
-                    permission: CollectionPermission.LimitedView,
+                    permission: CollectionPermission.Browse,
                 });
 
                 if (includePermissionsInfo) {

@@ -3,7 +3,8 @@ import request from 'supertest';
 import {testUserId} from '../../../../constants';
 import {OPERATION_DEFAULT_FIELDS, WORKBOOK_DEFAULT_FIELDS} from '../../../../models';
 import {routes} from '../../../../routes';
-import {app, auth, authPrivateRoute, getWorkbookBinding, testTenantId} from '../../auth';
+import {US_ERRORS, app, auth, authPrivateRoute, getWorkbookBinding, testTenantId} from '../../auth';
+import {createMockWorkbook, createMockWorkbookEntry} from '../../helpers';
 import {PlatformRole} from '../../roles';
 
 const workbooksData = [
@@ -646,5 +647,47 @@ describe('Workbook template', () => {
             workbookId: expect.any(String),
             isTemplate: true,
         });
+    });
+});
+
+describe('Workbook delete with locked entries', () => {
+    const lockDuration = 80000;
+
+    test('Delete workbook fails when an entry inside is locked', async () => {
+        const wb = await createMockWorkbook({title: `Lock test workbook ${Date.now()}`});
+        const entry = await createMockWorkbookEntry({workbookId: wb.workbookId});
+
+        await auth(request(app).post(`${routes.locks}/${entry.entryId}`), {
+            accessBindings: [getWorkbookBinding(wb.workbookId, 'update')],
+        })
+            .send({duration: lockDuration})
+            .expect(200);
+
+        const {body} = await auth(request(app).delete(`${routes.workbooks}/${wb.workbookId}`), {
+            accessBindings: [getWorkbookBinding(wb.workbookId, 'delete')],
+        }).expect(423);
+
+        expect(body.code).toBe(US_ERRORS.ENTRY_IS_LOCKED);
+    });
+
+    test('Delete workbook succeeds after the locked entry is unlocked', async () => {
+        const wb = await createMockWorkbook({title: `Lock test workbook ${Date.now()}`});
+        const entry = await createMockWorkbookEntry({workbookId: wb.workbookId});
+
+        const lockResponse = await auth(request(app).post(`${routes.locks}/${entry.entryId}`), {
+            accessBindings: [getWorkbookBinding(wb.workbookId, 'update')],
+        })
+            .send({duration: lockDuration})
+            .expect(200);
+
+        const {lockToken} = lockResponse.body;
+
+        await auth(request(app).delete(`${routes.locks}/${entry.entryId}`).query({lockToken}), {
+            accessBindings: [getWorkbookBinding(wb.workbookId, 'update')],
+        }).expect(200);
+
+        await auth(request(app).delete(`${routes.workbooks}/${wb.workbookId}`), {
+            accessBindings: [getWorkbookBinding(wb.workbookId, 'delete')],
+        }).expect(200);
     });
 });
