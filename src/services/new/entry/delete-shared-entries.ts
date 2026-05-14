@@ -1,13 +1,14 @@
 import {AppError} from '@gravity-ui/nodekit';
 
 import {US_ERRORS} from '../../../const';
-import Lock from '../../../db/models/lock';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {SharedEntryInstance} from '../../../registry/plugins/common/entities/shared-entry/types';
+import type {EntryColumns} from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
 import {markEntriesAsDeleted} from '../../entry/crud';
 import {makeSharedEntriesWithParentsMap} from '../collection/utils/get-parents';
+import {bulkCheckLock} from '../lock';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
 
@@ -75,27 +76,21 @@ export const deleteSharedEntries = async (
         }
     }
 
-    await Lock.bulkCheckLock(
-        entries.map((entry) => ({entryId: entry.entryId})),
-        ctx,
+    await bulkCheckLock({ctx}, {items: entries.map((entry) => ({entryId: entry.entryId}))});
+
+    const deletedEntries = await markEntriesAsDeleted(
+        {ctx},
+        entries.map((entry) => ({
+            entryId: entry.entryId,
+            key: entry.key as string,
+            displayKey: entry.displayKey as string,
+            innerMeta: entry.innerMeta as EntryColumns['innerMeta'],
+            updatedBy: makeUserId(userId),
+            scope: entry.scope,
+            type: entry.type,
+            createdBy: entry.createdBy,
+        })),
     );
-
-    const data = entries.map((entry) => ({
-        entryId: entry.entryId,
-        newKey: entry.key as string,
-        newDisplayKey: entry.displayKey as string,
-        updatedBy: makeUserId(userId),
-        newInnerMeta: {
-            ...entry.innerMeta,
-            oldKey: entry.key as string,
-            oldDisplayKey: entry.displayKey as string,
-        },
-        scope: entry.scope,
-        type: entry.type,
-        createdBy: entry.createdBy,
-    }));
-
-    const deletedEntries = await markEntriesAsDeleted({ctx}, data);
 
     const deletePermissions = async () => {
         await Promise.all(

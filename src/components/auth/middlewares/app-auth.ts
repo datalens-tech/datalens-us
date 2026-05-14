@@ -3,7 +3,8 @@ import jwt, {type Algorithm} from 'jsonwebtoken';
 
 import {AUTHORIZATION_HEADER, DL_AUTH_HEADER_KEY} from '../../../const/common';
 import {AUTH_ERRORS} from '../constants/error-constants';
-import type {AccessTokenPayload} from '../types/token';
+import {ACCESS_TOKEN_TYPE} from '../constants/token';
+import type {SubjectAccessTokenPayload} from '../types/token';
 
 const ALGORITHMS: Algorithm[] = ['PS256'];
 
@@ -19,24 +20,30 @@ export const appAuth = async (req: Request, res: Response, next: NextFunction) =
             try {
                 req.ctx.log('CHECK_ACCESS_TOKEN');
 
-                const {userId, sessionId, roles} = jwt.verify(
-                    accessToken,
-                    req.ctx.config.authTokenPublicKey || '',
-                    {
-                        algorithms: ALGORITHMS,
-                    },
-                ) as AccessTokenPayload;
+                const payload = jwt.verify(accessToken, req.ctx.config.authTokenPublicKey || '', {
+                    algorithms: ALGORITHMS,
+                }) as SubjectAccessTokenPayload;
 
-                req.originalContext.set('user', {
-                    userId,
-                    sessionId,
-                    accessToken,
-                    roles,
-                });
+                if (payload.type === ACCESS_TOKEN_TYPE.SERVICE_ACCOUNT) {
+                    req.originalContext.set('user', {
+                        userId: payload.userId,
+                        accessToken,
+                        roles: payload.roles,
+                        type: ACCESS_TOKEN_TYPE.SERVICE_ACCOUNT,
+                    });
+                } else {
+                    req.originalContext.set('user', {
+                        userId: payload.userId,
+                        sessionId: payload.sessionId,
+                        accessToken,
+                        roles: payload.roles,
+                        type: ACCESS_TOKEN_TYPE.USER,
+                    });
+                }
 
                 // for ctx info
-                res.locals.userId = userId;
-                res.locals.login = userId;
+                res.locals.userId = payload.userId;
+                res.locals.login = payload.userId;
 
                 req.ctx.log('CHECK_ACCESS_TOKEN_SUCCESS');
 

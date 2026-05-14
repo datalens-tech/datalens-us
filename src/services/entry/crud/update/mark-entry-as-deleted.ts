@@ -4,6 +4,7 @@ import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, TRASH_FOLDER} from '../../../.
 import {Entry, EntryColumn} from '../../../../db/models/new/entry';
 import {EntryScope} from '../../../../db/models/new/entry/types';
 import {EntryColumns} from '../../../../types/models';
+import {Utils} from '../../../../utils/utils';
 import {ServiceArgs} from '../../../new/types';
 import {getPrimary} from '../../../new/utils';
 
@@ -37,15 +38,18 @@ export async function markEntryAsDeleted(
         .timeout(DEFAULT_QUERY_TIMEOUT);
 }
 
-// These fields are required only because we cannot perform an insert without them,
-// as they are defined as NOT NULL columns in the database.
-type ExtraNonNullableEntryData = {
+type MarkEntriesAsDeletedData = Array<{
+    entryId: EntryColumns['entryId'];
+    key: EntryColumns['key'];
+    displayKey: EntryColumns['displayKey'];
+    innerMeta: EntryColumns['innerMeta'];
+    updatedBy: EntryColumns['updatedBy'];
+    // These fields are required only because we cannot perform an insert without them,
+    // as they are defined as NOT NULL columns in the database.
     scope: EntryScope;
     type: string;
     createdBy: string;
-};
-
-export type MarkEntriesAsDeletedData = Array<MarkEntryDeletedData & ExtraNonNullableEntryData>;
+}>;
 
 export async function markEntriesAsDeleted({trx}: ServiceArgs, data: MarkEntriesAsDeletedData) {
     if (data.length === 0) {
@@ -54,21 +58,17 @@ export async function markEntriesAsDeleted({trx}: ServiceArgs, data: MarkEntries
 
     return await Entry.query(getPrimary(trx))
         .insert(
-            data.map(
-                ({
+            data.map(({entryId, key, displayKey, innerMeta, updatedBy, scope, type, createdBy}) => {
+                const newKey = `${TRASH_FOLDER}/${entryId}_${Utils.getNameByKey({key})}`;
+                return {
                     entryId,
-                    newKey,
-                    newDisplayKey,
-                    newInnerMeta,
-                    updatedBy,
-                    scope,
-                    type,
-                    createdBy,
-                }) => ({
-                    entryId,
-                    key: `${TRASH_FOLDER}/${newKey}`,
-                    displayKey: `${TRASH_FOLDER}/${newDisplayKey}`,
-                    innerMeta: newInnerMeta,
+                    key: newKey,
+                    displayKey: newKey,
+                    innerMeta: {
+                        ...innerMeta,
+                        oldKey: key,
+                        oldDisplayKey: displayKey,
+                    },
                     updatedBy,
                     isDeleted: true,
                     updatedAt: raw(CURRENT_TIMESTAMP),
@@ -76,8 +76,8 @@ export async function markEntriesAsDeleted({trx}: ServiceArgs, data: MarkEntries
                     scope,
                     type,
                     createdBy,
-                }),
-            ),
+                };
+            }),
         )
         .onConflict(EntryColumn.EntryId)
         .merge()

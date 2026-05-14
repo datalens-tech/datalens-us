@@ -299,3 +299,84 @@ describe('Locks', () => {
         ).expect(200);
     });
 });
+
+describe('Locks – edge cases', () => {
+    let edgeEntryId: string;
+    let edgeLockToken: string;
+    let edgeWorkbookId: string;
+
+    beforeEach(async () => {
+        const wb = await createMockWorkbook({title: `Edge case workbook ${Date.now()}`});
+        edgeWorkbookId = wb.workbookId;
+        const entry = await createMockWorkbookEntry({workbookId: edgeWorkbookId});
+        edgeEntryId = entry.entryId;
+
+        const response = await auth(request(app).post(`${routes.locks}/${edgeEntryId}`), {
+            accessBindings: [getWorkbookBinding(edgeWorkbookId, 'update')],
+        })
+            .send({duration})
+            .expect(200);
+
+        edgeLockToken = response.body.lockToken;
+    });
+
+    afterEach(async () => {
+        await auth(request(app).delete(`${routes.locks}/${edgeEntryId}`).query({force: 'true'}), {
+            accessBindings: [getWorkbookBinding(edgeWorkbookId, 'update')],
+        });
+    });
+
+    test('Unlock with wrong lockToken returns 400', async () => {
+        const {body} = await auth(
+            request(app).delete(`${routes.locks}/${edgeEntryId}`).query({lockToken: 'wrong-token'}),
+            {accessBindings: [getWorkbookBinding(edgeWorkbookId, 'update')]},
+        ).expect(400);
+
+        expect(body.code).toBe(US_ERRORS.LOCK_TOKEN_REQUIRED);
+
+        await auth(request(app).get(`${routes.locks}/${edgeEntryId}`), {
+            accessBindings: [getWorkbookBinding(edgeWorkbookId, 'limitedView')],
+        }).expect(200);
+    });
+
+    test('Extend with wrong lockToken returns 400', async () => {
+        const {body} = await auth(request(app).post(`${routes.locks}/${edgeEntryId}/extend`), {
+            accessBindings: [getWorkbookBinding(edgeWorkbookId, 'update')],
+        })
+            .send({duration, lockToken: 'wrong-token'})
+            .expect(400);
+
+        expect(body.code).toBe(US_ERRORS.LOCK_TOKEN_REQUIRED);
+    });
+
+    test('Force lock overwrites existing lock and returns new token', async () => {
+        const {body} = await auth(request(app).post(`${routes.locks}/${edgeEntryId}`), {
+            accessBindings: [getWorkbookBinding(edgeWorkbookId, 'update')],
+        })
+            .send({duration, force: true})
+            .expect(200);
+
+        expect(body).toStrictEqual({lockToken: expect.any(String)});
+        expect(body.lockToken).not.toBe(edgeLockToken);
+    });
+
+    test('Lock with duration exceeding max returns 400', async () => {
+        const {body} = await auth(request(app).post(`${routes.locks}/${edgeEntryId}`), {
+            accessBindings: [getWorkbookBinding(edgeWorkbookId, 'update')],
+        })
+            .send({duration: 600001})
+            .expect(400);
+
+        expect(body.code).toBe(US_ERRORS.DURATION_IS_LIMITED);
+    });
+
+    test('Extend with duration exceeding max returns 400', async () => {
+        const {body} = await auth(request(app).post(`${routes.locks}/${edgeEntryId}/extend`), {
+            accessBindings: [getWorkbookBinding(edgeWorkbookId, 'update')],
+        })
+            .send({duration: 600001, lockToken: edgeLockToken})
+            .expect(400);
+
+        expect(body.code).toBe(US_ERRORS.DURATION_IS_LIMITED);
+    });
+});

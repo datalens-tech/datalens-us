@@ -25,6 +25,7 @@ type SelectedCollection = Pick<CollectionModel, ArrayElement<typeof collectionCo
 
 export type SelectedLicense = Pick<License, ArrayElement<typeof licenseColumns>> & {
     isActive: boolean;
+    isQuarantined: boolean;
 };
 
 export type SelectedEntry = Pick<Entry, ArrayElement<typeof entryColumns>> & {

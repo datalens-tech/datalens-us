@@ -15,7 +15,6 @@ import {
     US_ERRORS,
 } from '../../../const';
 import Entry from '../../../db/models/entry';
-import Lock from '../../../db/models/lock';
 import {EntryColumn} from '../../../db/models/new/entry';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import Revision from '../../../db/models/revision';
@@ -31,6 +30,7 @@ import {
 } from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
 import {checkSharedEntryPermission} from '../../new/entry/utils/check-collection-entry-permission/check-permission';
+import {checkLock} from '../../new/lock';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission} from '../../new/workbook/utils';
 
@@ -219,7 +219,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
             ...(!isPrivateRoute ? [fetchAndValidateLicenseOrFail({ctx})] : []),
         ]);
 
-        await Lock.checkLock({entryId, lockToken}, ctx);
+        await checkLock({ctx}, {entryId, lockToken});
     } else {
         throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
             code: US_ERRORS.NOT_EXIST_ENTRY,

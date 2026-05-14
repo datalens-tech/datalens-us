@@ -39,7 +39,7 @@ export const createCollectionController: AppRouteHandler = async (req, res) => {
             },
         );
 
-        logEvent({
+        await logEvent({
             type: LogEventType.CreateCollectionSuccess,
             ctx: req.ctx,
             reqBody: body,
@@ -53,7 +53,7 @@ export const createCollectionController: AppRouteHandler = async (req, res) => {
             }),
         );
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.CreateCollectionFail,
             ctx: req.ctx,
             reqBody: body,

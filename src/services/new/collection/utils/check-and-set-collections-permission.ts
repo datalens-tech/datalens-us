@@ -38,7 +38,7 @@ export const checkAndSetCollectionPermission = async (
         if (permission) {
             localPermission = permission;
         } else {
-            localPermission = CollectionPermission.LimitedView;
+            localPermission = CollectionPermission.Browse;
         }
 
         if (collectionInstance.model.parentId !== null) {

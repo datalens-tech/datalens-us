@@ -572,4 +572,4 @@ export type LogEventParams =
     | LogEventUpdateTenantSettingsSuccessParams
     | LogEventUpdateTenantSettingsFailParams;
 
-export type LogEvent = (params: LogEventParams) => void;
+export type LogEvent = (params: LogEventParams) => Promise<void>;

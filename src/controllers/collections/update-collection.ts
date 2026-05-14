@@ -43,7 +43,7 @@ export const updateCollectionController: AppRouteHandler = async (req, res) => {
             },
         );
 
-        logEvent({
+        await logEvent({
             type: LogEventType.UpdateCollectionSuccess,
             ctx: req.ctx,
             reqBody: body,
@@ -53,7 +53,7 @@ export const updateCollectionController: AppRouteHandler = async (req, res) => {
 
         res.status(200).send(collectionModel.format(result));
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.UpdateCollectionFail,
             ctx: req.ctx,
             reqBody: body,

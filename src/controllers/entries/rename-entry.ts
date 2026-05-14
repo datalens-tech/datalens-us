@@ -18,7 +18,7 @@ export const renameEntryController: AppRouteHandler = async (req, res) => {
             name: body.name,
         });
 
-        logEvent({
+        await logEvent({
             type: LogEventType.RenameEntrySuccess,
             ctx: req.ctx,
             data: result,
@@ -29,7 +29,7 @@ export const renameEntryController: AppRouteHandler = async (req, res) => {
 
         res.status(code).send(response);
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.RenameEntryFail,
             ctx: req.ctx,
             reqParams: logEventReqParams,

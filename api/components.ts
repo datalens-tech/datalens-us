@@ -28,9 +28,9 @@ export {
     getAdditionalHeaders,
     getAdditionalSecuritySchemes,
     SecurityType,
-    SecuritySchemeObject,
     GetAdditionalHeadersResult,
     GetAdditionalSecuritySchemesResult,
+    appValidationErrorHandler,
 } from '../src/components/api-docs';
 export {
     makeParser,

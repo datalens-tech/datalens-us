@@ -38,7 +38,7 @@ export const deleteWorkbookController: AppRouteHandler = async (
             },
         );
 
-        logEvent({
+        await logEvent({
             type: LogEventType.DeleteWorkbookSuccess,
             ctx: req.ctx,
             reqParams: params,
@@ -47,7 +47,7 @@ export const deleteWorkbookController: AppRouteHandler = async (
 
         res.status(200).send(workbookModel.format(result.workbooks[0]));
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.DeleteWorkbookFail,
             ctx: req.ctx,
             reqParams: params,

@@ -1,12 +1,11 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {raw} from 'objection';
 
 import {Feature, isEnabledFeature} from '../../../../components/features';
-import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../../const';
+import {US_ERRORS} from '../../../../const';
 import OldEntry from '../../../../db/models/entry';
 import {CollectionModelColumn} from '../../../../db/models/new/collection';
 import {Entry, EntryColumn} from '../../../../db/models/new/entry';
-import {LicenseColumnRaw} from '../../../../db/models/new/license';
+import {LicenseWithIsActive} from '../../../../db/models/new/license/presentations';
 import {TenantColumn} from '../../../../db/models/new/tenant';
 import {WorkbookModelColumn} from '../../../../db/models/new/workbook';
 import type {Permissions as SharedEntryPermissions} from '../../../../entities/shared-entry/types';
@@ -196,9 +195,7 @@ export const getEntry = async (
                 builder
                     .select([
                         ...selectedLicenseColumns,
-                        raw(`coalesce(?? > ${CURRENT_TIMESTAMP}, true)`, [
-                            LicenseColumnRaw.ExpiresAt,
-                        ]).as('is_active'),
+                        ...LicenseWithIsActive.computedStatusSelectColumns,
                     ])
                     .where({
                         tenantId,

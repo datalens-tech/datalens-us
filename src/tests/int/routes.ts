@@ -20,6 +20,8 @@ export const routes = {
     getEntriesData: '/v1/get-entries-data',
     getEntriesAnnotation: '/v1/get-entries-annotation',
     getEntriesMeta: '/v1/get-entries-meta',
+    getEntryMetaRoute: (entryId: string) => `/v1/entries/${entryId}/meta`,
+    getPrivateEntryMetaRoute: (entryId: string) => `/private/entries/${entryId}/meta`,
     checkEntriesExistence: '/v1/check-entries-existence',
     setDefaultColorPalette: '/v1/tenants/set-default-color-palette',
     updateTenantSettings: '/v1/tenants/settings',
@@ -30,6 +32,7 @@ export const routes = {
     privateGetEntriesRelations: '/private/v1/get-entries-relations',
     privateUpdateEntryUnversionedData: (entryId: string) =>
         `/private/entries/${entryId}/unversioned-data`,
+    allWorkbooks: '/private/all-workbooks',
     entryRevisions: (entryId: string) => `/v1/entries/${entryId}/revisions`,
     entryRelations: (entryId: string) => `/v1/entries/${entryId}/relations`,
     switchRevision: (entryId: string) => `/private/entries/${entryId}/switch-revision`,

@@ -54,6 +54,7 @@ export const getWorkbooksQuery = ({ctx, trx}: ServiceArgs, args: GetWorkbooksQue
             raw('null as ??', EntryColumn.Type),
             raw('null as ??', EntryColumn.DisplayKey),
             raw('null as ??', EntryColumn.Key),
+            raw('?? as entity_id', WorkbookModelColumn.WorkbookId),
         ])
         .where({
             [WorkbookModelColumn.TenantId]: tenantId,
@@ -108,6 +109,7 @@ export const getCollectionsQuery = ({ctx, trx}: ServiceArgs, args: GetCollection
             raw('null as ??', EntryColumn.Type),
             raw('null as ??', EntryColumn.DisplayKey),
             raw('null as ??', EntryColumn.Key),
+            raw('?? as entity_id', CollectionModelColumn.CollectionId),
         ])
         .where({
             [CollectionModelColumn.TenantId]: tenantId,
@@ -161,6 +163,7 @@ export const getEntryQuery = ({ctx, trx}: ServiceArgs, args: GetEntryQueryArgs) 
             EntryColumn.Type,
             EntryColumn.DisplayKey,
             EntryColumn.Key,
+            raw('?? as entity_id', EntryColumn.EntryId),
         ])
         .where({
             [EntryColumn.TenantId]: tenantId,
@@ -210,7 +213,9 @@ export const processPermissions = async ({
             } else if (isWorkbookModel(item.model)) {
                 return item.permissions?.[WorkbookPermission.LimitedView] === true;
             } else {
-                return item.permissions?.[CollectionPermission.LimitedView] === true;
+                return (
+                    (item as CollectionInstance).permissions?.[CollectionPermission.Browse] === true
+                );
             }
         });
     } else {

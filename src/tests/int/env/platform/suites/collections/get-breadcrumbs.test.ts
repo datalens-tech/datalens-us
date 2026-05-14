@@ -93,6 +93,7 @@ describe('Getting collection breadcrumbs', () => {
             permissions: {
                 ...COLLECTIONS_DEFAULT_PERMISSIONS,
                 limitedView: true,
+                browse: true,
             },
         });
     });

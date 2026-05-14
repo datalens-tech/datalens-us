@@ -10,6 +10,7 @@ export const LicenseColumn = {
     UserId: 'userId',
     LicenseType: 'licenseType',
     ExpiresAt: 'expiresAt',
+    QuarantineId: 'quarantineId',
     CreatedBy: 'createdBy',
     CreatedAt: 'createdAt',
     UpdatedBy: 'updatedBy',
@@ -33,6 +34,7 @@ export class License extends Model {
     [LicenseColumn.UserId]!: string;
     [LicenseColumn.LicenseType]!: LicenseType;
     [LicenseColumn.ExpiresAt]!: Nullable<string>;
+    [LicenseColumn.QuarantineId]!: Nullable<string>;
     [LicenseColumn.CreatedBy]!: string;
     [LicenseColumn.CreatedAt]!: string;
     [LicenseColumn.UpdatedBy]!: string;

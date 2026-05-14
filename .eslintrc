@@ -1,8 +1,0 @@
-{
-    "extends": ["@gravity-ui/eslint-config", "@gravity-ui/eslint-config/prettier", "@gravity-ui/eslint-config/import-order"],
-    "env": {
-        "node": true,
-        "jest": true
-    },
-    "root": true
-}

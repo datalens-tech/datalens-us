@@ -58,7 +58,7 @@ describe('Keys validator', () => {
                 .every((part): boolean => KEY_REG.test(part));
 
             if (!isPermitted) {
-                console.log(key);
+                console.info(key);
             }
 
             expect(isPermitted).toBeTruthy();
@@ -73,7 +73,7 @@ describe('Keys validator', () => {
                 .every((part): boolean => KEY_REG.test(part));
 
             if (isPermitted) {
-                console.log(key);
+                console.info(key);
             }
 
             expect(isPermitted).toBeFalsy();

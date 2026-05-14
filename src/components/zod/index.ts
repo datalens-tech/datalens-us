@@ -1,12 +1,9 @@
-import {extendZodWithOpenApi} from '@asteasolutions/zod-to-openapi';
 import {AppError} from '@gravity-ui/nodekit';
 import {ZodError, z} from 'zod';
 
 import {US_ERRORS} from '../../const/errors';
 
 import * as zc from './custom-types';
-
-extendZodWithOpenApi(z);
 
 const prepareError = (err: unknown): Error => {
     if (err instanceof ZodError) {

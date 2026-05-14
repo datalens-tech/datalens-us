@@ -75,6 +75,7 @@ export const Collection: CollectionConstructor<CollectionInstance> = class Colle
             delete: true,
             securityManage: true,
             securityApprove: true,
+            browse: true,
         };
     }
 
@@ -115,6 +116,7 @@ export const Collection: CollectionConstructor<CollectionInstance> = class Colle
             createSharedEntry: isEditorOrAdmin,
             limitedView: true,
             view: true,
+            browse: true,
             update: isEditorOrAdmin,
             copy: isEditorOrAdmin,
             move: isEditorOrAdmin,

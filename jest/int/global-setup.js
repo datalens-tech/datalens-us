@@ -34,8 +34,8 @@ module.exports = async () => {
         const containerConfig = {
             name: `postgres-test-${workerId}`,
             image: 'postgres',
-            tag: '14-alpine',
-            ports: [5432],
+            tag: '16-alpine',
+            ports: [testDbConfig.port],
             env: {
                 POSTGRES_USER: testDbConfig.user,
                 POSTGRES_PASSWORD: testDbConfig.password,
@@ -57,7 +57,7 @@ module.exports = async () => {
                 };
                 containers.push(container);
                 console.log(
-                    `[Global Setup] Container ${name} started at ${ip}:${portMappings.get(5432)} for worker ${workerId}`,
+                    `[Global Setup] Container ${name} started at ${ip}:${portMappings.get(testDbConfig.port)} for worker ${workerId}`,
                 );
                 return containerMetaInfo;
             }),
@@ -78,4 +78,6 @@ module.exports = async () => {
     global.__TESTCONTAINERS_ALL_CONTAINERS__ = containers;
 
     console.log(`[Global Setup] All ${maxWorkers} containers created and metadata saved.`);
+
+    return containersMetadata;
 };

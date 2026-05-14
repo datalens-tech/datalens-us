@@ -1,0 +1,2 @@
+export const MAX_LOCK_DURATION = 600000;
+export const DEFAULT_LOCK_DURATION = 300000;

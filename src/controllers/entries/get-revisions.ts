@@ -12,7 +12,7 @@ const requestSchema = {
         entryId: zc.encodedId(),
     }),
     query: z.object({
-        page: zc.stringNumber({min: 0}).optional(),
+        page: z.string().optional(),
         pageSize: zc.stringNumber({min: 1, max: 200}).optional(),
         revIds: z
             .union([zc.encodedId().transform((id) => [id]), zc.encodedIdArray({min: 0, max: 1000})])

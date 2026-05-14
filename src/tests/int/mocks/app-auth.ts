@@ -28,6 +28,7 @@ jest.mock('../../../components/auth/middlewares/app-auth', () => {
                     sessionId: 'test-session-id',
                     accessToken: tokenPart,
                     roles: user.roles,
+                    type: 'user',
                 });
 
                 res.locals.userId = user.userId;

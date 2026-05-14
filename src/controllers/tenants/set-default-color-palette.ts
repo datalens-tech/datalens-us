@@ -28,7 +28,7 @@ export const setDefaultColorPaletteController: AppRouteHandler = async (req, res
             },
             {defaultColorPaletteId: body.defaultColorPaletteId},
         );
-        logEvent({
+        await logEvent({
             type: LogEventType.SetDefaultColorPaletteSuccess,
             ctx: req.ctx,
             reqBody: body,
@@ -36,7 +36,7 @@ export const setDefaultColorPaletteController: AppRouteHandler = async (req, res
         });
         res.status(200).send(briefTenantWithSettingsModel.format(result));
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.SetDefaultColorPaletteFail,
             ctx: req.ctx,
             reqBody: body,

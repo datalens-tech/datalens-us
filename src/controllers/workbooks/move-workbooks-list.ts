@@ -42,7 +42,7 @@ export const moveWorkbooksListController: AppRouteHandler = async (
             },
         );
 
-        logEvent({
+        await logEvent({
             type: LogEventType.MoveWorkbooksListSuccess,
             ctx: req.ctx,
             reqBody: body,
@@ -51,7 +51,7 @@ export const moveWorkbooksListController: AppRouteHandler = async (
 
         res.status(200).send(await workbookModelArrayInObject.format(result));
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.MoveWorkbooksListFail,
             ctx: req.ctx,
             reqBody: body,

@@ -7,16 +7,7 @@ import NavigationService from '../../services/navigation.service';
 import {formatGetEntriesResponse} from '../../services/new/entry/formatters';
 import {isTrueArg} from '../../utils/env-utils';
 
-const idsSchema = z
-    .union([z.string(), z.array(z.unknown())])
-    .transform((value) => {
-        if (typeof value === 'string') {
-            return [value];
-        }
-
-        return value;
-    })
-    .pipe(zc.encodedIdArraySafe({min: 0, max: 1000}));
+const idsSchema = zc.queryArray().pipe(zc.encodedIdArraySafe({min: 0, max: 1000}));
 
 const orderBySchema = z.object({
     field: z.enum(['createdAt', 'name']),

@@ -10,7 +10,6 @@ import {
     US_ERRORS,
 } from '../../../const';
 import {default as OldEntry} from '../../../db/models/entry';
-import Lock from '../../../db/models/lock';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {WorkbookPermission} from '../../../entities/workbook';
@@ -18,6 +17,7 @@ import {DlsActions, EntryColumns, EntryScope, UsPermissions} from '../../../type
 import Utils, {makeUserId} from '../../../utils';
 import {getParentIds} from '../../new/collection/utils/get-parents';
 import {checkSharedEntryPermission} from '../../new/entry/utils/check-collection-entry-permission/check-permission';
+import {checkLock} from '../../new/lock';
 import {ServiceArgs} from '../../new/types';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission} from '../../new/workbook/utils';
@@ -150,7 +150,7 @@ export async function deleteEntry(
             }
         }
 
-        await Lock.checkLock({entryId, lockToken}, ctx);
+        await checkLock({ctx}, {entryId, lockToken});
 
         if (entryObj.scope === 'folder') {
             const entryObjKey = entryObj.key;

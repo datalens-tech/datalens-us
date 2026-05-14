@@ -29,4 +29,7 @@ export {
     requestSchema as resolveTenantRequestSchema,
 } from '../src/controllers/tenants/resolve-tenant';
 export {operation as operationModel} from '../src/controllers/response-models/operation';
-export {workbookContentEntryModel} from '../src/controllers/workbooks/response-models';
+export {
+    workbookContentEntryModel,
+    workbookModel,
+} from '../src/controllers/workbooks/response-models';

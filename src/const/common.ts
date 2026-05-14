@@ -272,6 +272,8 @@ export const ALLOWED_ENTRIES_SCOPE = [
 
 export const CONTENT_TYPE_JSON = 'application/json';
 
+export const CONTENT_TYPE_FORM_URLENCODED = 'application/x-www-form-urlencoded';
+
 export const ANNOTATION_DESCRIPTION_MAX_LENGTH = 36000;
 
 export const ANNOTATION_DESCRIPTION_SCHEMA = {

@@ -3,7 +3,7 @@ import {AppRouteHandler} from '@gravity-ui/expresskit';
 import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
-import LockService from '../../services/lock.service';
+import {lockEntry} from '../../services/new/lock';
 
 import {lockTokenModel} from './response-models';
 
@@ -25,12 +25,7 @@ export const lockController: AppRouteHandler = async (req, res) => {
     const {entryId} = params;
     const {duration, force} = body;
 
-    const result = await LockService.lock({
-        entryId,
-        duration,
-        force,
-        ctx: req.ctx,
-    });
+    const result = await lockEntry({ctx: req.ctx}, {entryId, duration, force});
 
     res.status(200).send(lockTokenModel.format(result));
 };

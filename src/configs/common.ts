@@ -1,6 +1,7 @@
 import {AuthPolicy} from '@gravity-ui/expresskit';
 import {AppConfig} from '@gravity-ui/nodekit';
 
+import {appValidationErrorHandler} from '../components/api-docs';
 import {APP_NAME, US_DYNAMIC_MASTER_TOKEN_HEADER, US_MASTER_TOKEN_HEADER} from '../const';
 import {getEnvCert, getEnvTokenVariable, getEnvVariable, isTrueArg} from '../utils/env-utils';
 
@@ -27,6 +28,7 @@ export default {
     appSensitiveHeaders: [US_MASTER_TOKEN_HEADER, US_DYNAMIC_MASTER_TOKEN_HEADER],
 
     // auth
+    authMethods: ['datalens-auth'],
     authTokenPublicKey: getEnvCert(process.env.AUTH_TOKEN_PUBLIC_KEY),
 
     multitenant: false,
@@ -59,4 +61,6 @@ export default {
             getEnvCert(process.env.BI_MASTER_TOKEN_PUBLIC_KEY_SECONDARY),
         ],
     },
+
+    appValidationErrorHandler,
 } as Partial<AppConfig>;

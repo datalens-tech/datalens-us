@@ -1,5 +1,4 @@
 import {AppError} from '@gravity-ui/nodekit';
-import {z} from 'zod';
 
 import {zc} from '../../../../components/zod';
 import {OrderBy, US_ERRORS} from '../../../../const';
@@ -34,11 +33,6 @@ export type GetEntriesRelationsResult = {
     relations: EntryRelationWithPermissions[];
     nextPageToken?: string;
 };
-
-const validationRules = {
-    [`${Entry.tableName}.${EntryColumn.CreatedAt}`]: zc.stringSqlTimestampz(),
-    [`${Entry.tableName}.${EntryColumn.EntryId}`]: z.string(),
-} as const;
 
 export const getEntriesRelations = async (
     {ctx, trx}: ServiceArgs,
@@ -87,12 +81,20 @@ export const getEntriesRelations = async (
     }
 
     const paginator = createPaginator({
-        sortField: `${Entry.tableName}.${EntryColumn.CreatedAt}`,
-        tiebreakerField: `${Entry.tableName}.${EntryColumn.EntryId}`,
-        direction: OrderBy.Asc,
+        sortFields: [
+            {
+                field: `${Entry.tableName}.${EntryColumn.CreatedAt}`,
+                direction: OrderBy.Asc,
+                validate: zc.stringSqlTimestampz(),
+            },
+        ],
+        tiebreakerField: {
+            field: `${Entry.tableName}.${EntryColumn.EntryId}`,
+            direction: OrderBy.Asc,
+            validate: zc.stringBigInt(),
+        },
         limit,
         pageToken,
-        validationRules,
     });
 
     const relatedEntriesQuery = EntryRelation.getSelectQuery(getReplica(trx), {

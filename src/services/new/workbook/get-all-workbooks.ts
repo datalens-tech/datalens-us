@@ -1,44 +1,54 @@
-import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE} from '../../../const';
+import {zc} from '../../../components/zod';
+import {DEFAULT_PAGE_SIZE, OrderBy} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
-import Utils from '../../../utils';
+import {createPaginator} from '../../../utils/cursor-pagination';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 
 export interface GetAllWorkbooksArgs {
-    page?: number;
+    page?: string;
     pageSize?: number;
 }
 
 export const getAllWorkbooks = async ({ctx}: ServiceArgs, args: GetAllWorkbooksArgs) => {
-    const {page = DEFAULT_PAGE, pageSize = DEFAULT_PAGE_SIZE} = args;
+    const {page, pageSize = DEFAULT_PAGE_SIZE} = args;
 
     ctx.log('GET_ALL_WORKBOOKS_START', {
         page,
         pageSize,
     });
 
-    const workbooksPage = await WorkbookModel.query(getReplica())
-        .select()
-        .where({
-            [WorkbookModelColumn.DeletedAt]: null,
-        })
-        .limit(pageSize)
-        .offset(pageSize * page)
-        .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
-
-    const nextPageToken = Utils.getOptimisticNextPageToken({
-        page,
-        pageSize,
-        curPage: workbooksPage,
+    const paginator = createPaginator({
+        sortFields: [
+            {
+                field: `${WorkbookModel.tableName}.${WorkbookModelColumn.CreatedAt}`,
+                direction: OrderBy.Asc,
+                validate: zc.stringSqlTimestampz(),
+            },
+        ],
+        tiebreakerField: {
+            field: `${WorkbookModel.tableName}.${WorkbookModelColumn.WorkbookId}`,
+            direction: OrderBy.Asc,
+            validate: zc.stringBigInt(),
+        },
+        limit: pageSize,
+        pageToken: page,
     });
 
+    const query = WorkbookModel.query(getReplica())
+        .select('*')
+        .where({[WorkbookModelColumn.DeletedAt]: null})
+        .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
+
+    const {result: workbooks, nextPageToken} = await paginator.execute(query);
+
     ctx.log('GET_ALL_WORKBOOKS_FINISH', {
-        workbooksCount: workbooksPage.length,
+        workbooksCount: workbooks.length,
         nextPageToken,
     });
 
     return {
-        workbooks: workbooksPage,
+        workbooks,
         nextPageToken,
     };
 };

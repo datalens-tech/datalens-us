@@ -1,5 +1,5 @@
 import {z} from '../../../components/zod';
-import Lock from '../../../db/models/lock';
+import {Lock} from '../../../db/models/new/lock';
 import Utils from '../../../utils';
 
 import {lockModel} from './lock-model';

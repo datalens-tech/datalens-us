@@ -19,7 +19,7 @@ import {AppEnv} from './const';
 import {registry} from './registry';
 import {setRegistryToContext} from './registry/utils';
 import {setupRegistryPlugins} from './registry/setup';
-import {getRoutes} from './routes';
+import {ExtendedAppRouteDescription, getRoutes} from './routes';
 import {Feature, isEnabledFeature} from './components/features';
 import {
     getAdditionalHeaders,
@@ -60,7 +60,10 @@ afterAuth.push(
     checkCtxTenantId,
 );
 
-if (nodekit.config.appAuthPolicy !== AuthPolicy.disabled) {
+if (
+    nodekit.config.appAuthPolicy !== AuthPolicy.disabled &&
+    nodekit.config.authMethods?.includes('datalens-auth')
+) {
     nodekit.config.appAuthHandler = appAuth;
 }
 
@@ -75,25 +78,41 @@ objectKeys(extendedRoutes).forEach((key) => {
         !Array.isArray(features) ||
         features.every((feature) => isEnabledFeature(nodekit.ctx, feature))
     ) {
-        if (nodekit.config.swaggerEnabled) {
-            registerApiRoute(
-                extendedRoutes[key],
-                getAdditionalHeaders(extendedRoutes[key], nodekit),
-            );
-        }
-
         routes[route] = {
             ...params,
+            handlerName: extendedRoutes[key].handlerName ?? extendedRoutes[key].handler.name,
+            handler: registerApiRoute(extendedRoutes[key], nodekit),
             manualDecodeId: extendedRoutes[key].handler.manualDecodeId,
         };
     }
 });
 
-const app = new ExpressKit(nodekit, routes);
+const {registerRoutes, getDocsHandler} = initSwagger({
+    nodekit,
+    securitySchemes: getAdditionalSecuritySchemes(nodekit),
+    transformOperation: (operation, {route}) => {
+        const {headers, security} = getAdditionalHeaders(
+            route as ExtendedAppRouteDescription<Feature>,
+            nodekit,
+        );
+
+        return {
+            ...operation,
+            parameters: [
+                ...(operation.parameters ?? []),
+                ...headers.map((header) => ({...header, in: 'header'})),
+            ],
+            security,
+        };
+    },
+});
+
+const app = new ExpressKit(nodekit, registerRoutes(routes, nodekit));
+
 registry.setupApp(app);
 
 if (nodekit.config.swaggerEnabled) {
-    initSwagger(app, getAdditionalSecuritySchemes(nodekit));
+    app.express.use('/api-docs', getDocsHandler());
 }
 
 if (require.main === module) {

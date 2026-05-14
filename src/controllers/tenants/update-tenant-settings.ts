@@ -30,7 +30,7 @@ export const updateTenantSettingsController: AppRouteHandler = async (req, res) 
             {key: body.key, value: body.value},
         );
 
-        logEvent({
+        await logEvent({
             type: LogEventType.UpdateTenantSettingsSuccess,
             ctx: req.ctx,
             reqBody: body,
@@ -39,7 +39,7 @@ export const updateTenantSettingsController: AppRouteHandler = async (req, res) 
 
         res.status(200).send(briefTenantWithSettingsModel.format(result));
     } catch (error) {
-        logEvent({
+        await logEvent({
             type: LogEventType.UpdateTenantSettingsFail,
             ctx: req.ctx,
             reqBody: body,

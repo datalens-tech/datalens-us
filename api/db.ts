@@ -74,6 +74,12 @@ export {LicenseType} from '../src/db/models/new/license/types';
 export {LicenseWithIsActive} from '../src/db/models/new/license/presentations';
 
 export {
+    LicenseQuarantine,
+    LicenseQuarantineColumn,
+    LicenseQuarantineColumnRaw,
+} from '../src/db/models/new/license-quarantine';
+
+export {
     SubscriptionStatus,
     SubscriptionContentType,
     SubscriptionArtifactType,
