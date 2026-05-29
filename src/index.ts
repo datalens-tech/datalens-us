@@ -8,6 +8,7 @@ import {
     decodeId,
     dlContext,
     finalRequestHandler,
+    noStore,
     resolveIsolationIds,
     resolveSpecialTokens,
     resolveTenantId,
@@ -29,6 +30,7 @@ import {
 } from './components/api-docs';
 import {objectKeys} from './utils/utility-types';
 import {initTemporal} from './components/temporal/init-temporal';
+import helpers from './controllers/helpers';
 
 setRegistryToContext(nodekit, registry);
 setupRegistryPlugins();
@@ -108,6 +110,11 @@ const {registerRoutes, getDocsHandler} = initSwagger({
 });
 
 const app = new ExpressKit(nodekit, registerRoutes(routes, nodekit));
+
+app.express.get('/ping', noStore, helpers.ping);
+app.express.get('/ping-db', noStore, helpers.pingDb);
+app.express.get('/ping-db-primary', noStore, helpers.pingDbPrimary);
+app.express.get('/pool', noStore, helpers.pool);
 
 registry.setupApp(app);
 

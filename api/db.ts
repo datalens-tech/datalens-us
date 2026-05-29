@@ -1,3 +1,12 @@
+export {
+    BrandedTransactionOrKnex,
+    MainDbTransactionOrKnex,
+    BrandedModelClass,
+    dbTransaction,
+    queryPrimary,
+    queryReplica,
+} from '../src/db';
+
 export {default as LegacyEntry} from '../src/db/models/entry';
 export {default as LegacyRevision} from '../src/db/models/revision';
 export {default as LegacyNavigation} from '../src/db/models/navigation';
@@ -16,7 +25,7 @@ export {TenantWithCurrentLimit} from '../src/db/models/new/tenant/presentations'
 export {WorkbookModel, WorkbookModelColumn} from '../src/db/models/new/workbook';
 export {CollectionModel, CollectionModelColumn} from '../src/db/models/new/collection';
 export {State} from '../src/db/models/new/state';
-export {Template} from '../src/db/models/new/template';
+export {Template, TemplateColumn} from '../src/db/models/new/template';
 export {Preset} from '../src/db/models/new/preset';
 export {Link} from '../src/db/models/new/link';
 export {Lock} from '../src/db/models/new/lock';

@@ -14,6 +14,7 @@ const requestSchema = {
     }),
     body: z.object({
         unversionedData: zc.limitedObject({limit: MAX_UNVERSIONED_DATA_OBJECT_SYMBOLS}),
+        lockToken: z.string().optional(),
     }),
 };
 
@@ -35,6 +36,7 @@ export const updateEntryUnversionedDataPrivateController: AppRouteHandler = asyn
             {
                 entryId: params.entryId,
                 unversionedData: body.unversionedData,
+                lockToken: body.lockToken,
             },
         );
 

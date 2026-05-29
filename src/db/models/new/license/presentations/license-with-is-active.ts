@@ -13,6 +13,17 @@ export class LicenseWithIsActive extends License {
         ]).as('is_active');
     }
 
+    static get quarantineEndsAtSelectColumn() {
+        return raw(`(SELECT lq.?? FROM ?? AS lq WHERE lq.?? = ?? AND ? < lq.??)`, [
+            LicenseQuarantineColumn.EndsAt,
+            LicenseQuarantine.tableName,
+            LicenseQuarantineColumn.LicenseQuarantineId,
+            LicenseColumn.QuarantineId,
+            raw(CURRENT_TIMESTAMP),
+            LicenseQuarantineColumn.EndsAt,
+        ]).as('quarantine_ends_at');
+    }
+
     static get isQuarantinedSelectColumn() {
         return raw(
             `(?? IS NOT NULL AND EXISTS (SELECT 1 FROM ?? AS lq WHERE lq.?? = ?? AND ? < lq.??))`,
@@ -30,6 +41,7 @@ export class LicenseWithIsActive extends License {
     static get computedStatusSelectColumns() {
         return [
             LicenseWithIsActive.isActiveSelectColumn,
+            LicenseWithIsActive.quarantineEndsAtSelectColumn,
             LicenseWithIsActive.isQuarantinedSelectColumn,
         ];
     }
@@ -45,5 +57,6 @@ export class LicenseWithIsActive extends License {
     }
 
     isActive!: boolean;
+    quarantineEndsAt!: Nullable<string>;
     isQuarantined!: boolean;
 }

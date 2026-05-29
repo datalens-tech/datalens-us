@@ -16,4 +16,30 @@ export default [
             },
         },
     },
+    {
+        rules: {
+            'no-restricted-imports': [
+                'warn',
+                {
+                    paths: [
+                        {
+                            name: 'objection',
+                            importNames: ['transaction'],
+                            message: 'Use a typed transaction wrapper instead.',
+                        },
+                    ],
+                },
+            ],
+            'no-restricted-syntax': [
+                'warn',
+                'WithStatement',
+                {
+                    selector:
+                        'CallExpression[callee.type="MemberExpression"][callee.object.type="Identifier"][callee.object.name=/^[A-Z]/][callee.property.name="query"][arguments.length>0]',
+                    message:
+                        'Use queryPrimary() or queryReplica() instead of direct .query() calls.',
+                },
+            ],
+        },
+    },
 ];

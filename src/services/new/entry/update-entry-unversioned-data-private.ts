@@ -5,19 +5,21 @@ import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, US_ERRORS} from '../../../cons
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {EntryColumns} from '../../../types/models';
 import {makeUserId} from '../../../utils';
+import {checkLock} from '../lock';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
 
 type UpdateUnversionedDataArgs = {
     entryId: string;
     unversionedData: EntryColumns['unversionedData'];
+    lockToken?: string;
 };
 
 export const updateEntryUnversionedDataPrivate = async (
     {ctx, trx}: ServiceArgs,
     args: UpdateUnversionedDataArgs,
 ) => {
-    const {entryId, unversionedData} = args;
+    const {entryId, unversionedData, lockToken} = args;
 
     ctx.log('UPDATE_UNVERSIONED_DATA_START', {
         entryId,
@@ -30,6 +32,8 @@ export const updateEntryUnversionedDataPrivate = async (
             code: US_ERRORS.PRIVATE_ROUTE_ONLY,
         });
     }
+
+    await checkLock({ctx}, {entryId, lockToken});
 
     const updatedBy = makeUserId(user.userId);
 
