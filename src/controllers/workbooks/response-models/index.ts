@@ -9,5 +9,4 @@ export * from './workbook-content-model';
 export * from './workbook-instance-array';
 export * from './workbook-instance-page';
 export * from './workbook-id-model';
-export * from './workbook-id-with-is-template-model';
 export * from './workbook-content-entry-model';

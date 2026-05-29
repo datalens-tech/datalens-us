@@ -4,6 +4,7 @@ export const routes = {
     favorites: '/v1/favorites',
     states: '/v1/states',
     locks: '/v1/locks',
+    privateCreateLock: (entryId: string) => `/private/locks/${entryId}`,
     collections: '/v1/collections',
     deleteCollections: '/v1/delete-collections',
     deleteWorkbooks: '/v2/delete-workbooks',
@@ -26,8 +27,6 @@ export const routes = {
     setDefaultColorPalette: '/v1/tenants/set-default-color-palette',
     updateTenantSettings: '/v1/tenants/settings',
     colorPalettes: '/v1/color-palettes',
-    privateSetIsTemplateWorkbook: (workbookId: string) =>
-        `/private/v2/workbooks/${workbookId}/setIsTemplate`,
     getEntriesRelations: '/v1/get-entries-relations',
     privateGetEntriesRelations: '/private/v1/get-entries-relations',
     privateUpdateEntryUnversionedData: (entryId: string) =>

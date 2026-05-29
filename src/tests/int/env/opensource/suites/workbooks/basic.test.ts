@@ -3,7 +3,7 @@ import request from 'supertest';
 import {testUserId} from '../../../../constants';
 import {OPERATION_DEFAULT_FIELDS, WORKBOOK_DEFAULT_FIELDS} from '../../../../models';
 import {routes} from '../../../../routes';
-import {US_ERRORS, app, auth, authPrivateRoute, testTenantId} from '../../auth';
+import {US_ERRORS, app, auth, testTenantId} from '../../auth';
 import {createMockWorkbook, createMockWorkbookEntry} from '../../helpers';
 import {OpensourceRole} from '../../roles';
 
@@ -22,12 +22,6 @@ const workbooksData = [
 
 let testWorkbookId: string;
 let testCopiedWorkbookId: string;
-
-const testTemplateWorkbookData = {
-    id: '',
-    title: 'Test template workbook title',
-    description: 'Testt template workbook description',
-};
 
 describe('Workbooks managment', () => {
     test('Create workbooks', async () => {
@@ -551,56 +545,5 @@ describe('Workbook delete with locked entries', () => {
         await auth(request(app).delete(`${routes.workbooks}/${wb.workbookId}`), {
             role: OpensourceRole.Editor,
         }).expect(200);
-    });
-});
-
-describe('Workbook template', () => {
-    test('Create workbook', async () => {
-        const response = await auth(request(app).post(routes.workbooks), {
-            role: OpensourceRole.Editor,
-        })
-            .send({
-                title: testTemplateWorkbookData.title,
-                description: testTemplateWorkbookData.description,
-            })
-            .expect(200);
-
-        const {body} = response;
-
-        expect(body).toStrictEqual({
-            ...WORKBOOK_DEFAULT_FIELDS,
-            collectionId: null,
-            createdBy: testUserId,
-            updatedBy: testUserId,
-            description: testTemplateWorkbookData.description,
-            title: testTemplateWorkbookData.title,
-            operation: OPERATION_DEFAULT_FIELDS,
-        });
-
-        testTemplateWorkbookData.id = body.workbookId;
-    });
-
-    test('Make workbook as template', async () => {
-        await request(app)
-            .post(routes.privateSetIsTemplateWorkbook(testTemplateWorkbookData.id))
-            .send({
-                workbookId: testTemplateWorkbookData.id,
-                isTemplate: true,
-            })
-            .expect(403);
-
-        const response = await authPrivateRoute(
-            request(app).post(routes.privateSetIsTemplateWorkbook(testTemplateWorkbookData.id)),
-        ).send({
-            workbookId: testTemplateWorkbookData.id,
-            isTemplate: true,
-        });
-
-        const {body} = response;
-
-        expect(body).toStrictEqual({
-            workbookId: expect.any(String),
-            isTemplate: true,
-        });
     });
 });

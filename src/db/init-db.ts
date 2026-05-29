@@ -11,6 +11,7 @@ import {isTrueArg} from '../utils/env-utils';
 
 export class Model extends getModel({cancelOnTimeout: true, useLimitInFirst: true}) {
     static DEFAULT_QUERY_TIMEOUT = DEFAULT_QUERY_TIMEOUT;
+    static readonly __dbBrand = 'main' as const;
 }
 
 export const getKnexOptions = () => ({

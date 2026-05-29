@@ -23,8 +23,8 @@
   },
   "main": "dist/index.js",
   "dependencies": {
-    "@gravity-ui/expresskit": "^3.1.1",
-    "@gravity-ui/expresskit-api": "^1.6.0",
+    "@gravity-ui/expresskit": "^3.1.2",
+    "@gravity-ui/expresskit-api": "^1.6.1",
     "@gravity-ui/gateway": "^4.10.4",
     "@gravity-ui/nodekit": "^2.11.0",
     "@gravity-ui/postgreskit": "^3.1.0",
@@ -98,6 +98,7 @@
     "db:migrate-one": "node dist/server/db/scripts/migrate-one.js",
     "db:rollback": "node dist/server/db/scripts/rollback.js",
     "db:rollback-one": "node dist/server/db/scripts/rollback-one.js",
+    "db:check-migrations": "node dist/server/db/scripts/check-migrations.js",
     "prepare-and-test": "rm -rf dist/server && pnpm run build && pnpm run test",
     "migration:create": "npx knex migrate:make --migrations-directory ./src/db/migrations -x ts",
     "docker:build": "docker build --build-arg app_version=${BUILD_VERSION} . -t ${TARGET_IMAGE}:${BUILD_VERSION} -t ${TARGET_IMAGE}:latest",

@@ -7,7 +7,6 @@ import collections from './controllers/collections';
 import colorPalettes from './controllers/color-palettes';
 import entries from './controllers/entries';
 import favorites from './controllers/favorites';
-import helpers from './controllers/helpers';
 import homeController from './controllers/home';
 import locks from './controllers/locks';
 import states from './controllers/states';
@@ -25,7 +24,6 @@ export type ExtendedAppRouteDescription<F = Feature> = AppRouteDescription & {
     features?: F[];
 };
 
-// eslint-disable-next-line complexity
 export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
     const makeRoute = (
         routeDescription: ExtendedAppRouteDescription,
@@ -40,31 +38,6 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             handler: homeController,
             disableSelfStats: true,
         }),
-
-        ping: {
-            route: 'GET /ping',
-            handler: helpers.ping,
-            authPolicy: AuthPolicy.disabled,
-            disableSelfStats: true,
-        },
-        pingDb: {
-            route: 'GET /ping-db',
-            handler: helpers.pingDb,
-            authPolicy: AuthPolicy.disabled,
-            disableSelfStats: true,
-        },
-        pingDbPrimary: {
-            route: 'GET /ping-db-primary',
-            handler: helpers.pingDbPrimary,
-            authPolicy: AuthPolicy.disabled,
-            disableSelfStats: true,
-        },
-        pool: {
-            route: 'GET /pool',
-            handler: helpers.pool,
-            authPolicy: AuthPolicy.disabled,
-            disableSelfStats: true,
-        },
 
         getEntry: makeRoute({
             route: 'GET /v1/entries/:entryId',
@@ -387,14 +360,6 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             handler: workbooks.copyWorkbookController,
             write: true,
         }),
-        privateSetIsTemplateWorkbook: makeRoute({
-            route: 'POST /private/v2/workbooks/:workbookId/setIsTemplate',
-            handler: workbooks.setWorkbookIsTemplateController,
-            authPolicy: AuthPolicy.disabled,
-            private: true,
-            write: true,
-        }),
-
         privateRestoreWorkbook: makeRoute({
             route: 'POST /private/v2/workbooks/:workbookId/restore',
             handler: workbooks.restoreWorkbookController,

@@ -2,10 +2,8 @@ import {TransactionOrKnex} from 'objection';
 
 import {Model} from '../../../db';
 
-export const getPrimary = (trx?: TransactionOrKnex) => {
-    return trx ?? Model.primary;
-};
+/** @deprecated use queryPrimary(Model, trx) */
+export const getPrimary = (trx?: TransactionOrKnex): TransactionOrKnex => trx ?? Model.primary;
 
-export const getReplica = (trx?: TransactionOrKnex) => {
-    return trx ?? Model.replica;
-};
+/** @deprecated use queryReplica(Model, trx) */
+export const getReplica = (trx?: TransactionOrKnex): TransactionOrKnex => trx ?? Model.replica;

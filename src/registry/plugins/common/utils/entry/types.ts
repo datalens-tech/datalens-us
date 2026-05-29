@@ -22,6 +22,7 @@ export type CheckLicense = (args: {
         expiresAt: string | null;
         licenseType: `${LicenseType}`;
         isActive: boolean;
+        quarantineEndsAt: string | null;
         isQuarantined: boolean;
     };
 }) => void;

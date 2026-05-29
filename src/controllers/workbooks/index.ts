@@ -10,7 +10,6 @@ import {getWorkbooksListByIdsController} from './get-workbooks-list-by-ids';
 import {moveWorkbookController} from './move-workbook';
 import {moveWorkbooksListController} from './move-workbooks-list';
 import {restoreWorkbookController} from './restore-workbook';
-import {setWorkbookIsTemplateController} from './set-workbook-is-template';
 import {updateWorkbookController} from './update-workbook';
 
 export default {
@@ -25,7 +24,6 @@ export default {
     getWorkbookContentController,
     getWorkbooksListController,
     getWorkbooksListByIdsController,
-    setWorkbookIsTemplateController,
     getAllWorkbooksController,
     restoreWorkbookController,
 };

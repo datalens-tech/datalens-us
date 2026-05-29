@@ -1,4 +1,5 @@
 export {ServiceArgs, CountAggregation} from '../src/services/new/types';
+export {MainDbTransactionOrKnex} from '../src/db';
 export {getPrimary, getReplica} from '../src/services/new/utils';
 
 export {checkEntry} from '../src/services/entry/actions/check-entry';
@@ -19,7 +20,6 @@ export {
 export {
     getWorkbook,
     createWorkbook,
-    setWorkbookIsTemplate,
     crossSyncCopiedJoinedEntryRevisions,
 } from '../src/services/new/workbook';
 export {getEntryPermissionsByWorkbook} from '../src/services/new/workbook/utils';
@@ -86,3 +86,5 @@ export {
     resolveTenantByEntryId,
     resolveTenant,
 } from '../src/services/new/tenants';
+
+export {getState} from '../src/services/new/state/get-state';
