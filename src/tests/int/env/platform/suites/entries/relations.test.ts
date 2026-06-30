@@ -1,5 +1,6 @@
 import request from 'supertest';
 
+import {IncorrectLinkError} from '../../../../../../components/errors';
 import {app, auth, getWorkbookBinding} from '../../auth';
 import {createMockWorkbook, createMockWorkbookEntry} from '../../helpers';
 
@@ -104,8 +105,8 @@ describe('Entry relations', () => {
             .expect(400);
 
         expect(response.body).toMatchObject({
-            code: 'INCORRECT_LINK_ERROR',
-            message: 'INCORRECT_LINK_ERROR',
+            code: IncorrectLinkError.code,
+            message: 'Some of the provided links are incorrect',
             details: {
                 invalidLinkIds: {
                     malformedLink: 'not-a-valid-id',
@@ -133,8 +134,8 @@ describe('Entry relations', () => {
             .expect(400);
 
         expect(response.body).toMatchObject({
-            code: 'INCORRECT_LINK_ERROR',
-            message: 'INCORRECT_LINK_ERROR',
+            code: IncorrectLinkError.code,
+            message: 'Some of the provided links are incorrect',
             details: {
                 invalidLinkIds: {
                     malformedLink: 'not-a-valid-id',

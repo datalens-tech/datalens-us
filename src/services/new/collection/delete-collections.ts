@@ -1,13 +1,13 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {US_ERRORS} from '../../../const';
+import {CollectionWithWorkbookTemplateCantBeDeletedError} from '../../../components/errors';
+import {MainDbTransactionOrKnex} from '../../../db';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {EntryColumn, Entry as EntryModel} from '../../../db/models/new/entry';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {CollectionPermission} from '../../../entities/collection';
 import Utils from '../../../utils';
-import {deleteSharedEntries} from '../entry/delete-shared-entries';
+import {deleteCollectionEntries} from '../entry/delete-collection-entries';
 import {ServiceArgs} from '../types';
 import {getPrimary, getReplica} from '../utils';
 import {deleteWorkbooks} from '../workbook';
@@ -111,9 +111,7 @@ export const deleteCollections = async (
 
     for (const workbook of workbooksForDelete) {
         if (workbook.isTemplate) {
-            throw new AppError("Collection with workbook template can't be deleted", {
-                code: US_ERRORS.COLLECTION_WITH_WORKBOOK_TEMPLATE_CANT_BE_DELETED,
-            });
+            throw new CollectionWithWorkbookTemplateCantBeDeletedError();
         }
     }
 
@@ -148,8 +146,12 @@ export const deleteCollections = async (
 
         if (sharedEntriesForDeleteIds.length) {
             deletedCollectionsEntitiesPromises.push(
-                deleteSharedEntries(
-                    {ctx, trx: transactionTrx, skipCheckPermissions: true},
+                deleteCollectionEntries(
+                    {
+                        ctx,
+                        mainTrx: transactionTrx as MainDbTransactionOrKnex,
+                        skipCheckPermissions: true,
+                    },
                     {entryIds: sharedEntriesForDeleteIds, detachDeletePermissions: true},
                 ),
             );

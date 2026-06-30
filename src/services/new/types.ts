@@ -20,7 +20,7 @@ type TrxKeys = {
 }[keyof ServiceArgsBase];
 
 /**
- * Укажите явно какие транзакции нужны сервису.
+ * Explicitly specify which transactions the service requires.
  * @example ServiceArgs<'mainTrx'>
  */
 export type ServiceArgs<K extends TrxKeys = TrxKeys> = Omit<ServiceArgsBase, TrxKeys> &

@@ -1,12 +1,9 @@
-import {AppError} from '@gravity-ui/nodekit';
-
+import {NotExistEntryError} from '../../../components/errors';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {US_ERRORS} from '../../../const';
 import OldEntry from '../../../db/models/entry';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {RevisionModel} from '../../../db/models/new/revision';
 import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
-import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {DlsActions} from '../../../types/models';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
@@ -14,9 +11,9 @@ import {getReplica} from '../utils';
 import {getWorkbook} from '../workbook';
 import {getEntryPermissionsByWorkbook} from '../workbook/utils';
 
+import {CollectionEntryPermissions, checkCollectionEntryPermission} from './collection-entry';
 import {EntryPermissions} from './types';
 import {checkFetchedEntry} from './utils';
-import {checkSharedEntryPermission} from './utils/check-collection-entry-permission/check-permission';
 import {validateTenantId} from './validators';
 
 const validateGetEntryByKey = makeSchemaValidator({
@@ -136,11 +133,11 @@ export const getEntryByKey = async (
             if (!isPrivateRoute) {
                 await checkFetchedEntry(ctx, joinedEntryRevision, getReplica(trx));
 
-                const {permissions} = await checkSharedEntryPermission(
+                const {permissions} = await checkCollectionEntryPermission(
                     {ctx, trx},
                     {
                         entry: joinedEntryRevision,
-                        permission: SharedEntryPermission.View,
+                        permission: CollectionEntryPermissions.Read,
                         includePermissionsInfo,
                     },
                 );
@@ -191,8 +188,6 @@ export const getEntryByKey = async (
     } else if (customErrorBypassEnabled) {
         return undefined;
     } else {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
 };

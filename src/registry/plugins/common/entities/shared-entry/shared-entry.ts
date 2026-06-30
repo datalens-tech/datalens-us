@@ -1,28 +1,14 @@
-import {AuthPolicy} from '@gravity-ui/expresskit';
 import type {AppContext} from '@gravity-ui/nodekit';
-import {AppError} from '@gravity-ui/nodekit';
 
-import {UserRole} from '../../../../../components/auth/constants/role';
-import {US_ERRORS} from '../../../../../const';
+import {SharedEntriesNotSupportedError} from '../../../../../components/errors';
 import type {Entry as EntryModel} from '../../../../../db/models/new/entry';
 import {Permissions, SharedEntryPermission} from '../../../../../entities/shared-entry/types';
-import {getMockedOperation} from '../../../../../entities/utils';
-import Utils from '../../../../../utils';
+import type {Operation} from '../../../../../entities/types';
 
 import {SharedEntryConstructor, SharedEntryInstance} from './types';
 
 export const SharedEntry: SharedEntryConstructor<SharedEntryInstance> = class SharedEntry implements SharedEntryInstance {
-    static bulkFetchAllPermissions = async (ctx, items) => {
-        return items.map(({model}) => {
-            const sharedEntry = new SharedEntry({ctx, model});
-            if (ctx.config.accessServiceEnabled) {
-                sharedEntry.fetchAllPermissions({parentIds: []});
-            } else {
-                sharedEntry.enableAllPermissions();
-            }
-            return sharedEntry;
-        });
-    };
+    static bulkFetchAllPermissions = async () => [];
 
     ctx: AppContext;
     model: EntryModel;
@@ -31,94 +17,33 @@ export const SharedEntry: SharedEntryConstructor<SharedEntryInstance> = class Sh
     constructor({ctx, model}: {ctx: AppContext; model: EntryModel}) {
         this.ctx = ctx;
         this.model = model;
+        throw new SharedEntriesNotSupportedError();
     }
 
-    async register() {
-        const isEditorOrAdmin = this.isEditorOrAdmin();
-
-        if (!isEditorOrAdmin) {
-            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
-            });
-        }
-
-        return Promise.resolve(getMockedOperation({id: Utils.encodeId(this.model.entryId)}));
+    async register(): Promise<Operation> {
+        throw new SharedEntriesNotSupportedError();
     }
 
-    async checkPermission(args: {
+    async checkPermission(_args: {
         parentIds: string[];
         permission: SharedEntryPermission;
     }): Promise<void> {
-        const permissions = this.getAllPermissions();
-
-        if (permissions[args.permission] === false) {
-            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
-            });
-        }
-
-        return Promise.resolve();
+        throw new SharedEntriesNotSupportedError();
     }
 
     async fetchAllPermissions(_args: {parentIds: string[]}): Promise<void> {
-        this.permissions = this.getAllPermissions();
-        return Promise.resolve();
+        throw new SharedEntriesNotSupportedError();
     }
 
-    setPermissions(permissions: Permissions) {
-        this.permissions = permissions;
+    setPermissions(_permissions: Permissions) {
+        throw new SharedEntriesNotSupportedError();
     }
 
     async deletePermissions(): Promise<void> {
-        this.permissions = undefined;
+        throw new SharedEntriesNotSupportedError();
     }
 
     enableAllPermissions() {
-        this.permissions = {
-            listAccessBindings: true,
-            updateAccessBindings: true,
-            limitedView: true,
-            view: true,
-            update: true,
-            copy: true,
-            move: true,
-            delete: true,
-            createEntryBinding: true,
-            createLimitedEntryBinding: true,
-            securityApprove: true,
-        };
-    }
-
-    private isEditorOrAdmin() {
-        const {appAuthPolicy} = this.ctx.config;
-        const user = this.ctx.get('user');
-
-        if (appAuthPolicy === AuthPolicy.disabled) {
-            return true;
-        }
-
-        return (user?.roles || []).some(
-            (role) => role === UserRole.Editor || role === UserRole.Admin,
-        );
-    }
-
-    private getAllPermissions() {
-        const isEditorOrAdmin = this.isEditorOrAdmin();
-
-        const permissions = {
-            listAccessBindings: true,
-            updateAccessBindings: isEditorOrAdmin,
-            limitedView: true,
-            view: true,
-            update: isEditorOrAdmin,
-            copy: isEditorOrAdmin,
-            move: isEditorOrAdmin,
-            delete: isEditorOrAdmin,
-            createEntryBinding: isEditorOrAdmin,
-            createLimitedEntryBinding: isEditorOrAdmin,
-            securityApprove: isEditorOrAdmin,
-        };
-
-        return permissions;
+        throw new SharedEntriesNotSupportedError();
     }
 };

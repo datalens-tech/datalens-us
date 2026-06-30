@@ -4,8 +4,7 @@ import {ApiTag} from '../../components/api-docs';
 import {makeReqParser, z, zc} from '../../components/zod';
 import {CONTENT_TYPE_JSON} from '../../const';
 import {restoreWorkbook} from '../../services/new/workbook';
-
-import {WorkbookIdModel, workbookIdModel} from './response-models';
+import {WorkbookIdModel, workbookIdModel} from '../response-models';
 
 const requestSchema = {
     params: z.object({

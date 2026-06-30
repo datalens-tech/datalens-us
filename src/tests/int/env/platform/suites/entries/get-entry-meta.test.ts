@@ -1,7 +1,8 @@
 import request from 'supertest';
 
+import {NotExistEntryError} from '../../../../../../components/errors';
 import {routes} from '../../../../routes';
-import {US_ERRORS, app, auth, authPrivateRoute, getWorkbookBinding} from '../../auth';
+import {app, auth, authPrivateRoute, getWorkbookBinding} from '../../auth';
 import {createMockWorkbook, createMockWorkbookEntry} from '../../helpers';
 
 const entryMetaRoute = routes.getEntryMetaRoute;
@@ -58,7 +59,7 @@ describe('Get entry meta', () => {
             accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
         }).expect(404);
 
-        expect(response.body.code).toBe(US_ERRORS.NOT_EXIST_ENTRY);
+        expect(response.body.code).toBe(NotExistEntryError.code);
     });
 
     test('Get entry meta without workbook access - should return 403', async () => {

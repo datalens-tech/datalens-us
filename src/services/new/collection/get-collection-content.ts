@@ -1,6 +1,5 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {US_ERRORS} from '../../../const';
+import {AccessServicePermissionDeniedError} from '../../../components/errors';
+import {OrderBy} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
 import Utils from '../../../utils';
@@ -13,8 +12,6 @@ import {getParentIds} from './utils/get-parents';
 
 export type OrderField = 'title' | 'createdAt' | 'updatedAt';
 
-export type OrderDirection = 'asc' | 'desc';
-
 export type Mode = 'all' | 'onlyCollections' | 'onlyWorkbooks';
 
 export interface GetCollectionContentArgs {
@@ -25,12 +22,11 @@ export interface GetCollectionContentArgs {
     workbooksPage?: Nullable<number>;
     pageSize?: number;
     orderField?: OrderField;
-    orderDirection?: OrderDirection;
+    orderDirection?: OrderBy;
     onlyMy?: boolean;
     mode?: Mode;
 }
 
-// eslint-disable-next-line complexity
 export const getCollectionContent = async (
     {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
     args: GetCollectionContentArgs,
@@ -43,7 +39,7 @@ export const getCollectionContent = async (
         workbooksPage = 0,
         pageSize = 100,
         orderField = 'title',
-        orderDirection = 'asc',
+        orderDirection = OrderBy.Asc,
         onlyMy = false,
         mode = 'all',
     } = args;
@@ -151,9 +147,7 @@ export const getCollectionContent = async (
 
                             return collection;
                         } catch (error) {
-                            const err = error as AppError;
-
-                            if (err.code === US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED) {
+                            if (error instanceof AccessServicePermissionDeniedError) {
                                 return null;
                             }
 

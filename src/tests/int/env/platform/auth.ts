@@ -1,7 +1,7 @@
 import request from 'supertest';
 
 import {UserRole} from '../../../../components/auth/constants/role';
-import {AUTHORIZATION_HEADER, DL_AUTH_HEADER_KEY} from '../../../../const';
+import {AUTHORIZATION_HEADER, DL_AUTH_HEADER_KEY, DL_COMPONENT_HEADER} from '../../../../const';
 import {CollectionPermission} from '../../../../entities/collection/types';
 import {SharedEntryPermission} from '../../../../entities/shared-entry/types';
 import {ResourceType} from '../../../../entities/types';
@@ -47,6 +47,7 @@ export type AccessBinding = ReturnType<
 export type AuthArgs = CommonAuthArgs & {
     role?: PlatformRole;
     accessBindings?: AccessBinding[];
+    component?: string | null;
 };
 
 export type AuthToken = {
@@ -62,6 +63,7 @@ export const auth = (req: request.Test, args: AuthArgs = {}) => {
         login = testUserLogin,
         role = PlatformRole.Visitor,
         accessBindings = [],
+        component,
     } = args;
 
     let roles: `${UserRole}`[] = [];
@@ -86,6 +88,9 @@ export const auth = (req: request.Test, args: AuthArgs = {}) => {
     };
 
     req.set(AUTHORIZATION_HEADER, `${DL_AUTH_HEADER_KEY} ${JSON.stringify(authToken)}`);
+    if (component) {
+        req.set(DL_COMPONENT_HEADER, component);
+    }
 
     return req;
 };

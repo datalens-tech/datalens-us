@@ -13,6 +13,7 @@ export const ctx = async (req: Request, res: Response, next: NextFunction) => {
         isPrivateRoute = false,
         dlContext,
         onlyPublic,
+        privateRestrictions,
     } = res.locals;
 
     const privatePermissions = resolvePrivatePermissions(
@@ -31,6 +32,7 @@ export const ctx = async (req: Request, res: Response, next: NextFunction) => {
         dlContext,
         onlyPublic,
         privatePermissions,
+        privateRestrictions,
     });
 
     req.ctx.log('REQUEST_INFO', {

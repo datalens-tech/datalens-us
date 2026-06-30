@@ -1,5 +1,7 @@
 import type {OrderByDirection} from 'objection';
 
+import {OrderBy} from '../const';
+
 import {
     CTX,
     DlsPermissionsMode,
@@ -64,8 +66,8 @@ interface NavigationServiceParams extends StdServiceParams {
 }
 export interface GetEntries extends NavigationServiceParams {
     ids?: string | string[];
-    type?: string;
-    orderBy?: EntriesOrderByFilter;
+    types?: string[];
+    orderBy?: EntriesOrderByFilter<string, OrderBy>;
     createdBy?: string | string[];
     meta?: object;
     filters?: EntriesFilters;
@@ -76,6 +78,8 @@ export interface GetEntries extends NavigationServiceParams {
     includeData?: boolean;
     includeLinks?: boolean;
     excludeLocked?: boolean;
+    paginationMode: 'offset' | 'cursor';
+    pageToken?: string;
 }
 export interface InterTenantGetEntries extends NavigationServiceParams {
     scope: EntryScope;

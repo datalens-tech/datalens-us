@@ -17,6 +17,7 @@ const selectedTenantColumns = [
     TenantColumn.BillingEndedAt,
     TenantColumn.Features,
     TenantColumn.Settings,
+    TenantColumn.Deleting,
 ] as const;
 
 const selectedColumns = [

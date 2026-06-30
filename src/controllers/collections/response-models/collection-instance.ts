@@ -3,22 +3,27 @@ import type {CollectionInstance} from '../../../registry/plugins/common/entities
 
 import {collectionModel} from './collection-model';
 
+export const collectionPermissionsSchema = z
+    .object({
+        listAccessBindings: z.boolean(),
+        updateAccessBindings: z.boolean(),
+        createCollection: z.boolean(),
+        createWorkbook: z.boolean(),
+        createSharedEntry: z.boolean(),
+        createSparkCluster: z.boolean(),
+        createTrinoCluster: z.boolean(),
+        limitedView: z.boolean(),
+        view: z.boolean(),
+        update: z.boolean(),
+        copy: z.boolean(),
+        move: z.boolean(),
+        delete: z.boolean(),
+    })
+    .describe('Collection permissions');
+
 const schema = collectionModel.schema
     .extend({
-        permissions: z
-            .object({
-                listAccessBindings: z.boolean(),
-                updateAccessBindings: z.boolean(),
-                createCollection: z.boolean(),
-                createWorkbook: z.boolean(),
-                limitedView: z.boolean(),
-                view: z.boolean(),
-                update: z.boolean(),
-                copy: z.boolean(),
-                move: z.boolean(),
-                delete: z.boolean(),
-            })
-            .optional(),
+        permissions: collectionPermissionsSchema.optional(),
     })
     .describe('Collection instance');
 

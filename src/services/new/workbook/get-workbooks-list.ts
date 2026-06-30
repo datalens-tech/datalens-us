@@ -1,6 +1,8 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE, US_ERRORS} from '../../../const';
+import {
+    AccessServicePermissionDeniedError,
+    CollectionNotExistsError,
+} from '../../../components/errors';
+import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE, OrderBy} from '../../../const';
 import {CollectionModel} from '../../../db/models/new/collection';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {CollectionPermission} from '../../../entities/collection';
@@ -12,8 +14,6 @@ import {getReplica} from '../utils';
 
 export type OrderField = 'title' | 'createdAt' | 'updatedAt';
 
-export type OrderDirection = 'asc' | 'desc';
-
 export interface GetWorkbookListArgs {
     collectionId: Nullable<string>;
     includePermissionsInfo?: boolean;
@@ -21,7 +21,7 @@ export interface GetWorkbookListArgs {
     page?: number;
     pageSize?: number;
     orderField?: OrderField;
-    orderDirection?: OrderDirection;
+    orderDirection?: OrderBy;
     onlyMy?: boolean;
 }
 
@@ -36,7 +36,7 @@ export const getWorkbooksList = async (
         page = DEFAULT_PAGE,
         pageSize = DEFAULT_PAGE_SIZE,
         orderField = 'title',
-        orderDirection = 'asc',
+        orderDirection = OrderBy.Asc,
         onlyMy = false,
     } = args;
 
@@ -77,9 +77,7 @@ export const getWorkbooksList = async (
         });
 
         if (parents.length === 0) {
-            throw new AppError(US_ERRORS.COLLECTION_NOT_EXISTS, {
-                code: US_ERRORS.COLLECTION_NOT_EXISTS,
-            });
+            throw new CollectionNotExistsError();
         }
 
         if (accessServiceEnabled && !skipCheckPermissions) {
@@ -147,9 +145,7 @@ export const getWorkbooksList = async (
 
                         return workbook;
                     } catch (error) {
-                        const err = error as AppError;
-
-                        if (err.code === US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED) {
+                        if (error instanceof AccessServicePermissionDeniedError) {
                             return null;
                         }
 

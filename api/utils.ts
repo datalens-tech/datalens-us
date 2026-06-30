@@ -20,3 +20,5 @@ export {getEnvCert, getEnvVariable, getEnvTokenVariable, isTrueArg} from '../src
 export {createPaginator, PaginationResult, PaginatorConfig} from '../src/utils/cursor-pagination';
 
 export {swapKeysAndValues} from '../src/utils/swap-object';
+
+export {checkMigrations} from '../src/db/scripts/utils';

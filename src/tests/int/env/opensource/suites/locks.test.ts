@@ -1,9 +1,14 @@
 import request from 'supertest';
 
+import {
+    EntryIsLockedError,
+    LockDurationIsLimitedError,
+    LockTokenRequiredError,
+} from '../../../../../components/errors';
 import {testUserLogin} from '../../../constants';
 import {LOCK_DEFAULT_FIELDS} from '../../../models';
 import {routes} from '../../../routes';
-import {US_ERRORS, app, auth} from '../auth';
+import {app, auth} from '../auth';
 import {createMockWorkbook, createMockWorkbookEntry} from '../helpers';
 import {OpensourceRole} from '../roles';
 
@@ -195,7 +200,7 @@ describe('Locks', () => {
             testLockToken = body1.lockToken;
 
             expect(body2).toStrictEqual({
-                code: US_ERRORS.ENTRY_IS_LOCKED,
+                code: EntryIsLockedError.code,
                 details: {
                     expiryDate: expect.any(String),
                     loginOrId: expect.any(String),
@@ -207,7 +212,7 @@ describe('Locks', () => {
             testLockToken = body2.lockToken;
 
             expect(body1).toStrictEqual({
-                code: US_ERRORS.ENTRY_IS_LOCKED,
+                code: EntryIsLockedError.code,
                 details: {
                     expiryDate: expect.any(String),
                     loginOrId: expect.any(String),
@@ -241,7 +246,7 @@ describe('Locks', () => {
         const {body: body2} = response2;
 
         expect(body1).not.toStrictEqual({
-            code: US_ERRORS.ENTRY_IS_LOCKED,
+            code: EntryIsLockedError.code,
             details: {
                 expiryDate: expect.any(String),
                 loginOrId: expect.any(String),
@@ -250,7 +255,7 @@ describe('Locks', () => {
         });
 
         expect(body2).not.toStrictEqual({
-            code: US_ERRORS.ENTRY_IS_LOCKED,
+            code: EntryIsLockedError.code,
             details: {
                 expiryDate: expect.any(String),
                 loginOrId: expect.any(String),
@@ -315,7 +320,7 @@ describe('Locks - edge cases', () => {
             {role: OpensourceRole.Editor},
         ).expect(400);
 
-        expect(body.code).toBe(US_ERRORS.LOCK_TOKEN_REQUIRED);
+        expect(body.code).toBe(LockTokenRequiredError.code);
 
         await auth(request(app).get(`${routes.locks}/${edgeEntryId}`)).expect(200);
     });
@@ -327,7 +332,7 @@ describe('Locks - edge cases', () => {
             .send({duration, lockToken: 'wrong-token'})
             .expect(400);
 
-        expect(body.code).toBe(US_ERRORS.LOCK_TOKEN_REQUIRED);
+        expect(body.code).toBe(LockTokenRequiredError.code);
     });
 
     test('Force lock overwrites existing lock and returns new token', async () => {
@@ -348,7 +353,7 @@ describe('Locks - edge cases', () => {
             .send({duration: 600001})
             .expect(400);
 
-        expect(body.code).toBe(US_ERRORS.DURATION_IS_LIMITED);
+        expect(body.code).toBe(LockDurationIsLimitedError.code);
     });
 
     test('Extend with duration exceeding max returns 400', async () => {
@@ -358,6 +363,6 @@ describe('Locks - edge cases', () => {
             .send({duration: 600001, lockToken: edgeLockToken})
             .expect(400);
 
-        expect(body.code).toBe(US_ERRORS.DURATION_IS_LIMITED);
+        expect(body.code).toBe(LockDurationIsLimitedError.code);
     });
 });

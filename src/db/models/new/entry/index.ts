@@ -7,7 +7,7 @@ import {RevisionModel} from '../revision';
 import {Tenant, TenantColumn} from '../tenant';
 import {WorkbookModel} from '../workbook';
 
-import {EntryScope} from './types';
+import {EntryInnerMeta, EntryScope} from './types';
 
 export const EntryColumn = {
     Scope: 'scope',
@@ -142,7 +142,7 @@ export class Entry extends Model {
     [EntryColumn.Scope]!: EntryScope;
     [EntryColumn.Type]!: string;
     [EntryColumn.Key]!: Nullable<string>;
-    [EntryColumn.InnerMeta]!: Nullable<Record<string, unknown>>;
+    [EntryColumn.InnerMeta]!: Nullable<EntryInnerMeta>;
     [EntryColumn.CreatedBy]!: string;
     [EntryColumn.CreatedAt]!: string;
     [EntryColumn.UpdatedBy]!: string;
@@ -158,7 +158,7 @@ export class Entry extends Model {
     [EntryColumn.Name]!: Nullable<string>;
     [EntryColumn.SortName]!: ArrayBuffer;
     [EntryColumn.Public]!: boolean;
-    [EntryColumn.UnversionedData]!: Record<string, unknown>;
+    [EntryColumn.UnversionedData]!: Record<string, unknown> | null;
     [EntryColumn.WorkbookId]!: Nullable<string>;
     [EntryColumn.Mirrored]!: boolean;
     [EntryColumn.CollectionId]!: Nullable<string>;

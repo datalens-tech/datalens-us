@@ -6,7 +6,8 @@ export type EntryScope =
     | 'connection'
     | 'widget'
     | 'config'
-    | 'report';
+    | 'report'
+    | 'compute';
 
 export type EntryInnerMeta = {
     oldKey: string;

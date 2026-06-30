@@ -3,7 +3,7 @@ ARG UBUNTU_VERSION=24.04
 # use native build platform for build js files only once
 FROM --platform=${BUILDPLATFORM} ubuntu:${UBUNTU_VERSION} AS native-build-stage
 
-ARG NODE_MAJOR=22
+ARG NODE_MAJOR=24
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -14,7 +14,7 @@ RUN mkdir -p /etc/apt/keyrings && \
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
 
-RUN apt-get update && apt-get -y install nodejs g++ make 
+RUN apt-get update && apt-get -y install nodejs g++ make
 RUN npm i -g pnpm@10.17.1
 
 RUN useradd -m -u 1001 app && mkdir /opt/app && chown app:app /opt/app
@@ -35,7 +35,7 @@ RUN pnpm run build && chown app /opt/app/dist/run
 # runtime base image for both platform
 FROM ubuntu:${UBUNTU_VERSION} AS base-stage
 
-ARG NODE_MAJOR=22
+ARG NODE_MAJOR=24
 
 ENV DEBIAN_FRONTEND=noninteractive
 

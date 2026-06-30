@@ -1,6 +1,4 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {US_ERRORS} from '../../../const/errors';
+import {EntryIsLockedError} from '../../../components/errors';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 
@@ -18,8 +16,7 @@ export const checkLock = async ({ctx, trx}: ServiceArgs, {entryId, lockToken}: C
     const lock = await pullActiveLock({entryId, trx});
 
     if (lock && lock.lockToken !== lockToken) {
-        throw new AppError(US_ERRORS.ENTRY_IS_LOCKED, {
-            code: US_ERRORS.ENTRY_IS_LOCKED,
+        throw new EntryIsLockedError({
             details: {
                 entryId: Utils.encodeId(entryId),
                 loginOrId: lock.login,

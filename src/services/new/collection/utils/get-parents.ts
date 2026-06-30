@@ -5,7 +5,6 @@ import {CollectionModel, CollectionModelColumn} from '../../../../db/models/new/
 import {Entry as EntryModel} from '../../../../db/models/new/entry';
 import {WorkbookModel} from '../../../../db/models/new/workbook';
 import {CollectionInstance} from '../../../../registry/plugins/common/entities/collection/types';
-import {SharedEntryInstance} from '../../../../registry/plugins/common/entities/shared-entry/types';
 import {WorkbookInstance} from '../../../../registry/plugins/common/entities/workbook/types';
 import {ServiceArgs} from '../../types';
 import {getReplica} from '../../utils';
@@ -195,15 +194,15 @@ export const makeCollectionsWithParentsMap = async (
     return collectionsWithParentsMap;
 };
 
-export const makeSharedEntriesWithParentsMap = async (
+export const makeCollectionEntriesWithParentsMap = async (
     {trx, ctx}: ServiceArgs,
     {
         models,
     }: {
         models: EntryModel[];
     },
-): Promise<Map<SharedEntryInstance, string[]>> => {
-    const sharedEntriesWithParentsMap = new Map<SharedEntryInstance, string[]>();
+): Promise<Map<EntryModel, string[]>> => {
+    const entriesWithParentsMap = new Map<EntryModel, string[]>();
     const collectionIds = models.map((item) => item.collectionId).filter((item) => Boolean(item));
 
     const parents = await getParents({
@@ -214,18 +213,11 @@ export const makeSharedEntriesWithParentsMap = async (
 
     const parentsMap = makeParentsMap(parents);
 
-    const registry = ctx.get('registry');
-    const {SharedEntry} = registry.common.classes.get();
-
     models.forEach((model) => {
-        const collectionId = model.collectionId;
+        const parentsForEntry = getParentsIdsFromMap(model.collectionId, parentsMap);
 
-        const parentsForSharedEntry = getParentsIdsFromMap(collectionId, parentsMap);
-
-        const sharedEntry = new SharedEntry({ctx, model});
-
-        sharedEntriesWithParentsMap.set(sharedEntry, parentsForSharedEntry);
+        entriesWithParentsMap.set(model, parentsForEntry);
     });
 
-    return sharedEntriesWithParentsMap;
+    return entriesWithParentsMap;
 };

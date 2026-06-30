@@ -1,10 +1,13 @@
-import {AppError} from '@gravity-ui/nodekit';
 import moment from 'moment';
 import {DBError, raw} from 'objection';
 import PG_ERRORS from 'pg-error-constants';
 
+import {
+    EntryIsLockedError,
+    EntryLockForceConflictError,
+    LockDurationIsLimitedError,
+} from '../../../components/errors';
 import {CURRENT_TIMESTAMP} from '../../../const';
-import {US_ERRORS} from '../../../const/errors';
 import {Lock, LockColumn} from '../../../db/models/new/lock';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
@@ -29,9 +32,7 @@ export const lockEntry = async (
     ctx.log('LOCK_ENTRY_REQUEST', {tenantId, entryId, duration, dlContext});
 
     if (duration > MAX_LOCK_DURATION) {
-        throw new AppError(`The max duration is ${MAX_LOCK_DURATION}`, {
-            code: US_ERRORS.DURATION_IS_LIMITED,
-        });
+        throw new LockDurationIsLimitedError({message: `The max duration is ${MAX_LOCK_DURATION}`});
     }
 
     if (!isPrivateRoute) {
@@ -84,13 +85,10 @@ export const lockEntry = async (
                     .timeout(Lock.DEFAULT_QUERY_TIMEOUT);
 
                 if (!result) {
-                    throw new AppError(US_ERRORS.ENTRY_LOCK_FORCE_CONFLICT, {
-                        code: US_ERRORS.ENTRY_LOCK_FORCE_CONFLICT,
-                    });
+                    throw new EntryLockForceConflictError();
                 }
             } else if (lockedEntry) {
-                throw new AppError(US_ERRORS.ENTRY_IS_LOCKED, {
-                    code: US_ERRORS.ENTRY_IS_LOCKED,
+                throw new EntryIsLockedError({
                     details: {
                         loginOrId: lockedEntry.login,
                         expiryDate: lockedEntry.expiryDate,

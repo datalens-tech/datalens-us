@@ -10,11 +10,13 @@ export {
 } from '../src/services/entry/actions/get-related-entries';
 
 export {getCollection} from '../src/services/new/collection/get-collection';
+export {getCollectionsListByIds} from '../src/services/new/collection/get-collections-list-by-ids';
+export {getWorkbooksListByIds} from '../src/services/new/workbook/get-workbooks-list-by-ids';
 export {
     getParentIds,
     makeWorkbooksWithParentsMap,
     makeCollectionsWithParentsMap,
-    makeSharedEntriesWithParentsMap,
+    makeCollectionEntriesWithParentsMap,
 } from '../src/services/new/collection/utils/get-parents';
 
 export {
@@ -37,6 +39,7 @@ export {
     GetEntryByKeyData,
     getLegacyEntryRevisions,
     copyToWorkbook,
+    ReturnMetaColumnsEntry,
 } from '../src/services/entry';
 
 export {default as EntryService} from '../src/services/entry.service';
@@ -55,26 +58,27 @@ export {
     PartialEntry,
 } from '../src/services/new/entry/types';
 export {getEntriesByKeyPattern} from '../src/services/entry';
-export {
-    formatGetEntryByKeyResponse,
-    formatEntryModel,
-    formatJoinedEntryRevisionModel,
-} from '../src/services/new/entry/formatters';
+export {formatGetEntryByKeyResponse} from '../src/services/new/entry/formatters';
 
 export {
     filterEntriesByPermission,
+    checkEntryByPermission,
     checkEntriesByPermission,
     checkWorkbookEntriesByPermission,
     checkFolderEntriesByPermission,
     checkCollectionEntriesByPermission,
 } from '../src/services/new/entry/utils';
+export {getSharedEntriesWithPermissions} from '../src/services/new/entry/get-shared-entries-with-permissions';
+export {mapSharedEntryPermissions} from '../src/services/new/entry/collection-entry/permission-mappers';
 export {
-    mapCollectionEntryPermissions,
-    mapReadOnlyCollectionEntryPermissions,
-    getReadOnlyCollectionEntryPermissions,
-    getMinimumReadOnlyCollectionEntryPermissions,
-} from '../src/services/new/entry/utils/check-collection-entry-permission/map-collection-entry-permissions';
-export {checkSharedEntryPermission} from '../src/services/new/entry/utils/check-collection-entry-permission/check-permission';
+    mapReadOnlySharedEntryPermissions,
+    getReadOnlySharedEntryPermissions,
+    getMinimumReadOnlySharedEntryPermissions,
+} from '../src/services/new/entry/shared-entry/permission-mappers';
+export {checkCollectionEntryPermission} from '../src/services/new/entry/collection-entry/check-permission';
+export {bulkFetchCollectionEntryPermissions} from '../src/services/new/entry/collection-entry/utils';
+export {checkSharedEntryPermission} from '../src/services/new/entry/check-shared-entry-permission';
+export {deleteCollectionEntries} from '../src/services/new/entry/delete-collection-entries';
 export {deleteSharedEntries} from '../src/services/new/entry/delete-shared-entries';
 
 export {

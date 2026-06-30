@@ -55,7 +55,7 @@ export const RETURN_COLUMNS = [
     'collectionId',
     'revisions.version',
     'revisions.sourceVersion',
-];
+] as const;
 
 export const RETURN_META_COLUMNS = [
     'entries.entryId',
@@ -68,7 +68,7 @@ export const RETURN_META_COLUMNS = [
     'tenantId',
     'workbookId',
     'collectionId',
-];
+] as const;
 
 export const RETURN_RELATION_COLUMNS = [
     'entries.entryId',
@@ -99,7 +99,7 @@ export const RETURN_NAVIGATION_COLUMNS = [
     'hidden',
     'entries.workbookId',
     'entries.collectionId',
-];
+] as const;
 
 export const RETURN_FAVORITES_COLUMNS = [
     'favorites.alias',

@@ -20,6 +20,8 @@ export const COLLECTIONS_DEFAULT_PERMISSIONS: Permissions = {
     createCollection: false,
     createWorkbook: false,
     createSharedEntry: false,
+    createSparkCluster: false,
+    createTrinoCluster: false,
     limitedView: false,
     view: false,
     update: false,

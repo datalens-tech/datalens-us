@@ -42,6 +42,11 @@ export const initSwagger = ({
         description: [installationText, envText, descriptionText].join('<br />'),
         transformOperation,
         skipMount: true,
+        swaggerUi: {
+            swaggerOptions: {
+                persistAuthorization: true,
+            },
+        },
     });
 
     return openApiRegistry;

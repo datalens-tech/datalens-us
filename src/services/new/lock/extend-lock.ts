@@ -1,8 +1,11 @@
-import {AppError} from '@gravity-ui/nodekit';
 import moment from 'moment';
 import {transaction} from 'objection';
 
-import {US_ERRORS} from '../../../const/errors';
+import {
+    LockDurationIsLimitedError,
+    LockTokenRequiredError,
+    NotExistLockedEntryError,
+} from '../../../components/errors';
 import {Lock, LockColumn} from '../../../db/models/new/lock';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
@@ -32,15 +35,11 @@ export const extendLock = async (
     });
 
     if (duration > MAX_LOCK_DURATION) {
-        throw new AppError(`The max duration is ${MAX_LOCK_DURATION}`, {
-            code: US_ERRORS.DURATION_IS_LIMITED,
-        });
+        throw new LockDurationIsLimitedError({message: `The max duration is ${MAX_LOCK_DURATION}`});
     }
 
     if (!force && !lockToken) {
-        throw new AppError(US_ERRORS.LOCK_TOKEN_REQUIRED, {
-            code: US_ERRORS.LOCK_TOKEN_REQUIRED,
-        });
+        throw new LockTokenRequiredError();
     }
 
     if (!isPrivateRoute) {
@@ -52,15 +51,11 @@ export const extendLock = async (
         const lockedEntry = await pullActiveLock({entryId, trx});
 
         if (!lockedEntry) {
-            throw new AppError(US_ERRORS.NOT_EXIST_LOCKED_ENTRY, {
-                code: US_ERRORS.NOT_EXIST_LOCKED_ENTRY,
-            });
+            throw new NotExistLockedEntryError();
         }
 
         if (lockToken && lockedEntry.lockToken !== lockToken) {
-            throw new AppError(US_ERRORS.LOCK_TOKEN_REQUIRED, {
-                code: US_ERRORS.LOCK_TOKEN_REQUIRED,
-            });
+            throw new LockTokenRequiredError();
         }
 
         return Lock.query(trx)

@@ -1,5 +1,4 @@
-import {AppError} from '@gravity-ui/nodekit';
-
+import {NotExistEntryError} from '../../../components/errors';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {zc} from '../../../components/zod';
 import {
@@ -8,38 +7,24 @@ import {
     OrderBy,
     RETURN_COLUMNS,
     RETURN_NAVIGATION_COLUMNS,
-    US_ERRORS,
 } from '../../../const';
 import Entry from '../../../db/models/entry';
-import {EntryScope} from '../../../db/models/new/entry/types';
 import {RevisionModel, RevisionModelColumn} from '../../../db/models/new/revision';
-import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {CTX, DlsActions} from '../../../types/models';
 import Utils from '../../../utils';
 import {createPaginator} from '../../../utils/cursor-pagination';
-import {checkSharedEntryPermission} from '../../new/entry/utils/check-collection-entry-permission/check-permission';
+import {
+    CollectionEntryPermissions,
+    checkCollectionEntryPermission,
+} from '../../new/entry/collection-entry';
 import {ServiceArgs} from '../../new/types';
 import {getWorkbook} from '../../new/workbook';
+import {ReturnNavigationColumnsEntry} from '../types';
 
 import {checkEntry} from './check-entry';
 
-export type EntryRevisionNavItem = {
-    entryId: string;
-    scope: EntryScope;
-    type: string;
-    key: string;
-    meta: Record<string, unknown> | null;
-    createdBy: string;
-    createdAt: string;
-    updatedBy: string;
-    updatedAt: string;
-    annotation: Record<string, unknown> | null;
-    savedId: string | null;
-    publishedId: string | null;
+export type EntryRevisionNavItem = ReturnNavigationColumnsEntry & {
     revId: string;
-    hidden: boolean;
-    workbookId: string | null;
-    collectionId: string | null;
 };
 
 export type GetEntryRevisionsResult = {
@@ -82,9 +67,7 @@ export async function getEntryRevisions(
         .timeout(DEFAULT_QUERY_TIMEOUT);
 
     if (!entry) {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
 
     if (!isPrivateRoute) {
@@ -95,9 +78,9 @@ export async function getEntryRevisions(
         if (entry.workbookId) {
             await getWorkbook({ctx}, {workbookId: entry.workbookId});
         } else if (entry.collectionId) {
-            await checkSharedEntryPermission(
+            await checkCollectionEntryPermission(
                 {ctx},
-                {entry, permission: SharedEntryPermission.View},
+                {entry, permission: CollectionEntryPermissions.Read},
             );
         } else if (ctx.config.dlsEnabled) {
             await DLS.checkPermission({ctx}, {entryId, action: DlsActions.Read});
@@ -178,9 +161,7 @@ export async function getLegacyEntryRevisions(ctx: CTX, {entryId}: GetLegacyEntr
         .timeout(DEFAULT_QUERY_TIMEOUT);
 
     if (!entryRevisions.length) {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
 
     ctx.log('GET_LEGACY_REVISIONS_SUCCESS');

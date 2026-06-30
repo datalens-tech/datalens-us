@@ -7,6 +7,7 @@ export enum EntryScope {
     Config = 'config',
     Pdf = 'pdf',
     Report = 'report',
+    Compute = 'compute',
 }
 
 // "type" is a string field and value can be any string, this enum is only used for checks in code
@@ -16,3 +17,9 @@ export enum EntryType {
     YaDocs = 'yadocs',
     // types can be added as needed
 }
+
+export type EntryInnerMeta = {
+    oldKey?: string;
+    oldDisplayKey?: string;
+    [key: string]: unknown;
+};

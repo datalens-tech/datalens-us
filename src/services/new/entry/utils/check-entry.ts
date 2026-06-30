@@ -1,7 +1,7 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {TransactionOrKnex} from 'objection';
 
-import {DEFAULT_QUERY_TIMEOUT, US_ERRORS} from '../../../../const';
+import {NotExistEntryError} from '../../../../components/errors';
+import {DEFAULT_QUERY_TIMEOUT} from '../../../../const';
 import {Entry} from '../../../../db/models/new/entry';
 import {CTX} from '../../../../types/models';
 
@@ -13,9 +13,7 @@ export const checkEntry = async (ctx: CTX, entryId: string, trx: TransactionOrKn
     const entry = await Entry.query(trx).findById(entryId).first().timeout(DEFAULT_QUERY_TIMEOUT);
 
     if (!entry) {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
 
     await checkFetchedEntry(

@@ -3,6 +3,7 @@ import {registry} from '../../index';
 import {DLS} from './components/dls/dls';
 import {checkOrganizationPermission} from './components/iam/utils';
 import {Collection} from './entities/collection/collection';
+import {CollectionEntry} from './entities/collection-entry/collection-entry';
 import {SharedEntry} from './entities/shared-entry/shared-entry';
 import {Workbook} from './entities/workbook/workbook';
 import {checkColorPalettesAdmin} from './utils/color-palettes/utils';
@@ -26,6 +27,7 @@ export const setupCommonPlugin = () => {
         Workbook,
         Collection,
         SharedEntry,
+        CollectionEntry,
     });
 
     registry.common.functions.register({

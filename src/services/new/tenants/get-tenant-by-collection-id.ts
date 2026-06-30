@@ -1,6 +1,4 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {US_ERRORS} from '../../../const';
+import {NotExistEntryError} from '../../../components/errors';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {Tenant, TenantColumn} from '../../../db/models/new/tenant';
 import {ServiceArgs} from '../types';
@@ -36,9 +34,7 @@ export const getTenantByCollectionId = async (
         .timeout(Tenant.DEFAULT_QUERY_TIMEOUT);
 
     if (!tenant) {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
 
     ctx.log('GET_TENANT_BY_COLLECTION_ID_SUCCESS');

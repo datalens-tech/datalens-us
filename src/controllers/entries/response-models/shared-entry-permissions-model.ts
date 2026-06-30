@@ -13,6 +13,7 @@ const schema = z
         delete: z.boolean(),
         createEntryBinding: z.boolean(),
         createLimitedEntryBinding: z.boolean(),
+        securityApprove: z.boolean(),
     })
     .describe('Shared entry permissions model');
 
@@ -28,6 +29,7 @@ const format = (data: Permissions): z.infer<typeof schema> => {
         delete: data.delete,
         createEntryBinding: data.createEntryBinding,
         createLimitedEntryBinding: data.createLimitedEntryBinding,
+        securityApprove: data.securityApprove,
     };
 };
 

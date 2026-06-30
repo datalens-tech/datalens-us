@@ -7,14 +7,14 @@ import {
 
 const requestSchema = z.object({
     collectionId: z.string(),
-    scope: zc.sharedEntryScope(),
+    scope: zc.collectionEntryScope(),
     name: zc.entityName(),
     type: z.string().optional(),
     links: z.record(z.string(), z.string()).optional(),
     hidden: z.boolean().optional(),
     mirrored: z.boolean().optional(),
     mode: z.enum(['save', 'publish']).optional(),
-    unversionedData: zc.limitedObject({limit: MAX_UNVERSIONED_DATA_OBJECT_SYMBOLS}).optional(),
+    unversionedData: zc.limitedObject({limit: MAX_UNVERSIONED_DATA_OBJECT_SYMBOLS}).nullish(),
     meta: zc.limitedObject({limit: MAX_META_OBJECT_SYMBOLS}).nullable().optional(),
     data: z.record(z.string(), z.unknown()).nullable().optional(),
     includePermissionsInfo: z.boolean().optional(),

@@ -1,14 +1,13 @@
-import {AppError} from '@gravity-ui/nodekit';
-
+import {NotExistEntryError} from '../../../../components/errors';
 import {zc} from '../../../../components/zod';
-import {OrderBy, US_ERRORS} from '../../../../const';
+import {OrderBy} from '../../../../const';
 import {Entry, EntryColumn} from '../../../../db/models/new/entry';
 import {EntryScope} from '../../../../db/models/new/entry/types';
 import Utils from '../../../../utils';
 import {createPaginator} from '../../../../utils/cursor-pagination';
 import {ServiceArgs} from '../../types';
 import {getReplica} from '../../utils';
-import {EntryWithPermissions} from '../types';
+import {EntryFullPermissions, EntryWithPermissions} from '../types';
 import {
     checkCollectionEntriesByPermission,
     checkFolderEntriesByPermission,
@@ -27,7 +26,10 @@ export type GetEntriesRelationsArgs = {
     pageToken?: string;
 };
 
-export type EntryRelationWithPermissions = EntryWithPermissions<EntryRelation>;
+export type EntryRelationWithPermissions = EntryWithPermissions<
+    EntryRelation,
+    EntryFullPermissions
+>;
 
 export type GetEntriesRelationsResult = {
     relations: EntryRelationWithPermissions[];
@@ -74,10 +76,7 @@ export const getEntriesRelations = async (
         const foundEntryIds = entriesData.map(({entryId}) => entryId);
         const missingEntryIds = entryIds.filter((id) => !foundEntryIds.includes(id));
 
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-            details: {missingEntryIds},
-        });
+        throw new NotExistEntryError({details: {missingEntryIds}});
     }
 
     const paginator = createPaginator({

@@ -11,9 +11,9 @@ const requestSchema = {
     query: z.object({
         collectionId: zc.encodedId().optional(),
         includePermissionsInfo: zc.stringBoolean().optional(),
-        filterString: z.string().optional(),
+        filterString: z.string().max(200).optional(),
         orderField: z.enum(['title', 'createdAt', 'updatedAt']).optional(),
-        orderDirection: z.enum(['asc', 'desc']).optional(),
+        orderDirection: zc.orderDirection().optional(),
         onlyMy: zc.stringBoolean().optional(),
         page: zc.stringNumber({min: 0}).optional(),
         pageSize: zc.stringNumber({min: 1, max: 1000}).optional(),

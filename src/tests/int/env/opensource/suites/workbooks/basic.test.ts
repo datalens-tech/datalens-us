@@ -1,9 +1,10 @@
 import request from 'supertest';
 
+import {EntryIsLockedError} from '../../../../../../components/errors';
 import {testUserId} from '../../../../constants';
 import {OPERATION_DEFAULT_FIELDS, WORKBOOK_DEFAULT_FIELDS} from '../../../../models';
 import {routes} from '../../../../routes';
-import {US_ERRORS, app, auth, testTenantId} from '../../auth';
+import {app, auth, testTenantId} from '../../auth';
 import {createMockWorkbook, createMockWorkbookEntry} from '../../helpers';
 import {OpensourceRole} from '../../roles';
 
@@ -266,6 +267,7 @@ describe('Entries in workboooks managment', () => {
 
         const responseEntry1 = await auth(request(app).post(routes.entries), {
             role: OpensourceRole.Editor,
+            component: 'backend',
         })
             .send({
                 scope: 'dataset',
@@ -308,6 +310,7 @@ describe('Entries in workboooks managment', () => {
 
         const responseEntry2 = await auth(request(app).post(routes.entries), {
             role: OpensourceRole.Editor,
+            component: 'backend',
         })
             .send({
                 scope: 'dataset',
@@ -523,7 +526,7 @@ describe('Workbook delete with locked entries', () => {
             role: OpensourceRole.Editor,
         }).expect(423);
 
-        expect(body.code).toBe(US_ERRORS.ENTRY_IS_LOCKED);
+        expect(body.code).toBe(EntryIsLockedError.code);
     });
 
     test('Delete workbook succeeds after the locked entry is unlocked', async () => {

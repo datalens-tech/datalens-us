@@ -7,6 +7,8 @@ import {DBError} from 'db-errors';
 
 import {US_ERRORS} from '../const/errors';
 
+import {PresentableError} from './errors';
+
 const PG_ERRORS = require('pg-error-constants');
 
 function getDBErrorCode(error: DBError): string {
@@ -14,8 +16,18 @@ function getDBErrorCode(error: DBError): string {
     return nativeError?.code || '';
 }
 
+function getApiErrorMessage(message: string, code: string, defaultMessage?: string) {
+    const returningDefaultMessage = defaultMessage || message;
+
+    return message === code ? returningDefaultMessage : message;
+}
+
 // eslint-disable-next-line complexity
 export default (error: AppError | DBError) => {
+    if (error instanceof PresentableError) {
+        return error.present();
+    }
+
     if (error instanceof DBError) {
         const dbCode = getDBErrorCode(error);
         switch (dbCode) {
@@ -46,28 +58,16 @@ export default (error: AppError | DBError) => {
         }
     }
 
-    const {code, message, details, debug} = error as AppError;
+    const {code, message, details} = error as AppError;
 
     switch (code) {
-        case US_ERRORS.DURATION_IS_LIMITED:
-        case US_ERRORS.LOCK_TOKEN_REQUIRED: {
-            return {
-                code: 400,
-                response: {
-                    code,
-                    message,
-                },
-            };
-        }
-
-        case US_ERRORS.ENTRY_IS_NOT_IN_WORKBOOK:
-        case US_ERRORS.PARENT_FOLDER_NOT_EXIST:
         case US_ERRORS.MODE_NOT_ALLOWED:
         case US_ERRORS.DECODE_ID_FAILED:
         case US_ERRORS.VALIDATION_ERROR:
-        case US_ERRORS.ENTRIES_REQUIRE_COLLECTION_ID:
-        case US_ERRORS.SHARED_ENTRY_REQUIRE_COLLECTION_ID:
-        case US_ERRORS.INCORRECT_LINK_ERROR: {
+        case US_ERRORS.COMPUTE_ENTRIES_FEATURE_DISABLED:
+        case US_ERRORS.COMPUTE_ENTRY_INVALID_TYPE:
+        case US_ERRORS.COMPUTE_ENTRY_TYPE_CHANGE_FORBIDDEN:
+        case US_ERRORS.TENANT_IS_BEING_DELETED: {
             return {
                 code: 400,
                 response: {
@@ -77,17 +77,6 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.ENTRIES_WITH_INSUFFICIENT_PERMISSIONS: {
-            return {
-                code: 403,
-                response: {
-                    code,
-                    message:
-                        "You can't do this action because of you don't have enough permissions for some entries",
-                },
-            };
-        }
-
         case US_ERRORS.DLS_FORBIDDEN: {
             return {
                 code: 403,
@@ -107,16 +96,6 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.NOT_EXIST_LOCKED_ENTRY: {
-            return {
-                code: 404,
-                response: {
-                    code,
-                    message: "The entity isn't locked",
-                },
-            };
-        }
-
         case US_ERRORS.NOT_EXIST_DRAFT: {
             return {
                 code: 404,
@@ -142,26 +121,6 @@ export default (error: AppError | DBError) => {
                 response: {
                     code,
                     message: "A template with this name doesn't exist",
-                },
-            };
-        }
-
-        case US_ERRORS.NOT_EXIST_DELETED_ENTRY:
-        case US_ERRORS.NOT_EXIST_ENTRY: {
-            return {
-                code: 404,
-                response: {
-                    code,
-                    message: "The entity doesn't exist",
-                },
-            };
-        }
-        case US_ERRORS.FOLDER_COPY_DENIED: {
-            return {
-                code: 403,
-                response: {
-                    code,
-                    message: 'Folders cannot be copied',
                 },
             };
         }
@@ -205,91 +164,12 @@ export default (error: AppError | DBError) => {
             };
         }
 
-        case US_ERRORS.ENTRY_ALREADY_EXISTS: {
-            return {
-                code: 409,
-                response: {
-                    code,
-                    message: 'The entry already exists',
-                    details,
-                },
-            };
-        }
-        case US_ERRORS.ENTRY_IS_LOCKED: {
-            return {
-                code: 423,
-                response: {
-                    code,
-                    message: 'The entry is locked',
-                    details,
-                    debug,
-                },
-            };
-        }
-        case US_ERRORS.ENTRY_LOCK_FORCE_CONFLICT: {
-            return {
-                code: 409,
-                response: {
-                    code,
-                    message: 'Conflict occurred while setting a forced lock',
-                    details,
-                },
-            };
-        }
-
-        case US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED: {
-            return {
-                code: 403,
-                response: {
-                    message: 'Auth denied',
-                    code,
-                },
-            };
-        }
-
         case US_ERRORS.WORKBOOK_TEMPLATE_NOT_EXISTS: {
             return {
                 code: 404,
                 response: {
                     code,
                     message: "The workbook template doesn't exist",
-                },
-            };
-        }
-        case US_ERRORS.ENTRY_WITHOUT_WORKBOOK_ID_COPY_DENIED: {
-            return {
-                code: 403,
-                response: {
-                    code,
-                    message: 'Entry without workbookId, cannot be copied to workbook',
-                },
-            };
-        }
-        case US_ERRORS.ENTRIES_WITH_DIFFERENT_WORKBOOK_IDS_COPY_DENIED: {
-            return {
-                code: 403,
-                response: {
-                    code,
-                    message: 'Entry with different workbookIds, cannot be copy denied',
-                },
-            };
-        }
-
-        case US_ERRORS.COLLECTION_ALREADY_EXISTS: {
-            return {
-                code: 409,
-                response: {
-                    code,
-                    message: 'The collection already exists',
-                },
-            };
-        }
-        case US_ERRORS.COLLECTION_CIRCULAR_REFERENCE_ERROR: {
-            return {
-                code: 409,
-                response: {
-                    code,
-                    message: message ?? 'Circular reference error between collections',
                 },
             };
         }
@@ -302,21 +182,13 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.COLLECTION_NOT_EXISTS: {
-            return {
-                code: 404,
-                response: {
-                    code,
-                    message: "The collection doesn't exist",
-                },
-            };
-        }
         case US_ERRORS.WORKBOOK_NOT_EXISTS: {
             return {
                 code: 404,
                 response: {
                     code,
-                    message: "The workbook doesn't exist",
+                    message: getApiErrorMessage(message, code, "The workbook doesn't exist"),
+                    details,
                 },
             };
         }
@@ -340,8 +212,6 @@ export default (error: AppError | DBError) => {
             };
         }
 
-        case US_ERRORS.ENTRY_AND_WORKBOOK_TENANT_MISMATCH:
-        case US_ERRORS.ENTRY_AND_COLLECTION_TENANT_MISMATCH:
         case US_ERRORS.TOO_MANY_COLOR_PALETTES: {
             return {
                 code: 500,
@@ -358,25 +228,6 @@ export default (error: AppError | DBError) => {
                 response: {
                     code,
                     message: "The pallete doesn't exist",
-                },
-            };
-        }
-
-        case US_ERRORS.MODIFY_USERS_FOLDER_DENIED: {
-            return {
-                code: 403,
-                response: {
-                    code,
-                    message,
-                },
-            };
-        }
-        case US_ERRORS.CIRCULAR_REFERENCE_ERROR: {
-            return {
-                code: 409,
-                response: {
-                    code,
-                    message: 'Circular reference error',
                 },
             };
         }
@@ -417,15 +268,6 @@ export default (error: AppError | DBError) => {
                 },
             };
         }
-        case US_ERRORS.COLLECTION_WITH_WORKBOOK_TEMPLATE_CANT_BE_DELETED: {
-            return {
-                code: 403,
-                response: {
-                    code,
-                    message: "Collection with workbook template can't be deleted",
-                },
-            };
-        }
 
         case US_ERRORS.TENANT_ID_MISSING_IN_CONTEXT: {
             return {
@@ -454,16 +296,6 @@ export default (error: AppError | DBError) => {
                 response: {
                     code,
                     message: "The favorite doesn't exist",
-                },
-            };
-        }
-
-        case US_ERRORS.INVALID_PAGE_TOKEN: {
-            return {
-                code: 400,
-                response: {
-                    code,
-                    message,
                 },
             };
         }

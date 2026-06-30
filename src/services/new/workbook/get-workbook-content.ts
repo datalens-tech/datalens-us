@@ -1,4 +1,5 @@
-import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE} from '../../../const';
+import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE, OrderBy} from '../../../const';
+import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import {JoinedEntryRevisionFavorite} from '../../../db/presentations';
 import {UsPermission} from '../../../types/models';
@@ -20,7 +21,7 @@ export interface GetWorkbookContentArgs {
     };
     orderBy?: {
         field: 'name' | 'createdAt';
-        direction: 'asc' | 'desc';
+        direction: OrderBy;
     };
     scope?: EntryScope | EntryScope[];
 }
@@ -71,7 +72,7 @@ export const getWorkbookContent = async (
                     : {
                           'entries.tenantId': tenantId,
                       }),
-                workbookId: workbookId,
+                [`${Entry.tableName}.${EntryColumn.WorkbookId}`]: workbookId,
                 isDeleted: false,
             });
 

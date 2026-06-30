@@ -17,7 +17,6 @@ export const TenantColumn = {
     BillingStartedAt: 'billingStartedAt',
     BillingEndedAt: 'billingEndedAt',
     TrialEndedAt: 'trialEndedAt',
-    TrialWithoutBilling: 'trialWithoutBilling',
     BillingInstanceServiceUpdatedAt: 'billingInstanceServiceUpdatedAt',
     BillingDiscount: 'billingDiscount',
     Branding: 'branding',
@@ -52,7 +51,6 @@ export class Tenant extends Model {
     [TenantColumn.BillingStartedAt]!: Nullable<string>;
     [TenantColumn.BillingEndedAt]!: Nullable<string>;
     [TenantColumn.TrialEndedAt]!: Nullable<string>;
-    [TenantColumn.TrialWithoutBilling]!: Nullable<boolean>;
     [TenantColumn.BillingInstanceServiceUpdatedAt]!: Nullable<string>;
     [TenantColumn.BillingDiscount]!: Nullable<number>;
     [TenantColumn.Branding]!: Record<string, unknown>;

@@ -3,7 +3,7 @@ import {copyEntriesToWorkbookController} from './copy-entries-to-workbook';
 import {copyEntryToWorkbookController} from './copy-entry-to-workbook';
 import {createEntryController} from './create-entry';
 import {deleteEntryController} from './delete-entry';
-import {getEntriesController} from './get-entries';
+import {getEntriesController, getEntriesV2Controller} from './get-entries';
 import {getEntriesAnnotationController} from './get-entries-annotation';
 import {getEntriesDataController} from './get-entries-data';
 import {getEntriesMetaController} from './get-entries-meta';
@@ -30,6 +30,7 @@ export default {
     updateEntryUnversionedDataPrivateController,
     createEntryController,
     getEntriesController,
+    getEntriesV2Controller,
     getEntryController,
     getEntriesRelationsController,
     switchRevisionEntryController,

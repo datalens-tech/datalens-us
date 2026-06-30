@@ -1,7 +1,6 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {US_ERRORS} from '../../../const';
+import {CollectionAlreadyExistsError, CollectionNotExistsError} from '../../../components/errors';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {Operation} from '../../../entities/types';
 import Utils from '../../../utils';
@@ -53,12 +52,9 @@ export const createCollection = async (
         parentIds = await getParentIds({ctx, trx: targetTrx, collectionId: parentId});
 
         if (parentIds.length === 0) {
-            throw new AppError(
-                `Cannot find parent collection with id – ${Utils.encodeId(parentId)}`,
-                {
-                    code: US_ERRORS.COLLECTION_NOT_EXISTS,
-                },
-            );
+            throw new CollectionNotExistsError({
+                message: `Cannot find parent collection with id – ${Utils.encodeId(parentId)}`,
+            });
         }
     }
 
@@ -76,8 +72,8 @@ export const createCollection = async (
     );
 
     if (checkCollectionByTitleResult === true) {
-        throw new AppError(`Collection with title "${title}" already exists in this scope`, {
-            code: US_ERRORS.COLLECTION_ALREADY_EXISTS,
+        throw new CollectionAlreadyExistsError({
+            message: `Collection with title "${title}" already exists in this scope`,
         });
     }
 

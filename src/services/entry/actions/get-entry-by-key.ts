@@ -1,8 +1,8 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {Optional as OptionalFields} from 'utility-types';
 
+import {NotExistEntryError} from '../../../components/errors';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {DEFAULT_QUERY_TIMEOUT, RETURN_COLUMNS, US_ERRORS} from '../../../const';
+import {DEFAULT_QUERY_TIMEOUT, RETURN_COLUMNS} from '../../../const';
 import Entry from '../../../db/models/entry';
 import {CTX, DlsActions, RevisionColumns} from '../../../types/models';
 import Utils from '../../../utils';
@@ -81,7 +81,7 @@ export async function getEntryByKey(
     const keyLowerCase = key && key.toLowerCase();
 
     const entry = (await Entry.query(Entry.replica)
-        .select(includeLinks ? RETURN_COLUMNS.concat('links') : RETURN_COLUMNS)
+        .select(includeLinks ? [...RETURN_COLUMNS, 'links'] : RETURN_COLUMNS)
         .join('revisions', (qb) => {
             if (revId) {
                 qb.on('entries.entryId', 'revisions.entryId');
@@ -107,9 +107,7 @@ export async function getEntryByKey(
         Pick<RevisionColumns, 'meta'>;
 
     if (!customErrorBypassEnabled && !entry) {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
 
     if (entry) {

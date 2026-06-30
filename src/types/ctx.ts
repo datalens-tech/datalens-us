@@ -1,3 +1,5 @@
+import {EntryScope} from '../db/models/new/entry/types';
+
 import {PrivatePermissions} from './models';
 
 export interface UserCtxInfo {
@@ -17,4 +19,5 @@ export interface CtxInfo {
     onlyPublic: boolean;
     onlyMirrored?: boolean;
     privatePermissions: PrivatePermissions;
+    privateRestrictions?: {allowedEntryScopes: EntryScope[]};
 }

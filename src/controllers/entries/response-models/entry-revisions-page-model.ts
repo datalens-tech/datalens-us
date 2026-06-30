@@ -1,26 +1,13 @@
 import {z} from '../../../components/zod';
-import {EntryScope} from '../../../db/models/new/entry/types';
 import type {EntryRevisionNavItem, GetEntryRevisionsResult} from '../../../services/entry';
 import Utils from '../../../utils';
 
+import {navigationEntryModel} from './navigation-entry-model';
+
 const revisionItemSchema = z
     .object({
-        entryId: z.string(),
-        scope: z.enum(EntryScope),
-        type: z.string(),
-        key: z.string().nullable(),
-        meta: z.record(z.string(), z.unknown()).nullable(),
-        createdBy: z.string(),
-        createdAt: z.string(),
-        updatedBy: z.string(),
-        updatedAt: z.string(),
-        annotation: z.record(z.string(), z.unknown()).nullable(),
-        savedId: z.string().nullable(),
-        publishedId: z.string().nullable(),
+        ...navigationEntryModel.schema.shape,
         revId: z.string(),
-        hidden: z.boolean(),
-        workbookId: z.string().nullable(),
-        collectionId: z.string().nullable(),
     })
     .describe('Entry revision navigation item');
 
@@ -33,22 +20,8 @@ const schema = z
 
 const formatItem = (item: EntryRevisionNavItem): z.infer<typeof revisionItemSchema> => {
     return {
-        entryId: Utils.encodeId(item.entryId),
-        scope: item.scope,
-        type: item.type,
-        key: item.key,
-        meta: item.meta,
-        createdBy: item.createdBy,
-        createdAt: item.createdAt,
-        updatedBy: item.updatedBy,
-        updatedAt: item.updatedAt,
-        annotation: item.annotation,
-        savedId: item.savedId ? Utils.encodeId(item.savedId) : null,
-        publishedId: item.publishedId ? Utils.encodeId(item.publishedId) : null,
+        ...navigationEntryModel.format(item),
         revId: Utils.encodeId(item.revId),
-        hidden: item.hidden,
-        workbookId: item.workbookId ? Utils.encodeId(item.workbookId) : null,
-        collectionId: item.collectionId ? Utils.encodeId(item.collectionId) : null,
     };
 };
 

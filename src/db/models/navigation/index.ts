@@ -1,11 +1,15 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
+import {z} from 'zod';
 
 import {Model} from '../..';
-import {RETURN_NAVIGATION_COLUMNS, US_ERRORS} from '../../../const';
+import {zc} from '../../../components/zod';
+import {OrderBy, RETURN_NAVIGATION_COLUMNS, US_ERRORS} from '../../../const';
 import {filterEntriesByPermission} from '../../../services/new/entry/utils';
 import * as MT from '../../../types/models';
 import Utils from '../../../utils';
+import {SortFieldConfig, createPaginator} from '../../../utils/cursor-pagination';
+import {EntryColumn} from '../new/entry';
 import {Favorite} from '../new/favorite';
 import Revision from '../revision';
 
@@ -52,13 +56,15 @@ class Navigation extends Model {
             tenantId,
             ids,
             scope,
-            type,
+            types,
             createdBy,
             metaFilters,
             filters,
             orderBy,
+            paginationMode,
             page = 0,
             pageSize = 100,
+            pageToken,
             requestedBy,
             includePermissionsInfo,
             ignoreWorkbookEntries,
@@ -74,13 +80,15 @@ class Navigation extends Model {
             tenantId,
             ids,
             scope,
-            type,
+            types,
             createdBy,
             metaFilters,
             filters,
             orderBy,
             page,
             pageSize,
+            pageToken,
+            paginationMode,
             requestedBy,
             includePermissionsInfo,
             ignoreWorkbookEntries,
@@ -93,7 +101,7 @@ class Navigation extends Model {
         const {user} = ctx.get('info');
 
         const returnColumnNames = includeLinks
-            ? RETURN_NAVIGATION_COLUMNS.concat('links')
+            ? [...RETURN_NAVIGATION_COLUMNS, 'links']
             : RETURN_NAVIGATION_COLUMNS;
         const selectColumnNames = [
             ...returnColumnNames,
@@ -107,7 +115,7 @@ class Navigation extends Model {
             selectColumnNames.push('data');
         }
 
-        const entries = await Navigation.query(this.replica)
+        const baseQuery = Navigation.query(this.replica)
             .select(selectColumnNames)
             .join('revisions', 'entries.savedId', 'revisions.revId')
             .leftJoin('workbooks', 'workbooks.workbookId', 'entries.workbookId')
@@ -134,8 +142,8 @@ class Navigation extends Model {
                         builder.where('entries.entryId', ids);
                     }
                 }
-                if (type) {
-                    builder.where('type', type);
+                if (types?.length) {
+                    builder.whereIn(EntryColumn.Type, types);
                 }
                 if (createdBy) {
                     builder.whereIn(
@@ -165,28 +173,83 @@ class Navigation extends Model {
                     );
                 }
             })
-            .modify((builder) => {
-                if (orderBy) {
-                    switch (orderBy.field) {
-                        case 'createdAt':
-                            builder.orderBy('entries.createdAt', orderBy.direction);
-                            builder.orderBy('entries.entryId');
-                            break;
-                        case 'name':
-                            builder.orderBy('sortName', orderBy.direction);
-                            break;
-                    }
-                }
-            })
-            .limit(pageSize)
-            .offset(pageSize * page)
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);
 
-        const nextPageToken = Utils.getOptimisticNextPageToken({
-            page,
-            pageSize,
-            curPage: entries,
-        });
+        let entries: NavigationFields[];
+        let nextPageToken: string | undefined;
+
+        if (paginationMode === 'cursor') {
+            let sortFields: SortFieldConfig[] = [];
+            if (orderBy) {
+                const direction = orderBy.direction;
+
+                switch (orderBy.field) {
+                    case 'createdAt':
+                        sortFields = [
+                            {
+                                field: `${Navigation.tableName}.${EntryColumn.CreatedAt}`,
+                                direction,
+                                validate: zc.stringSqlTimestampz(),
+                            },
+                        ];
+                        break;
+                    case 'name':
+                        sortFields = [
+                            {
+                                field: `${Navigation.tableName}.${EntryColumn.SortName}`,
+                                direction,
+                                validate: z.string(),
+                            },
+                        ];
+                        break;
+                }
+            }
+
+            const paginator = createPaginator({
+                sortFields,
+                tiebreakerField: {
+                    field: `${Navigation.tableName}.${EntryColumn.EntryId}`,
+                    direction: OrderBy.Asc,
+                    validate: zc.stringBigInt(),
+                },
+                limit: pageSize,
+                pageToken,
+            });
+
+            const paginationResult = await paginator.execute(baseQuery);
+            entries = paginationResult.result;
+            nextPageToken = paginationResult.nextPageToken;
+        } else {
+            entries = await baseQuery
+                .modify((builder) => {
+                    if (orderBy) {
+                        switch (orderBy.field) {
+                            case 'createdAt':
+                                builder.orderBy(
+                                    `${Navigation.tableName}.${EntryColumn.CreatedAt}`,
+                                    orderBy.direction,
+                                );
+                                break;
+                            case 'name':
+                                builder.orderBy(
+                                    `${Navigation.tableName}.${EntryColumn.SortName}`,
+                                    orderBy.direction,
+                                );
+                                break;
+                        }
+                    }
+
+                    builder.orderBy(`${Navigation.tableName}.${EntryColumn.EntryId}`);
+                })
+                .limit(pageSize)
+                .offset(pageSize * page);
+
+            nextPageToken = Utils.getOptimisticNextPageToken({
+                page,
+                pageSize,
+                curPage: entries,
+            });
+        }
 
         let entriesWithPermissionsOnly = await filterEntriesByPermission<NavigationFields>(
             {ctx},
@@ -211,14 +274,12 @@ class Navigation extends Model {
             return data;
         } else {
             const result = entriesWithPermissionsOnly.map((entry) => {
-                const {isLocked, entryId, scope, type} = entry;
-
-                if (isLocked) {
+                if (entry.isLocked) {
                     return {
-                        isLocked,
-                        entryId,
-                        scope,
-                        type,
+                        isLocked: entry.isLocked,
+                        entryId: entry.entryId,
+                        scope: entry.scope,
+                        type: entry.type,
                     };
                 } else {
                     return entry;

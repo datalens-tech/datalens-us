@@ -16,6 +16,8 @@ export enum CollectionPermission {
     CreateCollection = 'createCollection',
     CreateWorkbook = 'createWorkbook',
     CreateSharedEntry = 'createSharedEntry',
+    CreateSparkCluster = 'createSparkCluster',
+    CreateTrinoCluster = 'createTrinoCluster',
     LimitedView = 'limitedView',
     View = 'view',
     Update = 'update',

@@ -1,13 +1,13 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {US_ERRORS} from '../../../const';
+import {NotExistEntryError} from '../../../components/errors';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {EntryScope} from '../../../db/models/new/entry/types';
-import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {UsPermissions} from '../../../types/models';
 import Utils from '../../../utils';
+import {
+    CollectionEntryPermissions,
+    checkCollectionEntryPermission,
+} from '../../new/entry/collection-entry';
 import {EntryWithPermissions} from '../../new/entry/types';
-import {checkSharedEntryPermission} from '../../new/entry/utils/check-collection-entry-permission/check-permission';
 import {
     checkCollectionEntriesByPermission,
     checkFolderEntriesByPermission,
@@ -70,9 +70,7 @@ export async function getEntryRelations(
         .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
     if (!entry) {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
 
     const relatedEntries = await getRelatedEntries(
@@ -137,12 +135,15 @@ export async function getEntryRelations(
 
         relations = [...workbookRelations, ...sharedEntriesRelations];
     } else if (entry.collectionId) {
-        await checkSharedEntryPermission({ctx}, {entry, permission: SharedEntryPermission.View});
+        await checkCollectionEntryPermission(
+            {ctx},
+            {entry, permission: CollectionEntryPermissions.Read},
+        );
 
         const workbookRelations = await checkWorkbookEntriesByPermission(
             {ctx},
             {
-                entries: relations.filter((item) => item.workbookId === entry.workbookId),
+                entries: relations.filter((item) => item.workbookId),
                 includePermissionsInfo,
                 permission: UsPermissions.Execute,
             },

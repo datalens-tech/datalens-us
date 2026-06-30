@@ -1,5 +1,6 @@
 import {raw} from 'objection';
 
+import {OrderBy} from '../../../const';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import {Favorite, FavoriteColumn} from '../../../db/models/new/favorite';
@@ -12,7 +13,7 @@ import {getReplica} from '../utils';
 interface GetFavoritesArgs {
     orderBy?: {
         field: 'name' | 'createdAt';
-        direction: 'asc' | 'desc';
+        direction: OrderBy;
     };
     filters?: {
         name?: string;

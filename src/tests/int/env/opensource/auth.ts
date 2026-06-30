@@ -1,7 +1,7 @@
 import request from 'supertest';
 
 import {UserRole} from '../../../../components/auth/constants/role';
-import {AUTHORIZATION_HEADER, DL_AUTH_HEADER_KEY} from '../../../../const';
+import {AUTHORIZATION_HEADER, DL_AUTH_HEADER_KEY, DL_COMPONENT_HEADER} from '../../../../const';
 import type {CommonAuthArgs} from '../../auth';
 import {testUserId, testUserLogin} from '../../constants';
 
@@ -11,6 +11,7 @@ export {US_ERRORS, app, appConfig, testTenantId, authPrivateRoute, appNodekit} f
 
 export type AuthArgs = CommonAuthArgs & {
     role?: OpensourceRole;
+    component?: string | null;
 };
 
 export type AuthToken = {
@@ -20,7 +21,12 @@ export type AuthToken = {
 };
 
 export const auth = (req: request.Test, args: AuthArgs = {}) => {
-    const {userId = testUserId, login = testUserLogin, role = OpensourceRole.Viewer} = args;
+    const {
+        userId = testUserId,
+        login = testUserLogin,
+        role = OpensourceRole.Viewer,
+        component,
+    } = args;
 
     let roles: `${UserRole}`[] = [];
 
@@ -43,6 +49,9 @@ export const auth = (req: request.Test, args: AuthArgs = {}) => {
     };
 
     req.set(AUTHORIZATION_HEADER, `${DL_AUTH_HEADER_KEY} ${JSON.stringify(authToken)}`);
+    if (component) {
+        req.set(DL_COMPONENT_HEADER, component);
+    }
 
     return req;
 };

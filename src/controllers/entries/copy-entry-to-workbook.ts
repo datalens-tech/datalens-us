@@ -1,11 +1,34 @@
-import {AppRouteHandler} from '@gravity-ui/expresskit';
+import {withContract} from '@gravity-ui/expresskit';
 
-import {prepareResponseAsync} from '../../components/response-presenter';
+import {ApiTag} from '../../components/api-docs';
+import {z, zc} from '../../components/zod';
 import {LogEventType} from '../../registry/plugins/common/utils/log-event/types';
 import {copyEntryToWorkbook} from '../../services/new/entry';
-import {formatEntryModel} from '../../services/new/entry/formatters';
 
-export const copyEntryToWorkbookController: AppRouteHandler = async (req, res) => {
+import {copyEntryToWorkbookModel} from './response-models/copy-entry-to-workbook-model';
+
+export const copyEntryToWorkbookController = withContract({
+    operationId: 'copyEntryToWorkbook',
+    summary: 'Copy entry to workbook',
+    tags: [ApiTag.Entries],
+    request: {
+        params: z.object({
+            entryId: zc.encodedId(),
+        }),
+        body: z.object({
+            workbookId: zc.encodedId().optional(),
+            name: zc.entityName().optional(),
+        }),
+    },
+    response: {
+        content: {
+            200: {
+                schema: copyEntryToWorkbookModel.schema,
+                description: copyEntryToWorkbookModel.schema.description,
+            },
+        },
+    },
+})(async (req, res) => {
     const {params, body} = req;
 
     const registry = req.ctx.get('registry');
@@ -30,10 +53,7 @@ export const copyEntryToWorkbookController: AppRouteHandler = async (req, res) =
             reqParams: logEventReqParams,
         });
 
-        const formattedResponse = formatEntryModel(result);
-
-        const {code, response} = await prepareResponseAsync({data: formattedResponse});
-        res.status(code).send(response);
+        res.sendTyped(200, copyEntryToWorkbookModel.format(result));
     } catch (error) {
         await logEvent({
             type: LogEventType.CopyEntryToWorkbookFail,
@@ -44,4 +64,6 @@ export const copyEntryToWorkbookController: AppRouteHandler = async (req, res) =
 
         throw error;
     }
-};
+});
+
+copyEntryToWorkbookController.manualDecodeId = true;

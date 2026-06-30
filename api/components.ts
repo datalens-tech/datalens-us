@@ -19,7 +19,10 @@ export {default as prepareErrorResponse} from '../src/components/error-response-
 export {isEnabledFeature, Feature} from '../src/components/features';
 export type {FeaturesConfig} from '../src/components/features/types';
 
-export {resolvePrivatePermissions} from '../src/components/private-permissions';
+export {
+    resolvePrivatePermissions,
+    filterUnversionedData,
+} from '../src/components/private-permissions';
 
 export {
     registerApiRoute,

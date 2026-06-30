@@ -5,12 +5,20 @@ import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/col
 import {EntryColumn, Entry as EntryModel} from '../../../db/models/new/entry';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {CollectionPermission} from '../../../entities/collection';
-import {SharedEntryPermission} from '../../../entities/shared-entry';
+import {CollectionEntryPermissions} from '../../../entities/collection-entry';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {CollectionInstance} from '../../../registry/plugins/common/entities/collection/types';
-import {SharedEntryInstance} from '../../../registry/plugins/common/entities/shared-entry/types';
+import {
+    isCollectionEntryInstance,
+    isWorkbookInstance,
+} from '../../../registry/plugins/common/entities/structure-item/types';
 import {WorkbookInstance} from '../../../registry/plugins/common/entities/workbook/types';
 import Utils, {makeUserId} from '../../../utils';
+import {
+    CollectionEntryInstance,
+    bulkFetchCollectionEntryPermissions,
+    createCollectionEntry,
+} from '../entry/collection-entry';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 
@@ -199,7 +207,7 @@ export const processPermissions = async ({
 }: ProcessPermissionsArgs) => {
     const {accessServiceEnabled} = ctx.config;
     const registry = ctx.get('registry');
-    const {Workbook, Collection, SharedEntry} = registry.common.classes.get();
+    const {Workbook, Collection} = registry.common.classes.get();
 
     if (accessServiceEnabled && !skipCheckPermissions) {
         const itemsWithPermissions = await bulkFetchStructureItemsAllPermissions(
@@ -208,9 +216,9 @@ export const processPermissions = async ({
         );
 
         return itemsWithPermissions.filter((item) => {
-            if (isSharedEntryModel(item.model)) {
-                return item.permissions?.[SharedEntryPermission.View] === true;
-            } else if (isWorkbookModel(item.model)) {
+            if (isCollectionEntryInstance(item)) {
+                return item.hasPermission(CollectionEntryPermissions.Read);
+            } else if (isWorkbookInstance(item)) {
                 return item.permissions?.[WorkbookPermission.LimitedView] === true;
             } else {
                 return (
@@ -220,9 +228,9 @@ export const processPermissions = async ({
         });
     } else {
         return models.map((model: WorkbookModel | CollectionModel | EntryModel) => {
-            let item: WorkbookInstance | CollectionInstance | SharedEntryInstance;
-            if (isSharedEntryModel(model)) {
-                item = new SharedEntry({ctx, model});
+            let item: WorkbookInstance | CollectionInstance | CollectionEntryInstance;
+            if (isEntryModel(model)) {
+                item = createCollectionEntry(ctx, model);
             } else if (isWorkbookModel(model)) {
                 item = new Workbook({ctx, model});
             } else {
@@ -238,15 +246,13 @@ export const processPermissions = async ({
     }
 };
 
-function isSharedEntryModel(
-    model: CollectionModel | WorkbookModel | EntryModel,
-): model is EntryModel {
+function isEntryModel(model: CollectionModel | WorkbookModel | EntryModel): model is EntryModel {
     return 'entryId' in model && Boolean(model.entryId);
 }
 function isWorkbookModel(
     model: CollectionModel | WorkbookModel | EntryModel,
 ): model is WorkbookModel {
-    return !isSharedEntryModel(model) && 'workbookId' in model && Boolean(model.workbookId);
+    return !isEntryModel(model) && 'workbookId' in model && Boolean(model.workbookId);
 }
 
 async function bulkFetchStructureItemsAllPermissions(
@@ -258,14 +264,14 @@ async function bulkFetchStructureItemsAllPermissions(
     }
 
     const registry = ctx.get('registry');
-    const {Workbook, Collection, SharedEntry} = registry.common.classes.get();
+    const {Workbook, Collection} = registry.common.classes.get();
 
     const collectionItems: {model: CollectionModel; parentIds: string[]}[] = [];
     const workbookItems: {model: WorkbookModel; parentIds: string[]}[] = [];
-    const sharedEntryItems: {model: EntryModel; parentIds: string[]}[] = [];
+    const entryItems: {model: EntryModel; parentIds: string[]}[] = [];
     items.forEach(({model, parentIds}) => {
-        if (isSharedEntryModel(model)) {
-            sharedEntryItems.push({model, parentIds});
+        if (isEntryModel(model)) {
+            entryItems.push({model, parentIds});
         } else if (isWorkbookModel(model)) {
             workbookItems.push({model, parentIds});
         } else {
@@ -273,16 +279,15 @@ async function bulkFetchStructureItemsAllPermissions(
         }
     });
 
-    const [collectionsWithPermissions, workbooksWithPermissions, sharedEntrysWithPermissions] =
-        await Promise.all([
-            Collection.bulkFetchAllPermissions(ctx, collectionItems),
-            Workbook.bulkFetchAllPermissions(ctx, workbookItems),
-            SharedEntry.bulkFetchAllPermissions(ctx, sharedEntryItems),
-        ]);
+    const [collectionsWithPermissions, workbooksWithPermissions, entriesMap] = await Promise.all([
+        Collection.bulkFetchAllPermissions(ctx, collectionItems),
+        Workbook.bulkFetchAllPermissions(ctx, workbookItems),
+        bulkFetchCollectionEntryPermissions({ctx}, entryItems),
+    ]);
 
     const collectionsById: {[collectionId: string]: CollectionInstance} = {};
     const workbooksById: {[workbookId: string]: WorkbookInstance} = {};
-    const sharedEntriesById: {[entryId: string]: SharedEntryInstance} = {};
+    const entriesById: {[entryId: string]: CollectionEntryInstance} = {};
 
     collectionsWithPermissions.forEach((item) => {
         collectionsById[item.model.collectionId] = item;
@@ -290,13 +295,13 @@ async function bulkFetchStructureItemsAllPermissions(
     workbooksWithPermissions.forEach((item) => {
         workbooksById[item.model.workbookId] = item;
     });
-    sharedEntrysWithPermissions.forEach((item) => {
-        sharedEntriesById[item.model.entryId] = item;
+    entriesMap.forEach((instance, entryId) => {
+        entriesById[entryId] = instance;
     });
 
     return items.map((item) => {
-        if (isSharedEntryModel(item.model)) {
-            return sharedEntriesById[item.model.entryId];
+        if (isEntryModel(item.model)) {
+            return entriesById[item.model.entryId];
         } else if (isWorkbookModel(item.model)) {
             return workbooksById[item.model.workbookId];
         } else {

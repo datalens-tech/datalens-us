@@ -213,7 +213,7 @@ export async function createEntryInWorkbook(
         });
 
         return await Entry.query(trx)
-            .select(RETURN_COLUMNS.concat('links'))
+            .select([...RETURN_COLUMNS, 'links'])
             .join('revisions', 'entries.entryId', 'revisions.entryId')
             .where({
                 'entries.entryId': entryId,

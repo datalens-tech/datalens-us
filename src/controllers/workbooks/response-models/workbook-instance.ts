@@ -3,22 +3,24 @@ import type {WorkbookInstance} from '../../../registry/plugins/common/entities/w
 
 import {workbookModel} from './workbook-model';
 
+export const workbookPermissionsSchema = z
+    .object({
+        listAccessBindings: z.boolean(),
+        updateAccessBindings: z.boolean(),
+        limitedView: z.boolean(),
+        view: z.boolean(),
+        update: z.boolean(),
+        copy: z.boolean(),
+        move: z.boolean(),
+        publish: z.boolean(),
+        embed: z.boolean(),
+        delete: z.boolean(),
+    })
+    .describe('Workbook permissions');
+
 const schema = workbookModel.schema
     .extend({
-        permissions: z
-            .object({
-                listAccessBindings: z.boolean(),
-                updateAccessBindings: z.boolean(),
-                limitedView: z.boolean(),
-                view: z.boolean(),
-                update: z.boolean(),
-                copy: z.boolean(),
-                move: z.boolean(),
-                publish: z.boolean(),
-                embed: z.boolean(),
-                delete: z.boolean(),
-            })
-            .optional(),
+        permissions: workbookPermissionsSchema.optional(),
     })
     .describe('Workbook instance');
 

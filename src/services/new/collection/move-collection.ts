@@ -1,8 +1,12 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
+import {
+    CollectionAlreadyExistsError,
+    CollectionCircularReferenceError,
+    CollectionNotExistsError,
+} from '../../../components/errors';
 import {OrganizationPermission} from '../../../components/iam';
-import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
+import {CURRENT_TIMESTAMP} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
 import {EXTRA_PERMISSIONS_ACTION} from '../../../registry/plugins/common/utils/extra-permissions/constants';
@@ -68,20 +72,17 @@ export const moveCollection = async (
         }
 
         if (newParentId === collectionId) {
-            throw new AppError('The collection cannot be a parent of itself', {
-                code: US_ERRORS.COLLECTION_CIRCULAR_REFERENCE_ERROR,
+            throw new CollectionCircularReferenceError({
+                message: 'The collection cannot be a parent of itself',
             });
         }
 
         if (newParentParentIds.includes(collectionId)) {
-            throw new AppError(
-                `The new parent collection ${Utils.encodeId(
+            throw new CollectionCircularReferenceError({
+                message: `The new parent collection ${Utils.encodeId(
                     newParentId,
                 )} is a child of the current one – ${Utils.encodeId(collectionId)}`,
-                {
-                    code: US_ERRORS.COLLECTION_CIRCULAR_REFERENCE_ERROR,
-                },
-            );
+            });
         }
     }
 
@@ -137,9 +138,7 @@ export const moveCollection = async (
     );
 
     if (checkCollectionByTitleResult === true) {
-        throw new AppError(US_ERRORS.COLLECTION_ALREADY_EXISTS, {
-            code: US_ERRORS.COLLECTION_ALREADY_EXISTS,
-        });
+        throw new CollectionAlreadyExistsError();
     }
 
     const patchedCollection = await CollectionModel.query(targetTrx)
@@ -158,9 +157,7 @@ export const moveCollection = async (
         .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
 
     if (!patchedCollection) {
-        throw new AppError(US_ERRORS.COLLECTION_NOT_EXISTS, {
-            code: US_ERRORS.COLLECTION_NOT_EXISTS,
-        });
+        throw new CollectionNotExistsError();
     }
 
     ctx.log('MOVE_COLLECTION_FINISH', {

@@ -3,3 +3,4 @@ export * from './errors';
 export {US_ERRORS} from './errors';
 export * from './user';
 export * from './tenant';
+export * from './route-tags';

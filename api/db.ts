@@ -7,7 +7,7 @@ export {
     queryReplica,
 } from '../src/db';
 
-export {default as LegacyEntry} from '../src/db/models/entry';
+export {default as LegacyEntry, GetEntriesByKeyItem} from '../src/db/models/entry';
 export {default as LegacyRevision} from '../src/db/models/revision';
 export {default as LegacyNavigation} from '../src/db/models/navigation';
 export {default as LegacyTemplate} from '../src/db/models/template';

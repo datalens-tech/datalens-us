@@ -1,9 +1,9 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 import {z} from 'zod';
 
+import {EntriesRequireCollectionIdError} from '../../../components/errors';
 import {zc} from '../../../components/zod';
-import {OrderBy, US_ERRORS} from '../../../const';
+import {OrderBy} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
@@ -18,8 +18,6 @@ import {getReplica} from '../utils';
 import {getCollectionsQuery, getEntryQuery, getWorkbooksQuery, processPermissions} from './utils';
 
 export type OrderField = 'title' | 'createdAt' | 'updatedAt';
-
-export type OrderDirection = 'asc' | 'desc';
 
 export type Mode = 'all' | 'onlyCollections' | 'onlyWorkbooks' | 'onlyEntries';
 
@@ -51,13 +49,13 @@ export interface GetStructureItemsContentArgs {
     page?: string;
     pageSize?: number;
     orderField?: OrderField;
-    orderDirection?: OrderDirection;
+    orderDirection?: OrderBy;
     onlyMy?: boolean;
     mode?: Mode;
 }
 
 export const getStructureItems = async (
-    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions: skipCheckPermissionsArg = false}: ServiceArgs,
     args: GetStructureItemsContentArgs,
 ) => {
     const {
@@ -67,7 +65,7 @@ export const getStructureItems = async (
         page,
         pageSize = 100,
         orderField = 'title',
-        orderDirection = 'asc',
+        orderDirection = OrderBy.Asc,
         onlyMy = false,
         mode = 'all',
     } = args;
@@ -85,12 +83,19 @@ export const getStructureItems = async (
     });
 
     const {accessServiceEnabled} = ctx.config;
+    const {isAuditRoute} = ctx.get('info');
+    const skipCheckPermissions = skipCheckPermissionsArg || Boolean(isAuditRoute);
     const targetTrx = getReplica(trx);
 
     let parentIds: string[] = [];
     if (collectionId) {
         const collection = await getCollection(
-            {ctx, trx: targetTrx, skipValidation: true, skipCheckPermissions},
+            {
+                ctx,
+                trx: targetTrx,
+                skipValidation: true,
+                skipCheckPermissions,
+            },
             {collectionId},
         );
 
@@ -112,7 +117,7 @@ export const getStructureItems = async (
 
     const allParentIds = collectionId ? [collectionId, ...parentIds] : [];
     const queryArgs = {collectionId, filterString, onlyMy};
-    const direction = orderDirection === 'asc' ? OrderBy.Asc : OrderBy.Desc;
+    const direction = orderDirection;
     const paginatorBase = {limit: pageSize, pageToken: page};
     const sortFieldValidator = orderField === 'title' ? z.string() : zc.stringSqlTimestampz();
 
@@ -172,9 +177,7 @@ export const getStructureItems = async (
         nextPageToken = token;
     } else if (mode === 'onlyEntries') {
         if (!collectionId) {
-            throw new AppError('Collection ID is required for entries', {
-                code: US_ERRORS.ENTRIES_REQUIRE_COLLECTION_ID,
-            });
+            throw new EntriesRequireCollectionIdError();
         }
 
         const query = getEntryQuery({ctx, trx}, {...queryArgs, collectionId}).timeout(

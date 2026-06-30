@@ -1,10 +1,33 @@
-import {AppRouteHandler} from '@gravity-ui/expresskit';
+import {withContract} from '@gravity-ui/expresskit';
 
-import {prepareResponseAsync} from '../../components/response-presenter';
+import {ApiTag} from '../../components/api-docs';
+import {z, zc} from '../../components/zod';
 import {LogEventType} from '../../registry/plugins/common/utils/log-event/types';
 import {renameEntry} from '../../services/entry';
 
-export const renameEntryController: AppRouteHandler = async (req, res) => {
+import {renameEntryModel} from './response-models/rename-entry-model';
+
+export const renameEntryController = withContract({
+    operationId: 'renameEntry',
+    summary: 'Rename entry',
+    tags: [ApiTag.Entries],
+    request: {
+        params: z.object({
+            entryId: zc.encodedId(),
+        }),
+        body: z.object({
+            name: zc.entityName(),
+        }),
+    },
+    response: {
+        content: {
+            200: {
+                schema: renameEntryModel.schema,
+                description: renameEntryModel.schema.description,
+            },
+        },
+    },
+})(async (req, res) => {
     const {params, body} = req;
 
     const registry = req.ctx.get('registry');
@@ -13,10 +36,7 @@ export const renameEntryController: AppRouteHandler = async (req, res) => {
     const logEventReqParams = {entryId: params.entryId, name: body.name};
 
     try {
-        const result = await renameEntry(req.ctx, {
-            entryId: params.entryId,
-            name: body.name,
-        });
+        const result = await renameEntry(req.ctx, {entryId: params.entryId, name: body.name});
 
         await logEvent({
             type: LogEventType.RenameEntrySuccess,
@@ -25,9 +45,7 @@ export const renameEntryController: AppRouteHandler = async (req, res) => {
             reqParams: logEventReqParams,
         });
 
-        const {code, response} = await prepareResponseAsync({data: result});
-
-        res.status(code).send(response);
+        res.sendTyped(200, await renameEntryModel.format(result));
     } catch (error) {
         await logEvent({
             type: LogEventType.RenameEntryFail,
@@ -38,4 +56,6 @@ export const renameEntryController: AppRouteHandler = async (req, res) => {
 
         throw error;
     }
-};
+});
+
+renameEntryController.manualDecodeId = true;

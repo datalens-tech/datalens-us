@@ -1,7 +1,7 @@
-import {AppContext, AppError} from '@gravity-ui/nodekit';
+import {AppContext} from '@gravity-ui/nodekit';
 
+import {AccessServicePermissionDeniedError} from '../../../components/errors';
 import {OrganizationPermission} from '../../../components/iam';
-import {US_ERRORS} from '../../../const';
 import {ServiceArgs} from '../types';
 
 export const getRootCollectionPermissions = async ({ctx}: ServiceArgs) => {
@@ -40,8 +40,7 @@ async function checkCreateCollectionInRoot(ctx: AppContext) {
 
         return true;
     } catch (error: unknown) {
-        const err = error as AppError;
-        if (err.code === US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED) {
+        if (error instanceof AccessServicePermissionDeniedError) {
             return false;
         } else {
             throw error;
@@ -60,8 +59,7 @@ async function checkCreateWorkbookInRoot(ctx: AppContext) {
 
         return true;
     } catch (error: unknown) {
-        const err = error as AppError;
-        if (err.code === US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED) {
+        if (error instanceof AccessServicePermissionDeniedError) {
             return false;
         } else {
             throw error;

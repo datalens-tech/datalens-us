@@ -3,6 +3,7 @@ import type {HttpMethod} from '@gravity-ui/expresskit/dist/types';
 import type {NodeKit} from '@gravity-ui/nodekit';
 
 import {Feature} from './components/features';
+import {PrivateRouteTag} from './const';
 import collections from './controllers/collections';
 import colorPalettes from './controllers/color-palettes';
 import entries from './controllers/entries';
@@ -48,6 +49,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             handler: entries.getEntryController,
             authPolicy: AuthPolicy.disabled,
             private: true,
+            privateTags: [PrivateRouteTag.EntriesCrud],
         }),
 
         getEntryMeta: makeRoute({
@@ -71,6 +73,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             handler: entries.createEntryController,
             authPolicy: AuthPolicy.disabled,
             private: true,
+            privateTags: [PrivateRouteTag.EntriesCrud],
             write: true,
             requireCtxTenantId: true,
         }),
@@ -88,6 +91,7 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             handler: entries.updateEntryController,
             authPolicy: AuthPolicy.disabled,
             private: true,
+            privateTags: [PrivateRouteTag.EntriesCrud],
             write: true,
         }),
 
@@ -131,17 +135,29 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             handler: entries.deleteEntryController,
             authPolicy: AuthPolicy.disabled,
             private: true,
+            privateTags: [PrivateRouteTag.EntriesCrud],
             write: true,
         }),
 
         getEntries: makeRoute({
             route: 'GET /v1/entries',
             handler: entries.getEntriesController,
-            requireCtxTenantId: true,
         }),
         privateGetEntries: makeRoute({
             route: 'GET /private/entries',
             handler: entries.getEntriesController,
+            authPolicy: AuthPolicy.disabled,
+            private: true,
+            requireCtxTenantId: true,
+        }),
+
+        getEntriesV2: makeRoute({
+            route: 'POST /v1/get-entries',
+            handler: entries.getEntriesV2Controller,
+        }),
+        privateGetEntriesV2: makeRoute({
+            route: 'POST /private/v1/get-entries',
+            handler: entries.getEntriesV2Controller,
             authPolicy: AuthPolicy.disabled,
             private: true,
             requireCtxTenantId: true,

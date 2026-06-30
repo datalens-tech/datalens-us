@@ -5,7 +5,10 @@ export {default as helpers} from '../src/controllers/helpers';
 export {
     entryWithRevisionModel,
     entryPermissionsModel,
+    entryFullPermissionsModel,
     sharedEntryPermissionsModel,
+    entryModel,
+    entryMetaColumnsModel,
 } from '../src/controllers/entries/response-models';
 
 export {
@@ -29,11 +32,13 @@ export {
     resolveTenantController,
     requestSchema as resolveTenantRequestSchema,
 } from '../src/controllers/tenants/resolve-tenant';
-export {operation as operationModel} from '../src/controllers/response-models/operation';
+export {operation as operationModel, workbookIdModel} from '../src/controllers/response-models';
 export {
     workbookContentEntryModel,
-    workbookIdModel,
     workbookModel,
+    workbookModelArrayInObject,
+    workbookPermissionsSchema,
 } from '../src/controllers/workbooks/response-models';
+export {collectionPermissionsSchema} from '../src/controllers/collections/response-models';
 
 export {stateModel} from '../src/controllers/states/response-models/state-model';

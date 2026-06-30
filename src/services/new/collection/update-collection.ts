@@ -1,7 +1,7 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
-import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
+import {CollectionAlreadyExistsError, CollectionNotExistsError} from '../../../components/errors';
+import {CURRENT_TIMESTAMP} from '../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
 import Utils from '../../../utils';
@@ -84,9 +84,7 @@ export const updateCollection = async (
         );
 
         if (checkCollectionByTitleResult === true) {
-            throw new AppError(US_ERRORS.COLLECTION_ALREADY_EXISTS, {
-                code: US_ERRORS.COLLECTION_ALREADY_EXISTS,
-            });
+            throw new CollectionAlreadyExistsError();
         }
     }
 
@@ -106,9 +104,7 @@ export const updateCollection = async (
         .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
 
     if (!patchedCollection) {
-        throw new AppError(US_ERRORS.COLLECTION_NOT_EXISTS, {
-            code: US_ERRORS.COLLECTION_NOT_EXISTS,
-        });
+        throw new CollectionNotExistsError();
     }
 
     ctx.log('UPDATE_COLLECTION_FINISH', {

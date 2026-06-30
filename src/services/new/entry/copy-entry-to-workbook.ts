@@ -1,7 +1,7 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {EntryIsNotInWorkbookError, NotExistEntryError} from '../../../components/errors';
 import {BiTrackingLogs, US_ERRORS} from '../../../const';
 import OldEntry from '../../../db/models/entry';
 import {Entry} from '../../../db/models/new/entry';
@@ -15,23 +15,6 @@ import {checkWorkbookPermission} from '../../new/workbook/utils/check-workbook-p
 import {getPrimary} from '../utils';
 import {getWorkbook} from '../workbook';
 
-const validateCopyEntryToWorkbook = makeSchemaValidator({
-    type: 'object',
-    required: ['entryId'],
-    properties: {
-        entryId: {
-            type: 'string',
-        },
-        workbookId: {
-            type: 'string',
-        },
-        name: {
-            type: 'string',
-            verifyEntryName: true,
-        },
-    },
-});
-
 export type CopyEntryToWorkbookArgs = {
     entryId: string;
     workbookId?: string;
@@ -39,7 +22,7 @@ export type CopyEntryToWorkbookArgs = {
 };
 
 export const copyEntryToWorkbook = async (
-    {ctx, trx, skipValidation = false, skipCheckPermissions = false}: ServiceArgs,
+    {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: CopyEntryToWorkbookArgs,
 ) => {
     const {entryId, workbookId, name} = args;
@@ -61,10 +44,6 @@ export const copyEntryToWorkbook = async (
         copiedBy,
     });
 
-    if (!skipValidation) {
-        validateCopyEntryToWorkbook(args);
-    }
-
     const result = await transaction(getPrimary(trx), async (transactionTrx) => {
         const copingEntry = await Entry.query(transactionTrx)
             .where({
@@ -76,15 +55,11 @@ export const copyEntryToWorkbook = async (
             .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
         if (!copingEntry) {
-            throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-                code: US_ERRORS.NOT_EXIST_ENTRY,
-            });
+            throw new NotExistEntryError();
         }
 
         if (copingEntry.workbookId === null) {
-            throw new AppError(US_ERRORS.ENTRY_IS_NOT_IN_WORKBOOK, {
-                code: US_ERRORS.ENTRY_IS_NOT_IN_WORKBOOK,
-            });
+            throw new EntryIsNotInWorkbookError();
         }
 
         if (copingEntry.scope === EntryScope.Connection) {
