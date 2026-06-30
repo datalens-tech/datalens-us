@@ -8,13 +8,14 @@ import {getReplica} from '../utils';
 type GetWorkbooksListAndAllParentsArgs = {
     workbookIds: string[];
     includePermissionsInfo?: boolean;
+    skipPermissionsFilter?: boolean;
 };
 
 export const getWorkbooksListByIds = async (
     {ctx, trx, checkLicense, skipCheckPermissions = false}: ServiceArgs,
     args: GetWorkbooksListAndAllParentsArgs,
 ) => {
-    const {workbookIds, includePermissionsInfo = false} = args;
+    const {workbookIds, includePermissionsInfo = false, skipPermissionsFilter = false} = args;
 
     ctx.log('GET_WORKBOOKS_LIST_BY_IDS_STARTED', {
         workbookIds: await Utils.macrotasksMap(workbookIds, (id) => Utils.encodeId(id)),
@@ -69,9 +70,11 @@ export const getWorkbooksListByIds = async (
 
     let workbooks = await Workbook.bulkFetchAllPermissions(ctx, workbooksForBulk);
 
-    workbooks = workbooks.filter(
-        (workbook) => workbook.permissions?.[WorkbookPermission.LimitedView] === true,
-    );
+    if (!skipPermissionsFilter) {
+        workbooks = workbooks.filter(
+            (workbook) => workbook.permissions?.[WorkbookPermission.LimitedView] === true,
+        );
+    }
 
     if (!includePermissionsInfo) {
         workbooks = workbooks.map((workbook) => {

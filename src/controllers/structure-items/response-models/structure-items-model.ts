@@ -1,8 +1,8 @@
 import {z} from '../../../components/zod';
 import {CollectionInstance} from '../../../registry/plugins/common/entities/collection/types';
-import {SharedEntryInstance} from '../../../registry/plugins/common/entities/shared-entry/types';
+import {CollectionEntryInstance} from '../../../registry/plugins/common/entities/collection-entry/types';
 import {
-    isSharedEntryInstance,
+    isCollectionEntryInstance,
     isWorkbookInstance,
 } from '../../../registry/plugins/common/entities/structure-item/types';
 import {WorkbookInstance} from '../../../registry/plugins/common/entities/workbook/types';
@@ -10,14 +10,14 @@ import Utils from '../../../utils';
 import {collectionInstance} from '../../collections/response-models';
 import {workbookInstance} from '../../workbooks/response-models';
 
-import {sharedEntryInstance} from './structure-shared-entry-instance';
+import {collectionEntryInstance} from './structure-collection-entry-instance';
 
 const schema = z
     .object({
         items: collectionInstance.schema
             .extend({entity: z.literal('collection')})
             .or(workbookInstance.schema.extend({entity: z.literal('workbook')}))
-            .or(sharedEntryInstance.schema.extend({entity: z.literal('entry')}))
+            .or(collectionEntryInstance.schema.extend({entity: z.literal('entry')}))
             .array(),
         nextPageToken: z.string().nullable(),
     })
@@ -26,7 +26,7 @@ const schema = z
 export type StructureItemsModel = z.infer<typeof schema>;
 
 const format = async (data: {
-    items: (CollectionInstance | WorkbookInstance | SharedEntryInstance)[];
+    items: (CollectionInstance | WorkbookInstance | CollectionEntryInstance)[];
     nextPageToken: Nullable<string>;
     includePermissionsInfo?: boolean;
 }): Promise<StructureItemsModel> => {
@@ -34,11 +34,12 @@ const format = async (data: {
     return {
         items: await Utils.macrotasksMap(
             items,
-            (structureItem: CollectionInstance | WorkbookInstance | SharedEntryInstance) => {
-                if (isSharedEntryInstance(structureItem)) {
+            (structureItem: CollectionInstance | WorkbookInstance | CollectionEntryInstance) => {
+                if (isCollectionEntryInstance(structureItem)) {
                     return {
-                        ...sharedEntryInstance.format({
-                            sharedEntry: structureItem,
+                        ...collectionEntryInstance.format({
+                            model: structureItem.model,
+                            permissions: structureItem.permissions,
                             includePermissionsInfo,
                         }),
                         entity: 'entry' as const,

@@ -1,10 +1,23 @@
-import {SYSTEM_USER} from '../const';
+import {AppError} from '@gravity-ui/nodekit';
+
+import {Feature, isEnabledFeature} from '../components/features';
+import {SYSTEM_USER, US_ERRORS} from '../const';
 import Entry from '../db/models/entry';
 import {EntryScope} from '../db/models/new/entry/types';
+import {Operation} from '../entities/types';
+import {RevisionColumns, UsPermission} from '../types/models';
 import * as ST from '../types/services.types';
 
 import {createEntryInWorkbook} from './entry';
+import {EntryWithRevisionResult} from './entry/types';
 import {createEntryInCollection} from './new/entry/create-in-collection';
+import {checkPrivateScopeAccess} from './new/entry/utils';
+
+export type CreatedEntry = EntryWithRevisionResult & {
+    links?: RevisionColumns['links'];
+    permissions?: UsPermission;
+    operation?: Operation;
+};
 
 export default class EntryService {
     static async _getEntriesByKey({key, branch, ctx}: ST.PrivateGetEntriesByKey) {
@@ -49,7 +62,7 @@ export default class EntryService {
         version,
         sourceVersion,
         ctx,
-    }: ST.CreateEntry) {
+    }: ST.CreateEntry): Promise<CreatedEntry | CreatedEntry[]> {
         const {requestId, tenantId, user, dlContext, isPrivateRoute} = ctx.get('info');
 
         const registry = ctx.get('registry');
@@ -63,11 +76,21 @@ export default class EntryService {
                 features: checkTenantFeatures,
                 foldersEnabled: !workbookId && !collectionId,
             }),
-            ...(!isPrivateRoute ? [fetchAndValidateLicenseOrFail({ctx})] : []),
+            ...(isPrivateRoute ? [] : [fetchAndValidateLicenseOrFail({ctx})]),
         ]);
 
+        checkPrivateScopeAccess({ctx}, scope ?? '');
+
+        if (scope === EntryScope.Compute) {
+            if (!isEnabledFeature(ctx, Feature.ComputeEntriesEnabled)) {
+                throw new AppError('Compute entries feature is disabled', {
+                    code: US_ERRORS.COMPUTE_ENTRIES_FEATURE_DISABLED,
+                });
+            }
+        }
+
         if (workbookId) {
-            return await createEntryInWorkbook(ctx, {
+            return (await createEntryInWorkbook(ctx, {
                 workbookId,
                 name: name as string,
                 scope,
@@ -84,11 +107,11 @@ export default class EntryService {
                 includePermissionsInfo,
                 version,
                 sourceVersion,
-            });
+            })) as unknown as CreatedEntry;
         }
 
         if (collectionId) {
-            return await createEntryInCollection(
+            return (await createEntryInCollection(
                 {ctx},
                 {
                     collectionId,
@@ -108,10 +131,10 @@ export default class EntryService {
                     version,
                     sourceVersion,
                 },
-            );
+            )) as unknown as CreatedEntry;
         }
 
-        return await Entry.create(
+        return (await Entry.create(
             {
                 requestId,
                 tenantId,
@@ -139,7 +162,7 @@ export default class EntryService {
                 sourceVersion,
             },
             ctx,
-        );
+        )) as unknown as CreatedEntry | CreatedEntry[];
     }
 
     static async resolveTenantIdByEntryId({entryId, ctx}: ST.ResolveTenantIdByEntryId) {

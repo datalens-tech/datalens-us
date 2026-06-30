@@ -1,6 +1,8 @@
 export const routes = {
     entries: '/v1/entries',
+    getEntries: '/v1/get-entries',
     privateEntries: '/private/entries',
+    privateGetEntries: '/private/v1/get-entries',
     favorites: '/v1/favorites',
     states: '/v1/states',
     locks: '/v1/locks',
@@ -35,4 +37,6 @@ export const routes = {
     entryRevisions: (entryId: string) => `/v1/entries/${entryId}/revisions`,
     entryRelations: (entryId: string) => `/v1/entries/${entryId}/relations`,
     switchRevision: (entryId: string) => `/private/entries/${entryId}/switch-revision`,
+    copyEntryToWorkbook: (entryId: string) => `/v2/entries/${entryId}/copy`,
+    copyEntriesToWorkbook: '/v2/copy-entries',
 } as const;

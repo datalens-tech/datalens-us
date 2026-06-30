@@ -1,16 +1,29 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {TransactionOrKnex} from 'objection';
 
+import {
+    AccessServicePermissionDeniedError,
+    CollectionEntryCannotBeMigratedToWorkbookError,
+    EntriesWithDifferentWorkbookIdsCopyDeniedError,
+    EntryWithoutWorkbookIdCopyDeniedError,
+    FolderCopyDeniedError,
+    NotExistEntryError,
+    WorkbookEntryCannotBeMigratedToWorkbookError,
+} from '../../../components/errors';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {BiTrackingLogs, US_ERRORS} from '../../../const';
 import Link from '../../../db/models/links';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
-import {WorkbookModel} from '../../../db/models/new/workbook';
-import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
+import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
+import {
+    JoinedEntryRevision,
+    type JoinedEntryRevisionColumns,
+} from '../../../db/presentations/joined-entry-revision';
 import {WorkbookPermission} from '../../../entities/workbook';
-import {CTX} from '../../../types/models';
+import {CTX, UsPermissions} from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
 import {getParentIds} from '../../new/collection/utils/get-parents';
+import {checkEntriesByPermission} from '../../new/entry/utils/check-entries-by-permission';
 import {resolveEntriesNameCollisions} from '../../new/entry/utils/resolveNameCollisions';
 
 interface Params {
@@ -20,6 +33,7 @@ interface Params {
     trxOverride?: TransactionOrKnex;
     skipLinkSync?: boolean;
     skipWorkbookPermissionsCheck?: boolean;
+    entryPermission?: UsPermissions;
     resolveNameCollisions?: boolean;
     isMigrateCopiedEntries?: boolean;
 }
@@ -44,6 +58,9 @@ export const validateParams = makeSchemaValidator({
         skipWorkbookPermissionsCheck: {
             type: 'boolean',
         },
+        entryPermission: {
+            type: 'string',
+        },
         resolveNameCollisions: {
             type: 'boolean',
         },
@@ -53,6 +70,34 @@ export const validateParams = makeSchemaValidator({
     },
 });
 
+const checkSourceEntriesPermissions = async ({
+    ctx,
+    trxOverride,
+    entries,
+    permission,
+}: {
+    ctx: CTX;
+    trxOverride?: TransactionOrKnex;
+    entries: JoinedEntryRevisionColumns[];
+    permission: UsPermissions;
+}) => {
+    const chunkSize = 1000;
+
+    for (let index = 0; index < entries.length; index += chunkSize) {
+        const checkedEntries = await checkEntriesByPermission(
+            {ctx, trx: trxOverride},
+            {
+                entries: entries.slice(index, index + chunkSize),
+                permission,
+            },
+        );
+
+        if (checkedEntries.some(({isLocked}) => isLocked)) {
+            throw new AccessServicePermissionDeniedError();
+        }
+    }
+};
+
 export const copyToWorkbook = async (ctx: CTX, params: Params) => {
     const {
         entryIds,
@@ -61,6 +106,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
         trxOverride,
         skipLinkSync,
         skipWorkbookPermissionsCheck = false,
+        entryPermission,
         resolveNameCollisions,
         isMigrateCopiedEntries,
     } = params;
@@ -85,60 +131,67 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
     const originJoinedEntryRevisions = await JoinedEntryRevision.find({
         where: (builder) => {
             builder.where({
-                [`${Entry.tableName}.isDeleted`]: false,
+                [`${Entry.tableName}.${EntryColumn.IsDeleted}`]: false,
             });
 
-            builder.whereIn(`${Entry.tableName}.entryId`, entryIds);
+            builder.whereIn(`${Entry.tableName}.${EntryColumn.EntryId}`, entryIds);
         },
         trx: Entry.replica,
     });
 
     if (originJoinedEntryRevisions.length === 0) {
-        throw new AppError("Entries don't exist", {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError({message: "Entries don't exist"});
     }
 
     let workbookId: Optional<string>;
     originJoinedEntryRevisions.forEach((joinedEntryRevision) => {
         if (tenantIdOverride === undefined && joinedEntryRevision.tenantId !== tenantId) {
-            throw new AppError(
-                `Entry ${Utils.encodeId(joinedEntryRevision.entryId)} doesn't exist`,
-                {
-                    code: US_ERRORS.NOT_EXIST_ENTRY,
-                },
-            );
-        }
-
-        if (joinedEntryRevision.scope === 'folder') {
-            throw new AppError('Folders cannot be copied', {
-                code: US_ERRORS.FOLDER_COPY_DENIED,
+            throw new NotExistEntryError({
+                message: `Entry ${Utils.encodeId(joinedEntryRevision.entryId)} doesn't exist`,
             });
         }
 
-        if (!isMigrateCopiedEntries) {
+        if (joinedEntryRevision.scope === 'folder') {
+            throw new FolderCopyDeniedError();
+        }
+
+        if (isMigrateCopiedEntries) {
+            if (joinedEntryRevision.collectionId !== null) {
+                throw new CollectionEntryCannotBeMigratedToWorkbookError({
+                    message: `Entry ${Utils.encodeId(
+                        joinedEntryRevision.entryId,
+                    )} cannot be migrated to workbook because it belongs to collection ${Utils.encodeId(
+                        joinedEntryRevision.collectionId,
+                    )}`,
+                });
+            }
+
+            if (joinedEntryRevision.workbookId !== null) {
+                throw new WorkbookEntryCannotBeMigratedToWorkbookError({
+                    message: `Entry ${Utils.encodeId(
+                        joinedEntryRevision.entryId,
+                    )} cannot be migrated to workbook because it belongs to workbook ${Utils.encodeId(
+                        joinedEntryRevision.workbookId,
+                    )}`,
+                });
+            }
+        } else {
             if (joinedEntryRevision.workbookId === null) {
-                throw new AppError(
-                    `Entry ${Utils.encodeId(
+                throw new EntryWithoutWorkbookIdCopyDeniedError({
+                    message: `Entry ${Utils.encodeId(
                         joinedEntryRevision.entryId,
                     )} doesn't have a workbookId and cannot be copied to a workbook.`,
-                    {
-                        code: US_ERRORS.ENTRY_WITHOUT_WORKBOOK_ID_COPY_DENIED,
-                    },
-                );
+                });
             }
 
             if (workbookId === undefined) {
                 workbookId = joinedEntryRevision.workbookId;
             } else if (joinedEntryRevision.workbookId !== workbookId) {
-                throw new AppError(
-                    `Copying entries from different workbooks is denied – ${Utils.encodeId(
+                throw new EntriesWithDifferentWorkbookIdsCopyDeniedError({
+                    message: `Copying entries from different workbooks is denied – ${Utils.encodeId(
                         workbookId,
                     )} and ${Utils.encodeId(joinedEntryRevision.workbookId)}`,
-                    {
-                        code: US_ERRORS.ENTRIES_WITH_DIFFERENT_WORKBOOK_IDS_COPY_DENIED,
-                    },
-                );
+                });
             }
         }
 
@@ -157,8 +210,17 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
     });
 
     if (workbookId === undefined && !isMigrateCopiedEntries) {
-        throw new AppError(`Entries don't have a workbookId and cannot be copied to a workbook.`, {
-            code: US_ERRORS.ENTRY_WITHOUT_WORKBOOK_ID_COPY_DENIED,
+        throw new EntryWithoutWorkbookIdCopyDeniedError({
+            message: `Entries don't have a workbookId and cannot be copied to a workbook.`,
+        });
+    }
+
+    if (entryPermission) {
+        await checkSourceEntriesPermissions({
+            ctx,
+            trxOverride,
+            entries: originJoinedEntryRevisions,
+            permission: entryPermission,
         });
     }
 
@@ -243,11 +305,19 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
             workbookTargetTrx,
         )
             .findById(destinationWorkbookId)
+            .where({[WorkbookModelColumn.DeletedAt]: null})
             .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
+
+        if (destinationWorkbookModel === undefined) {
+            throw new AppError('Workbook not exists', {
+                code: US_ERRORS.WORKBOOK_NOT_EXISTS,
+            });
+        }
 
         if (workbookId) {
             const originWorkbookModel = await WorkbookModel.query(workbookTargetTrx)
                 .findById(workbookId)
+                .where({[WorkbookModelColumn.DeletedAt]: null})
                 .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
             if (originWorkbookModel === undefined) {
@@ -282,12 +352,6 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
                     permission: WorkbookPermission.Copy,
                 });
             }
-        }
-
-        if (destinationWorkbookModel === undefined) {
-            throw new AppError('Workbook not exists', {
-                code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-            });
         }
 
         const destinationWorkbook = new Workbook({

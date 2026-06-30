@@ -1,15 +1,51 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {Model} from '../..';
+import {Model, queryReplica} from '../..';
+import {
+    EntryAlreadyExistsError,
+    FolderAlreadyExistsWithDifferentKeyCaseError,
+    NotExistEntryError,
+    ParentFolderNotExistError,
+} from '../../../components/errors';
 import {BiTrackingLogs, RETURN_COLUMNS, US_ERRORS} from '../../../const';
 import * as MT from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
 import Link from '../links';
+import {EntryColumn} from '../new/entry';
+import {EntryInnerMeta, EntryScope} from '../new/entry/types';
 import Revision from '../revision';
 import Tenant from '../tenant';
 
 import {validateCreateEntry, validateResolveTenantIdByEntryId} from './scheme';
+
+export type GetEntriesByKeyItem = {
+    entryId: string;
+    scope: EntryScope;
+    type: string;
+    key: string | null;
+    unversionedData: Record<string, unknown>;
+    createdBy: string;
+    createdAt: string;
+    updatedBy: string;
+    updatedAt: string;
+    savedId: string | null;
+    publishedId: string | null;
+    revId: string;
+    tenantId: string | null;
+    data: Record<string, unknown> | null;
+    meta: Record<string, unknown> | null;
+    annotation: Record<string, unknown> | null;
+    hidden: boolean;
+    mirrored: boolean;
+    public: boolean;
+    workbookId: string | null;
+    collectionId: string | null;
+    version: number | null;
+    sourceVersion: number | null;
+    innerMeta: EntryInnerMeta | null;
+    folderId: string | null;
+};
 
 interface Entry extends MT.EntryColumns {
     revisions: any; // TODO: Figure out how to type a upsertGraph
@@ -101,33 +137,21 @@ class Entry extends Model {
             isDeleted,
         });
 
-        let result;
         const keyLowerCase = key && key.toLowerCase();
 
-        if (branch === 'published') {
-            result = await Entry.query(this.replica)
-                .select([...RETURN_COLUMNS, 'innerMeta', 'tenantId as folderId'])
-                .join('revisions', 'entries.publishedId', 'revisions.revId')
-                .where({
-                    key: keyLowerCase,
-                    isDeleted: isDeleted,
-                })
-                .timeout(Model.DEFAULT_QUERY_TIMEOUT);
-        } else {
-            result = await Entry.query(this.replica)
-                .select([...RETURN_COLUMNS, 'innerMeta', 'tenantId as folderId'])
-                .join('revisions', 'entries.savedId', 'revisions.revId')
-                .where({
-                    key: keyLowerCase,
-                    isDeleted: isDeleted,
-                })
-                .timeout(Model.DEFAULT_QUERY_TIMEOUT);
-        }
+        const joinLeftCol = branch === 'published' ? 'entries.publishedId' : 'entries.savedId';
+
+        const result = (await queryReplica(Entry)
+            .select([...RETURN_COLUMNS, 'innerMeta', 'tenantId as folderId'])
+            .join('revisions', joinLeftCol, 'revisions.revId')
+            .where({
+                [EntryColumn.Key]: keyLowerCase,
+                [EntryColumn.IsDeleted]: isDeleted,
+            })
+            .timeout(Model.DEFAULT_QUERY_TIMEOUT)) as unknown as GetEntriesByKeyItem[];
 
         if (!result.length) {
-            throw new AppError('NOT_EXIST_ENTRY', {
-                code: 'NOT_EXIST_ENTRY',
-            });
+            throw new NotExistEntryError();
         }
 
         ctx.log('PRIVATE_GET_ENTRIES_BY_KEY_SUCCESS');
@@ -335,6 +359,20 @@ class Entry extends Model {
                                 );
                             }
                         }
+
+                        const requestedKey = folderKeys.find(
+                            (folderKey) =>
+                                folderKey.toLowerCase() === existedParentFolder.key.toLowerCase(),
+                        );
+
+                        if (!requestedKey || requestedKey !== existedParentFolder.key) {
+                            throw new FolderAlreadyExistsWithDifferentKeyCaseError({
+                                details: {
+                                    existedKey: existedParentFolder.key,
+                                    key: requestedKey || displayKey,
+                                },
+                            });
+                        }
                     }
 
                     const notExistedFolderKeys = folderKeys.filter((folderKey) => {
@@ -435,10 +473,21 @@ class Entry extends Model {
                             },
                         );
                     }
-                } else {
-                    throw new AppError("The parent folder doesn't exist.", {
-                        code: 'PARENT_FOLDER_NOT_EXIST',
+
+                    const requestedParentKey = Utils.getParentFolderKey({
+                        keyFormatted: displayKey,
                     });
+
+                    if (parentFolder.key !== requestedParentKey) {
+                        throw new FolderAlreadyExistsWithDifferentKeyCaseError({
+                            details: {
+                                existedKey: parentFolder.key,
+                                key: requestedParentKey,
+                            },
+                        });
+                    }
+                } else {
+                    throw new ParentFolderNotExistError();
                 }
             }
 
@@ -451,8 +500,7 @@ class Entry extends Model {
                 .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
             if (checkExistenceEntry) {
-                throw new AppError(US_ERRORS.ENTRY_ALREADY_EXISTS, {
-                    code: US_ERRORS.ENTRY_ALREADY_EXISTS,
+                throw new EntryAlreadyExistsError({
                     details: {
                         entryId: Utils.encodeId(checkExistenceEntry.entryId),
                     },
@@ -530,7 +578,7 @@ class Entry extends Model {
                     .timeout(Model.DEFAULT_QUERY_TIMEOUT);
             } else {
                 allCreatedEntries = await Entry.query(TRX)
-                    .select(RETURN_COLUMNS.concat('links'))
+                    .select([...RETURN_COLUMNS, 'links'])
                     .join('revisions', 'entries.entryId', 'revisions.entryId')
                     .where({
                         'entries.entryId': entryId,
@@ -715,9 +763,7 @@ class Entry extends Model {
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);
 
         if (!result) {
-            throw new AppError('NOT_EXIST_ENTRY', {
-                code: 'NOT_EXIST_ENTRY',
-            });
+            throw new NotExistEntryError();
         }
 
         ctx.log('RESOLVE_TENANT_ID_BY_ENTRY_ID_SUCCESS');

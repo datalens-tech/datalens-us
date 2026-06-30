@@ -6,7 +6,7 @@ import {CONTENT_TYPE_JSON, MAX_UNVERSIONED_DATA_OBJECT_SYMBOLS} from '../../cons
 import {LogEventType} from '../../registry/plugins/common/utils/log-event/types';
 import {updateEntryUnversionedDataPrivate} from '../../services/new/entry';
 
-import {entryModel} from './response-models';
+import {entryModelWithUnversionedData} from './response-models';
 
 const requestSchema = {
     params: z.object({
@@ -22,6 +22,8 @@ const parseReq = makeReqParser(requestSchema);
 
 export const updateEntryUnversionedDataPrivateController: AppRouteHandler = async (req, res) => {
     const {params, body} = await parseReq(req);
+
+    const {privatePermissions} = req.ctx.get('info');
 
     const registry = req.ctx.get('registry');
     const {logEvent} = registry.common.functions.get();
@@ -47,7 +49,7 @@ export const updateEntryUnversionedDataPrivateController: AppRouteHandler = asyn
             reqParams: logEventReqParams,
         });
 
-        res.status(200).send(entryModel.format(result));
+        res.status(200).send(entryModelWithUnversionedData.format(result, privatePermissions));
     } catch (error) {
         await logEvent({
             type: LogEventType.UpdateEntryUnversionedDataFail,
@@ -75,10 +77,10 @@ updateEntryUnversionedDataPrivateController.api = {
     },
     responses: {
         200: {
-            description: entryModel.schema.description ?? '',
+            description: entryModelWithUnversionedData.schema.description ?? '',
             content: {
                 [CONTENT_TYPE_JSON]: {
-                    schema: entryModel.schema,
+                    schema: entryModelWithUnversionedData.schema,
                 },
             },
         },

@@ -7,52 +7,64 @@ import type {
     CollectionPermission,
     Permissions as CollectionPermissions,
 } from '../../../../../entities/collection/types';
-import type {
-    SharedEntryPermission,
-    Permissions as SharedEntryPermissions,
-} from '../../../../../entities/shared-entry/types';
+import type {CollectionEntryPermissions} from '../../../../../entities/collection-entry';
+import {ALLOWED_COLLECTION_ENTRY_SCOPES} from '../../../../../entities/shared-entry';
 import type {Operation} from '../../../../../entities/types';
 import type {
     WorkbookPermission,
     Permissions as WorkbookPermissions,
 } from '../../../../../entities/workbook';
-import type {SharedEntryInstance} from '../shared-entry/types';
+import type {
+    CollectionEntryFullPermissions,
+    CollectionEntryInstance,
+} from '../collection-entry/types';
 import type {WorkbookInstance} from '../workbook/types';
 
-export interface StructureItemInstance {
+export interface PermissionedEntityInstance<
+    TPermission,
+    TPermissions,
+    TModel = CollectionModel | WorkbookModel | EntryModel,
+> {
     ctx: AppContext;
-    model: CollectionModel | WorkbookModel | EntryModel;
-    permissions?: CollectionPermissions | WorkbookPermissions | SharedEntryPermissions;
+    model: TModel;
+    permissions?: TPermissions;
 
     register(args: {parentIds: string[]}): Promise<Operation>;
 
-    checkPermission(args: {
-        parentIds: string[];
-        permission: CollectionPermission | WorkbookPermission | SharedEntryPermission;
-    }): Promise<void>;
+    checkPermission(args: {parentIds: string[]; permission: TPermission}): Promise<void>;
 
-    setPermissions(
-        permissions: CollectionPermissions | WorkbookPermissions | SharedEntryPermissions,
-    ): void;
+    fetchAllPermissions(args: {parentIds: string[]}): Promise<void>;
+
+    setPermissions(permissions: TPermissions): void;
 
     deletePermissions(args: {parentIds: string[]; skipCheckPermissions?: boolean}): Promise<void>;
 
     enableAllPermissions(): void;
-
-    fetchAllPermissions(args: {parentIds: string[]}): Promise<void>;
 }
 
-export const isSharedEntryInstance = (
+export interface StructureItemInstance extends PermissionedEntityInstance<
+    CollectionPermission | WorkbookPermission | CollectionEntryPermissions,
+    CollectionPermissions | WorkbookPermissions | CollectionEntryFullPermissions
+> {}
+
+const isEntryModel = (model: CollectionModel | WorkbookModel | EntryModel): model is EntryModel => {
+    return 'entryId' in model && Boolean(model.entryId);
+};
+
+export const isCollectionEntryInstance = (
     structureItemInstance: StructureItemInstance,
-): structureItemInstance is SharedEntryInstance => {
-    return 'entryId' in structureItemInstance.model && Boolean(structureItemInstance.model.entryId);
+): structureItemInstance is CollectionEntryInstance => {
+    return (
+        isEntryModel(structureItemInstance.model) &&
+        ALLOWED_COLLECTION_ENTRY_SCOPES.includes(structureItemInstance.model.scope)
+    );
 };
 
 export const isWorkbookInstance = (
     structureItemInstance: StructureItemInstance,
 ): structureItemInstance is WorkbookInstance => {
     return (
-        !isSharedEntryInstance(structureItemInstance) &&
+        !isEntryModel(structureItemInstance.model) &&
         'workbookId' in structureItemInstance.model &&
         Boolean(structureItemInstance.model.workbookId)
     );

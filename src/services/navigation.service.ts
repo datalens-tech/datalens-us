@@ -1,17 +1,46 @@
 import Navigation from '../db/models/navigation';
 import * as ST from '../types/services.types';
 
+import {ReturnNavigationColumnsEntry} from './entry/types';
+
+export type LockedNavigationEntry = {
+    entryId: string;
+    scope: string;
+    type: string;
+    isLocked: true;
+};
+
+export type FullNavigationEntry = ReturnNavigationColumnsEntry & {
+    workbookTitle?: string | null;
+    collectionTitle?: string | null;
+    isFavorite?: boolean;
+    unversionedData?: Record<string, unknown> | null;
+    data?: Record<string, unknown> | null;
+    links?: Record<string, unknown> | null;
+    permissions?: Record<string, boolean>;
+    isLocked?: false;
+};
+
+export type NavigationEntry = LockedNavigationEntry | FullNavigationEntry;
+
+export interface GetEntriesResult {
+    entries: NavigationEntry[];
+    nextPageToken?: string;
+}
+
 export default class NavigationService {
     static async getEntries({
         ids,
         scope,
-        type,
+        types,
         createdBy,
         orderBy,
         meta,
         filters,
         page,
         pageSize,
+        pageToken,
+        paginationMode,
         includePermissionsInfo,
         ignoreWorkbookEntries,
         ignoreSharedEntries,
@@ -22,19 +51,21 @@ export default class NavigationService {
     }: ST.GetEntries) {
         const {requestId, tenantId, user, dlContext} = ctx.get('info');
 
-        return await Navigation.getEntries(
+        const result = await Navigation.getEntries(
             {
                 requestId,
                 tenantId,
                 ids,
                 scope,
-                type,
+                types,
                 createdBy,
                 orderBy,
                 metaFilters: meta,
                 filters,
                 page,
                 pageSize,
+                pageToken,
+                paginationMode,
                 includePermissionsInfo,
                 ignoreWorkbookEntries,
                 ignoreSharedEntries,
@@ -46,6 +77,8 @@ export default class NavigationService {
             },
             ctx,
         );
+
+        return result;
     }
 
     static async interTenantGetEntries({

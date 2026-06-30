@@ -1,16 +1,14 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {US_ERRORS} from '../../../const';
+import {NotExistEntryError} from '../../../components/errors';
 import {Entry} from '../../../db/models/new/entry';
 import {JoinedEntryRevision} from '../../../db/presentations/joined-entry-revision';
-import {DlsActions, UsPermissions} from '../../../types/models';
+import {DlsActions} from '../../../types/models';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
 import {getWorkbook} from '../workbook';
 
+import {CollectionEntryPermissions, resolveCollectionEntryPermissions} from './collection-entry';
 import {checkFetchedEntry} from './utils';
-import {checkCollectionEntryPermission} from './utils/check-collection-entry-permission';
 
 export type GetEntryMetaArgs = {
     entryId: string;
@@ -50,18 +48,11 @@ export const getEntryMeta = async ({ctx, trx}: ServiceArgs, args: GetEntryMetaAr
                 await getWorkbook({ctx, trx}, {workbookId: joinedEntryRevision.workbookId});
             }
         } else if (joinedEntryRevision.collectionId) {
-            const {SharedEntry} = registry.common.classes.get();
-
-            const sharedEntryInstance = new SharedEntry({
-                ctx,
-                model: joinedEntryRevision as unknown as Entry,
-            });
-
-            await checkCollectionEntryPermission(
+            await resolveCollectionEntryPermissions(
                 {ctx, trx: getReplica(trx)},
                 {
-                    sharedEntryInstance,
-                    permission: UsPermissions.Read,
+                    entry: joinedEntryRevision as unknown as Entry,
+                    permission: CollectionEntryPermissions.Read,
                     includePermissions: false,
                     skipCheckPermissions: isPrivateRoute,
                 },
@@ -92,8 +83,6 @@ export const getEntryMeta = async ({ctx, trx}: ServiceArgs, args: GetEntryMetaAr
 
         return joinedEntryRevision;
     } else {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
 };

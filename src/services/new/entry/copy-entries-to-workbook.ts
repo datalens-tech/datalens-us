@@ -1,6 +1,7 @@
 import {transaction} from 'objection';
 
 import {JoinedEntryRevisionColumns} from '../../../db/presentations';
+import {UsPermissions} from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
 import {copyToWorkbook} from '../../entry/actions';
 import {ServiceArgs} from '../types';
@@ -11,13 +12,14 @@ export type CopyEntriesToWorkbookParams = {
     entryIds: string[];
     workbookId: string;
     isMigrateCopiedEntries?: boolean;
+    entryPermission?: UsPermissions;
 };
 
 export const copyEntriesToWorkbook = async (
     {ctx, trx, skipCheckPermissions = false}: ServiceArgs,
     args: CopyEntriesToWorkbookParams,
 ) => {
-    const {entryIds, workbookId: targetWorkbookId, isMigrateCopiedEntries} = args;
+    const {entryIds, workbookId: targetWorkbookId, isMigrateCopiedEntries, entryPermission} = args;
     const {user} = ctx.get('info');
     const updatedBy = makeUserId(user.userId);
 
@@ -34,6 +36,7 @@ export const copyEntriesToWorkbook = async (
             trxOverride: transactionTrx,
             skipLinkSync: true,
             skipWorkbookPermissionsCheck: skipCheckPermissions,
+            entryPermission,
             resolveNameCollisions: true,
             isMigrateCopiedEntries,
         });

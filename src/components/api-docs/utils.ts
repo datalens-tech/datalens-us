@@ -143,6 +143,7 @@ export const registerApiRoute = <F>(
         summary: api.summary,
         description: api.description,
         tags: api.tags ? [...api.tags] : undefined,
+        deprecated: api.deprecated,
         request: {
             body: requestBodySchema,
             params: requestParams,

@@ -1,9 +1,8 @@
 import {AuthPolicy} from '@gravity-ui/expresskit';
 import type {AppContext} from '@gravity-ui/nodekit';
-import {AppError} from '@gravity-ui/nodekit';
 
 import {UserRole} from '../../../../../components/auth/constants/role';
-import {US_ERRORS} from '../../../../../const';
+import {AccessServicePermissionDeniedError} from '../../../../../components/errors';
 import type {WorkbookModel} from '../../../../../db/models/new/workbook';
 import {getMockedOperation} from '../../../../../entities/utils';
 import {Permissions, WorkbookPermission} from '../../../../../entities/workbook/types';
@@ -13,15 +12,17 @@ import {WorkbookConstructor, WorkbookInstance} from './types';
 
 export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook implements WorkbookInstance {
     static bulkFetchAllPermissions = async (ctx, items) => {
-        return items.map(({model}) => {
-            const workbook = new Workbook({ctx, model});
-            if (ctx.config.accessServiceEnabled) {
-                workbook.fetchAllPermissions({parentIds: []});
-            } else {
-                workbook.enableAllPermissions();
-            }
-            return workbook;
-        });
+        return Promise.all(
+            items.map(async ({model}) => {
+                const workbook = new Workbook({ctx, model});
+                if (!ctx.config.accessServiceEnabled) {
+                    workbook.enableAllPermissions();
+                    return workbook;
+                }
+                await workbook.fetchAllPermissions({parentIds: []});
+                return workbook;
+            }),
+        );
     };
 
     ctx: AppContext;
@@ -37,9 +38,7 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook im
         const isEditorOrAdmin = this.isEditorOrAdmin();
 
         if (!isEditorOrAdmin) {
-            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
-            });
+            throw new AccessServicePermissionDeniedError();
         }
 
         return Promise.resolve(getMockedOperation({id: Utils.encodeId(this.model.workbookId)}));
@@ -52,9 +51,7 @@ export const Workbook: WorkbookConstructor<WorkbookInstance> = class Workbook im
         const permissions = this.getAllPermissions();
 
         if (permissions[args.permission] === false) {
-            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
-            });
+            throw new AccessServicePermissionDeniedError();
         }
 
         return Promise.resolve();

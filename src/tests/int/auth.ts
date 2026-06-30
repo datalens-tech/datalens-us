@@ -1,7 +1,7 @@
 import request from 'supertest';
 
 import usApp from '../..';
-import {US_DYNAMIC_MASTER_TOKEN_HEADER, US_ERRORS} from '../../const';
+import {DL_COMPONENT_HEADER, US_DYNAMIC_MASTER_TOKEN_HEADER, US_ERRORS} from '../../const';
 
 export type CommonAuthArgs = {
     userId?: string;
@@ -18,11 +18,15 @@ export const testTenantId = 'common';
 
 export type AuthPrivateRouteOptions = {
     serviceId?: string;
+    component?: string | null;
 };
 
 export const authPrivateRoute = (req: request.Test, options: AuthPrivateRouteOptions = {}) => {
-    const {serviceId = 'test-service'} = options;
+    const {serviceId = 'test-service', component} = options;
     const token = JSON.stringify({serviceId});
     req.set(US_DYNAMIC_MASTER_TOKEN_HEADER, token);
+    if (component) {
+        req.set(DL_COMPONENT_HEADER, component);
+    }
     return req;
 };

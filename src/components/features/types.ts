@@ -7,6 +7,7 @@ export enum Feature {
     TemporalEnabled = 'TemporalEnabled',
     DynamicMasterTokenEnabled = 'DynamicMasterTokenEnabled',
     DynamicMasterTokenIsRequired = 'DynamicMasterTokenIsRequired',
+    ComputeEntriesEnabled = 'ComputeEntriesEnabled',
 }
 
 export type FeaturesConfig = {

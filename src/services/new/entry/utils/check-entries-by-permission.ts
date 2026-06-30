@@ -1,16 +1,20 @@
+import {AccessServicePermissionDeniedError} from '../../../../components/errors';
 import {Entry as EntryModel} from '../../../../db/models/new/entry';
-import {getSharedEntryDisabledPermissions} from '../../../../entities/shared-entry/utils';
-import {SharedEntryInstance} from '../../../../registry/plugins/common/entities/shared-entry/types';
+import {EntryScope} from '../../../../db/models/new/entry/types';
 import {WorkbookInstance} from '../../../../registry/plugins/common/entities/workbook/types';
 import {DlsActions, UsPermissions} from '../../../../types/models';
-import {makeSharedEntriesWithParentsMap} from '../../collection/utils/get-parents';
+import {makeCollectionEntriesWithParentsMap} from '../../collection/utils/get-parents';
 import {ServiceArgs} from '../../types';
 import {getReplica} from '../../utils';
 import {getWorkbooksListByIds} from '../../workbook/get-workbooks-list-by-ids';
 import {getEntryPermissionsByWorkbook} from '../../workbook/utils';
-import {EntryWithPermissions, PartialEntry} from '../types';
-
-import {mapCollectionEntryPermissions} from './check-collection-entry-permission/map-collection-entry-permissions';
+import {
+    bulkFetchCollectionEntryPermissions,
+    createCollectionEntry,
+    getCollectionEntryDisabledPermissions,
+    getCollectionEntryPermissions,
+} from '../collection-entry';
+import {EntryFullPermissions, EntryWithPermissions, PartialEntry} from '../types';
 
 const DLSPermissionsMap: Record<UsPermissions, DlsActions> = {
     [UsPermissions.Execute]: DlsActions.Execute,
@@ -60,18 +64,18 @@ export type CheckEntriesByPermissionArgs<T> = {
 export const checkFolderEntriesByPermission = async <T extends PartialEntry>(
     {ctx, trx}: ServiceArgs,
     args: CheckEntriesByPermissionArgs<T>,
-): Promise<EntryWithPermissions<T>[]> => {
+): Promise<EntryWithPermissions<T, EntryFullPermissions>[]> => {
     const {entries, permission = UsPermissions.Read, includePermissionsInfo} = args;
 
     if (entries.length === 0) {
         return [];
     }
 
-    const {isPrivateRoute} = ctx.get('info');
+    const {isPrivateRoute, isAuditRoute} = ctx.get('info');
     const registry = ctx.get('registry');
 
     // TODO: use originatePermissions
-    if (!isPrivateRoute && ctx.config.dlsEnabled) {
+    if (!isPrivateRoute && !isAuditRoute && ctx.config.dlsEnabled) {
         const {DLS} = registry.common.classes.get();
 
         return DLS.checkBulkPermission(
@@ -90,16 +94,16 @@ export const checkFolderEntriesByPermission = async <T extends PartialEntry>(
 export const checkWorkbookEntriesByPermission = async <T extends PartialEntry>(
     {ctx, trx}: ServiceArgs,
     args: CheckEntriesByPermissionArgs<T>,
-): Promise<EntryWithPermissions<T>[]> => {
+): Promise<EntryWithPermissions<T, EntryFullPermissions>[]> => {
     const {entries, permission = UsPermissions.Read, includePermissionsInfo} = args;
 
     if (entries.length === 0) {
         return [];
     }
 
-    const {isPrivateRoute} = ctx.get('info');
+    const {isPrivateRoute, isAuditRoute} = ctx.get('info');
 
-    if (isPrivateRoute || !ctx.config.accessServiceEnabled) {
+    if (isPrivateRoute || isAuditRoute || !ctx.config.accessServiceEnabled) {
         return entries.map((entry) => makeEntryWithFullPermissions(entry, includePermissionsInfo));
     }
 
@@ -145,66 +149,59 @@ export const checkWorkbookEntriesByPermission = async <T extends PartialEntry>(
 export const checkCollectionEntriesByPermission = async <T extends PartialEntry>(
     {ctx, trx}: ServiceArgs,
     args: CheckEntriesByPermissionArgs<T>,
-): Promise<EntryWithPermissions<T>[]> => {
+): Promise<EntryWithPermissions<T, EntryFullPermissions>[]> => {
     const {entries, permission = UsPermissions.Read, includePermissionsInfo} = args;
 
     if (entries.length === 0) {
         return [];
     }
 
-    const {isPrivateRoute} = ctx.get('info');
-    const registry = ctx.get('registry');
-    const {SharedEntry} = registry.common.classes.get();
+    const {isPrivateRoute, isAuditRoute} = ctx.get('info');
 
-    if (isPrivateRoute || !ctx.config.accessServiceEnabled) {
+    if (isPrivateRoute || isAuditRoute || !ctx.config.accessServiceEnabled) {
         return entries.map((entry) => {
-            const sharedEntry = new SharedEntry({ctx, model: entry as unknown as EntryModel});
-            sharedEntry.enableAllPermissions();
+            const instance = createCollectionEntry(ctx, entry as unknown as EntryModel);
+            instance.enableAllPermissions();
             return {
                 ...makeEntryWithFullPermissions(entry, includePermissionsInfo),
-                fullPermissions: includePermissionsInfo ? sharedEntry.permissions : undefined,
+                fullPermissions: includePermissionsInfo ? instance.permissions : undefined,
             };
         });
     }
 
-    const sharedEntriesWithParentsMap = await makeSharedEntriesWithParentsMap(
+    const entriesWithParentsMap = await makeCollectionEntriesWithParentsMap(
         {ctx, trx},
         {
             models: entries as unknown[] as EntryModel[],
         },
     );
 
-    const sharedEntriesForBulk: {model: EntryModel; parentIds: string[]}[] = [];
-
-    sharedEntriesWithParentsMap.forEach((parentIds, sharedEntry) => {
-        sharedEntriesForBulk.push({model: sharedEntry.model, parentIds});
+    const items: {model: EntryModel; parentIds: string[]}[] = [];
+    entriesWithParentsMap.forEach((parentIds, model) => {
+        items.push({model, parentIds});
     });
 
-    const sharedEntries = await SharedEntry.bulkFetchAllPermissions(ctx, sharedEntriesForBulk);
-
-    const sharedEntriesIdsMap = new Map<string, SharedEntryInstance>(
-        sharedEntries.map((sharedEntry) => [sharedEntry.model.entryId, sharedEntry]),
-    );
+    const instancesMap = await bulkFetchCollectionEntryPermissions({ctx, trx}, items);
 
     return entries.map((entry) => {
-        const sharedEntry = sharedEntriesIdsMap.get(entry.entryId);
+        const instance = instancesMap.get(entry.entryId);
 
-        if (!sharedEntry) {
+        if (!instance) {
             return {
                 ...makeEntryWithNoPermissions(entry, includePermissionsInfo),
                 fullPermissions: includePermissionsInfo
-                    ? getSharedEntryDisabledPermissions()
+                    ? getCollectionEntryDisabledPermissions(entry.scope as EntryScope)
                     : undefined,
             };
         }
 
-        const permissions = mapCollectionEntryPermissions({sharedEntry});
+        const permissions = getCollectionEntryPermissions(instance);
 
         return {
             ...entry,
             isLocked: !(permissions && permissions[permission]),
             permissions: includePermissionsInfo ? permissions : undefined,
-            fullPermissions: includePermissionsInfo ? sharedEntry.permissions : undefined,
+            fullPermissions: includePermissionsInfo ? instance.permissions : undefined,
         };
     });
 };
@@ -212,7 +209,7 @@ export const checkCollectionEntriesByPermission = async <T extends PartialEntry>
 export const checkEntriesByPermission = async <T extends PartialEntry>(
     {ctx, trx}: ServiceArgs,
     args: CheckEntriesByPermissionArgs<T>,
-): Promise<EntryWithPermissions<T>[]> => {
+): Promise<EntryWithPermissions<T, EntryFullPermissions>[]> => {
     const {entries, permission, includePermissionsInfo} = args;
 
     const workbookEntries: T[] = [];
@@ -246,7 +243,7 @@ export const checkEntriesByPermission = async <T extends PartialEntry>(
         ],
     );
 
-    const result: EntryWithPermissions<T>[] = [
+    const result: EntryWithPermissions<T, EntryFullPermissions>[] = [
         ...folderEntriesResult,
         ...workbookEntriesResult,
         ...collectionEntriesResult,
@@ -264,4 +261,33 @@ export const checkEntriesByPermission = async <T extends PartialEntry>(
     });
 
     return orderedResult;
+};
+
+export type CheckEntryByPermissionArgs<T> = {
+    entry: T;
+    permission?: UsPermissions;
+    includePermissionsInfo?: boolean;
+    throwPermissionError?: boolean;
+};
+
+export const checkEntryByPermission = async <T extends PartialEntry>(
+    {ctx, mainTrx}: ServiceArgs<'mainTrx'>,
+    args: CheckEntryByPermissionArgs<T>,
+): Promise<EntryWithPermissions<T, EntryFullPermissions>> => {
+    const {entry, permission, includePermissionsInfo, throwPermissionError = true} = args;
+
+    const [checkedEntry] = await checkEntriesByPermission(
+        {ctx, trx: mainTrx},
+        {
+            entries: [entry],
+            permission,
+            includePermissionsInfo,
+        },
+    );
+
+    if (throwPermissionError && checkedEntry.isLocked) {
+        throw new AccessServicePermissionDeniedError();
+    }
+
+    return checkedEntry;
 };

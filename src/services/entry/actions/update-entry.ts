@@ -2,6 +2,11 @@ import {AppError} from '@gravity-ui/nodekit';
 import {RawBuilder, TransactionOrKnex, raw, transaction} from 'objection';
 import {Optional} from 'utility-types';
 
+import {
+    NotExistDeletedEntryError,
+    NotExistEntryError,
+    ParentFolderNotExistError,
+} from '../../../components/errors';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {
     AJV_PATTERN_KEYS_NOT_OBJECT,
@@ -18,7 +23,6 @@ import Entry from '../../../db/models/entry';
 import {EntryColumn} from '../../../db/models/new/entry';
 import {EntryScope} from '../../../db/models/new/entry/types';
 import Revision from '../../../db/models/revision';
-import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {
     CTX,
@@ -29,87 +33,59 @@ import {
     SyncLinksConf,
 } from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
-import {checkSharedEntryPermission} from '../../new/entry/utils/check-collection-entry-permission/check-permission';
+import {
+    CollectionEntryPermissions,
+    checkCollectionEntryPermission,
+} from '../../new/entry/collection-entry';
+import {checkPrivateScopeAccess} from '../../new/entry/utils';
 import {checkLock} from '../../new/lock';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission} from '../../new/workbook/utils';
+import {EntryWithRevisionResult} from '../types';
 
 import {checkEntry} from './check-entry';
 
-type Mode = 'save' | 'publish' | 'recover';
-const ModeValues: Mode[] = ['save', 'publish', 'recover'];
-
-type EntryPatchWithRawTimestamp = Partial<Omit<EntryColumns, 'updatedAt'>> & {
-    updatedAt?: RawBuilder;
+export type UpdatedEntry = EntryWithRevisionResult & {
+    links?: RevisionColumns['links'];
 };
+
+type Mode = 'save' | 'publish' | 'recover';
 
 const validateUpdateEntry = makeSchemaValidator({
     type: 'object',
     required: ['entryId'],
     properties: {
-        entryId: {
-            type: 'string',
-        },
+        entryId: {type: 'string'},
         meta: {
             type: ['object', 'null'],
             patternProperties: AJV_PATTERN_KEYS_NOT_OBJECT,
             restrictMetaSize: true,
         },
-        data: {
-            type: ['object', 'null'],
-        },
-        unversionedData: {
-            type: ['object', 'null'],
-            restrictUnversionedDataSize: true,
-        },
-        links: {
-            type: ['object'],
-            patternProperties: AJV_PATTERN_KEYS_NOT_OBJECT,
-        },
-        hidden: {
-            type: 'boolean',
-        },
-        lockToken: {
-            type: 'string',
-        },
-        type: {
-            type: 'string',
-        },
-        revId: {
-            type: 'string',
-        },
-        currentScope: {
-            type: 'string',
-            enum: ALLOWED_SCOPE_VALUES,
-        },
-        currentType: {
-            type: 'string',
-        },
-        mode: {
-            type: 'string',
-            enum: ModeValues,
-        },
-        skipSyncLinks: {
-            type: 'boolean',
-        },
-        useLegacyLogin: {
-            type: 'boolean',
-        },
-        checkServicePlan: {
-            type: 'string',
-        },
+        data: {type: ['object', 'null']},
+        unversionedData: {type: ['object', 'null'], restrictUnversionedDataSize: true},
+        links: {type: ['object'], patternProperties: AJV_PATTERN_KEYS_NOT_OBJECT},
+        hidden: {type: 'boolean'},
+        lockToken: {type: 'string'},
+        type: {type: 'string'},
+        revId: {type: 'string'},
+        currentScope: {type: 'string', enum: ALLOWED_SCOPE_VALUES},
+        currentType: {type: 'string'},
+        mode: {type: 'string', enum: ['save', 'publish', 'recover']},
+        skipSyncLinks: {type: 'boolean'},
+        useLegacyLogin: {type: 'boolean'},
+        checkServicePlan: {type: 'string'},
         description: ANNOTATION_DESCRIPTION_SCHEMA,
         annotation: ANNOTATION_SCHEMA,
-        version: {
-            type: ['number', 'null'],
-        },
-        sourceVersion: {
-            type: ['number', 'null'],
-        },
+        version: {type: ['number', 'null']},
+        sourceVersion: {type: ['number', 'null']},
     },
 });
 
-type UpdateEntryData = {
+type EntryPatchWithRawTimestamp = Partial<Omit<EntryColumns, 'updatedAt'>> & {
+    updatedAt?: RawBuilder;
+};
+
+export type UpdateEntryData = {
     entryId: EntryColumns['entryId'];
     type?: EntryColumns['type'];
     unversionedData?: EntryColumns['unversionedData'];
@@ -221,9 +197,17 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
 
         await checkLock({ctx}, {entryId, lockToken});
     } else {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
+    }
+
+    checkPrivateScopeAccess({ctx}, entry.scope);
+
+    if (entry.scope === EntryScope.Compute) {
+        if (type !== undefined && type !== entry.type) {
+            throw new AppError('Compute entry type cannot be changed', {
+                code: US_ERRORS.COMPUTE_ENTRY_TYPE_CHANGE_FORBIDDEN,
+            });
+        }
     }
 
     let updatedBy: string = makeUserId(user.userId);
@@ -246,9 +230,9 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         }
     } else if (entry.collectionId) {
         if (!isPrivateRoute && accessServiceEnabled) {
-            await checkSharedEntryPermission(
+            await checkCollectionEntryPermission(
                 {ctx},
-                {entry, permission: SharedEntryPermission.Update},
+                {entry, permission: CollectionEntryPermissions.Edit},
             );
         }
     } else {
@@ -384,7 +368,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                         .timeout(DEFAULT_QUERY_TIMEOUT);
 
                     return await Entry.query(trx)
-                        .select(RETURN_COLUMNS.concat('links'))
+                        .select([...RETURN_COLUMNS, 'links'])
                         .join('revisions', 'entries.entryId', 'revisions.entryId')
                         .where({
                             'entries.entryId': entryId,
@@ -546,14 +530,9 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                                 });
 
                                 if (notFoundParentFolders.length) {
-                                    throw new AppError(
-                                        `Couldn't found these parent folders - '${notFoundParentFolders.join(
-                                            ', ',
-                                        )}'`,
-                                        {
-                                            code: US_ERRORS.PARENT_FOLDER_NOT_EXIST,
-                                        },
-                                    );
+                                    throw new ParentFolderNotExistError({
+                                        details: {parentFolders: notFoundParentFolders},
+                                    });
                                 }
                             }
                         }
@@ -618,9 +597,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                                 .timeout(DEFAULT_QUERY_TIMEOUT);
                         }
                     } else {
-                        throw new AppError(US_ERRORS.NOT_EXIST_DELETED_ENTRY, {
-                            code: US_ERRORS.NOT_EXIST_DELETED_ENTRY,
-                        });
+                        throw new NotExistDeletedEntryError();
                     }
 
                     return await Entry.query(trx)
@@ -646,5 +623,5 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
         entryId: Utils.encodeId(entryId),
     });
 
-    return result;
+    return result as unknown as UpdatedEntry;
 }

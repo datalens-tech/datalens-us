@@ -1,6 +1,4 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {US_ERRORS} from '../../../const';
+import {NotExistEntryError} from '../../../components/errors';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {Favorite, FavoriteColumn} from '../../../db/models/new/favorite';
 import {ServiceArgs} from '../types';
@@ -32,9 +30,7 @@ export const deleteFavorite = async ({ctx, trx}: ServiceArgs, {entryId}: DeleteF
         .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
     if (!entry) {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
 
     const result = await Favorite.query(getPrimary(trx))

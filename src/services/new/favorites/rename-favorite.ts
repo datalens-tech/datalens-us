@@ -1,5 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 
+import {NotExistEntryError} from '../../../components/errors';
 import {US_ERRORS} from '../../../const';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {Favorite, FavoriteColumn} from '../../../db/models/new/favorite';
@@ -37,9 +38,7 @@ export const renameFavorite = async (
         .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
     if (!entry) {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
 
     const displayAlias = name ? name : null;

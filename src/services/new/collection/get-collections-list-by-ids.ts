@@ -1,6 +1,5 @@
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
-import {CollectionInstance} from '../../../registry/plugins/common/entities/collection/types';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
@@ -10,13 +9,14 @@ import {makeCollectionsWithParentsMap} from './utils';
 export interface GetCollectionsListByIdsArgs {
     collectionIds: string[];
     includePermissionsInfo?: boolean;
+    skipPermissionsFilter?: boolean;
 }
 
 export const getCollectionsListByIds = async (
     {ctx, trx, checkLicense, skipCheckPermissions = false}: ServiceArgs,
     args: GetCollectionsListByIdsArgs,
 ) => {
-    const {collectionIds, includePermissionsInfo = false} = args;
+    const {collectionIds, includePermissionsInfo = false, skipPermissionsFilter = false} = args;
 
     ctx.log('GET_COLLECTIONS_LIST_BY_IDS_START', {
         collectionIds: await Utils.macrotasksMap(collectionIds, (id) => Utils.encodeId(id)),
@@ -57,49 +57,33 @@ export const getCollectionsListByIds = async (
     }
 
     const collectionsMap = await makeCollectionsWithParentsMap({ctx, trx}, {models});
-    const acceptedCollectionsMap = new Map<CollectionModel, string[]>();
 
-    const checkPermissionPromises: Promise<CollectionInstance | void>[] = [];
+    const collectionsForBulk: {model: CollectionModel; parentIds: string[]}[] = [];
 
     collectionsMap.forEach((parentIds, collection) => {
-        const promise = collection
-            .checkPermission({
-                parentIds,
-                permission: CollectionPermission.Browse,
-            })
-            .then(() => {
-                acceptedCollectionsMap.set(collection.model, parentIds);
-
-                return collection;
-            })
-            .catch(() => {});
-
-        checkPermissionPromises.push(promise);
+        collectionsForBulk.push({model: collection.model, parentIds});
     });
 
-    let collections = await Promise.all(checkPermissionPromises);
+    let collections = await Collection.bulkFetchAllPermissions(ctx, collectionsForBulk);
 
-    if (includePermissionsInfo) {
-        const mappedCollections: {model: CollectionModel; parentIds: string[]}[] = [];
-
-        acceptedCollectionsMap.forEach((parentIds, collectionModel) => {
-            mappedCollections.push({
-                model: collectionModel,
-                parentIds,
-            });
-        });
-
-        collections = await Collection.bulkFetchAllPermissions(ctx, mappedCollections);
+    if (!skipPermissionsFilter) {
+        collections = collections.filter(
+            (collection) => collection.permissions?.[CollectionPermission.Browse] === true,
+        );
     }
 
-    const result = collections.filter((item) => Boolean(item)) as CollectionInstance[];
+    if (!includePermissionsInfo) {
+        collections = collections.map(
+            (collection) => new Collection({ctx, model: collection.model}),
+        );
+    }
 
     ctx.log('GET_COLLECTIONS_LIST_BY_IDS_FINISH', {
         collectionIds: await Utils.macrotasksMap(
-            result.map((item) => item.model.collectionId),
+            collections.map((collection) => collection.model.collectionId),
             (id) => Utils.encodeId(id),
         ),
     });
 
-    return result;
+    return collections;
 };

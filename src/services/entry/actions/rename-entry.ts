@@ -1,47 +1,34 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {raw, transaction} from 'objection';
 
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
+import {ModifyUsersFolderDeniedError, NotExistEntryError} from '../../../components/errors';
 import {
     BiTrackingLogs,
     CURRENT_TIMESTAMP,
     EXTENDED_QUERY_TIMEOUT,
     RETURN_COLUMNS,
-    US_ERRORS,
 } from '../../../const';
 import Entry from '../../../db/models/entry';
-import {SharedEntryPermission} from '../../../entities/shared-entry';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {CTX, DlsActions} from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
-import {checkSharedEntryPermission} from '../../new/entry/utils/check-collection-entry-permission/check-permission';
+import {
+    CollectionEntryPermissions,
+    checkCollectionEntryPermission,
+} from '../../new/entry/collection-entry';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission} from '../../new/workbook/utils';
+import {ReturnColumnsEntry} from '../types';
 
 import {checkEntry} from './check-entry';
 
-const validateRenameEntry = makeSchemaValidator({
-    type: 'object',
-    required: ['entryId', 'name'],
-    properties: {
-        entryId: {
-            type: 'string',
-        },
-        name: {
-            type: 'string',
-            verifyEntryName: true,
-        },
-    },
-});
+export type RenamedEntry = ReturnColumnsEntry;
 
-type RenameEntryData = {
+export type RenameEntryData = {
     entryId: string;
     name: string;
 };
 
 export const renameEntry = async (ctx: CTX, renameEntryData: RenameEntryData) => {
-    validateRenameEntry(renameEntryData);
-
     const {entryId, name} = renameEntryData;
 
     ctx.log('RENAME_ENTRY_REQUEST', {
@@ -66,15 +53,11 @@ export const renameEntry = async (ctx: CTX, renameEntryData: RenameEntryData) =>
             .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
         if (!renamingEntry) {
-            throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-                code: US_ERRORS.NOT_EXIST_ENTRY,
-            });
+            throw new NotExistEntryError();
         }
 
         if (Utils.isUsersFolder(renamingEntry.key)) {
-            throw new AppError("Folder 'Users' cannot be renamed", {
-                code: US_ERRORS.MODIFY_USERS_FOLDER_DENIED,
-            });
+            throw new ModifyUsersFolderDeniedError({message: "Folder 'Users' cannot be renamed"});
         }
 
         if (!renamingEntry.workbookId) {
@@ -99,9 +82,9 @@ export const renameEntry = async (ctx: CTX, renameEntryData: RenameEntryData) =>
             }
         } else if (renamingEntry.collectionId) {
             if (!isPrivateRoute && accessServiceEnabled) {
-                await checkSharedEntryPermission(
+                await checkCollectionEntryPermission(
                     {ctx, trx},
-                    {entry: renamingEntry, permission: SharedEntryPermission.Update},
+                    {entry: renamingEntry, permission: CollectionEntryPermissions.Edit},
                 );
             }
         } else if (!isPrivateRoute && ctx.config.dlsEnabled) {
@@ -166,5 +149,5 @@ export const renameEntry = async (ctx: CTX, renameEntryData: RenameEntryData) =>
     ctx.log(BiTrackingLogs.RenameEntry, {
         entryId: Utils.encodeId(entryId),
     });
-    return result;
+    return result as unknown as RenamedEntry[];
 };

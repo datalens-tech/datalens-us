@@ -1,9 +1,8 @@
 import {AuthPolicy} from '@gravity-ui/expresskit';
 import type {AppContext} from '@gravity-ui/nodekit';
-import {AppError} from '@gravity-ui/nodekit';
 
 import {UserRole} from '../../../../../components/auth/constants/role';
-import {US_ERRORS} from '../../../../../const';
+import {AccessServicePermissionDeniedError} from '../../../../../components/errors';
 import type {CollectionModel} from '../../../../../db/models/new/collection';
 import {CollectionPermission, Permissions} from '../../../../../entities/collection/types';
 import {getMockedOperation} from '../../../../../entities/utils';
@@ -13,15 +12,17 @@ import {CollectionConstructor, CollectionInstance} from './types';
 
 export const Collection: CollectionConstructor<CollectionInstance> = class Collection implements CollectionInstance {
     static bulkFetchAllPermissions = async (ctx, items) => {
-        return items.map(({model}) => {
-            const collection = new Collection({ctx, model});
-            if (ctx.config.accessServiceEnabled) {
-                collection.fetchAllPermissions({parentIds: []});
-            } else {
-                collection.enableAllPermissions();
-            }
-            return collection;
-        });
+        return Promise.all(
+            items.map(async ({model}) => {
+                const collection = new Collection({ctx, model});
+                if (!ctx.config.accessServiceEnabled) {
+                    collection.enableAllPermissions();
+                    return collection;
+                }
+                await collection.fetchAllPermissions({parentIds: []});
+                return collection;
+            }),
+        );
     };
 
     ctx: AppContext;
@@ -37,9 +38,7 @@ export const Collection: CollectionConstructor<CollectionInstance> = class Colle
         const isEditorOrAdmin = this.isEditorOrAdmin();
 
         if (!isEditorOrAdmin) {
-            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
-            });
+            throw new AccessServicePermissionDeniedError();
         }
 
         return Promise.resolve(getMockedOperation({id: Utils.encodeId(this.model.collectionId)}));
@@ -52,9 +51,7 @@ export const Collection: CollectionConstructor<CollectionInstance> = class Colle
         const permissions = this.getAllPermissions();
 
         if (permissions[args.permission] === false) {
-            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
-            });
+            throw new AccessServicePermissionDeniedError();
         }
 
         return Promise.resolve();
@@ -67,6 +64,8 @@ export const Collection: CollectionConstructor<CollectionInstance> = class Colle
             createCollection: true,
             createWorkbook: true,
             createSharedEntry: true,
+            createSparkCluster: true,
+            createTrinoCluster: true,
             limitedView: true,
             view: true,
             update: true,
@@ -114,6 +113,8 @@ export const Collection: CollectionConstructor<CollectionInstance> = class Colle
             createCollection: isEditorOrAdmin,
             createWorkbook: isEditorOrAdmin,
             createSharedEntry: isEditorOrAdmin,
+            createSparkCluster: isEditorOrAdmin,
+            createTrinoCluster: isEditorOrAdmin,
             limitedView: true,
             view: true,
             browse: true,

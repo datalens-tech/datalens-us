@@ -1,6 +1,7 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
+import {CollectionNotExistsError} from '../../../components/errors';
 import {US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {WorkbookStatus} from '../../../db/models/new/workbook/types';
@@ -58,8 +59,8 @@ export const createWorkbook = async (
         });
 
         if (parentIds.length === 0) {
-            throw new AppError(`Cannot find parent collection with id – ${collectionId}`, {
-                code: US_ERRORS.COLLECTION_NOT_EXISTS,
+            throw new CollectionNotExistsError({
+                message: `Cannot find parent collection with id – ${Utils.encodeId(collectionId)}`,
             });
         }
     }

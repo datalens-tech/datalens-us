@@ -1,7 +1,6 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {US_ERRORS} from '../../../const/errors';
+import {LockTokenRequiredError, NotExistLockedEntryError} from '../../../components/errors';
 import {Lock, LockColumn} from '../../../db/models/new/lock';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
@@ -22,9 +21,7 @@ export const unlockEntry = async (
     ctx.log('UNLOCK_ENTRY_REQUEST', {tenantId, entryId, dlContext});
 
     if (!lockToken && !force) {
-        throw new AppError('The correct lock token is required', {
-            code: US_ERRORS.LOCK_TOKEN_REQUIRED,
-        });
+        throw new LockTokenRequiredError({message: 'The correct lock token is required'});
     }
 
     if (!isPrivateRoute) {
@@ -35,15 +32,11 @@ export const unlockEntry = async (
         const lockedEntry = await pullActiveLock({entryId, trx});
 
         if (!lockedEntry) {
-            throw new AppError(US_ERRORS.NOT_EXIST_LOCKED_ENTRY, {
-                code: US_ERRORS.NOT_EXIST_LOCKED_ENTRY,
-            });
+            throw new NotExistLockedEntryError();
         }
 
         if (lockToken && lockedEntry.lockToken !== lockToken) {
-            throw new AppError(US_ERRORS.LOCK_TOKEN_REQUIRED, {
-                code: US_ERRORS.LOCK_TOKEN_REQUIRED,
-            });
+            throw new LockTokenRequiredError();
         }
 
         return Lock.query(trx)

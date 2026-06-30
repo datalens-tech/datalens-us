@@ -1,3 +1,4 @@
+import {filterUnversionedData} from '../../../../components/private-permissions';
 import {JoinedEntryRevisionColumns} from '../../../../db/presentations/joined-entry-revision';
 import {CTX} from '../../../../types/models';
 import {EntryPermissions} from '../types';
@@ -15,17 +16,16 @@ export const formatGetEntryByKeyResponse = (
 ) => {
     const {privatePermissions} = ctx.get('info');
 
-    let isHiddenUnversionedData = false;
-    if (!privatePermissions.ownedScopes.includes(joinedEntryRevision?.scope!)) {
-        isHiddenUnversionedData = true;
-    }
-
     return {
         entryId: joinedEntryRevision.entryId,
         scope: joinedEntryRevision.scope,
         type: joinedEntryRevision.type,
         key: joinedEntryRevision.displayKey,
-        unversionedData: isHiddenUnversionedData ? undefined : joinedEntryRevision.unversionedData,
+        unversionedData: filterUnversionedData(
+            joinedEntryRevision.scope,
+            joinedEntryRevision.unversionedData,
+            privatePermissions,
+        ),
         createdBy: joinedEntryRevision.createdBy,
         createdAt: joinedEntryRevision.createdAt,
         updatedBy: joinedEntryRevision.updatedBy,

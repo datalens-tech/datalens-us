@@ -47,7 +47,7 @@ export interface EntryColumns {
     publishedId: string | null;
     tenantId: string;
     public: boolean;
-    unversionedData: Record<string, unknown>;
+    unversionedData: Record<string, unknown> | null;
     workbookId: string | null;
     collectionId: string | null;
     // tsv: string;

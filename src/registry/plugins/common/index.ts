@@ -8,6 +8,7 @@ import {
 import type {DLSConstructor} from './components/dls/types';
 import type {CheckOrganizationPermission} from './components/iam/types';
 import type {CollectionConstructor} from './entities/collection/types';
+import type {CollectionEntryConstructor} from './entities/collection-entry/types';
 import type {SharedEntryConstructor} from './entities/shared-entry/types';
 import type {WorkbookConstructor} from './entities/workbook/types';
 import type {CheckColorPalettesAdmin} from './utils/color-palettes/types';
@@ -31,6 +32,7 @@ export const commonPlugin = {
         Workbook: makeClassTemplate<WorkbookConstructor>(),
         Collection: makeClassTemplate<CollectionConstructor>(),
         SharedEntry: makeClassTemplate<SharedEntryConstructor>(),
+        CollectionEntry: makeClassTemplate<CollectionEntryConstructor>(),
     }),
     functions: createFunctionsRegistry({
         checkOrganizationPermission: makeFunctionTemplate<CheckOrganizationPermission>(),

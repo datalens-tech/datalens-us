@@ -1,6 +1,7 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
+import {NotExistEntryError} from '../../../components/errors';
 import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, US_ERRORS} from '../../../const';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {EntryColumns} from '../../../types/models';
@@ -53,9 +54,7 @@ export const updateEntryUnversionedDataPrivate = async (
         .timeout(DEFAULT_QUERY_TIMEOUT);
 
     if (!updatedEntry) {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
 
     ctx.log('UPDATE_UNVERSIONED_DATA_SUCCESS');

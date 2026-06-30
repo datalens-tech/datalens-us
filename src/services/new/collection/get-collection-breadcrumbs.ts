@@ -1,6 +1,4 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {US_ERRORS} from '../../../const';
+import {CollectionNotExistsError} from '../../../components/errors';
 import {CollectionPermission} from '../../../entities/collection';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
@@ -33,9 +31,7 @@ export const getCollectionBreadcrumbs = async (
     const parentModels = await getParents({ctx, trx: targetTrx, collectionIds: [collectionId]});
 
     if (parentModels.length === 0) {
-        throw new AppError(US_ERRORS.COLLECTION_NOT_EXISTS, {
-            code: US_ERRORS.COLLECTION_NOT_EXISTS,
-        });
+        throw new CollectionNotExistsError();
     }
 
     const {Collection} = registry.common.classes.get();

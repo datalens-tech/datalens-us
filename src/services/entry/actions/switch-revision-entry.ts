@@ -1,6 +1,7 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
+import {NotExistEntryError} from '../../../components/errors';
 import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, SYSTEM_USER, US_ERRORS} from '../../../const';
 import Entry from '../../../db/models/entry';
 import {EntryColumn} from '../../../db/models/new/entry';
@@ -35,9 +36,7 @@ export async function switchRevisionEntry({ctx, trx}: ServiceArgs, args: SwitchR
         .timeout(DEFAULT_QUERY_TIMEOUT);
 
     if (!entry) {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
 
     const revision = await Revision.query(replica)

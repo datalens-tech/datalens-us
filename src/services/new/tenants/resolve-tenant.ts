@@ -1,6 +1,4 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {US_ERRORS} from '../../../const';
+import {NotExistEntryError} from '../../../components/errors';
 import {ServiceArgs} from '../types';
 
 import {getTenantByCollectionId} from './get-tenant-by-collection-id';
@@ -30,9 +28,7 @@ export const resolveTenant = async ({ctx, trx}: ServiceArgs, args: ResolveTenant
     }
 
     if (tenant === undefined) {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
 
     ctx.log('RESOLVE_TENANT_SUCCESS', {tenant});

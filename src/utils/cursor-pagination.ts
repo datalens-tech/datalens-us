@@ -2,6 +2,7 @@ import {AppError} from '@gravity-ui/nodekit';
 import {Model, QueryBuilder, raw, ref} from 'objection';
 import {z} from 'zod';
 
+import {InvalidPageTokenError} from '../components/errors';
 import {OrderBy, US_ERRORS} from '../const';
 
 export interface SortFieldConfig {
@@ -37,14 +38,14 @@ const decodeCursorPageToken = (cursorFields: SortFieldConfig[], pageToken: strin
         const parsedPayload = JSON.parse(payload);
 
         if (!Array.isArray(parsedPayload) || parsedPayload.length !== cursorFields.length) {
-            throw new AppError('Invalid page token', {code: US_ERRORS.INVALID_PAGE_TOKEN});
+            throw new InvalidPageTokenError();
         }
 
         return cursorFields.map((sf, i) => {
             const result = sf.validate.safeParse(parsedPayload[i]);
             if (!result.success) {
-                throw new AppError(`Invalid page token: ${result.error.message}`, {
-                    code: US_ERRORS.INVALID_PAGE_TOKEN,
+                throw new InvalidPageTokenError({
+                    message: `Invalid page token: ${result.error.message}`,
                 });
             }
             return result.data;
@@ -53,10 +54,9 @@ const decodeCursorPageToken = (cursorFields: SortFieldConfig[], pageToken: strin
         if (error instanceof AppError) {
             throw error;
         }
-        throw new AppError(
-            `Invalid page token: ${error instanceof Error ? error.message : 'Unknown error'}`,
-            {code: US_ERRORS.INVALID_PAGE_TOKEN},
-        );
+        throw new InvalidPageTokenError({
+            message: `Invalid page token: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        });
     }
 };
 

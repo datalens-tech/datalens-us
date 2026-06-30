@@ -1,16 +1,13 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {US_ERRORS} from '../../../const';
+import {AccessServicePermissionDeniedError, NotExistEntryError} from '../../../components/errors';
+import {queryPrimary} from '../../../db';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
-import {SharedEntryPermission} from '../../../entities/shared-entry';
-import {SharedEntryInstance} from '../../../registry/plugins/common/entities/shared-entry/types';
+import {ALLOWED_SHARED_ENTRY_SCOPES, SharedEntryPermission} from '../../../entities/shared-entry';
 import type {EntryColumns} from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
 import {markEntriesAsDeleted} from '../../entry/crud';
-import {makeSharedEntriesWithParentsMap} from '../collection/utils/get-parents';
+import {makeCollectionEntriesWithParentsMap} from '../collection/utils/get-parents';
 import {bulkCheckLock} from '../lock';
 import {ServiceArgs} from '../types';
-import {getPrimary} from '../utils';
 
 export interface DeleteSharedEntriesArgs {
     entryIds: string[];
@@ -19,7 +16,7 @@ export interface DeleteSharedEntriesArgs {
 }
 
 export const deleteSharedEntries = async (
-    {ctx, trx}: ServiceArgs,
+    {ctx, mainTrx}: ServiceArgs<'mainTrx'>,
     args: DeleteSharedEntriesArgs,
 ) => {
     const {entryIds, skipCheckPermissions = false, detachDeletePermissions = false} = args;
@@ -35,44 +32,41 @@ export const deleteSharedEntries = async (
         isPrivateRoute,
         tenantId,
     } = ctx.get('info');
-    const registry = ctx.get('registry');
-    const {SharedEntry} = registry.common.classes.get();
 
-    const entries = await Entry.query(getPrimary(trx))
+    const {SharedEntry} = ctx.get('registry').common.classes.get();
+
+    const entries = await queryPrimary(Entry, mainTrx)
         .select()
         .whereIn([EntryColumn.EntryId], entryIds)
         .where({[EntryColumn.IsDeleted]: false, [EntryColumn.TenantId]: tenantId})
         .whereNotNull(EntryColumn.CollectionId)
+        .whereIn([EntryColumn.Scope], ALLOWED_SHARED_ENTRY_SCOPES)
         .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
-    const sharedEntriesWithParentsMap = await makeSharedEntriesWithParentsMap(
-        {ctx, trx: getPrimary(trx)},
+    const entriesWithParentsMap = await makeCollectionEntriesWithParentsMap(
+        {ctx, trx: mainTrx},
         {
             models: entries,
         },
     );
 
-    const sharedEntriesIdsMap = new Map<
-        string,
-        {entry: SharedEntryInstance; parentIds: string[]}
-    >();
-    const sharedEntriesForBulk: {model: Entry; parentIds: string[]}[] = [];
+    const itemsByEntryId = new Map<string, {model: Entry; parentIds: string[]}>();
+    const items: {model: Entry; parentIds: string[]}[] = [];
 
-    sharedEntriesWithParentsMap.forEach((parentIds, sharedEntry) => {
-        sharedEntriesIdsMap.set(sharedEntry.model.entryId, {entry: sharedEntry, parentIds});
-        sharedEntriesForBulk.push({model: sharedEntry.model, parentIds});
+    entriesWithParentsMap.forEach((parentIds, model) => {
+        itemsByEntryId.set(model.entryId, {model, parentIds});
+        items.push({model, parentIds});
     });
 
     if (accessServiceEnabled && !skipCheckPermissions && !isPrivateRoute) {
-        const sharedEntries = await SharedEntry.bulkFetchAllPermissions(ctx, sharedEntriesForBulk);
+        const sharedEntries = await SharedEntry.bulkFetchAllPermissions(ctx, items);
+
         if (
             sharedEntries.some(
                 (sharedEntry) => !sharedEntry.permissions?.[SharedEntryPermission.Delete],
             )
         ) {
-            throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-                code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
-            });
+            throw new AccessServicePermissionDeniedError();
         }
     }
 
@@ -95,16 +89,16 @@ export const deleteSharedEntries = async (
     const deletePermissions = async () => {
         await Promise.all(
             deletedEntries.map(async (entry) => {
-                const {entryId} = entry;
-
-                const sharedEntryData = sharedEntriesIdsMap.get(entryId);
-                if (!sharedEntryData) {
-                    throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-                        code: US_ERRORS.NOT_EXIST_ENTRY,
-                    });
+                const item = itemsByEntryId.get(entry.entryId);
+                if (!item) {
+                    throw new NotExistEntryError();
                 }
-                const {entry: sharedEntry, parentIds} = sharedEntryData;
-                await sharedEntry.deletePermissions({parentIds, skipCheckPermissions: true});
+
+                const sharedEntry = new SharedEntry({ctx, model: item.model});
+                await sharedEntry.deletePermissions({
+                    parentIds: item.parentIds,
+                    skipCheckPermissions: true,
+                });
             }),
         );
     };

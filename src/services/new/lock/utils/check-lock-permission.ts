@@ -1,10 +1,10 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {US_ERRORS} from '../../../../const/errors';
+import {NotExistEntryError} from '../../../../components/errors';
 import {Entry, EntryColumn} from '../../../../db/models/new/entry';
-import {SharedEntryPermission} from '../../../../entities/shared-entry';
 import {WorkbookPermission} from '../../../../entities/workbook';
-import {checkSharedEntryPermission} from '../../entry/utils/check-collection-entry-permission/check-permission';
+import {
+    CollectionEntryPermissions,
+    checkCollectionEntryPermission,
+} from '../../entry/collection-entry';
 import {ServiceArgs} from '../../types';
 import {getReplica} from '../../utils';
 import {getWorkbook} from '../../workbook';
@@ -28,9 +28,7 @@ export const checkLockPermission = async (
         .timeout(Entry.DEFAULT_QUERY_TIMEOUT);
 
     if (!entry) {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
 
     if (entry.workbookId) {
@@ -51,14 +49,14 @@ export const checkLockPermission = async (
         }
     } else if (entry.collectionId) {
         if (accessServiceEnabled) {
-            await checkSharedEntryPermission(
+            await checkCollectionEntryPermission(
                 {ctx},
                 {
                     entry,
                     permission:
                         permission === 'read'
-                            ? SharedEntryPermission.View
-                            : SharedEntryPermission.Update,
+                            ? CollectionEntryPermissions.Read
+                            : CollectionEntryPermissions.Edit,
                 },
             );
         }

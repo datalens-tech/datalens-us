@@ -1,3 +1,4 @@
+import type {ComputeEntryPermissions} from '../../../../entities/compute-entry/types';
 import type {Permissions as SharedEntryPermissions} from '../../../../entities/shared-entry/types';
 import type {EntryScope} from '../../../../types/models';
 
@@ -8,10 +9,12 @@ export interface EntryPermissions {
     admin?: boolean;
 }
 
-export type EntryWithPermissions<T> = T & {
+export type EntryFullPermissions = SharedEntryPermissions | ComputeEntryPermissions;
+
+export type EntryWithPermissions<T, P = SharedEntryPermissions> = T & {
     isLocked?: boolean;
     permissions?: EntryPermissions;
-    fullPermissions?: SharedEntryPermissions;
+    fullPermissions?: P;
     isRestricted?: boolean;
 };
 

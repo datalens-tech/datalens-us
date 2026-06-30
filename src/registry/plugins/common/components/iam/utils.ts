@@ -1,16 +1,14 @@
 import {AuthPolicy} from '@gravity-ui/expresskit';
-import {AppContext, AppError} from '@gravity-ui/nodekit';
+import {AppContext} from '@gravity-ui/nodekit';
 
 import {UserRole} from '../../../../../components/auth/constants/role';
+import {AccessServicePermissionDeniedError} from '../../../../../components/errors';
 import {OrganizationPermission} from '../../../../../components/iam';
-import {US_ERRORS} from '../../../../../const';
 
 import type {CheckOrganizationPermission} from './types';
 
 export const throwAccessServicePermissionDenied = () => {
-    throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-        code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
-    });
+    throw new AccessServicePermissionDeniedError();
 };
 
 const checkAuthOrganizationPermission: CheckOrganizationPermission = async (args: {

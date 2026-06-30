@@ -1,15 +1,14 @@
-import {AppContext, AppError} from '@gravity-ui/nodekit';
+import {AppContext} from '@gravity-ui/nodekit';
 import {TransactionOrKnex} from 'objection';
 
-import {US_ERRORS} from '../../../../const';
+import {AccessServicePermissionDeniedError} from '../../../../components/errors';
 import {Entry as EntryModel} from '../../../../db/models/new/entry';
 import {WorkbookModel} from '../../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../../entities/workbook';
-import {UsPermissions} from '../../../../types/models';
 import {getParentIds} from '../../collection/utils';
 import {getReplica} from '../../utils';
 import {getEntryPermissionsByWorkbook} from '../../workbook/utils';
-import {checkCollectionEntryPermission} from '../utils/check-collection-entry-permission';
+import {CollectionEntryPermissions, resolveCollectionEntryPermissions} from '../collection-entry';
 
 import {
     ENTITY_BINDING_QUERY_TIMEOUT,
@@ -59,9 +58,7 @@ export const checkWorkbookEntry = async ({
             await workbookInstance.fetchAllPermissions({parentIds});
 
             if (!workbookInstance.permissions?.[WorkbookPermission.LimitedView]) {
-                throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-                    code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
-                });
+                throw new AccessServicePermissionDeniedError();
             }
         } else {
             await workbookInstance.checkPermission({
@@ -94,22 +91,14 @@ export const checkCollectionEntry = async ({
     ctx: AppContext;
     trx?: TransactionOrKnex;
     entry: SelectedEntry;
-    permission: UsPermissions;
+    permission: CollectionEntryPermissions;
     includePermissionsInfo?: boolean;
     skipCheckPermissions?: boolean;
 }) => {
-    const registry = ctx.get('registry');
-    const {SharedEntry} = registry.common.classes.get();
-
-    const sharedEntryInstance = new SharedEntry({
-        ctx,
-        model: entry as EntryModel,
-    });
-
-    return await checkCollectionEntryPermission(
+    return await resolveCollectionEntryPermissions(
         {ctx, trx},
         {
-            sharedEntryInstance,
+            entry: entry as unknown as EntryModel,
             permission,
             includePermissions: includePermissionsInfo,
             skipCheckPermissions,

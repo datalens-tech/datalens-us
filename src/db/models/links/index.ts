@@ -1,6 +1,7 @@
 import {AppError} from '@gravity-ui/nodekit';
 
 import {Model} from '../..';
+import {IncorrectLinkError, SyncLinksFailedError} from '../../../components/errors';
 import {US_ERRORS} from '../../../const';
 import * as MT from '../../../types/models';
 import Utils from '../../../utils';
@@ -54,9 +55,7 @@ class Links extends Model {
                 throw error;
             }
 
-            throw new AppError('SYNC_LINKS_FAILED', {
-                code: 'SYNC_LINKS_FAILED',
-            });
+            throw new SyncLinksFailedError();
         }
     }
 
@@ -80,10 +79,7 @@ class Links extends Model {
         });
 
         if (Object.keys(invalidLinkIds).length > 0) {
-            throw new AppError(US_ERRORS.INCORRECT_LINK_ERROR, {
-                code: US_ERRORS.INCORRECT_LINK_ERROR,
-                details: {invalidLinkIds},
-            });
+            throw new IncorrectLinkError({details: {invalidLinkIds}});
         }
 
         return validLinks;

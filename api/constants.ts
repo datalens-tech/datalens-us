@@ -29,4 +29,5 @@ export {
     TenantSettings,
     DL_WORKBOOK_ID_HEADER,
     DL_DATASET_ID_HEADER,
+    PrivateRouteTag,
 } from '../src/const';

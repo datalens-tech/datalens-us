@@ -37,6 +37,7 @@ describe('Update entry unversioned data (private)', () => {
 
         const result = await authPrivateRoute(
             request(app).post(routes.privateUpdateEntryUnversionedData(entryId)),
+            {component: 'backend'},
         )
             .send({
                 unversionedData: newUnversionedData,
@@ -77,6 +78,7 @@ describe('Update entry unversioned data (private)', () => {
 
         const result = await authPrivateRoute(
             request(app).post(routes.privateUpdateEntryUnversionedData(entryId)),
+            {component: 'backend'},
         )
             .send({
                 unversionedData: newUnversionedData,
@@ -85,5 +87,34 @@ describe('Update entry unversioned data (private)', () => {
             .expect(200);
 
         expect(result.body.unversionedData).toEqual(newUnversionedData);
+    });
+
+    test('unversionedData is hidden without x-dl-component header', async () => {
+        const result = await authPrivateRoute(
+            request(app).post(routes.privateUpdateEntryUnversionedData(entryId)),
+            {component: null},
+        )
+            .send({
+                unversionedData: {anyField: 'anyValue'},
+                lockToken,
+            })
+            .expect(200);
+
+        expect(result.body.unversionedData).toBeUndefined();
+    });
+
+    test('unversionedData is hidden when x-dl-component does not own the scope', async () => {
+        // entry scope is 'dataset' which belongs to backend component, not ui
+        const result = await authPrivateRoute(
+            request(app).post(routes.privateUpdateEntryUnversionedData(entryId)),
+            {component: 'ui'},
+        )
+            .send({
+                unversionedData: {anyField: 'anyValue'},
+                lockToken,
+            })
+            .expect(200);
+
+        expect(result.body.unversionedData).toBeUndefined();
     });
 });

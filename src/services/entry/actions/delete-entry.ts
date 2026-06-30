@@ -1,53 +1,52 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
+import {
+    EntriesWithInsufficientPermissionsError,
+    ModifyUsersFolderDeniedError,
+    NotExistEntryError,
+} from '../../../components/errors';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {
     ALLOWED_SCOPE_VALUES,
     BiTrackingLogs,
     DEFAULT_QUERY_TIMEOUT,
     RETURN_COLUMNS,
-    US_ERRORS,
 } from '../../../const';
 import {default as OldEntry} from '../../../db/models/entry';
-import {Entry, EntryColumn} from '../../../db/models/new/entry';
-import {SharedEntryPermission} from '../../../entities/shared-entry';
+import {EntryColumn, Entry as EntryModel} from '../../../db/models/new/entry';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {DlsActions, EntryColumns, EntryScope, UsPermissions} from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
 import {getParentIds} from '../../new/collection/utils/get-parents';
-import {checkSharedEntryPermission} from '../../new/entry/utils/check-collection-entry-permission/check-permission';
+import {
+    CollectionEntryPermissions,
+    checkCollectionEntryPermission,
+    createCollectionEntry,
+} from '../../new/entry/collection-entry';
+import {checkPrivateScopeAccess} from '../../new/entry/utils';
 import {checkLock} from '../../new/lock';
 import {ServiceArgs} from '../../new/types';
 import {getWorkbook} from '../../new/workbook/get-workbook';
 import {checkWorkbookPermission} from '../../new/workbook/utils';
 import {markEntryAsDeleted} from '../crud';
+import {ReturnColumnsEntry} from '../types';
 
 import {checkEntry} from './check-entry';
+
+export type DeletedEntry = ReturnColumnsEntry & {
+    isDeleted: boolean;
+    deletedAt: string | null;
+};
 
 const validateArgs = makeSchemaValidator({
     type: 'object',
     required: ['entryId'],
     properties: {
-        entryId: {
-            type: 'string',
-        },
-        lockToken: {
-            type: 'string',
-        },
-        useLegacyLogin: {
-            type: 'boolean',
-        },
-        scope: {
-            type: 'string',
-            enum: ALLOWED_SCOPE_VALUES,
-        },
-        types: {
-            type: 'array',
-            items: {
-                type: 'string',
-            },
-        },
+        entryId: {type: 'string'},
+        lockToken: {type: 'string'},
+        useLegacyLogin: {type: 'boolean'},
+        scope: {type: 'string', enum: ALLOWED_SCOPE_VALUES},
+        types: {type: 'array', items: {type: 'string'}},
     },
 });
 
@@ -71,7 +70,7 @@ export async function deleteEntry(
     });
 
     const registry = ctx.get('registry');
-    const {DLS, SharedEntry} = registry.common.classes.get();
+    const {DLS} = registry.common.classes.get();
     const {fetchAndValidateLicenseOrFail} = registry.common.functions.get();
 
     if (!skipValidation) {
@@ -107,15 +106,13 @@ export async function deleteEntry(
             .timeout(DEFAULT_QUERY_TIMEOUT);
 
         if (!entry) {
-            throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-                code: US_ERRORS.NOT_EXIST_ENTRY,
-            });
+            throw new NotExistEntryError();
         }
 
+        checkPrivateScopeAccess({ctx}, entry.scope);
+
         if (Utils.isUsersFolder(entry.key)) {
-            throw new AppError("Folder 'Users' cannot be deleted", {
-                code: US_ERRORS.MODIFY_USERS_FOLDER_DENIED,
-            });
+            throw new ModifyUsersFolderDeniedError({message: "Folder 'Users' cannot be deleted"});
         }
 
         const entryObj: EntryColumns = entry.toJSON();
@@ -140,9 +137,9 @@ export async function deleteEntry(
                 }
             } else if (entryObj.collectionId) {
                 if (accessServiceEnabled) {
-                    await checkSharedEntryPermission(
+                    await checkCollectionEntryPermission(
                         {ctx, trx},
-                        {entry: entryObj, permission: SharedEntryPermission.Delete},
+                        {entry: entryObj, permission: CollectionEntryPermissions.Delete},
                     );
                 }
             } else if (ctx.config.dlsEnabled) {
@@ -173,9 +170,7 @@ export async function deleteEntry(
                     });
 
                 if (haveEntriesWithPermissionsLess) {
-                    throw new AppError(US_ERRORS.ENTRIES_WITH_INSUFFICIENT_PERMISSIONS, {
-                        code: US_ERRORS.ENTRIES_WITH_INSUFFICIENT_PERMISSIONS,
-                    });
+                    throw new EntriesWithInsufficientPermissionsError();
                 }
             }
 
@@ -227,7 +222,7 @@ export async function deleteEntry(
             });
         }
 
-        return await OldEntry.query(trx)
+        return (await OldEntry.query(trx)
             .select([...RETURN_COLUMNS, 'isDeleted', 'deletedAt'])
             .join('revisions', 'entries.savedId', 'revisions.revId')
             .where({
@@ -235,7 +230,7 @@ export async function deleteEntry(
                 isDeleted: true,
             })
             .first()
-            .timeout(DEFAULT_QUERY_TIMEOUT);
+            .timeout(DEFAULT_QUERY_TIMEOUT)) as DeletedEntry | undefined;
     });
 
     if (result && result.collectionId) {
@@ -243,13 +238,17 @@ export async function deleteEntry(
             ctx,
             collectionId: result.collectionId,
         });
-        const sharedEntry = new SharedEntry({
-            ctx,
-            model: result as Entry,
-        });
-        await sharedEntry.deletePermissions({
+
+        const instance = createCollectionEntry(ctx, result as unknown as EntryModel);
+        await instance.deletePermissions({
             parentIds,
             skipCheckPermissions: true,
+        });
+    }
+
+    if (!result) {
+        throw new NotExistEntryError({
+            message: 'Entry deletion failed: entry not found after delete',
         });
     }
 

@@ -1,7 +1,7 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
-import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../../const';
+import {CollectionNotExistsError} from '../../../../components/errors';
+import {CURRENT_TIMESTAMP} from '../../../../const';
 import {CollectionModel, CollectionModelColumn} from '../../../../db/models/new/collection';
 import {CollectionInstance} from '../../../../registry/plugins/common/entities/collection/types';
 import {ServiceArgs} from '../../types';
@@ -51,9 +51,7 @@ export const markCollectionsAsDeleted = async (
             collections.map(async ({collectionId}) => {
                 const collectionData = collectionIdsMap.get(collectionId);
                 if (!collectionData) {
-                    throw new AppError(US_ERRORS.COLLECTION_NOT_EXISTS, {
-                        code: US_ERRORS.COLLECTION_NOT_EXISTS,
-                    });
+                    throw new CollectionNotExistsError();
                 }
                 const {collectionInstance, parentIds} = collectionData;
                 await collectionInstance.deletePermissions({

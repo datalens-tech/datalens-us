@@ -37,6 +37,7 @@ export interface AppRouteApiMetadata {
 
 export interface PlatformAppRouteParams {
     private?: boolean;
+    privateTags?: string[];
     write?: boolean;
     manualDecodeId?: boolean;
     requireCtxTenantId?: boolean;

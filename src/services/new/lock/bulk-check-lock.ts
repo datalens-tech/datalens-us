@@ -1,7 +1,6 @@
-import {AppError} from '@gravity-ui/nodekit';
 import moment from 'moment';
 
-import {US_ERRORS} from '../../../const/errors';
+import {EntryIsLockedError} from '../../../components/errors';
 import {Lock, LockColumn} from '../../../db/models/new/lock';
 import Utils from '../../../utils';
 import {ServiceArgs} from '../types';
@@ -28,8 +27,7 @@ export const bulkCheckLock = async ({ctx, trx}: ServiceArgs, {items}: {items: Ch
         const lock = locksMap.get(item.entryId);
 
         if (lock && lock.lockToken !== item.lockToken) {
-            throw new AppError(US_ERRORS.ENTRY_IS_LOCKED, {
-                code: US_ERRORS.ENTRY_IS_LOCKED,
+            throw new EntryIsLockedError({
                 details: {
                     entryId: Utils.encodeId(item.entryId),
                     loginOrId: lock.login,

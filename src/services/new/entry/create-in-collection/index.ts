@@ -1,7 +1,7 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {BiTrackingLogs, RETURN_COLUMNS, US_ERRORS} from '../../../../const';
+import {CollectionNotExistsError} from '../../../../components/errors';
+import {BiTrackingLogs, RETURN_COLUMNS} from '../../../../const';
 import LegacyEntry from '../../../../db/models/entry';
 import {EntryColumn, Entry as EntryModel} from '../../../../db/models/new/entry';
 import {RevisionModel, RevisionModelColumn} from '../../../../db/models/new/revision';
@@ -11,6 +11,7 @@ import Utils, {makeUserId} from '../../../../utils';
 import {getParentIds} from '../../collection/utils/get-parents';
 import {ServiceArgs} from '../../types';
 import {getPrimary} from '../../utils/get-trx';
+import {createCollectionEntry} from '../collection-entry';
 
 import {CreateEntryInCollectionArgs, parseArgs} from './validate';
 
@@ -53,8 +54,8 @@ export async function createEntryInCollection(
     });
 
     if (parentIds.length === 0) {
-        throw new AppError(`Cannot find parent collection with id – ${collectionId}`, {
-            code: US_ERRORS.COLLECTION_NOT_EXISTS,
+        throw new CollectionNotExistsError({
+            message: `Cannot find parent collection with id – ${Utils.encodeId(collectionId)}`,
         });
     }
 
@@ -115,7 +116,7 @@ export async function createEntryInCollection(
             .timeout(RevisionModel.DEFAULT_QUERY_TIMEOUT);
 
         const model = await EntryModel.query(transactionTrx)
-            .select(RETURN_COLUMNS.concat(RevisionModelColumn.Links))
+            .select([...RETURN_COLUMNS, RevisionModelColumn.Links])
             .join(
                 RevisionModel.tableName,
                 `${EntryModel.tableName}.${EntryColumn.EntryId}`,
@@ -128,17 +129,10 @@ export async function createEntryInCollection(
             .first()
             .timeout(EntryModel.DEFAULT_QUERY_TIMEOUT);
 
-        const {SharedEntry} = registry.common.classes.get();
-
-        const sharedEntry = new SharedEntry({
-            ctx,
-            model: model!,
-        });
-
         if (accessServiceEnabled && accessBindingsServiceEnabled && !isPrivateRoute) {
-            operation = await sharedEntry.register({
-                parentIds,
-            });
+            const collectionEntry = createCollectionEntry(ctx, model!);
+
+            operation = await collectionEntry.register({parentIds});
         }
 
         return model!;

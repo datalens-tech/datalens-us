@@ -1,5 +1,11 @@
 import {AppError} from '@gravity-ui/nodekit';
 
+import {
+    CollectionNotExistsError,
+    EntryAndCollectionTenantMismatchError,
+    EntryAndWorkbookTenantMismatchError,
+    NotExistEntryError,
+} from '../../../../components/errors';
 import {Feature, isEnabledFeature} from '../../../../components/features';
 import {US_ERRORS} from '../../../../const';
 import OldEntry from '../../../../db/models/entry';
@@ -8,13 +14,13 @@ import {Entry, EntryColumn} from '../../../../db/models/new/entry';
 import {LicenseWithIsActive} from '../../../../db/models/new/license/presentations';
 import {TenantColumn} from '../../../../db/models/new/tenant';
 import {WorkbookModelColumn} from '../../../../db/models/new/workbook';
-import type {Permissions as SharedEntryPermissions} from '../../../../entities/shared-entry/types';
-import {DlsActions, UsPermissions} from '../../../../types/models';
+import {DlsActions} from '../../../../types/models';
 import Utils, {withTimeout} from '../../../../utils';
 import {ServiceArgs} from '../../types';
 import {getReplica} from '../../utils';
-import {EntryPermissions} from '../types';
-import {checkWorkbookIsolation} from '../utils';
+import {CollectionEntryPermissions} from '../collection-entry';
+import {EntryFullPermissions, EntryPermissions} from '../types';
+import {checkPrivateScopeAccess, checkWorkbookIsolation} from '../utils';
 
 import {
     ENTRY_QUERY_TIMEOUT,
@@ -45,7 +51,7 @@ export type GetEntryResult = {
     revision: SelectedRevision;
     includePermissionsInfo?: boolean;
     permissions: EntryPermissions;
-    fullPermissions?: SharedEntryPermissions;
+    fullPermissions?: EntryFullPermissions;
     includeLinks?: boolean;
     includeServicePlan?: boolean;
     servicePlan?: string;
@@ -56,7 +62,6 @@ export type GetEntryResult = {
     tenantSettings?: Record<string, unknown>;
 };
 
-// eslint-disable-next-line complexity
 export const getEntry = async (
     {ctx, trx}: ServiceArgs,
     args: GetEntryArgs,
@@ -209,14 +214,20 @@ export const getEntry = async (
     const revision = entry?.publishedRevision ?? entry?.savedRevision ?? entry?.revisions?.[0];
 
     if (!entry || !revision) {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
+
+    checkPrivateScopeAccess({ctx}, entry.scope);
 
     if (!entry.tenant) {
         throw new AppError(US_ERRORS.NOT_EXIST_TENANT, {
             code: US_ERRORS.NOT_EXIST_TENANT,
+        });
+    }
+
+    if (entry.tenant.deleting) {
+        throw new AppError(US_ERRORS.TENANT_IS_BEING_DELETED, {
+            code: US_ERRORS.TENANT_IS_BEING_DELETED,
         });
     }
 
@@ -241,7 +252,7 @@ export const getEntry = async (
 
     let dlsPermissions: any; // TODO: Update the type after refactoring DLS.checkPermission(...)
     let iamPermissions: Optional<EntryPermissions>;
-    let fullPermissions: Optional<SharedEntryPermissions>;
+    let fullPermissions: Optional<EntryFullPermissions>;
 
     if (entry.workbookId) {
         if (!entry.workbook || entry.workbook[WorkbookModelColumn.DeletedAt] !== null) {
@@ -251,9 +262,7 @@ export const getEntry = async (
         }
 
         if (entry.tenantId !== entry.workbook.tenantId) {
-            throw new AppError(US_ERRORS.ENTRY_AND_WORKBOOK_TENANT_MISMATCH, {
-                code: US_ERRORS.ENTRY_AND_WORKBOOK_TENANT_MISMATCH,
-            });
+            throw new EntryAndWorkbookTenantMismatchError();
         }
 
         const checkWorkbookEnabled =
@@ -270,22 +279,18 @@ export const getEntry = async (
         }
     } else if (entry.collectionId) {
         if (!entry.collection || entry.collection[CollectionModelColumn.DeletedAt] !== null) {
-            throw new AppError(US_ERRORS.COLLECTION_NOT_EXISTS, {
-                code: US_ERRORS.COLLECTION_NOT_EXISTS,
-            });
+            throw new CollectionNotExistsError();
         }
 
         if (entry.tenantId !== entry.collection.tenantId) {
-            throw new AppError(US_ERRORS.ENTRY_AND_COLLECTION_TENANT_MISMATCH, {
-                code: US_ERRORS.ENTRY_AND_COLLECTION_TENANT_MISMATCH,
-            });
+            throw new EntryAndCollectionTenantMismatchError();
         }
 
         const checkedResult = await checkCollectionEntry({
             ctx,
             trx,
             entry,
-            permission: UsPermissions.Execute,
+            permission: CollectionEntryPermissions.Execute,
             includePermissionsInfo,
             skipCheckPermissions:
                 isPrivateOrAuditRoute || onlyPublic || onlyMirrored || isEmbedding,

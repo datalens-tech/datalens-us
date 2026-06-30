@@ -262,6 +262,10 @@ export class Utils {
         return encodedId;
     }
 
+    static encodeIdOrNull(bigIntId: any) {
+        return bigIntId ? Utils.encodeId(bigIntId) : null;
+    }
+
     static decodeId(id: string) {
         let decodedId = '';
 

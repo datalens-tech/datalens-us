@@ -38,12 +38,15 @@ import type {
     UpdateWorkbookReqBody,
     UpdateWorkbookReqParams,
 } from '../../../../../controllers/workbooks/update-workbook';
-import OldEntry from '../../../../../db/models/entry';
 import type {CollectionModel} from '../../../../../db/models/new/collection';
 import {ColorPaletteModel} from '../../../../../db/models/new/color-palette';
 import {Entry} from '../../../../../db/models/new/entry';
 import {Tenant} from '../../../../../db/models/new/tenant';
 import type {WorkbookModel} from '../../../../../db/models/new/workbook';
+import type {DeletedEntry} from '../../../../../services/entry/actions/delete-entry';
+import type {RenamedEntry} from '../../../../../services/entry/actions/rename-entry';
+import type {UpdatedEntry} from '../../../../../services/entry/actions/update-entry';
+import type {CreatedEntry} from '../../../../../services/entry.service';
 
 export enum LogEventType {
     CreateCollectionSuccess = 'createCollectionSuccess',
@@ -383,7 +386,7 @@ export interface LogEventDeleteEntrySuccessParams extends EventParams {
     type: LogEventType.DeleteEntrySuccess;
 
     reqParams: DeleteEntryReqParams;
-    entry: OldEntry | undefined;
+    entry: DeletedEntry | undefined;
 }
 
 export interface LogEventDeleteEntryFailParams extends EventParams {
@@ -426,7 +429,7 @@ export interface LogEventCreateEntrySuccessParams extends EventParams {
     type: LogEventType.CreateEntrySuccess;
 
     reqParams: CreateEntryReqParams;
-    data: OldEntry | Entry | OldEntry[] | Entry[] | undefined;
+    data: CreatedEntry | CreatedEntry[] | undefined;
 }
 
 export interface LogEventCreateEntryFailParams extends EventParams {
@@ -445,7 +448,7 @@ export interface LogEventRenameEntrySuccessParams extends EventParams {
     type: LogEventType.RenameEntrySuccess;
 
     reqParams: RenameEntryReqParams;
-    data: OldEntry[];
+    data: RenamedEntry[];
 }
 
 export interface LogEventRenameEntryFailParams extends EventParams {
@@ -464,7 +467,7 @@ export interface LogEventUpdateEntrySuccessParams extends EventParams {
     type: LogEventType.UpdateEntrySuccess;
 
     reqParams: UpdateEntryReqParams;
-    data: OldEntry | undefined;
+    data: UpdatedEntry | undefined;
 }
 
 export interface LogEventUpdateEntryFailParams extends EventParams {

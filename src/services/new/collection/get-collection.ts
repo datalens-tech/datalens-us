@@ -1,6 +1,4 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {US_ERRORS} from '../../../const';
+import {CollectionNotExistsError} from '../../../components/errors';
 import {CollectionModel, CollectionModelColumn} from '../../../db/models/new/collection';
 import {CollectionPermission} from '../../../entities/collection';
 import type {CollectionInstance} from '../../../registry/plugins/common/entities/collection/types';
@@ -53,9 +51,7 @@ export const getCollection = async <T extends CollectionInstance = CollectionIns
         .timeout(CollectionModel.DEFAULT_QUERY_TIMEOUT);
 
     if (!model) {
-        throw new AppError(US_ERRORS.COLLECTION_NOT_EXISTS, {
-            code: US_ERRORS.COLLECTION_NOT_EXISTS,
-        });
+        throw new CollectionNotExistsError();
     }
 
     const {Collection} = registry.common.classes.get();

@@ -27,7 +27,7 @@ const requestSchema = {
         orderBy: z
             .object({
                 field: z.enum(['name', 'createdAt']),
-                direction: z.enum(['asc', 'desc']),
+                direction: zc.orderDirection(),
             })
             .optional(),
         page: zc.stringNumber({min: 0}).optional(),

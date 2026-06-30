@@ -1,17 +1,6 @@
-import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {DEFAULT_QUERY_TIMEOUT} from '../../../const';
 import Entry from '../../../db/models/entry';
 import {ServiceArgs} from '../../new/types';
-
-const validateArgs = makeSchemaValidator({
-    type: 'object',
-    required: ['keyPattern'],
-    properties: {
-        keyPattern: {
-            type: 'string',
-        },
-    },
-});
 
 const selectedColumns = ['entryId', 'scope', 'display_key as key', 'type'];
 
@@ -19,17 +8,10 @@ type GetEntriesByKeyPatternArgs = {
     keyPattern: string;
 };
 
-export async function getEntriesByKeyPattern(
-    {ctx, skipValidation = false}: ServiceArgs,
-    args: GetEntriesByKeyPatternArgs,
-) {
+export async function getEntriesByKeyPattern({ctx}: ServiceArgs, args: GetEntriesByKeyPatternArgs) {
     const {keyPattern} = args;
 
     ctx.log('ENTRIES_BY_KEY_PATTERN_CALL', {keyPattern});
-
-    if (!skipValidation) {
-        validateArgs(args);
-    }
 
     const {tenantId} = ctx.get('info');
 

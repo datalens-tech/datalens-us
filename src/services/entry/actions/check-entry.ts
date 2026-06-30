@@ -1,6 +1,7 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {TransactionOrKnex} from 'objection';
 
+import {NotExistEntryError} from '../../../components/errors';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {DEFAULT_QUERY_TIMEOUT, US_ERRORS} from '../../../const';
 import Entry from '../../../db/models/entry';
@@ -50,9 +51,7 @@ export async function checkEntry(ctx: CTX, trx: TransactionOrKnex, data: CheckEn
     }
 
     if (!entry) {
-        throw new AppError(US_ERRORS.NOT_EXIST_ENTRY, {
-            code: US_ERRORS.NOT_EXIST_ENTRY,
-        });
+        throw new NotExistEntryError();
     }
 
     const {workbookId} = entry;

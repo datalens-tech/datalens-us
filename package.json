@@ -24,7 +24,7 @@
   "main": "dist/index.js",
   "dependencies": {
     "@gravity-ui/expresskit": "^3.1.2",
-    "@gravity-ui/expresskit-api": "^1.6.1",
+    "@gravity-ui/expresskit-api": "^1.7.0",
     "@gravity-ui/gateway": "^4.10.4",
     "@gravity-ui/nodekit": "^2.11.0",
     "@gravity-ui/postgreskit": "^3.1.0",

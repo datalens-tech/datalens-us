@@ -83,9 +83,18 @@ export type {
     WorkbookInstance,
     BulkFetchWorkbooksAllPermissions,
 } from '../../src/registry/plugins/common/entities/workbook/types';
-export type {StructureItemInstance} from '../../src/registry/plugins/common/entities/structure-item/types';
+export type {
+    StructureItemInstance,
+    PermissionedEntityInstance,
+} from '../../src/registry/plugins/common/entities/structure-item/types';
 export type {
     SharedEntryConstructor,
     SharedEntryInstance,
     BulkFetchSharedEntriesAllPermissions,
 } from '../../src/registry/plugins/common/entities/shared-entry/types';
+export type {
+    CollectionEntryConstructor,
+    CollectionEntryInstance,
+    CollectionEntryFullPermissions,
+    BulkFetchCollectionEntriesAllPermissions,
+} from '../../src/registry/plugins/common/entities/collection-entry/types';

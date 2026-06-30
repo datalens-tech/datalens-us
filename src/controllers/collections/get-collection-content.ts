@@ -16,7 +16,7 @@ const requestSchema = {
         workbooksPage: z.string().optional().nullable(),
         pageSize: zc.stringNumber().optional(),
         orderField: z.enum(['title', 'createdAt', 'updatedAt']).optional(),
-        orderDirection: z.enum(['asc', 'desc']).optional(),
+        orderDirection: zc.orderDirection().optional(),
         onlyMy: zc.stringBoolean().optional(),
         mode: z.enum(['all', 'onlyCollections', 'onlyWorkbooks']).optional(),
     }),

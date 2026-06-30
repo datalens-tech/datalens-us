@@ -1,9 +1,10 @@
 import request from 'supertest';
 
+import {EntryIsLockedError} from '../../../../../../components/errors';
 import {testUserId} from '../../../../constants';
 import {OPERATION_DEFAULT_FIELDS, WORKBOOK_DEFAULT_FIELDS} from '../../../../models';
 import {routes} from '../../../../routes';
-import {US_ERRORS, app, auth, getWorkbookBinding, testTenantId} from '../../auth';
+import {app, auth, getWorkbookBinding, testTenantId} from '../../auth';
 import {createMockWorkbook, createMockWorkbookEntry} from '../../helpers';
 import {PlatformRole} from '../../roles';
 
@@ -315,6 +316,7 @@ describe('Entries in workboooks managment', () => {
                 getWorkbookBinding(testWorkbookId, 'limitedView'),
                 getWorkbookBinding(testWorkbookId, 'update'),
             ],
+            component: 'backend',
         })
             .send({
                 scope: 'dataset',
@@ -360,6 +362,7 @@ describe('Entries in workboooks managment', () => {
                 getWorkbookBinding(testWorkbookId, 'limitedView'),
                 getWorkbookBinding(testWorkbookId, 'update'),
             ],
+            component: 'backend',
         })
             .send({
                 scope: 'dataset',
@@ -610,7 +613,7 @@ describe('Workbook delete with locked entries', () => {
             accessBindings: [getWorkbookBinding(wb.workbookId, 'delete')],
         }).expect(423);
 
-        expect(body.code).toBe(US_ERRORS.ENTRY_IS_LOCKED);
+        expect(body.code).toBe(EntryIsLockedError.code);
     });
 
     test('Delete workbook succeeds after the locked entry is unlocked', async () => {

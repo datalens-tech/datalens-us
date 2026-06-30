@@ -18,7 +18,7 @@ const schema = z
         publishedId: z.string().nullable(),
         tenantId: z.string().nullable(),
         workbookId: z.string().nullable(),
-        unversionedData: z.record(z.string(), z.unknown()),
+        collectionId: z.string().nullable(),
     })
     .describe('Entry model');
 
@@ -33,11 +33,11 @@ const format = (data: Entry): z.infer<typeof schema> => {
         createdAt: data.createdAt,
         updatedBy: data.updatedBy,
         updatedAt: data.updatedAt,
-        savedId: data.savedId ? Utils.encodeId(data.savedId) : null,
-        publishedId: data.publishedId ? Utils.encodeId(data.publishedId) : null,
+        savedId: Utils.encodeIdOrNull(data.savedId),
+        publishedId: Utils.encodeIdOrNull(data.publishedId),
         tenantId: data.tenantId,
-        workbookId: data.workbookId ? Utils.encodeId(data.workbookId) : null,
-        unversionedData: data.unversionedData,
+        workbookId: Utils.encodeIdOrNull(data.workbookId),
+        collectionId: Utils.encodeIdOrNull(data.collectionId),
     };
 };
 

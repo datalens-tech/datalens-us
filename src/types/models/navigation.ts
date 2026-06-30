@@ -1,5 +1,7 @@
 import {OrderByDirection} from 'objection';
 
+import {OrderBy} from '../../const';
+
 import {BasicRequestParams, RequestedBy} from './common';
 import {EntryScope} from './entry';
 import {EntriesFilters, EntriesOrderByFilter} from './filters';
@@ -13,12 +15,14 @@ export interface GetEntriesConfig extends BasicRequestParams {
     tenantId: string;
     ids?: string | string[];
     scope?: EntryScope;
-    type?: string;
-    orderBy?: EntriesOrderByFilter;
+    types?: string[];
+    orderBy?: EntriesOrderByFilter<string, OrderBy>;
     createdBy?: string | string[];
     metaFilters?: object;
+    paginationMode: 'offset' | 'cursor';
     page?: number;
     pageSize?: number;
+    pageToken?: string;
     filters?: EntriesFilters;
     isPrivateRoute?: any;
     includePermissionsInfo?: boolean;

@@ -3,8 +3,8 @@ import {EntryScope} from '../../../db/models/new/entry/types';
 import type {GetEntryRelationsResult, RelationItem} from '../../../services/entry';
 import Utils from '../../../utils';
 
+import {entryFullPermissionsModel} from './entry-full-permissions-model';
 import {entryPermissionsModel} from './entry-permissions-model';
-import {sharedEntryPermissionsModel} from './shared-entry-permissions-model';
 
 const relationItemSchema = z
     .object({
@@ -22,7 +22,7 @@ const relationItemSchema = z
         links: z.record(z.string(), z.unknown()).nullable(),
         isLocked: z.boolean().optional(),
         permissions: entryPermissionsModel.schema.optional(),
-        fullPermissions: sharedEntryPermissionsModel.schema.optional(),
+        fullPermissions: entryFullPermissionsModel.schema.optional(),
     })
     .describe('Entry relation item');
 
@@ -49,7 +49,9 @@ const formatRelation = (relation: RelationItem): z.infer<typeof relationItemSche
         links: relation.links ?? null,
         isLocked: relation.isLocked,
         permissions: relation.permissions,
-        fullPermissions: relation.fullPermissions,
+        fullPermissions: relation.fullPermissions
+            ? entryFullPermissionsModel.format(relation.fullPermissions, relation.scope)
+            : undefined,
     };
 };
 

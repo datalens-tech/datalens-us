@@ -1,5 +1,6 @@
 import {AppError} from '@gravity-ui/nodekit';
 
+import {AccessServicePermissionDeniedError} from '../../../components/errors';
 import {US_ERRORS} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../entities/workbook';
@@ -32,7 +33,7 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
         includePermissionsInfo,
     });
 
-    const {tenantId, isPrivateRoute, onlyMirrored} = ctx.get('info');
+    const {tenantId, isPrivateRoute, isAuditRoute, onlyMirrored} = ctx.get('info');
     const {accessServiceEnabled} = ctx.config;
 
     const registry = ctx.get('registry');
@@ -72,7 +73,13 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
         model,
     });
 
-    if (accessServiceEnabled && !skipCheckPermissions && !isPrivateRoute && !onlyMirrored) {
+    if (
+        accessServiceEnabled &&
+        !skipCheckPermissions &&
+        !isPrivateRoute &&
+        !isAuditRoute &&
+        !onlyMirrored
+    ) {
         let parentIds: string[] = [];
 
         if (workbook.model.collectionId !== null) {
@@ -90,9 +97,7 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
             await workbook.fetchAllPermissions({parentIds});
 
             if (!workbook.permissions?.[WorkbookPermission.LimitedView]) {
-                throw new AppError(US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED, {
-                    code: US_ERRORS.ACCESS_SERVICE_PERMISSION_DENIED,
-                });
+                throw new AccessServicePermissionDeniedError();
             }
         } else {
             await workbook.checkPermission({
