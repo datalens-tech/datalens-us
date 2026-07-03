@@ -83,6 +83,24 @@ describe('Update entry', () => {
         expect(body.entryId).toBe(entryId);
     });
 
+    test('Successfully resets entry type to an empty string', async () => {
+        const {body: setBody} = await auth(request(app).post(`${routes.entries}/${entryId}`), {
+            role: OpensourceRole.Editor,
+        })
+            .send({type: 'extract'})
+            .expect(200);
+
+        expect(setBody.type).toBe('extract');
+
+        const {body: resetBody} = await auth(request(app).post(`${routes.entries}/${entryId}`), {
+            role: OpensourceRole.Editor,
+        })
+            .send({type: ''})
+            .expect(200);
+
+        expect(resetBody.type).toBe('');
+    });
+
     test('Returns 200 when recovering deleted entry', async () => {
         const entry = await createMockWorkbookEntry({
             name: 'Entry to delete and recover',

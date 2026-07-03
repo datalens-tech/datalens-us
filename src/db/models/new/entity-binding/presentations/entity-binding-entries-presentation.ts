@@ -3,7 +3,7 @@ import {QueryBuilder, RawBuilder, TransactionOrKnex, raw} from 'objection';
 
 import {Model} from '../../../..';
 import {Entry, EntryColumn} from '../../entry';
-import {Favorite, FavoriteColumn} from '../../favorite';
+import {Favorite, FavoriteColumn, FavoriteEntityType} from '../../favorite';
 import {RevisionModel, RevisionModelColumn} from '../../revision';
 import {EntityBindingModel, EntityBindingModelColumn} from '../index';
 
@@ -52,7 +52,15 @@ export class EntityBindingEntriesPresentation extends Model {
     protected static leftJoinFavorite(userLogin: string) {
         return (builder: Knex.JoinClause) => {
             builder
-                .on(`${Favorite.tableName}.entryId`, `${Entry.tableName}.entryId`)
+                .on(
+                    `${Favorite.tableName}.${FavoriteColumn.EntityId}`,
+                    `${Entry.tableName}.entryId`,
+                )
+                .andOnVal(
+                    `${Favorite.tableName}.${FavoriteColumn.EntityType}`,
+                    '=',
+                    FavoriteEntityType.Entry,
+                )
                 .andOnIn(`${Favorite.tableName}.${FavoriteColumn.Login}`, [userLogin]);
         };
     }
@@ -72,6 +80,8 @@ export class EntityBindingEntriesPresentation extends Model {
             `${Entry.tableName}.${EntryColumn.InnerMeta}`,
             `${Entry.tableName}.${EntryColumn.CreatedBy}`,
             `${Entry.tableName}.${EntryColumn.CreatedAt}`,
+            `${Entry.tableName}.${EntryColumn.UpdatedBy}`,
+            `${Entry.tableName}.${EntryColumn.UpdatedAt}`,
             `${Entry.tableName}.${EntryColumn.IsDeleted}`,
             `${Entry.tableName}.${EntryColumn.DeletedAt}`,
             `${Entry.tableName}.${EntryColumn.Hidden}`,
@@ -87,8 +97,6 @@ export class EntityBindingEntriesPresentation extends Model {
             `${RevisionModel.tableName}.${RevisionModelColumn.Data}`,
             `${RevisionModel.tableName}.${RevisionModelColumn.Meta}`,
             `${RevisionModel.tableName}.${RevisionModelColumn.Annotation}`,
-            `${RevisionModel.tableName}.${RevisionModelColumn.UpdatedBy}`,
-            `${RevisionModel.tableName}.${RevisionModelColumn.UpdatedAt}`,
             `${RevisionModel.tableName}.${RevisionModelColumn.RevId}`,
             `${RevisionModel.tableName}.${RevisionModelColumn.Links}`,
         ];
@@ -96,7 +104,7 @@ export class EntityBindingEntriesPresentation extends Model {
         if (includeFavorite) {
             baseColumns.push(
                 raw(`CASE WHEN ?? IS NULL THEN FALSE ELSE TRUE END AS is_favorite`, [
-                    `${Favorite.tableName}.${FavoriteColumn.EntryId}`,
+                    `${Favorite.tableName}.${FavoriteColumn.EntityId}`,
                 ]),
             );
         }
@@ -117,6 +125,8 @@ export class EntityBindingEntriesPresentation extends Model {
     [EntryColumn.InnerMeta]!: Entry[typeof EntryColumn.InnerMeta];
     [EntryColumn.CreatedBy]!: Entry[typeof EntryColumn.CreatedBy];
     [EntryColumn.CreatedAt]!: Entry[typeof EntryColumn.CreatedAt];
+    [EntryColumn.UpdatedBy]!: Entry[typeof EntryColumn.UpdatedBy];
+    [EntryColumn.UpdatedAt]!: Entry[typeof EntryColumn.UpdatedAt];
     [EntryColumn.IsDeleted]!: Entry[typeof EntryColumn.IsDeleted];
     [EntryColumn.DeletedAt]!: Entry[typeof EntryColumn.DeletedAt];
     [EntryColumn.Hidden]!: Entry[typeof EntryColumn.Hidden];
@@ -132,8 +142,6 @@ export class EntityBindingEntriesPresentation extends Model {
     [RevisionModelColumn.Data]!: RevisionModel[typeof RevisionModelColumn.Data];
     [RevisionModelColumn.Meta]!: RevisionModel[typeof RevisionModelColumn.Meta];
     [RevisionModelColumn.Annotation]!: RevisionModel[typeof RevisionModelColumn.Annotation];
-    [RevisionModelColumn.UpdatedBy]!: RevisionModel[typeof RevisionModelColumn.UpdatedBy];
-    [RevisionModelColumn.UpdatedAt]!: RevisionModel[typeof RevisionModelColumn.UpdatedAt];
     [RevisionModelColumn.RevId]!: RevisionModel[typeof RevisionModelColumn.RevId];
     [RevisionModelColumn.Links]!: RevisionModel[typeof RevisionModelColumn.Links];
 

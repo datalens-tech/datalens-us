@@ -1,7 +1,6 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {US_ERRORS} from '../../const';
+import {TooManyColorPalettesError} from '../../components/errors';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
 import {ServiceArgs} from '../../services/new/types';
 import Utils from '../../utils';
@@ -46,8 +45,8 @@ export const createColorPalette = async ({ctx}: ServiceArgs, args: CreateColorPa
             isGradient ? 'gradient' : 'plain'
         } color palettes are allowed`;
 
-        throw new AppError(message, {
-            code: US_ERRORS.TOO_MANY_COLOR_PALETTES,
+        throw new TooManyColorPalettesError({
+            message,
             details: {
                 maxPalettesCount: MAX_PALETTES_COUNT,
             },

@@ -1,6 +1,7 @@
 import request from 'supertest';
 
-import {makeUserId} from '../../../../../utils';
+import {Favorite, FavoriteColumn, FavoriteEntityType} from '../../../../../db/models/new/favorite';
+import Utils, {makeUserId} from '../../../../../utils';
 import {testUserId, testUserLogin} from '../../../constants';
 import {GET_FAVORITES_ENTRY_DEFAULT_FIELDS, MODIFY_FAVORITES_DEFAULT_FIELDS} from '../../../models';
 import {routes} from '../../../routes';
@@ -57,6 +58,16 @@ describe('Favorites', () => {
         const {body: entryBody} = entryResponse;
 
         expect(entryBody.isFavorite).toBe(true);
+
+        const favoriteRow = await Favorite.query(Favorite.replica)
+            .where({
+                [FavoriteColumn.EntryId]: Utils.decodeId(entryId),
+                [FavoriteColumn.Login]: testUserLogin,
+            })
+            .first();
+
+        expect(favoriteRow?.entityId).toBe(favoriteRow?.entryId);
+        expect(favoriteRow?.entityType).toBe(FavoriteEntityType.Entry);
     });
 
     test('Get favorites list', async () => {

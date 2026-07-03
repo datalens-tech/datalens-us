@@ -1,6 +1,7 @@
 import {AppError} from '@gravity-ui/nodekit';
 
 import {Model} from '../..';
+import {NotExistTenantError} from '../../../components/errors';
 import {US_ERRORS} from '../../../const';
 import * as MT from '../../../types/models';
 
@@ -36,9 +37,7 @@ class Tenant extends Model {
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);
 
         if (!result) {
-            throw new AppError(US_ERRORS.NOT_EXIST_TENANT, {
-                code: US_ERRORS.NOT_EXIST_TENANT,
-            });
+            throw new NotExistTenantError();
         }
 
         ctx.log('TENANT_GET_ONE_SUCCESS');
@@ -87,9 +86,7 @@ class Tenant extends Model {
             .timeout(Model.DEFAULT_QUERY_TIMEOUT);
 
         if (!tenant) {
-            throw new AppError(US_ERRORS.NOT_EXIST_TENANT, {
-                code: US_ERRORS.NOT_EXIST_TENANT,
-            });
+            throw new NotExistTenantError();
         }
 
         await Tenant.query(this.primary)

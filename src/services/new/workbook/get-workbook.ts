@@ -1,7 +1,7 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {AccessServicePermissionDeniedError} from '../../../components/errors';
-import {US_ERRORS} from '../../../const';
+import {
+    AccessServicePermissionDeniedError,
+    WorkbookNotExistsError,
+} from '../../../components/errors';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {WorkbookPermission} from '../../../entities/workbook';
 import type {WorkbookInstance} from '../../../registry/plugins/common/entities/workbook/types';
@@ -61,9 +61,7 @@ export const getWorkbook = async <T extends WorkbookInstance = WorkbookInstance>
         .timeout(getWorkbookQueryTimeout);
 
     if (!model) {
-        throw new AppError(US_ERRORS.WORKBOOK_NOT_EXISTS, {
-            code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-        });
+        throw new WorkbookNotExistsError();
     }
 
     const {Workbook} = registry.common.classes.get();

@@ -1,8 +1,8 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
+import {NotExistTenantError} from '../../../components/errors';
 import {OrganizationPermission} from '../../../components/iam';
-import {TenantSettings, US_ERRORS} from '../../../const';
+import {TenantSettings} from '../../../const';
 import {Tenant} from '../../../db/models/new/tenant';
 import {registry} from '../../../registry';
 import {ServiceArgs} from '../types';
@@ -44,9 +44,7 @@ export const setDefaultColorPalette = async (
         .timeout(Tenant.DEFAULT_QUERY_TIMEOUT);
 
     if (!updatedTenant) {
-        throw new AppError(US_ERRORS.NOT_EXIST_TENANT, {
-            code: US_ERRORS.NOT_EXIST_TENANT,
-        });
+        throw new NotExistTenantError();
     }
 
     ctx.log('SET_DEFAULT_COLOR_PALETTE_FINISH', {

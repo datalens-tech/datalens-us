@@ -10,7 +10,7 @@ import * as MT from '../../../types/models';
 import Utils from '../../../utils';
 import {SortFieldConfig, createPaginator} from '../../../utils/cursor-pagination';
 import {EntryColumn} from '../new/entry';
-import {Favorite} from '../new/favorite';
+import {Favorite, FavoriteEntityType} from '../new/favorite';
 import Revision from '../revision';
 
 import {validateInterTenantGetEntries} from './scheme';
@@ -45,7 +45,7 @@ class Navigation extends Model {
                 modelClass: Favorite,
                 join: {
                     from: 'entries.entryId',
-                    to: 'favorites.entryId',
+                    to: 'favorites.entityId',
                 },
             },
         };
@@ -107,7 +107,7 @@ class Navigation extends Model {
             ...returnColumnNames,
             'workbooks.title as workbookTitle',
             'collections.title as collectionTitle',
-            raw('CASE sub.entry_id WHEN sub.entry_id THEN TRUE ELSE FALSE END AS is_favorite'),
+            raw('CASE sub.entity_id WHEN sub.entity_id THEN TRUE ELSE FALSE END AS is_favorite'),
             'unversionedData',
         ];
 
@@ -122,11 +122,12 @@ class Navigation extends Model {
             .leftJoin('collections', 'collections.collectionId', 'entries.collectionId')
             .leftJoin(
                 Favorite.query(this.replica)
-                    .select('favorites.entryId')
+                    .select('favorites.entityId')
                     .where('login', user.login)
                     .andWhere('tenantId', '=', tenantId)
+                    .andWhere('entityType', '=', FavoriteEntityType.Entry)
                     .as('sub'),
-                'sub.entryId',
+                'sub.entityId',
                 'entries.entryId',
             )
             .where({

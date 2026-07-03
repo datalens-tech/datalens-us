@@ -2,8 +2,8 @@ import {AppError} from '@gravity-ui/nodekit';
 import {Model, QueryBuilder, raw, ref} from 'objection';
 import {z} from 'zod';
 
-import {InvalidPageTokenError} from '../components/errors';
-import {OrderBy, US_ERRORS} from '../const';
+import {InvalidPageTokenError, QuerySelectIsRequiredError} from '../components/errors';
+import {OrderBy} from '../const';
 
 export interface SortFieldConfig {
     field: string;
@@ -32,7 +32,10 @@ const encodeCursorPageToken = (values: string[]): string => {
     return Buffer.from(payload, 'utf8').toString('base64url');
 };
 
-const decodeCursorPageToken = (cursorFields: SortFieldConfig[], pageToken: string): string[] => {
+export const decodeCursorPageToken = (
+    cursorFields: SortFieldConfig[],
+    pageToken: string,
+): string[] => {
     try {
         const payload = Buffer.from(pageToken, 'base64url').toString('utf8');
         const parsedPayload = JSON.parse(payload);
@@ -96,9 +99,7 @@ export function createPaginator(config: PaginatorConfig) {
 
     const onBuild = <M extends Model>(builder: QueryBuilder<M, M[]>) => {
         if (!builder.hasSelects()) {
-            throw new AppError('The query requires select statement', {
-                code: US_ERRORS.QUERY_SELECT_IS_REQUIRED_ERROR,
-            });
+            throw new QuerySelectIsRequiredError();
         }
 
         cursorFields.forEach((sf, i) => {

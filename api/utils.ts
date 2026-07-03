@@ -17,7 +17,13 @@ export {whereBuilderInterTenantGetEntries} from '../src/db/models/navigation/uti
 
 export {getEnvCert, getEnvVariable, getEnvTokenVariable, isTrueArg} from '../src/utils/env-utils';
 
-export {createPaginator, PaginationResult, PaginatorConfig} from '../src/utils/cursor-pagination';
+export {
+    createPaginator,
+    decodeCursorPageToken,
+    PaginationResult,
+    PaginatorConfig,
+    SortFieldConfig,
+} from '../src/utils/cursor-pagination';
 
 export {swapKeysAndValues} from '../src/utils/swap-object';
 

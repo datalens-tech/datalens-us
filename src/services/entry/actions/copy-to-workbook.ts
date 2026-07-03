@@ -1,4 +1,3 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {TransactionOrKnex} from 'objection';
 
 import {
@@ -8,10 +7,12 @@ import {
     EntryWithoutWorkbookIdCopyDeniedError,
     FolderCopyDeniedError,
     NotExistEntryError,
+    WorkbookCopyFileConnectionError,
     WorkbookEntryCannotBeMigratedToWorkbookError,
+    WorkbookNotExistsError,
 } from '../../../components/errors';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {BiTrackingLogs, US_ERRORS} from '../../../const';
+import {BiTrackingLogs} from '../../../const';
 import Link from '../../../db/models/links';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
@@ -198,14 +199,11 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
         const isFileConnection = Utils.isFileConnection(joinedEntryRevision);
 
         if (isFileConnection) {
-            throw new AppError(
-                `Entry ${Utils.encodeId(
+            throw new WorkbookCopyFileConnectionError({
+                message: `Entry ${Utils.encodeId(
                     joinedEntryRevision.entryId,
                 )} is a file connection and cannot be copied to a workbook.`,
-                {
-                    code: US_ERRORS.WORKBOOK_COPY_FILE_CONNECTION_ERROR,
-                },
-            );
+            });
         }
     });
 
@@ -309,9 +307,7 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
             .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
         if (destinationWorkbookModel === undefined) {
-            throw new AppError('Workbook not exists', {
-                code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-            });
+            throw new WorkbookNotExistsError();
         }
 
         if (workbookId) {
@@ -321,15 +317,11 @@ export const copyToWorkbook = async (ctx: CTX, params: Params) => {
                 .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
             if (originWorkbookModel === undefined) {
-                throw new AppError('Workbook not exists', {
-                    code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-                });
+                throw new WorkbookNotExistsError();
             }
 
             if (tenantIdOverride === undefined && originWorkbookModel.tenantId !== tenantId) {
-                throw new AppError('Workbook not exists', {
-                    code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-                });
+                throw new WorkbookNotExistsError();
             }
 
             if (tenantIdOverride === undefined) {

@@ -1,14 +1,9 @@
 import {NotExistEntryError} from '../../../components/errors';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
 import {zc} from '../../../components/zod';
-import {
-    DEFAULT_PAGE_SIZE,
-    DEFAULT_QUERY_TIMEOUT,
-    OrderBy,
-    RETURN_COLUMNS,
-    RETURN_NAVIGATION_COLUMNS,
-} from '../../../const';
+import {DEFAULT_PAGE_SIZE, DEFAULT_QUERY_TIMEOUT, OrderBy} from '../../../const';
 import Entry from '../../../db/models/entry';
+import {EntryColumn} from '../../../db/models/new/entry';
 import {RevisionModel, RevisionModelColumn} from '../../../db/models/new/revision';
 import {CTX, DlsActions} from '../../../types/models';
 import Utils from '../../../utils';
@@ -34,6 +29,25 @@ export type GetEntryRevisionsResult = {
 
 const SORT_FIELD = `${RevisionModel.tableName}.${RevisionModelColumn.UpdatedAt}`;
 const TIEBREAKER_FIELD = `${RevisionModel.tableName}.${RevisionModelColumn.RevId}`;
+
+const GET_ENTRY_REVISIONS_RETURN_COLUMNS = [
+    `${Entry.tableName}.${EntryColumn.EntryId}`,
+    `${Entry.tableName}.${EntryColumn.Scope}`,
+    `${Entry.tableName}.${EntryColumn.Type}`,
+    `${Entry.tableName}.${EntryColumn.DisplayKey} as key`,
+    `${Entry.tableName}.${EntryColumn.CreatedBy}`,
+    `${Entry.tableName}.${EntryColumn.CreatedAt}`,
+    `${Entry.tableName}.${EntryColumn.SavedId}`,
+    `${Entry.tableName}.${EntryColumn.PublishedId}`,
+    `${Entry.tableName}.${EntryColumn.Hidden}`,
+    `${Entry.tableName}.${EntryColumn.WorkbookId}`,
+    `${Entry.tableName}.${EntryColumn.CollectionId}`,
+    `${RevisionModel.tableName}.${RevisionModelColumn.Meta}`,
+    `${RevisionModel.tableName}.${RevisionModelColumn.UpdatedBy}`,
+    `${RevisionModel.tableName}.${RevisionModelColumn.UpdatedAt}`,
+    `${RevisionModel.tableName}.${RevisionModelColumn.Annotation}`,
+    `${RevisionModel.tableName}.${RevisionModelColumn.RevId}`,
+];
 
 export type GetEntryRevisionsData = {
     entryId: string;
@@ -101,7 +115,7 @@ export async function getEntryRevisions(
     });
 
     const query = Entry.query(Entry.replica)
-        .select([...RETURN_NAVIGATION_COLUMNS, 'revisions.revId'])
+        .select(GET_ENTRY_REVISIONS_RETURN_COLUMNS)
         .join('revisions', 'entries.entryId', 'revisions.entryId')
         .where({
             'entries.entryId': entryId,
@@ -142,6 +156,31 @@ type GetLegacyEntryRevisionsData = {
     entryId: string;
 };
 
+const GET_LEGACY_ENTRY_REVISIONS_RETURN_COLUMNS = [
+    `${Entry.tableName}.${EntryColumn.EntryId}`,
+    `${Entry.tableName}.${EntryColumn.Scope}`,
+    `${Entry.tableName}.${EntryColumn.Type}`,
+    `${Entry.tableName}.${EntryColumn.DisplayKey} as key`,
+    `${Entry.tableName}.${EntryColumn.CreatedBy}`,
+    `${Entry.tableName}.${EntryColumn.CreatedAt}`,
+    `${Entry.tableName}.${EntryColumn.SavedId}`,
+    `${Entry.tableName}.${EntryColumn.PublishedId}`,
+    `${Entry.tableName}.${EntryColumn.TenantId}`,
+    `${Entry.tableName}.${EntryColumn.Hidden}`,
+    `${Entry.tableName}.${EntryColumn.Mirrored}`,
+    `${Entry.tableName}.${EntryColumn.Public}`,
+    `${Entry.tableName}.${EntryColumn.WorkbookId}`,
+    `${Entry.tableName}.${EntryColumn.CollectionId}`,
+    `${RevisionModel.tableName}.${RevisionModelColumn.RevId}`,
+    `${RevisionModel.tableName}.${RevisionModelColumn.Data}`,
+    `${RevisionModel.tableName}.${RevisionModelColumn.Meta}`,
+    `${RevisionModel.tableName}.${RevisionModelColumn.Annotation}`,
+    `${RevisionModel.tableName}.${RevisionModelColumn.UpdatedBy}`,
+    `${RevisionModel.tableName}.${RevisionModelColumn.UpdatedAt}`,
+    `${RevisionModel.tableName}.${RevisionModelColumn.Version}`,
+    `${RevisionModel.tableName}.${RevisionModelColumn.SourceVersion}`,
+];
+
 export async function getLegacyEntryRevisions(ctx: CTX, {entryId}: GetLegacyEntryRevisionsData) {
     ctx.log('GET_LEGACY_REVISIONS_REQUEST', {
         entryId: Utils.encodeId(entryId),
@@ -152,7 +191,7 @@ export async function getLegacyEntryRevisions(ctx: CTX, {entryId}: GetLegacyEntr
     await checkEntry(ctx, Entry.replica, {entryId});
 
     const entryRevisions = await Entry.query(Entry.replica)
-        .select(RETURN_COLUMNS)
+        .select(GET_LEGACY_ENTRY_REVISIONS_RETURN_COLUMNS)
         .join('revisions', 'entries.entryId', 'revisions.entryId')
         .where({
             'entries.entryId': entryId,

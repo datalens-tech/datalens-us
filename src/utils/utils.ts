@@ -1,6 +1,6 @@
-import {AppError} from '@gravity-ui/nodekit';
 import chunk from 'lodash/chunk';
 
+import {DecodeIdFailedError} from '../components/errors';
 import {
     CODING_BASE,
     COPY_END,
@@ -8,7 +8,6 @@ import {
     ENCODED_ID_LENGTH,
     ID_VARIABLES,
     TRUE_FLAGS,
-    US_ERRORS,
 } from '../const';
 import {EntryScope as EntryScopeEnum, EntryType} from '../db/models/new/entry/types';
 import {EntryScope, USAPIResponse} from '../types/models';
@@ -271,8 +270,8 @@ export class Utils {
 
         if (id) {
             if (id.length !== ENCODED_ID_LENGTH) {
-                throw new AppError('The ID must consist of 13 characters.', {
-                    code: US_ERRORS.DECODE_ID_FAILED,
+                throw new DecodeIdFailedError({
+                    message: 'The ID must consist of 13 characters.',
                 });
             }
 
@@ -289,9 +288,7 @@ export class Utils {
 
             // recheck
             if (Number(decodedRotationNumber) !== Utils.getRotationNumber(decodedId)) {
-                throw new AppError('The ID is incorrect.', {
-                    code: US_ERRORS.DECODE_ID_FAILED,
-                });
+                throw new DecodeIdFailedError({message: 'The ID is incorrect.'});
             }
         }
 

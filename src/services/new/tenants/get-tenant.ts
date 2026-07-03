@@ -1,7 +1,5 @@
-import {AppError} from '@gravity-ui/nodekit';
-
+import {NotExistTenantError} from '../../../components/errors';
 import {makeSchemaValidator} from '../../../components/validation-schema-compiler';
-import {US_ERRORS} from '../../../const';
 import {Tenant, TenantColumn} from '../../../db/models/new/tenant';
 import {ServiceArgs} from '../types';
 import {getReplica} from '../utils';
@@ -39,9 +37,7 @@ export const getTenant = async (
         .timeout(Tenant.DEFAULT_QUERY_TIMEOUT);
 
     if (tenant === undefined) {
-        throw new AppError(US_ERRORS.NOT_EXIST_TENANT, {
-            code: US_ERRORS.NOT_EXIST_TENANT,
-        });
+        throw new NotExistTenantError();
     }
 
     ctx.log('GET_TENANT_SUCCESS', {tenantId});

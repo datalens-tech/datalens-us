@@ -1,7 +1,13 @@
 import {Model} from '../../..';
 
+import {FavoriteEntityType} from './types';
+
+export {FavoriteEntityType} from './types';
+
 export const FavoriteColumn = {
     EntryId: 'entryId',
+    EntityId: 'entityId',
+    EntityType: 'entityType',
     TenantId: 'tenantId',
     Login: 'login',
     Alias: 'alias',
@@ -12,6 +18,8 @@ export const FavoriteColumn = {
 
 export const FavoriteColumnRaw = {
     EntryId: 'entry_id',
+    EntityId: 'entity_id',
+    EntityType: 'entity_type',
     TenantId: 'tenant_id',
     Login: 'login',
     Alias: 'alias',
@@ -26,10 +34,12 @@ export class Favorite extends Model {
     }
 
     static get idColumn() {
-        return [FavoriteColumn.EntryId, FavoriteColumn.Login];
+        return [FavoriteColumn.EntityId, FavoriteColumn.Login];
     }
 
     [FavoriteColumn.EntryId]!: string;
+    [FavoriteColumn.EntityId]!: string;
+    [FavoriteColumn.EntityType]!: FavoriteEntityType;
     [FavoriteColumn.TenantId]!: string;
     [FavoriteColumn.Login]!: string;
     [FavoriteColumn.CreatedAt]!: string;

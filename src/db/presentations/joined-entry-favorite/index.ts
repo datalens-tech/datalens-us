@@ -3,13 +3,15 @@ import {Modifier, TransactionOrKnex, raw} from 'objection';
 
 import {Model} from '../..';
 import {Entry} from '../../models/new/entry';
-import {Favorite} from '../../models/new/favorite';
+import {Favorite, FavoriteColumnRaw} from '../../models/new/favorite';
 import {selectedEntryColumns} from '../constants';
 import {leftJoinFavorite} from '../utils';
 
 const selectedColumns = [
     ...selectedEntryColumns.map((col) => `${Entry.tableName}.${col}`),
-    raw(`CASE WHEN ${Favorite.tableName}.entry_id IS NULL THEN FALSE ELSE TRUE END AS is_favorite`),
+    raw(
+        `CASE WHEN ${Favorite.tableName}.${FavoriteColumnRaw.EntityId} IS NULL THEN FALSE ELSE TRUE END AS is_favorite`,
+    ),
 ];
 
 export type JoinedEntryFavoriteColumns = Pick<Entry, ArrayElement<typeof selectedEntryColumns>> & {

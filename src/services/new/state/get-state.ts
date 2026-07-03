@@ -3,6 +3,7 @@ import {AppError} from '@gravity-ui/nodekit';
 import {US_ERRORS} from '../../../const';
 import {queryReplica} from '../../../db';
 import {State} from '../../../db/models/new/state';
+import {getEntry} from '../entry';
 import {ServiceArgs} from '../types';
 
 interface GetStateArgs {
@@ -16,6 +17,8 @@ export const getState = async ({ctx, mainTrx}: ServiceArgs<'mainTrx'>, args: Get
     const {tenantId} = ctx.get('info');
 
     ctx.log('GET_STATE_REQUEST', {tenantId, entryId, hash});
+
+    await getEntry({ctx, trx: mainTrx}, {entryId});
 
     const state = await queryReplica(State, mainTrx)
         .findById([hash, entryId])

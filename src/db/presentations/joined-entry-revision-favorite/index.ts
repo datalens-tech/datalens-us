@@ -2,7 +2,7 @@ import type {Knex} from 'knex';
 import {Modifier, TransactionOrKnex, raw} from 'objection';
 
 import {Entry} from '../../models/new/entry';
-import {Favorite} from '../../models/new/favorite';
+import {Favorite, FavoriteColumnRaw} from '../../models/new/favorite';
 import {RevisionModel} from '../../models/new/revision';
 import {
     JoinRevisionArgs,
@@ -15,7 +15,9 @@ import {leftJoinFavorite} from '../utils';
 
 export const selectedJoinedEntryRevisionFavoriteColumns = [
     ...joinedEntryRevisionColumns,
-    raw(`CASE WHEN ${Favorite.tableName}.entry_id IS NULL THEN FALSE ELSE TRUE END AS is_favorite`),
+    raw(
+        `CASE WHEN ${Favorite.tableName}.${FavoriteColumnRaw.EntityId} IS NULL THEN FALSE ELSE TRUE END AS is_favorite`,
+    ),
 ];
 
 export type JoinedEntryRevisionFavoriteColumns = JoinedEntryRevisionColumns & {

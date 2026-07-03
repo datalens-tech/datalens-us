@@ -3,6 +3,7 @@ import {RawBuilder, TransactionOrKnex, raw, transaction} from 'objection';
 import {Optional} from 'utility-types';
 
 import {
+    ModeNotAllowedError,
     NotExistDeletedEntryError,
     NotExistEntryError,
     ParentFolderNotExistError,
@@ -203,7 +204,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
     checkPrivateScopeAccess({ctx}, entry.scope);
 
     if (entry.scope === EntryScope.Compute) {
-        if (type !== undefined && type !== entry.type) {
+        if (typeof type === 'string' && type !== entry.type) {
             throw new AppError('Compute entry type cannot be changed', {
                 code: US_ERRORS.COMPUTE_ENTRY_TYPE_CHANGE_FORBIDDEN,
             });
@@ -352,7 +353,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                         mirrored: mirroredNext,
                     };
 
-                    if (type) {
+                    if (typeof type === 'string') {
                         patch.type = type;
                     }
 
@@ -443,7 +444,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                             updatedAt: raw(CURRENT_TIMESTAMP),
                         };
 
-                        if (type) {
+                        if (typeof type === 'string') {
                             patch.type = type;
                         }
 
@@ -612,9 +613,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
                 });
             }
             default: {
-                throw new AppError("This mode doesn't allowed", {
-                    code: US_ERRORS.MODE_NOT_ALLOWED,
-                });
+                throw new ModeNotAllowedError();
             }
         }
     })();

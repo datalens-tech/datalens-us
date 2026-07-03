@@ -1,5 +1,6 @@
 import hashGenerator from '../../../components/hash-generator';
 import {State, StateColumn} from '../../../db/models/new/state';
+import {getEntry} from '../entry';
 import {ServiceArgs} from '../types';
 import {getPrimary} from '../utils';
 
@@ -16,6 +17,8 @@ export const createState = async ({ctx, trx}: ServiceArgs, args: CreateStateArgs
     const {tenantId} = ctx.get('info');
 
     ctx.log('CREATE_STATE_REQUEST', {tenantId, entryId});
+
+    await getEntry({ctx, trx}, {entryId});
 
     const hash = hashGenerator({entryId, data});
 

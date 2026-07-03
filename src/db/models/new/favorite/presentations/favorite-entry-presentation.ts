@@ -9,6 +9,7 @@ import {
 import {Entry, EntryColumn} from '../../entry';
 import {WorkbookModel as Workbook, WorkbookModelColumn as WorkbookColumn} from '../../workbook';
 import {Favorite, FavoriteColumn} from '../index';
+import {FavoriteEntityType} from '../types';
 
 export class FavoriteEntryPresentation extends Model {
     static get tableName() {
@@ -33,10 +34,16 @@ export class FavoriteEntryPresentation extends Model {
     }
 
     protected static joinEntry(builder: Knex.JoinClause) {
-        builder.on(
-            `${Favorite.tableName}.${FavoriteColumn.EntryId}`,
-            `${Entry.tableName}.${EntryColumn.EntryId}`,
-        );
+        builder
+            .on(
+                `${Favorite.tableName}.${FavoriteColumn.EntityId}`,
+                `${Entry.tableName}.${EntryColumn.EntryId}`,
+            )
+            .andOnVal(
+                `${Favorite.tableName}.${FavoriteColumn.EntityType}`,
+                '=',
+                FavoriteEntityType.Entry,
+            );
     }
 
     protected static leftJoinWorkbook(builder: Knex.JoinClause) {
@@ -55,7 +62,7 @@ export class FavoriteEntryPresentation extends Model {
 
     protected static get selectedColumns() {
         return [
-            `${Favorite.tableName}.${FavoriteColumn.EntryId}`,
+            `${Entry.tableName}.${EntryColumn.EntryId}`,
             `${Favorite.tableName}.${FavoriteColumn.Alias}`,
             `${Favorite.tableName}.${FavoriteColumn.DisplayAlias}`,
 

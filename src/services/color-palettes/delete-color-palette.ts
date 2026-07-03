@@ -1,6 +1,4 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {US_ERRORS} from '../../const';
+import {ColorPaletteNotExistsError} from '../../components/errors';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
 import {ServiceArgs} from '../../services/new/types';
 
@@ -36,9 +34,7 @@ export const deleteColorPalette = async (
         .timeout(ColorPaletteModel.DEFAULT_QUERY_TIMEOUT);
 
     if (!result) {
-        throw new AppError(US_ERRORS.COLOR_PALETTE_NOT_EXISTS, {
-            code: US_ERRORS.COLOR_PALETTE_NOT_EXISTS,
-        });
+        throw new ColorPaletteNotExistsError();
     }
 
     ctx.log('DELETE_COLOR_PALETTE_FINISH', {

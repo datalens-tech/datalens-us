@@ -1,7 +1,7 @@
-import {AppContext, AppError} from '@gravity-ui/nodekit';
+import {AppContext} from '@gravity-ui/nodekit';
 import {TransactionOrKnex, transaction} from 'objection';
 
-import {US_ERRORS} from '../../../const';
+import {WorkbookCopyFileConnectionError, WorkbookNotExistsError} from '../../../components/errors';
 import Link from '../../../db/models/links';
 import {Entry} from '../../../db/models/new/entry';
 import {RevisionModel} from '../../../db/models/new/revision';
@@ -57,15 +57,11 @@ export const copyWorkbook = async (
         .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
     if (originWorkbookModel === undefined) {
-        throw new AppError(US_ERRORS.WORKBOOK_NOT_EXISTS, {
-            code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-        });
+        throw new WorkbookNotExistsError();
     }
 
     if (tenantIdOverride === undefined && originWorkbookModel.tenantId !== tenantId) {
-        throw new AppError(US_ERRORS.WORKBOOK_NOT_EXISTS, {
-            code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-        });
+        throw new WorkbookNotExistsError();
     }
 
     const originTenantId = originWorkbookModel.tenantId;
@@ -118,9 +114,7 @@ export const copyWorkbook = async (
     const fileConnectionExists = Utils.checkFileConnectionsExistence(originEntries);
 
     if (fileConnectionExists) {
-        throw new AppError(US_ERRORS.WORKBOOK_COPY_FILE_CONNECTION_ERROR, {
-            code: US_ERRORS.WORKBOOK_COPY_FILE_CONNECTION_ERROR,
-        });
+        throw new WorkbookCopyFileConnectionError();
     }
 
     let operation: any;

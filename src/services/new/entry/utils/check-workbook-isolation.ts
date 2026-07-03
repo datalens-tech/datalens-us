@@ -1,6 +1,4 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {US_ERRORS} from '../../../../const';
+import {WorkbookIsolationInterruptionError} from '../../../../components/errors';
 import {ServiceArgs} from '../../types';
 
 type PartialEntry = {
@@ -26,8 +24,6 @@ export const checkWorkbookIsolation = ({ctx}: ServiceArgs, {entry}: CheckWorkboo
     }
 
     if (requestWorkbookId !== entry.workbookId) {
-        throw new AppError(US_ERRORS.WORKBOOK_ISOLATION_INTERRUPTION, {
-            code: US_ERRORS.WORKBOOK_ISOLATION_INTERRUPTION,
-        });
+        throw new WorkbookIsolationInterruptionError();
     }
 };

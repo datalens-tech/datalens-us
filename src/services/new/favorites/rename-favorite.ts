@@ -3,7 +3,7 @@ import {AppError} from '@gravity-ui/nodekit';
 import {NotExistEntryError} from '../../../components/errors';
 import {US_ERRORS} from '../../../const';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
-import {Favorite, FavoriteColumn} from '../../../db/models/new/favorite';
+import {Favorite, FavoriteColumn, FavoriteEntityType} from '../../../db/models/new/favorite';
 import {ServiceArgs} from '../types';
 import {getPrimary, getReplica} from '../utils';
 
@@ -47,7 +47,8 @@ export const renameFavorite = async (
     const result = await Favorite.query(getPrimary(trx))
         .patch({[FavoriteColumn.Alias]: alias, [FavoriteColumn.DisplayAlias]: displayAlias})
         .where({
-            [FavoriteColumn.EntryId]: entryId,
+            [FavoriteColumn.EntityId]: entryId,
+            [FavoriteColumn.EntityType]: FavoriteEntityType.Entry,
             [FavoriteColumn.TenantId]: tenantId,
             [FavoriteColumn.Login]: login,
         })

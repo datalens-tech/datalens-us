@@ -2,7 +2,7 @@ import request from 'supertest';
 
 import {STATE_DEFAULT_FIELDS} from '../../../models';
 import {routes} from '../../../routes';
-import {app, auth} from '../auth';
+import {app, auth, getWorkbookBinding} from '../auth';
 import {createMockWorkbook, createMockWorkbookEntry} from '../helpers';
 
 const stateData = {
@@ -28,7 +28,9 @@ describe('States', () => {
     });
 
     test('Create state', async () => {
-        const response = await auth(request(app).post(`${routes.states}/${entryId}`))
+        const response = await auth(request(app).post(`${routes.states}/${entryId}`), {
+            accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
+        })
             .send({
                 data: stateData,
             })
@@ -42,9 +44,9 @@ describe('States', () => {
     });
 
     test('Get state', async () => {
-        const response = await auth(
-            request(app).get(`${routes.states}/${entryId}/${stateHash}`),
-        ).expect(200);
+        const response = await auth(request(app).get(`${routes.states}/${entryId}/${stateHash}`), {
+            accessBindings: [getWorkbookBinding(workbookId, 'limitedView')],
+        }).expect(200);
 
         const {body} = response;
 
@@ -54,5 +56,15 @@ describe('States', () => {
             hash: stateHash,
             data: stateData,
         });
+    });
+
+    test('Create state without entry access returns 403', async () => {
+        await auth(request(app).post(`${routes.states}/${entryId}`))
+            .send({data: stateData})
+            .expect(403);
+    });
+
+    test('Get state without entry access returns 403', async () => {
+        await auth(request(app).get(`${routes.states}/${entryId}/${stateHash}`)).expect(403);
     });
 });

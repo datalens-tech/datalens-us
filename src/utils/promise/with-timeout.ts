@@ -1,6 +1,4 @@
-import {AppError} from '@gravity-ui/nodekit';
-
-import {US_ERRORS} from '../../const';
+import {ActionTimeoutError} from '../../components/errors';
 
 export const withTimeout = async <T>(
     promise: Promise<T>,
@@ -8,11 +6,7 @@ export const withTimeout = async <T>(
 ): Promise<T> => {
     const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
-            reject(
-                new AppError(errorMessage, {
-                    code: US_ERRORS.ACTION_TIMEOUT,
-                }),
-            );
+            reject(new ActionTimeoutError({message: errorMessage}));
         }, timeoutMs);
     });
 

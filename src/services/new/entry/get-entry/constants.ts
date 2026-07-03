@@ -12,6 +12,8 @@ export const entryColumns = [
     EntryColumn.InnerMeta,
     EntryColumn.CreatedBy,
     EntryColumn.CreatedAt,
+    EntryColumn.UpdatedBy,
+    EntryColumn.UpdatedAt,
     EntryColumn.IsDeleted,
     EntryColumn.DeletedAt,
     EntryColumn.Hidden,
@@ -34,8 +36,6 @@ export const selectedEntryColumns = entryColumns.map((column) => `${Entry.tableN
 export const revisionColumns = [
     RevisionModelColumn.Data,
     RevisionModelColumn.Meta,
-    RevisionModelColumn.UpdatedBy,
-    RevisionModelColumn.UpdatedAt,
     RevisionModelColumn.RevId,
     RevisionModelColumn.Links,
     RevisionModelColumn.EntryId,
@@ -58,7 +58,7 @@ export const tenantColumns = [
 
 export const selectedTenantColumns = tenantColumns.map((column) => `${Tenant.tableName}.${column}`);
 
-export const favoriteColumns = [FavoriteColumn.EntryId, FavoriteColumn.Login] as const;
+export const favoriteColumns = [FavoriteColumn.EntityId, FavoriteColumn.Login] as const;
 
 export const selectedFavoriteColumns = favoriteColumns.map(
     (column) => `${Favorite.tableName}.${column}`,

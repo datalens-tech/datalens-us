@@ -1,17 +1,26 @@
 import {NextFunction, Request, Response} from '@gravity-ui/expresskit';
-import {AppContext, AppError} from '@gravity-ui/nodekit';
+import {AppContext} from '@gravity-ui/nodekit';
 
+import {
+    IncorrectDatasetIdHeaderError,
+    IncorrectWorkbookIdHeaderError,
+    PresentableError,
+} from '../../components/errors';
 import {Feature, isEnabledFeature} from '../../components/features';
-import {DL_DATASET_ID_HEADER, DL_WORKBOOK_ID_HEADER, US_ERRORS} from '../../const';
+import {DL_DATASET_ID_HEADER, DL_WORKBOOK_ID_HEADER} from '../../const';
 import Utils from '../../utils';
 
-const decodeIdFromHeader = (ctx: AppContext, header: string | undefined, errorMessage: string) => {
+const decodeIdFromHeader = (
+    ctx: AppContext,
+    header: string | undefined,
+    ErrorClass: new () => PresentableError,
+) => {
     if (!header) return undefined;
     try {
         return Utils.decodeId(header);
     } catch (err) {
-        ctx.logError(errorMessage, err);
-        throw new AppError(errorMessage, {code: errorMessage});
+        ctx.logError(ErrorClass.name, err);
+        throw new ErrorClass();
     }
 };
 
@@ -20,13 +29,13 @@ export const resolveIsolationIds = (req: Request, res: Response, next: NextFunct
         res.locals.workbookId = decodeIdFromHeader(
             req.ctx,
             req.headers[DL_WORKBOOK_ID_HEADER] as string | undefined,
-            US_ERRORS.INCORRECT_WORKBOOK_ID_HEADER,
+            IncorrectWorkbookIdHeaderError,
         );
 
         res.locals.datasetId = decodeIdFromHeader(
             req.ctx,
             req.headers[DL_DATASET_ID_HEADER] as string | undefined,
-            US_ERRORS.INCORRECT_DATASET_ID_HEADER,
+            IncorrectDatasetIdHeaderError,
         );
     }
 

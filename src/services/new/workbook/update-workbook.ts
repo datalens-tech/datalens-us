@@ -1,7 +1,7 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
-import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
+import {WorkbookAlreadyExistsError, WorkbookNotExistsError} from '../../../components/errors';
+import {CURRENT_TIMESTAMP} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {WorkbookStatus} from '../../../db/models/new/workbook/types';
 import {WorkbookPermission} from '../../../entities/workbook';
@@ -95,9 +95,7 @@ export const updateWorkbook = async (
         );
 
         if (checkWorkbookByTitleResult === true) {
-            throw new AppError(US_ERRORS.WORKBOOK_ALREADY_EXISTS, {
-                code: US_ERRORS.WORKBOOK_ALREADY_EXISTS,
-            });
+            throw new WorkbookAlreadyExistsError();
         }
     }
 
@@ -119,9 +117,7 @@ export const updateWorkbook = async (
         .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
     if (!patchedWorkbook) {
-        throw new AppError(US_ERRORS.WORKBOOK_NOT_EXISTS, {
-            code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-        });
+        throw new WorkbookNotExistsError();
     }
 
     ctx.log('UPDATE_WORKBOOK_FINISH', {

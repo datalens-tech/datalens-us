@@ -1,3 +1,5 @@
+import {FavoriteEntityType} from '../../db/models/new/favorite/types';
+
 import {EntryInnerMeta, EntryScope} from './entry';
 import {SyncLinks} from './link';
 import {TemplateData} from './template';
@@ -89,6 +91,8 @@ export interface FavoriteColumns {
     workbookId: string | null;
     scope: EntryScope;
     entryId: string;
+    entityId: string;
+    entityType: FavoriteEntityType;
     tenantId: string;
     login: string;
     alias: string | null;

@@ -1,8 +1,8 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
+import {WorkbookAlreadyExistsError, WorkbookNotExistsError} from '../../../components/errors';
 import {OrganizationPermission} from '../../../components/iam';
-import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../const';
+import {CURRENT_TIMESTAMP} from '../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {CollectionPermission} from '../../../entities/collection';
 import {WorkbookPermission} from '../../../entities/workbook';
@@ -117,9 +117,7 @@ export const moveWorkbook = async (
     );
 
     if (checkWorkbookByTitleResult === true) {
-        throw new AppError(US_ERRORS.WORKBOOK_ALREADY_EXISTS, {
-            code: US_ERRORS.WORKBOOK_ALREADY_EXISTS,
-        });
+        throw new WorkbookAlreadyExistsError();
     }
 
     const patchedWorkbook = await WorkbookModel.query(targetTrx)
@@ -138,9 +136,7 @@ export const moveWorkbook = async (
         .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
     if (!patchedWorkbook) {
-        throw new AppError(US_ERRORS.WORKBOOK_NOT_EXISTS, {
-            code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-        });
+        throw new WorkbookNotExistsError();
     }
 
     ctx.log('MOVE_WORKBOOK_FINISH', {

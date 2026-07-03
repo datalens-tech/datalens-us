@@ -117,7 +117,7 @@ export class Entry extends Model {
                 modelClass: Favorite,
                 join: {
                     from: `${Entry.tableName}.${EntryColumn.EntryId}`,
-                    to: `${Favorite.tableName}.entryId`,
+                    to: `${Favorite.tableName}.entityId`,
                 },
             },
             tenant: {
@@ -179,6 +179,6 @@ export class Entry extends Model {
     }
 
     get isFavorite() {
-        return Boolean(this.favorite?.entryId);
+        return Boolean(this.favorite?.entityId);
     }
 }

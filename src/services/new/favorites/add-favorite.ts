@@ -1,6 +1,6 @@
 import {NotExistEntryError} from '../../../components/errors';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
-import {Favorite, FavoriteColumn} from '../../../db/models/new/favorite';
+import {Favorite, FavoriteColumn, FavoriteEntityType} from '../../../db/models/new/favorite';
 import {getWorkbook} from '../../../services/new/workbook';
 import {DlsActions} from '../../../types/models';
 import {
@@ -63,6 +63,8 @@ export const addFavorite = async ({ctx, trx}: ServiceArgs, {entryId}: AddFavorit
         .insert({
             [FavoriteColumn.TenantId]: tenantId,
             [FavoriteColumn.EntryId]: entryId,
+            [FavoriteColumn.EntityId]: entryId,
+            [FavoriteColumn.EntityType]: FavoriteEntityType.Entry,
             [FavoriteColumn.Login]: login,
         })
         .returning('*')

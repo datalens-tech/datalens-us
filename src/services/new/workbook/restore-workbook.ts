@@ -1,7 +1,7 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {raw, transaction} from 'objection';
 
-import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, TRASH_FOLDER, US_ERRORS} from '../../../const';
+import {WorkbookIsAlreadyRestoredError, WorkbookNotExistsError} from '../../../components/errors';
+import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, TRASH_FOLDER} from '../../../const';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import Utils from '../../../utils';
@@ -33,15 +33,11 @@ export const restoreWorkbook = async ({ctx, trx}: ServiceArgs, args: RestoreWork
         .timeout(WorkbookModel.DEFAULT_QUERY_TIMEOUT);
 
     if (!model) {
-        throw new AppError(US_ERRORS.WORKBOOK_NOT_EXISTS, {
-            code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-        });
+        throw new WorkbookNotExistsError();
     }
 
     if (model.deletedAt === null) {
-        throw new AppError(US_ERRORS.WORKBOOK_IS_ALREADY_RESTORED, {
-            code: US_ERRORS.WORKBOOK_IS_ALREADY_RESTORED,
-        });
+        throw new WorkbookIsAlreadyRestoredError();
     }
 
     const primaryTrx = getPrimary(trx);
@@ -81,9 +77,7 @@ export const restoreWorkbook = async ({ctx, trx}: ServiceArgs, args: RestoreWork
     });
 
     if (!result) {
-        throw new AppError(US_ERRORS.WORKBOOK_NOT_EXISTS, {
-            code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-        });
+        throw new WorkbookNotExistsError();
     }
 
     ctx.log('RESTORE_WORKBOOK_FINISH', {

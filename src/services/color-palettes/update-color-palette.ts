@@ -1,7 +1,6 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {US_ERRORS} from '../../const';
+import {ColorPaletteNotExistsError} from '../../components/errors';
 import {ColorPaletteModel, ColorPaletteModelColumn} from '../../db/models/new/color-palette';
 import {WorkbookModel} from '../../db/models/new/workbook';
 import {ServiceArgs} from '../../services/new/types';
@@ -70,9 +69,7 @@ export const updateColorPalette = async ({ctx, trx}: ServiceArgs, args: UpdateCo
     });
 
     if (!result) {
-        throw new AppError(US_ERRORS.COLOR_PALETTE_NOT_EXISTS, {
-            code: US_ERRORS.COLOR_PALETTE_NOT_EXISTS,
-        });
+        throw new ColorPaletteNotExistsError();
     }
 
     ctx.log('UPDATE_COLOR_PALETTE_FINISH', {

@@ -1,8 +1,7 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
-import {NotExistEntryError} from '../../../components/errors';
-import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT, US_ERRORS} from '../../../const';
+import {NotExistEntryError, PrivateRouteOnlyError} from '../../../components/errors';
+import {CURRENT_TIMESTAMP, DEFAULT_QUERY_TIMEOUT} from '../../../const';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {EntryColumns} from '../../../types/models';
 import {makeUserId} from '../../../utils';
@@ -29,9 +28,7 @@ export const updateEntryUnversionedDataPrivate = async (
     const {isPrivateRoute, user, tenantId} = ctx.get('info');
 
     if (!isPrivateRoute) {
-        throw new AppError(US_ERRORS.PRIVATE_ROUTE_ONLY, {
-            code: US_ERRORS.PRIVATE_ROUTE_ONLY,
-        });
+        throw new PrivateRouteOnlyError();
     }
 
     await checkLock({ctx}, {entryId, lockToken});

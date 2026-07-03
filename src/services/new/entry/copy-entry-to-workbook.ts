@@ -1,7 +1,11 @@
 import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {EntryIsNotInWorkbookError, NotExistEntryError} from '../../../components/errors';
+import {
+    EntryIsNotInWorkbookError,
+    NotExistEntryError,
+    WorkbookCopyFileConnectionError,
+} from '../../../components/errors';
 import {BiTrackingLogs, US_ERRORS} from '../../../const';
 import OldEntry from '../../../db/models/entry';
 import {Entry} from '../../../db/models/new/entry';
@@ -66,9 +70,7 @@ export const copyEntryToWorkbook = async (
             const fileConnectionExists = Utils.checkFileConnectionsExistence([copingEntry]);
 
             if (fileConnectionExists) {
-                throw new AppError(US_ERRORS.WORKBOOK_COPY_FILE_CONNECTION_ERROR, {
-                    code: US_ERRORS.WORKBOOK_COPY_FILE_CONNECTION_ERROR,
-                });
+                throw new WorkbookCopyFileConnectionError();
             }
         }
 

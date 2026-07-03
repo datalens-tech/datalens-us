@@ -5,12 +5,15 @@ import {
     EntryAndCollectionTenantMismatchError,
     EntryAndWorkbookTenantMismatchError,
     NotExistEntryError,
+    NotExistTenantError,
+    WorkbookNotExistsError,
 } from '../../../../components/errors';
 import {Feature, isEnabledFeature} from '../../../../components/features';
 import {US_ERRORS} from '../../../../const';
 import OldEntry from '../../../../db/models/entry';
 import {CollectionModelColumn} from '../../../../db/models/new/collection';
 import {Entry, EntryColumn} from '../../../../db/models/new/entry';
+import {FavoriteColumn, FavoriteEntityType} from '../../../../db/models/new/favorite';
 import {LicenseWithIsActive} from '../../../../db/models/new/license/presentations';
 import {TenantColumn} from '../../../../db/models/new/tenant';
 import {WorkbookModelColumn} from '../../../../db/models/new/workbook';
@@ -193,7 +196,10 @@ export const getEntry = async (
             },
 
             favoriteModifier(builder) {
-                builder.select(selectedFavoriteColumns).where({login: userLogin});
+                builder.select(selectedFavoriteColumns).where({
+                    [FavoriteColumn.Login]: userLogin,
+                    [FavoriteColumn.EntityType]: FavoriteEntityType.Entry,
+                });
             },
 
             licenseModifier(builder) {
@@ -220,9 +226,7 @@ export const getEntry = async (
     checkPrivateScopeAccess({ctx}, entry.scope);
 
     if (!entry.tenant) {
-        throw new AppError(US_ERRORS.NOT_EXIST_TENANT, {
-            code: US_ERRORS.NOT_EXIST_TENANT,
-        });
+        throw new NotExistTenantError();
     }
 
     if (entry.tenant.deleting) {
@@ -256,9 +260,7 @@ export const getEntry = async (
 
     if (entry.workbookId) {
         if (!entry.workbook || entry.workbook[WorkbookModelColumn.DeletedAt] !== null) {
-            throw new AppError(US_ERRORS.WORKBOOK_NOT_EXISTS, {
-                code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-            });
+            throw new WorkbookNotExistsError();
         }
 
         if (entry.tenantId !== entry.workbook.tenantId) {

@@ -1,8 +1,7 @@
 import {NextFunction, Request, Response} from '@gravity-ui/expresskit';
-import {AppError} from '@gravity-ui/nodekit';
 
-import {US_ERRORS} from '../../const/errors';
 import Utils from '../../utils';
+import {DecodeIdFailedError} from '../errors';
 
 export const decodeId = async (req: Request, _res: Response, next: NextFunction) => {
     if (req.routeInfo.manualDecodeId) {
@@ -45,9 +44,7 @@ export const decodeId = async (req: Request, _res: Response, next: NextFunction)
     } catch {
         const errorMsg =
             'Some of the Ids do not have a correct format — an id should be in the lower case and consist of 13 symbols';
-        throw new AppError(errorMsg, {
-            code: US_ERRORS.DECODE_ID_FAILED,
-        });
+        throw new DecodeIdFailedError({message: errorMsg});
     }
 
     return next();

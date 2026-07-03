@@ -9,6 +9,8 @@ const stateData = {
     'test-key': 'test-value1',
 };
 
+const notExistingEntryId = 'fvsb9zbfkqos2';
+
 let workbookId: string;
 let entryId: string;
 let stateHash: string;
@@ -54,5 +56,17 @@ describe('States', () => {
             hash: stateHash,
             data: stateData,
         });
+    });
+
+    test('Create state for an inaccessible entry returns 404', async () => {
+        await auth(request(app).post(`${routes.states}/${notExistingEntryId}`))
+            .send({data: stateData})
+            .expect(404);
+    });
+
+    test('Get state for an inaccessible entry returns 404', async () => {
+        await auth(request(app).get(`${routes.states}/${notExistingEntryId}/${stateHash}`)).expect(
+            404,
+        );
     });
 });

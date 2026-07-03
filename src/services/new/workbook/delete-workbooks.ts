@@ -1,7 +1,6 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {US_ERRORS} from '../../../const';
+import {WorkbookTemplateCantBeDeletedError} from '../../../components/errors';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
 import {WorkbookPermission} from '../../../entities/workbook';
 import {WorkbookInstance} from '../../../registry/plugins/common/entities/workbook/types';
@@ -55,9 +54,7 @@ export const deleteWorkbooks = async (
 
     const checkDeletePermissionPromises = workbooks.map(async (workbook) => {
         if (workbook.model.isTemplate) {
-            throw new AppError("Workbook template can't be deleted", {
-                code: US_ERRORS.WORKBOOK_TEMPLATE_CANT_BE_DELETED,
-            });
+            throw new WorkbookTemplateCantBeDeletedError();
         }
 
         let parentIds: string[] = [];

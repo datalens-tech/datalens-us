@@ -1,7 +1,7 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
-import {CURRENT_TIMESTAMP, US_ERRORS} from '../../../../const';
+import {WorkbookNotExistsError} from '../../../../components/errors';
+import {CURRENT_TIMESTAMP} from '../../../../const';
 import {WorkbookModel, WorkbookModelColumn} from '../../../../db/models/new/workbook';
 import {WorkbookInstance} from '../../../../registry/plugins/common/entities/workbook/types';
 import {ServiceArgs} from '../../types';
@@ -48,9 +48,7 @@ export const markWorkbooksAsDeleted = async (
             workbooks.map(async ({workbookId}) => {
                 const workbookData = workbookIdsMap.get(workbookId);
                 if (!workbookData) {
-                    throw new AppError(US_ERRORS.WORKBOOK_NOT_EXISTS, {
-                        code: US_ERRORS.WORKBOOK_NOT_EXISTS,
-                    });
+                    throw new WorkbookNotExistsError();
                 }
                 const {workbookInstance, parentIds} = workbookData;
                 await workbookInstance.deletePermissions({

@@ -1,8 +1,6 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
-import {CollectionNotExistsError} from '../../../components/errors';
-import {US_ERRORS} from '../../../const';
+import {CollectionNotExistsError, WorkbookAlreadyExistsError} from '../../../components/errors';
 import {WorkbookModel, WorkbookModelColumn} from '../../../db/models/new/workbook';
 import {WorkbookStatus} from '../../../db/models/new/workbook/types';
 import Utils from '../../../utils';
@@ -79,8 +77,8 @@ export const createWorkbook = async (
     );
 
     if (checkWorkbookByTitleResult === true) {
-        throw new AppError(`Workbook with title "${title}" already exists in this scope`, {
-            code: US_ERRORS.WORKBOOK_ALREADY_EXISTS,
+        throw new WorkbookAlreadyExistsError({
+            message: `Workbook with title "${title}" already exists in this scope`,
         });
     }
 

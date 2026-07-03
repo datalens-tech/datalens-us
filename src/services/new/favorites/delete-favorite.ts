@@ -1,6 +1,6 @@
 import {NotExistEntryError} from '../../../components/errors';
 import {Entry, EntryColumn} from '../../../db/models/new/entry';
-import {Favorite, FavoriteColumn} from '../../../db/models/new/favorite';
+import {Favorite, FavoriteColumn, FavoriteEntityType} from '../../../db/models/new/favorite';
 import {ServiceArgs} from '../types';
 import {getPrimary, getReplica} from '../utils';
 
@@ -36,7 +36,8 @@ export const deleteFavorite = async ({ctx, trx}: ServiceArgs, {entryId}: DeleteF
     const result = await Favorite.query(getPrimary(trx))
         .delete()
         .where({
-            [FavoriteColumn.EntryId]: entryId,
+            [FavoriteColumn.EntityId]: entryId,
+            [FavoriteColumn.EntityType]: FavoriteEntityType.Entry,
             [FavoriteColumn.TenantId]: tenantId,
             [FavoriteColumn.Login]: login,
         })

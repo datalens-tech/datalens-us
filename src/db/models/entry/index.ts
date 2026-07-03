@@ -6,6 +6,7 @@ import {
     EntryAlreadyExistsError,
     FolderAlreadyExistsWithDifferentKeyCaseError,
     NotExistEntryError,
+    NotExistTenantError,
     ParentFolderNotExistError,
 } from '../../../components/errors';
 import {BiTrackingLogs, RETURN_COLUMNS, US_ERRORS} from '../../../const';
@@ -290,9 +291,7 @@ class Entry extends Model {
                 const isTenantExistence = await Tenant.checkExistence(tenantId, ctx);
 
                 if (!isTenantExistence) {
-                    throw new AppError(US_ERRORS.NOT_EXIST_TENANT, {
-                        code: US_ERRORS.NOT_EXIST_TENANT,
-                    });
+                    throw new NotExistTenantError();
                 }
             }
 

@@ -1,8 +1,7 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 
+import {NotExistTenantError} from '../../../components/errors';
 import {OrganizationPermission} from '../../../components/iam';
-import {US_ERRORS} from '../../../const';
 import {dbTransaction, queryPrimary} from '../../../db';
 import {Tenant} from '../../../db/models/new/tenant';
 import {registry} from '../../../registry';
@@ -56,9 +55,7 @@ export const updateTenantSettings = async (
                 .first();
 
             if (!updatedTenant) {
-                throw new AppError(US_ERRORS.NOT_EXIST_TENANT, {
-                    code: US_ERRORS.NOT_EXIST_TENANT,
-                });
+                throw new NotExistTenantError();
             }
             return updatedTenant;
         },
