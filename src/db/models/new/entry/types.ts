@@ -8,6 +8,7 @@ export enum EntryScope {
     Pdf = 'pdf',
     Report = 'report',
     Compute = 'compute',
+    Artifact = 'artifact',
 }
 
 // "type" is a string field and value can be any string, this enum is only used for checks in code

@@ -27,7 +27,7 @@ const CURSOR_COLUMN_PREFIX = '$cursor';
 
 type ItemWithCursor<T> = T & Record<string, string>;
 
-const encodeCursorPageToken = (values: string[]): string => {
+export const encodeCursorPageToken = (values: string[]): string => {
     const payload = JSON.stringify(values);
     return Buffer.from(payload, 'utf8').toString('base64url');
 };

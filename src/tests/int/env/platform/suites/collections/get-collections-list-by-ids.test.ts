@@ -1,8 +1,9 @@
 import request from 'supertest';
 
+import {UsValidationError} from '../../../../../../components/errors';
 import {COLLECTIONS_DEFAULT_FIELDS} from '../../../../models';
 import {routes} from '../../../../routes';
-import {US_ERRORS, app, auth, getCollectionBinding} from '../../auth';
+import {app, auth, getCollectionBinding} from '../../auth';
 import {createMockCollection} from '../../helpers';
 
 const rootCollection = {
@@ -76,7 +77,7 @@ describe('Get collections by ids', () => {
             ],
         }).expect(400);
 
-        expect(response.body.code).toBe(US_ERRORS.VALIDATION_ERROR);
+        expect(response.body.code).toBe(UsValidationError.code);
     });
 
     test('Successfully get list by ids', async () => {

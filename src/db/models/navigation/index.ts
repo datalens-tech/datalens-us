@@ -1,10 +1,10 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {raw} from 'objection';
 import {z} from 'zod';
 
 import {Model} from '../..';
+import {UsValidationError} from '../../../components/errors';
 import {zc} from '../../../components/zod';
-import {OrderBy, RETURN_NAVIGATION_COLUMNS, US_ERRORS} from '../../../const';
+import {OrderBy, RETURN_NAVIGATION_COLUMNS} from '../../../const';
 import {filterEntriesByPermission} from '../../../services/new/entry/utils';
 import * as MT from '../../../types/models';
 import Utils from '../../../utils';
@@ -339,10 +339,7 @@ class Navigation extends Model {
         });
 
         if (!isValid) {
-            throw new AppError('Validation error', {
-                code: US_ERRORS.VALIDATION_ERROR,
-                details: {validationErrors},
-            });
+            throw new UsValidationError({details: {validationErrors}});
         }
 
         const entries = await Navigation.query(this.replica)

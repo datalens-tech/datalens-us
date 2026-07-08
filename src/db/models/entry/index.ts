@@ -1,4 +1,3 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {transaction} from 'objection';
 
 import {Model, queryReplica} from '../..';
@@ -8,8 +7,9 @@ import {
     NotExistEntryError,
     NotExistTenantError,
     ParentFolderNotExistError,
+    UsValidationError,
 } from '../../../components/errors';
-import {BiTrackingLogs, RETURN_COLUMNS, US_ERRORS} from '../../../const';
+import {BiTrackingLogs, RETURN_COLUMNS} from '../../../const';
 import * as MT from '../../../types/models';
 import Utils, {makeUserId} from '../../../utils';
 import Link from '../links';
@@ -264,10 +264,7 @@ class Entry extends Model {
         });
 
         if (!isValid) {
-            throw new AppError('Validation error', {
-                code: US_ERRORS.VALIDATION_ERROR,
-                details: {validationErrors},
-            });
+            throw new UsValidationError({details: {validationErrors}});
         }
 
         const keyLowerCase = key && key.toLowerCase();
@@ -747,10 +744,7 @@ class Entry extends Model {
         const {isValid, validationErrors} = validateResolveTenantIdByEntryId({entryId});
 
         if (!isValid) {
-            throw new AppError('Validation error', {
-                code: US_ERRORS.VALIDATION_ERROR,
-                details: {validationErrors},
-            });
+            throw new UsValidationError({details: {validationErrors}});
         }
 
         const result = await Entry.query(this.replica)

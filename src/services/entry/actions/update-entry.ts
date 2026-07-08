@@ -3,6 +3,7 @@ import {RawBuilder, TransactionOrKnex, raw, transaction} from 'objection';
 import {Optional} from 'utility-types';
 
 import {
+    ComputeEntryTypeChangeForbiddenError,
     ModeNotAllowedError,
     NotExistDeletedEntryError,
     NotExistEntryError,
@@ -168,6 +169,10 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
             entryId,
         })
         .where((builder) => {
+            if (mode !== 'recover') {
+                builder.andWhere({[`${Entry.tableName}.${EntryColumn.IsDeleted}`]: false});
+            }
+
             if (currentScope) {
                 builder.andWhere({[`${Entry.tableName}.${EntryColumn.Scope}`]: currentScope});
             }
@@ -205,9 +210,7 @@ export async function updateEntry(ctx: CTX, updateData: UpdateEntryData) {
 
     if (entry.scope === EntryScope.Compute) {
         if (typeof type === 'string' && type !== entry.type) {
-            throw new AppError('Compute entry type cannot be changed', {
-                code: US_ERRORS.COMPUTE_ENTRY_TYPE_CHANGE_FORBIDDEN,
-            });
+            throw new ComputeEntryTypeChangeForbiddenError();
         }
     }
 

@@ -1,8 +1,11 @@
 import {AppError} from '@gravity-ui/nodekit';
 
 import {Model} from '../..';
-import {IncorrectLinkError, SyncLinksFailedError} from '../../../components/errors';
-import {US_ERRORS} from '../../../const';
+import {
+    IncorrectLinkError,
+    SyncLinksFailedError,
+    UsValidationError,
+} from '../../../components/errors';
 import * as MT from '../../../types/models';
 import Utils from '../../../utils';
 
@@ -25,10 +28,7 @@ class Links extends Model {
             const {isValid, validationErrors} = validateCreateLink({entryId, links});
 
             if (!isValid) {
-                throw new AppError('Validation error', {
-                    code: US_ERRORS.VALIDATION_ERROR,
-                    details: {validationErrors},
-                });
+                throw new UsValidationError({details: {validationErrors}});
             }
 
             const dbLinks = await Links.produceDbLinks(entryId, links);

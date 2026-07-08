@@ -7,7 +7,8 @@ export type EntryScope =
     | 'widget'
     | 'config'
     | 'report'
-    | 'compute';
+    | 'compute'
+    | 'artifact';
 
 export type EntryInnerMeta = {
     oldKey: string;
@@ -40,7 +41,7 @@ export interface EntryType {
     public?: boolean;
     isLocked?: boolean;
     hidden?: any;
-    // eslint-disable-next-line camelcase
+
     is_release?: any;
 }
 

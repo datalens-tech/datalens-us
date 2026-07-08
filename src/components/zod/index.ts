@@ -1,16 +1,12 @@
-import {AppError} from '@gravity-ui/nodekit';
 import {ZodError, z} from 'zod';
 
-import {US_ERRORS} from '../../const/errors';
+import {UsValidationError} from '../errors';
 
 import * as zc from './custom-types';
 
 const prepareError = (err: unknown): Error => {
     if (err instanceof ZodError) {
-        return new AppError('Validation error', {
-            code: US_ERRORS.VALIDATION_ERROR,
-            details: err.issues,
-        });
+        return new UsValidationError({details: err.issues});
     } else {
         return err as Error;
     }

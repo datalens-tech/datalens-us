@@ -12,8 +12,6 @@ export const entryColumns = [
     EntryColumn.InnerMeta,
     EntryColumn.CreatedBy,
     EntryColumn.CreatedAt,
-    EntryColumn.UpdatedBy,
-    EntryColumn.UpdatedAt,
     EntryColumn.IsDeleted,
     EntryColumn.DeletedAt,
     EntryColumn.Hidden,
@@ -36,6 +34,8 @@ export const selectedEntryColumns = entryColumns.map((column) => `${Entry.tableN
 export const revisionColumns = [
     RevisionModelColumn.Data,
     RevisionModelColumn.Meta,
+    RevisionModelColumn.UpdatedBy,
+    RevisionModelColumn.UpdatedAt,
     RevisionModelColumn.RevId,
     RevisionModelColumn.Links,
     RevisionModelColumn.EntryId,

@@ -40,7 +40,7 @@ export const validateCreateEntryInWorkbook = makeSchemaValidator({
         },
         scope: {
             type: 'string',
-            enum: ['connection', 'dataset', 'dash', 'widget', 'report'],
+            enum: ['connection', 'dataset', 'dash', 'widget', 'report', 'artifact'],
         },
         type: {
             type: 'string',

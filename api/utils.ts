@@ -20,6 +20,7 @@ export {getEnvCert, getEnvVariable, getEnvTokenVariable, isTrueArg} from '../src
 export {
     createPaginator,
     decodeCursorPageToken,
+    encodeCursorPageToken,
     PaginationResult,
     PaginatorConfig,
     SortFieldConfig,

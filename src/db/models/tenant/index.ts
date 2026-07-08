@@ -1,8 +1,7 @@
 import {AppError} from '@gravity-ui/nodekit';
 
 import {Model} from '../..';
-import {NotExistTenantError} from '../../../components/errors';
-import {US_ERRORS} from '../../../const';
+import {NotExistTenantError, UsValidationError} from '../../../components/errors';
 import * as MT from '../../../types/models';
 
 import {validateGet} from './scheme';
@@ -23,10 +22,7 @@ class Tenant extends Model {
         const {isValid, validationErrors} = validateGet({tenantId});
 
         if (!isValid) {
-            throw new AppError('Validation error', {
-                code: US_ERRORS.VALIDATION_ERROR,
-                details: {validationErrors},
-            });
+            throw new UsValidationError({details: {validationErrors}});
         }
 
         const result = await Tenant.query(this.replica)
@@ -52,10 +48,7 @@ class Tenant extends Model {
 
         try {
             if (!isValid) {
-                throw new AppError('Validation error', {
-                    code: US_ERRORS.VALIDATION_ERROR,
-                    details: {validationErrors},
-                });
+                throw new UsValidationError({details: {validationErrors}});
             }
 
             const result = await Tenant.query(this.replica)

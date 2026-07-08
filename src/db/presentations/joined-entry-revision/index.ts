@@ -11,6 +11,8 @@ const selectedRevisionColumns = [
     'data',
     'meta',
     'annotation',
+    'updatedBy',
+    'updatedAt',
     'revId',
     'links',
     'version',

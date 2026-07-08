@@ -55,10 +55,6 @@ export default (error: AppError | DBError) => {
     const {code, message, details} = error as AppError;
 
     switch (code) {
-        case US_ERRORS.VALIDATION_ERROR:
-        case US_ERRORS.COMPUTE_ENTRIES_FEATURE_DISABLED:
-        case US_ERRORS.COMPUTE_ENTRY_INVALID_TYPE:
-        case US_ERRORS.COMPUTE_ENTRY_TYPE_CHANGE_FORBIDDEN:
         case US_ERRORS.TENANT_IS_BEING_DELETED: {
             return {
                 code: 400,

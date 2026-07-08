@@ -1,6 +1,5 @@
 'use strict';
 
-import {AppError} from '@gravity-ui/nodekit';
 import Ajv from 'ajv';
 
 import {
@@ -8,7 +7,8 @@ import {
     MAX_META_OBJECT_SYMBOLS,
     MAX_UNVERSIONED_DATA_OBJECT_SYMBOLS,
 } from '../const';
-import {US_ERRORS} from '../const/errors';
+
+import {UsValidationError} from './errors';
 
 const ajv = new Ajv({
     allErrors: true,
@@ -184,10 +184,7 @@ export const makeSchemaValidator = (schema: object) => {
     return <T extends object>(data: T): T => {
         const {isValid, validationErrors} = preparedSchema(data);
         if (!isValid) {
-            throw new AppError('Validation error', {
-                code: US_ERRORS.VALIDATION_ERROR,
-                details: {validationErrors},
-            });
+            throw new UsValidationError({details: {validationErrors}});
         }
         return data;
     };

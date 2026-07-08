@@ -49,6 +49,24 @@ export class CollectionEntryRequireCollectionIdError extends definePresentableEr
     message: 'Collection ID is required for a collection entry',
 }) {}
 
+export class ComputeEntriesFeatureDisabledError extends definePresentableError({
+    code: 'COMPUTE_ENTRIES_FEATURE_DISABLED',
+    httpCode: 400,
+    message: 'Compute entries feature is disabled',
+}) {}
+
+export class ComputeEntryInvalidTypeError extends definePresentableError({
+    code: 'COMPUTE_ENTRY_INVALID_TYPE',
+    httpCode: 400,
+    message: 'Invalid compute entry type',
+}) {}
+
+export class ComputeEntryTypeChangeForbiddenError extends definePresentableError({
+    code: 'COMPUTE_ENTRY_TYPE_CHANGE_FORBIDDEN',
+    httpCode: 400,
+    message: 'Compute entry type cannot be changed',
+}) {}
+
 export class ParentFolderNotExistError extends definePresentableError({
     code: 'PARENT_FOLDER_NOT_EXIST',
     httpCode: 400,

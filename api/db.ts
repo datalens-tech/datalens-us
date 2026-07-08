@@ -36,6 +36,11 @@ export {
     FavoriteEntityType,
 } from '../src/db/models/new/favorite';
 export {UserSettings} from '../src/db/models/new/user-settings';
+export {
+    InstallationSetting,
+    InstallationSettingColumn,
+    InstallationSettingColumnRaw,
+} from '../src/db/models/new/installation-setting';
 export {Comment, CommentType} from '../src/db/models/new/comment';
 export {DataExport} from '../src/db/models/new/data-export';
 export {DataExportStatus} from '../src/db/models/new/data-export/types';

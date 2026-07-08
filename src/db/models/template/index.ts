@@ -1,7 +1,7 @@
 import {AppError} from '@gravity-ui/nodekit';
 
 import {Model} from '../..';
-import {US_ERRORS} from '../../../const';
+import {UsValidationError} from '../../../components/errors';
 import * as MT from '../../../types/models';
 
 import {validateCreate, validateDelete, validateGet, validateUpdate} from './scheme';
@@ -34,10 +34,7 @@ class Template extends Model {
         const {isValid, validationErrors} = validateGet({name});
 
         if (!isValid) {
-            throw new AppError('Validation error', {
-                code: US_ERRORS.VALIDATION_ERROR,
-                details: {validationErrors},
-            });
+            throw new UsValidationError({details: {validationErrors}});
         }
 
         const template = await Template.query(this.replica)
@@ -66,10 +63,7 @@ class Template extends Model {
         const {isValid, validationErrors} = validateCreate({name, data});
 
         if (!isValid) {
-            throw new AppError('Validation error', {
-                code: US_ERRORS.VALIDATION_ERROR,
-                details: {validationErrors},
-            });
+            throw new UsValidationError({details: {validationErrors}});
         }
 
         const template = await Template.query(this.primary)
@@ -91,10 +85,7 @@ class Template extends Model {
         const {isValid, validationErrors} = validateUpdate({name, data});
 
         if (!isValid) {
-            throw new AppError('Validation error', {
-                code: US_ERRORS.VALIDATION_ERROR,
-                details: {validationErrors},
-            });
+            throw new UsValidationError({details: {validationErrors}});
         }
 
         const template = await Template.query(this.primary)
@@ -125,10 +116,7 @@ class Template extends Model {
         const {isValid, validationErrors} = validateDelete({name});
 
         if (!isValid) {
-            throw new AppError('Validation error', {
-                code: US_ERRORS.VALIDATION_ERROR,
-                details: {validationErrors},
-            });
+            throw new UsValidationError({details: {validationErrors}});
         }
 
         const template = await Template.query(this.primary)

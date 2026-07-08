@@ -7,11 +7,12 @@ import {
     withContract,
 } from '@gravity-ui/expresskit';
 import type {SecuritySchemeObject} from '@gravity-ui/expresskit-api';
-import {AppContext, AppError, NodeKit} from '@gravity-ui/nodekit';
+import {AppContext, NodeKit} from '@gravity-ui/nodekit';
 import {ZodType, z} from 'zod';
 
+import {UsValidationError} from '../../components/errors';
 import {Feature, isEnabledFeature} from '../../components/features';
-import {US_DYNAMIC_MASTER_TOKEN_HEADER, US_ERRORS, US_MASTER_TOKEN_HEADER} from '../../const';
+import {US_DYNAMIC_MASTER_TOKEN_HEADER, US_MASTER_TOKEN_HEADER} from '../../const';
 import type {ExtendedAppRouteDescription} from '../../routes';
 
 import {SecurityType} from './constants';
@@ -175,12 +176,7 @@ export const appValidationErrorHandler = (_ctx: AppContext): AppErrorHandler => 
                 return {...issue, path};
             });
 
-            next(
-                new AppError('Validation error', {
-                    code: US_ERRORS.VALIDATION_ERROR,
-                    details: issues,
-                }),
-            );
+            next(new UsValidationError({details: issues}));
         } else {
             next(err);
         }

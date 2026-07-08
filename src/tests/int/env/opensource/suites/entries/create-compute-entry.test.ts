@@ -1,7 +1,8 @@
 import request from 'supertest';
 
+import {ComputeEntriesFeatureDisabledError} from '../../../../../../components/errors';
 import {routes} from '../../../../routes';
-import {US_ERRORS, app, auth} from '../../auth';
+import {app, auth} from '../../auth';
 import {createMockCollection} from '../../helpers';
 import {OpensourceRole} from '../../roles';
 
@@ -27,6 +28,6 @@ describe('Create compute entry', () => {
             })
             .expect(400);
 
-        expect(response.body.code).toBe(US_ERRORS.COMPUTE_ENTRIES_FEATURE_DISABLED);
+        expect(response.body.code).toBe(ComputeEntriesFeatureDisabledError.code);
     });
 });

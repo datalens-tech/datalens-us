@@ -1,7 +1,6 @@
-import {AppError} from '@gravity-ui/nodekit';
-
+import {ComputeEntriesFeatureDisabledError} from '../components/errors';
 import {Feature, isEnabledFeature} from '../components/features';
-import {SYSTEM_USER, US_ERRORS} from '../const';
+import {SYSTEM_USER} from '../const';
 import Entry from '../db/models/entry';
 import {EntryScope} from '../db/models/new/entry/types';
 import {Operation} from '../entities/types';
@@ -83,9 +82,7 @@ export default class EntryService {
 
         if (scope === EntryScope.Compute) {
             if (!isEnabledFeature(ctx, Feature.ComputeEntriesEnabled)) {
-                throw new AppError('Compute entries feature is disabled', {
-                    code: US_ERRORS.COMPUTE_ENTRIES_FEATURE_DISABLED,
-                });
+                throw new ComputeEntriesFeatureDisabledError();
             }
         }
 

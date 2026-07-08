@@ -63,6 +63,11 @@ export function getRoutes(_nodekit: NodeKit, options: GetRoutesOptions) {
             private: true,
         }),
 
+        getEntryAccessDescription: makeRoute({
+            route: 'GET /v1/entries/:entryId/access-description',
+            handler: entries.getEntryAccessDescriptionController,
+        }),
+
         createEntry: makeRoute({
             route: 'POST /v1/entries',
             handler: entries.createEntryController,

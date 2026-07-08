@@ -1,8 +1,9 @@
 import request from 'supertest';
 
+import {UsValidationError} from '../../../../../../components/errors';
 import {WORKBOOK_DEFAULT_FIELDS} from '../../../../models';
 import {routes} from '../../../../routes';
-import {US_ERRORS, app, auth, getWorkbookBinding} from '../../auth';
+import {app, auth, getWorkbookBinding} from '../../auth';
 import {createMockWorkbook} from '../../helpers';
 
 const rootWorkbook = {
@@ -76,7 +77,7 @@ describe('Get workbooks by ids', () => {
             ],
         }).expect(400);
 
-        expect(response.body.code).toBe(US_ERRORS.VALIDATION_ERROR);
+        expect(response.body.code).toBe(UsValidationError.code);
     });
 
     test('Successfully get list by ids', async () => {

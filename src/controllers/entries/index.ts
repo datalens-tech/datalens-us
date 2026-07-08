@@ -9,6 +9,7 @@ import {getEntriesDataController} from './get-entries-data';
 import {getEntriesMetaController} from './get-entries-meta';
 import {getEntriesRelationsController} from './get-entries-relations';
 import {getEntryController} from './get-entry';
+import {getEntryAccessDescriptionController} from './get-entry-access-description';
 import {getEntryMetaController} from './get-entry-meta';
 import {getRelationsController} from './get-relations';
 import {getRevisionsController} from './get-revisions';
@@ -37,4 +38,5 @@ export default {
     getRevisionsController,
     getRelationsController,
     getEntryMetaController,
+    getEntryAccessDescriptionController,
 };

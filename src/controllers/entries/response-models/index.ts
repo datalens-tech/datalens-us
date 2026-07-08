@@ -10,6 +10,7 @@ export * from './entry-with-revision-and-favorite-model';
 export * from './entry-permissions-model';
 export * from './entry-full-permissions-model';
 export * from './entry-meta-model';
+export * from './entry-access-description-model';
 export * from './entries-annotation-model';
 export * from './shared-entry-permissions-model';
 export * from './entry-model';
